@@ -1,0 +1,474 @@
+{
+  "Home": {
+    "title": "NEXTY.DEV",
+    "tagLine": "最新の Next.js フルスタック SaaS テンプレート",
+    "description": "Next.js と Supabase を活用した本格的な SaaS 開発キット。コンテンツ配信、AI ツール、サブスクリプションサービスを迅速に構築できます。"
+  },
+  "Login": {
+    "title": "おかえりなさい",
+    "description": "以下の方法でログインしていただけます",
+    "Toast": {
+      "rateLimitTitle": "リクエストが多すぎます",
+      "rateLimitDescription": "しばらくしてから再度お試しください。",
+      "Email": {
+        "successTitle": "メールを送信しました",
+        "successDescription": "ログインリンクをメールでお送りしましたので、ご確認ください。",
+        "errorTitle": "エラーが発生しました",
+        "errorDescription": "メールの送信に失敗しました。お手数ですが、再度お試しください。"
+      },
+      "OTP": {
+        "errorTitle": "エラーが発生しました",
+        "sendSuccessTitle": "認証コードを送信しました！",
+        "sendSuccessDescription": "メールで認証コードをご確認ください。",
+        "sendErrorDescription": "認証コードの送信に失敗しました。再度お試しください。",
+        "verifySuccessTitle": "ログインに成功しました！",
+        "verifySuccessDescription": "おかえりなさい。",
+        "verifyErrorDescription": "認証コードが無効または期限切れです。再度お試しください。"
+      },
+      "Google": {
+        "errorTitle": "エラーが発生しました",
+        "errorDescription": "Googleアカウントでのログインに失敗しました。お手数ですが、再度お試しください。"
+      },
+      "Github": {
+        "errorTitle": "エラーが発生しました",
+        "errorDescription": "GitHubアカウントでのログインに失敗しました。お手数ですが、再度お試しください。"
+      }
+    },
+    "signInMethods": {
+      "or": "または",
+      "signInWithGoogle": "Googleアカウントでログイン",
+      "signInWithGithub": "GitHubアカウントでログイン",
+      "signInWithEmail": "メールアドレスでログイン",
+      "otpMethod": "認証コード",
+      "magicLinkMethod": "マジックリンク",
+      "sendOTP": "認証コードを送信",
+      "verifyOTP": "認証する",
+      "resendOTP": "コードが届かない場合は再送信",
+      "backToEmail": "戻る",
+      "otpSentTo": "認証コードを送信しました："
+    },
+    "Button": {
+      "signIn": "ログイン",
+      "signOut": "ログアウト"
+    },
+    "UserMenus": [
+      {
+        "name": "設定",
+        "href": "/dashboard/settings",
+        "icon": "Settings"
+      },
+      {
+        "name": "注文履歴",
+        "href": "/dashboard/my-orders",
+        "icon": "ShoppingCart"
+      },
+      {
+        "name": "サブスクリプション",
+        "href": "/dashboard/subscription",
+        "icon": "WalletCards"
+      },
+      {
+        "name": "クレジット履歴",
+        "href": "/dashboard/credit-history",
+        "icon": "Coins"
+      }
+    ],
+    "AdminMenus": [
+      {
+        "name": "概要",
+        "href": "/dashboard/overview",
+        "icon": "LayoutDashboard"
+      },
+      {
+        "name": "ユーザー管理",
+        "href": "/dashboard/users",
+        "icon": "Users"
+      },
+      {
+        "name": "注文管理",
+        "href": "/dashboard/orders",
+        "icon": "ShoppingCart"
+      },
+      {
+        "name": "料金プラン管理",
+        "href": "/dashboard/prices",
+        "icon": "DollarSign"
+      },
+      {
+        "name": "ブログ管理",
+        "href": "/dashboard/blogs",
+        "icon": "Rss"
+      },
+      {
+        "name": "用語集管理",
+        "href": "/dashboard/glossary",
+        "icon": "BookOpen"
+      },
+      {
+        "name": "R2リソース",
+        "href": "/dashboard/r2-resources",
+        "icon": "FileBox"
+      }
+    ]
+  },
+  "Blogs": {
+    "title": "ブログ記事",
+    "description": "Next.jsエコシステムとNexty.devテンプレートの最新情報をお届けします。",
+    "emptyState": {
+      "title": "記事がありません",
+      "description": "現在コンテンツを作成中です。もうしばらくお待ちください！"
+    },
+    "loadMorePostsFailed": "記事の読み込みに失敗しました",
+    "loadMorePosts": "記事を読み込み中...",
+    "filterPostsFailed": "記事の読み込みに失敗しました",
+    "noPostsFoundForThisTag": "このタグの記事は見つかりませんでした",
+    "reachedTheEnd": "すべての記事を表示しました",
+    "BlogDetail": {
+      "featured": "特集記事",
+      "viewCount": "{count} 回閲覧",
+      "accessRestricted": "アクセス制限",
+      "unauthorized": "この記事はログインユーザーのみ閲覧できます",
+      "premium": "プレミアムコンテンツ",
+      "premiumContent": "この記事は有料会員限定です",
+      "signIn": "ログイン",
+      "upgrade": "アップグレード",
+      "backToBlogs": "ブログ一覧に戻る",
+      "notFound": "記事が見つかりません"
+    }
+  },
+  "About": {
+    "title": "About",
+    "description": "About the site"
+  },
+  "AIDemo": {
+    "title": "AI機能",
+    "description": "チャット、画像生成、動画生成のためのプロダクションレディなAIコンポーネント。",
+    "metaDescription": "複数のプロバイダーによるチャット、画像生成、動画生成などのAI機能を探索。",
+    "hub": {
+      "chatTitle": "AIチャット",
+      "chatDescription": "OpenAI、Anthropic、Google、DeepSeek、xAI、OpenRouterの18以上の言語モデルによるシングルターンとマルチターンの会話。",
+      "imageTitle": "AI画像生成",
+      "imageDescription": "GPT Image、Nano Banana、Grok、Flux（ReplicateとfaI.ai経由）によるテキストから画像、画像から画像の生成。",
+      "videoTitle": "AI動画生成",
+      "videoDescription": "Seedance、Kling、Wan（Replicateとfal.ai経由）によるテキストから動画、画像から動画の生成。",
+      "tagline": "すぐに使えるAIコンポーネント。数分でAI機能を構築。"
+    },
+    "chat": {
+      "title": "AIチャット",
+      "metaDescription": "シングルターンとマルチターンの会話によるAIチャットデモ。",
+      "singleTurn": "シングルターン",
+      "multiTurn": "マルチターン",
+      "model": "モデル",
+      "yourQuestion": "あなたの質問",
+      "response": "回答",
+      "readyToRespond": "回答の準備ができました",
+      "responseAppearHere": "回答がここに表示されます",
+      "generateResponse": "回答を生成",
+      "generating": "生成中...",
+      "startConversation": "会話を開始",
+      "startConversationDescription": "メッセージを送信してAIとのチャットを開始",
+      "enterToSend": "Enterで送信",
+      "shiftEnterNewLine": "Shift+Enterで改行",
+      "messages": "{count} メッセージ",
+      "chars": "{count} 文字",
+      "clearChat": "チャットをクリア",
+      "clear": "クリア",
+      "thinking": "考え中...",
+      "typePlaceholder": "メッセージを入力...（Enterで送信、Shift+Enterで改行）",
+      "systemPrompt": "システムプロンプト",
+      "systemPromptPlaceholder": "あなたは親切なアシスタントです...",
+      "promptPlaceholder": "メッセージを入力...",
+      "reasoning": "推論",
+      "reasoningDescription": "モデルの思考プロセスを表示"
+    },
+    "image": {
+      "title": "AI画像生成",
+      "metaDescription": "複数のモデルとプロバイダーを使用してAI画像を生成。",
+      "model": "モデル",
+      "prompt": "プロンプト",
+      "promptPlaceholder": "生成したい画像を説明...",
+      "referenceImage": "参照画像",
+      "referenceImageRequired": "このモデルには参照画像のアップロードが必要です。",
+      "advancedSettings": "詳細設定",
+      "aspectRatio": "アスペクト比",
+      "size": "サイズ",
+      "resolution": "解像度",
+      "quality": "品質",
+      "qualityLow": "低",
+      "qualityMedium": "中",
+      "qualityHigh": "高",
+      "background": "背景",
+      "backgroundAuto": "自動",
+      "backgroundOpaque": "不透明",
+      "backgroundTransparent": "透明",
+      "outputFormat": "出力形式",
+      "seed": "シード",
+      "randomSeed": "ランダムシード",
+      "negativePrompt": "ネガティブプロンプト",
+      "negativePromptPlaceholder": "画像に含めたくないものを説明...",
+      "guidanceScale": "ガイダンススケール",
+      "inferenceSteps": "推論ステップ",
+      "strength": "強度",
+      "generate": "画像を生成",
+      "generating": "生成中...",
+      "generationTime": "{time}秒",
+      "download": "ダウンロード",
+      "copyPrompt": "プロンプトをコピー",
+      "promptCopied": "コピーしました！",
+      "emptyStateTitle": "キャンバスの準備ができました",
+      "emptyState": "プロンプトを入力して生成ボタンを押すと、あなたのビジョンが形になります",
+      "noSettings": "このモデルには詳細設定がありません"
+    },
+    "video": {
+      "title": "AI動画生成",
+      "metaDescription": "テキストから動画、画像から動画のAI動画生成デモ。",
+      "textToVideo": "テキストから動画",
+      "imageToVideo": "画像から動画",
+      "model": "モデル",
+      "prompt": "プロンプト",
+      "promptPlaceholder": "生成したい動画を説明...",
+      "motionPlaceholder": "モーションを説明...",
+      "duration": "再生時間",
+      "seconds": "{count}秒",
+      "referenceImage": "参照画像",
+      "referenceImageRequired": "このモデルには参照画像が必要です。",
+      "generate": "動画を生成",
+      "generating": "生成中...",
+      "generationTime": "{time}秒",
+      "download": "ダウンロード",
+      "emptyStateTitle": "ステージの準備ができました",
+      "emptyState": "プロンプトを入力して生成ボタンを押すと、動画が作成されます",
+      "aspectRatio": "アスペクト比",
+      "resolution": "解像度",
+      "negativePrompt": "ネガティブプロンプト",
+      "negativePromptPlaceholder": "動画に含めたくない内容を説明...",
+      "cfgScale": "CFGスケール",
+      "generateAudio": "音声生成",
+      "cameraFixed": "カメラ固定",
+      "seed": "シード",
+      "randomSeed": "ランダムシード",
+      "videoReady": "動画の生成が完了しました！",
+      "videoFailed": "動画の生成に失敗しました"
+    },
+    "common": {
+      "generate": "生成",
+      "stop": "停止",
+      "clear": "クリア",
+      "download": "ダウンロード",
+      "model": "モデル",
+      "prompt": "プロンプト",
+      "uploadImage": "画像をアップロード",
+      "dragDrop": "ドラッグ＆ドロップまたはクリックしてアップロード",
+      "maxSize": "最大サイズ：{size}MB",
+      "removeImage": "画像を削除",
+      "noResult": "まだ結果がありません。何か生成してみましょう！",
+      "error": "エラーが発生しました",
+      "retry": "リトライ",
+      "backToHub": "AIデモに戻る",
+      "poweredBy": "{provider} が提供"
+    }
+  },
+  "ErrorPage": {
+    "403": {
+      "title": "403 - アクセスが拒否されました",
+      "description": "このページにアクセスする権限がありません。",
+      "button": {
+        "name": "ホームに戻る",
+        "href": "/"
+      }
+    },
+    "RedirectError": {
+      "title": "リダイレクトエラー",
+      "description": "認証過程でエラーが発生しました。",
+      "goToHome": "ホームに戻る",
+      "goToLogin": "ログイン画面に戻る",
+      "invalid_params": {
+        "title": "パラメータエラー",
+        "description": "リクエストに必要なパラメータが不足しています。"
+      },
+      "invalid_redirect": {
+        "title": "重定向エラー",
+        "description": "提供されたリダイレクトURLが許可されていません。"
+      },
+      "token_expired": {
+        "title": "トークン期限切れ",
+        "description": "検証トークンが期限切れになりました。再度ログインしてください。"
+      },
+      "invalid_token": {
+        "title": "トークンエラー",
+        "description": "提供された検証トークンが無効です。"
+      },
+      "invalid_link_or_expired": {
+        "title": "リンクエラー",
+        "description": "メール検証リンクが無効または期限切れです。"
+      },
+      "server_error": {
+        "title": "サーバーエラー",
+        "description": "認証中にサーバーで予期せぬエラーが発生しました。"
+      },
+      "unknown": {
+        "title": "認証エラー",
+        "description": "認証中に未知のエラーが発生しました。"
+      }
+    },
+    "StripeError": {
+      "goToHome": "ホームに戻る",
+      "goToDashboard": "ダッシュボードに戻る",
+      "title": "Payment Portal Error",
+      "description": "支払い情報にエラーが発生しました。"
+    }
+  },
+  "LanguageDetection": {
+    "title": "言語の提案",
+    "description": "ブラウザの言語設定が現在のサイト言語と異なっています。いつでも言語を切り替えることができます。",
+    "countdown": "閉じるまで {countdown} 秒",
+    "switchTo": "に切り替える"
+  },
+  "Header": {
+    "links": [
+      {
+        "name": "機能特性",
+        "href": "/#features"
+      },
+      {
+        "id": "pricing",
+        "name": "料金プラン",
+        "href": "/#pricing"
+      },
+      {
+        "name": "AI Demo",
+        "href": "/ai-demo"
+      },
+      {
+        "name": "ブログ",
+        "href": "/blog"
+      },
+      {
+        "id": "demo",
+        "name": "Demo",
+        "href": "#",
+        "items": [
+          {
+            "name": "Nexty Demo",
+            "href": "https://demo.nexty.dev/",
+            "target": "_blank",
+            "rel": "noopener noreferrer nofollow",
+            "description": "Next.js SaaS Boilerplate"
+          },
+          {
+            "name": "AI Image Generator Demo",
+            "href": "https://flux-kontext.nexty.dev/",
+            "target": "_blank",
+            "rel": "noopener noreferrer nofollow",
+            "description": "AI Image Generator Demo Based on NEXTY.DEV"
+          },
+          {
+            "name": "Directory Boilerplate Demo",
+            "href": "https://dofollow.tools/",
+            "target": "_blank",
+            "rel": "noopener noreferrer nofollow",
+            "description": "Directory Boilerplate Demo Based on NEXTY.DEV"
+          }
+        ]
+      }
+    ]
+  },
+  "Footer": {
+    "Copyright": "著作権所有 © {year} {name} 全著作権保有。",
+    "About": "サイトについて",
+    "PrivacyPolicy": "プライバシーポリシー",
+    "TermsOfService": "利用規約",
+    "RefundPolicy": "返金ポリシー",
+    "Newsletter": {
+      "title": "ニュースレターのご案内",
+      "description": "最新情報を定期的にお届けいたします",
+      "subscribe": {
+        "invalidEmail": "メールアドレスの形式が正しくありません",
+        "defaultErrorMessage": "登録処理に失敗しました。恐れ入りますが、時間をおいて再度お試しください",
+        "successMessage": "ニュースレターの登録が完了いたしました",
+        "multipleSubmissions": "アクセスが集中しております。24時間後に再度お試しください"
+      },
+      "unsubscribe": {
+        "title": "ニュースレター配信停止",
+        "success": "Nextyニュースレターの配信停止が完了しました。",
+        "emailPrefix": "メールアドレス：",
+        "regretMessage": "いつでも再登録して、Nextyの最新アップデートやチュートリアルを受け取ることができます。",
+        "errorGeneric": "配信停止の処理中にエラーが発生しました",
+        "errorNoToken": "配信停止トークンが提供されていません",
+        "errorMessage": "正しい配信停止リンクを使用していることをご確認ください。問題が解決しない場合は、サポートチームまでお問い合わせください。",
+        "contactPrefix": "お問い合わせ先：",
+        "contactPrefixSuccess": "ご質問がございましたら、お気軽にお問い合わせください：",
+        "backToHome": "ホームに戻る",
+        "invalidEmail": "無効なメールアドレスです",
+        "notInNewsletter": "このメールアドレスは配信リストに登録されていません",
+        "confirmTitle": "配信停止の確認",
+        "confirmMessage": "ニュースレターの配信を停止してもよろしいですか？新機能やコンテンツの更新情報が届かなくなります。",
+        "confirmButton": "配信停止する",
+        "cancelButton": "キャンセル",
+        "processing": "処理中...",
+        "finalWarning": "この操作は取り消すことができません。後でいつでも再登録できます。",
+        "errorInvalidToken": "無効な配信停止リンクです。リンクが破損しているか、期限切れの可能性があります。"
+      }
+    },
+    "Links": {
+      "groups": [
+        {
+          "title": "製品",
+          "links": [
+            {
+              "href": "/#features",
+              "name": "機能特性"
+            },
+            {
+              "id": "pricing",
+              "href": "/#pricing",
+              "name": "料金プラン"
+            },
+            {
+              "href": "/blog",
+              "name": "ブログ"
+            },
+            {
+              "href": "/glossary",
+              "name": "用語集"
+            }
+          ]
+        },
+        {
+          "title": "サポート",
+          "links": [
+            {
+              "name": "Docs",
+              "href": "https://docs.nexty.dev/ja/docs",
+              "target": "_blank"
+            },
+            {
+              "name": "Roadmap",
+              "href": "https://nexty.dev/ja/roadmap"
+            }
+          ]
+        },
+        {
+          "title": "言語",
+          "links": [
+            {
+              "href": "/en",
+              "name": "English",
+              "useA": true
+            },
+            {
+              "href": "/zh",
+              "name": "中文",
+              "useA": true
+            },
+            {
+              "href": "/ja",
+              "name": "日本語",
+              "useA": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

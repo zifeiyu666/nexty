@@ -1,0 +1,21 @@
+{
+  "title": "概览",
+  "users": "用户",
+  "oneTimePayments": "一次性付款",
+  "monthlySubscriptions": "月度订阅",
+  "yearlySubscriptions": "年度订阅",
+  "today": "今日",
+  "yesterday": "昨日",
+  "growthRate": "增长率",
+  "newUsers": "新用户",
+  "totalUsers": "总用户数",
+  "orders": "订单",
+  "revenue": "收入",
+  "count": "数量",
+  "growthTrend": "增长趋势",
+  "totalOrders": "总订单数",
+  "newOrders": "新订单",
+  "last7Days": "最近7天",
+  "last30Days": "最近30天",
+  "last90Days": "最近90天"
+}

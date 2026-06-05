@@ -1,0 +1,17 @@
+{
+  "title": "クレジット履歴",
+  "description": "すべてのクレジット付与と使用履歴をここで確認できます。",
+  "load_error": "クレジット履歴の読み込みに失敗しました。しばらくしてから再度お試しください。",
+  "no_records": "クレジット履歴が見つかりません。",
+  "header_date": "日時",
+  "header_type": "種類",
+  "header_details": "詳細",
+  "header_amount": "金額",
+  "header_balance_one_time": "単発残高",
+  "header_balance_subscription": "サブスク残高",
+  "type_one_time_purchase": "クレジット購入",
+  "type_subscription_grant": "サブスク付与",
+  "type_feature_usage": "機能使用",
+  "type_refund_revoke": "返金取消",
+  "type_subscription_ended_revoke": "サブスクリプションクレジット期限切れ"
+}

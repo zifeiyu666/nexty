@@ -1,0 +1,12 @@
+{
+  "title": "Orders",
+  "description": "Here's a list of all orders.",
+  "user": "User",
+  "orderId": "Order ID",
+  "amount": "Amount",
+  "discount": "Discount",
+  "type": "Type",
+  "status": "Status",
+  "createdAt": "Created At",
+  "filterByEmail": "Filter by email..."
+}

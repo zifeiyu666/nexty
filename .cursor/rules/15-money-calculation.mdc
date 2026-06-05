@@ -1,0 +1,218 @@
+---
+description: JavaScript money/currency calculation safety guidelines
+globs:
+  - "**/payments/**"
+  - "**/stripe/**"
+  - "**/creem/**"
+  - "**/credit*"
+  - "**/price*"
+  - "**/order*"
+  - "**/invoice*"
+  - "**/refund*"
+alwaysApply: false
+---
+
+## JavaScript Money Calculation Safety
+
+JavaScript uses IEEE 754 double-precision floats, which causes precision loss in monetary calculations. **Always** follow these rules.
+
+---
+
+## Core Principles
+
+### 1. Always use integers (cents) for storage and calculation
+
+```typescript
+// ❌ Wrong: using floats for money
+const price = 19.99;
+const total = price * 3; // 59.97000000000001
+
+// ✅ Correct: use integers (cents)
+const priceCents = 1999;
+const totalCents = priceCents * 3; // 5997
+```
+
+### 2. Use Math.round() when converting to eliminate float errors
+
+```typescript
+// ❌ Wrong: direct multiplication
+function toCents(amount: string): number {
+  return parseFloat(amount) * 100; // 19.99 * 100 = 1998.9999999999998
+}
+
+// ✅ Correct: use Math.round
+function toCents(amount: string | number): number {
+  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+  return Math.round(num * 100);
+}
+```
+
+### 3. Use toFixed(2) for display
+
+```typescript
+// ❌ Wrong: toString may produce infinite decimals
+function toCurrencyAmount(cents: number): string {
+  return (cents / 100).toString(); // may be "19.990000000000002"
+}
+
+// ✅ Correct: use toFixed(2)
+function toCurrencyAmount(cents: number): string {
+  return (cents / 100).toFixed(2); // "19.99"
+}
+```
+
+---
+
+## Common Pitfalls
+
+### Pitfall 1: Float comparison
+
+```typescript
+// ❌ Dangerous: direct float comparison
+if (0.1 + 0.2 === 0.3) { } // false!
+
+// ✅ Correct: use epsilon tolerance
+const EPSILON = 0.001;
+if (Math.abs((0.1 + 0.2) - 0.3) < EPSILON) { } // true
+
+// ✅ Better: always compare integers
+if (10 + 20 === 30) { } // true (in cents)
+```
+
+### Pitfall 2: Percentage/discount calculation
+
+```typescript
+// ❌ Wrong: float percentage
+const price = 99.99;
+const discount = price * 0.15; // 14.9985
+
+// ✅ Correct: integer math then round
+const priceCents = 9999;
+const discountCents = Math.round(priceCents * 15 / 100); // 1500
+```
+
+### Pitfall 3: Division and splitting
+
+```typescript
+// ❌ Wrong: division produces infinite decimals
+const total = 100;
+const perPerson = total / 3; // 33.333333...
+
+// ✅ Correct: integer division + remainder
+const totalCents = 10000;
+const perPersonCents = Math.floor(totalCents / 3); // 3333
+const remainder = totalCents % 3; // 1 (assign to first person)
+```
+
+### Pitfall 4: Accumulation
+
+```typescript
+// ❌ Wrong: float accumulation compounds errors
+let total = 0;
+items.forEach(item => {
+  total += item.price; // errors accumulate
+});
+
+// ✅ Correct: accumulate integers then convert
+let totalCents = 0;
+items.forEach(item => {
+  totalCents += item.priceCents;
+});
+const total = totalCents / 100;
+```
+
+---
+
+## Project Utilities
+
+Use helpers from `lib/payments/webhook-helpers.ts`:
+
+```typescript
+import { toCurrencyAmount, toCents } from '@/lib/payments/webhook-helpers';
+
+// cents -> display
+const display = toCurrencyAmount(1999); // "19.99"
+
+// string -> cents
+const cents = toCents("19.99"); // 1999
+```
+
+---
+
+## Database Storage
+
+- **Amount fields**: use `integer` type for cents
+- **Naming**: use `amountCents`, `totalCents` for clarity
+- **Display fields**: use `varchar` or `decimal(12,2)` if needed
+
+```typescript
+// schema example
+export const orders = pgTable('orders', {
+  amountSubtotal: integer('amount_subtotal'), // in cents
+  amountTotal: integer('amount_total'),       // in cents
+  currency: varchar('currency', { length: 3 }), // "usd", "jpy"
+});
+```
+
+---
+
+## Payment Provider Notes
+
+### Stripe
+- Stripe API uses **cents** as smallest unit
+- No conversion needed, use integers directly
+
+```typescript
+const session = await stripe.checkout.sessions.create({
+  line_items: [{
+    price_data: {
+      unit_amount: 1999, // 19.99 USD in cents
+      currency: 'usd',
+    },
+  }],
+});
+```
+
+### Creem
+- Creem API may return string amounts
+- Use `toCents()` to convert before processing
+
+```typescript
+const amountCents = toCents(payload.amount); // "19.99" -> 1999
+```
+
+---
+
+## Checklist
+
+When writing money-related code:
+
+- [ ] Internal calculations use integers (cents)
+- [ ] String to int uses `Math.round(parseFloat(x) * 100)`
+- [ ] Int to display uses `.toFixed(2)` or `Intl.NumberFormat`
+- [ ] Comparisons use integers or epsilon tolerance
+- [ ] Database stores `integer` type
+- [ ] Confirm API units (cents vs dollars)
+- [ ] Test edge cases: 0.01, 0.015 (rounding), large amounts
+
+---
+
+## High-Precision Scenarios
+
+For scenarios requiring higher precision (currency exchange, compound interest), consider specialized libraries:
+
+```bash
+pnpm add decimal.js
+# or
+pnpm add bignumber.js
+```
+
+```typescript
+import Decimal from 'decimal.js';
+
+const rate = new Decimal('0.0001');
+const amount = new Decimal('1000000');
+const result = amount.times(rate).toFixed(2); // precise calculation
+```
+
+For typical e-commerce/subscription scenarios, **integer (cents) calculation is sufficient** without extra dependencies.

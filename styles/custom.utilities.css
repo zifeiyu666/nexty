@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+@import '@fontsource/science-gothic/latin.css';
+
+@theme inline {
+  --font-science-gothic: 'Science Gothic', sans-serif;
+
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 200%;
+    }
+  }
+}
+
+@layer components {
+  :root {
+    --color-1: 0 100% 63%;
+
+    --color-2: 270 100% 63%;
+
+    --color-3: 210 100% 63%;
+
+    --color-4: 195 100% 63%;
+
+    --color-5: 90 100% 63%;
+  }
+}
+
+@layer utilities {
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+}
+
+@utility title-gradient {
+  @apply text-foreground/90;
+
+  .dark & {
+    @apply bg-clip-text bg-linear-to-b from-foreground to-muted-foreground text-transparent;
+  }
+}
+@utility dark {
+  & .title-gradient {
+    @apply bg-clip-text bg-linear-to-b from-foreground to-muted-foreground text-transparent;
+  }
+}
+@utility theme {
+  --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+}

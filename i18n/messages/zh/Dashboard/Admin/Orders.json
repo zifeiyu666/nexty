@@ -1,0 +1,12 @@
+{
+  "title": "订单",
+  "description": "这是所有订单的列表。",
+  "user": "用户",
+  "orderId": "订单ID",
+  "amount": "金额",
+  "discount": "折扣",
+  "type": "类型",
+  "status": "状态",
+  "createdAt": "创建时间",
+  "filterByEmail": "通过电子邮件筛选..."
+}

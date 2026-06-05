@@ -1,0 +1,12 @@
+{
+  "title": "注文",
+  "description": "すべての注文のリストです。",
+  "user": "ユーザー",
+  "orderId": "注文ID",
+  "amount": "金額",
+  "discount": "割引",
+  "type": "タイプ",
+  "status": "ステータス",
+  "createdAt": "作成日時",
+  "filterByEmail": "メールアドレスで絞り込み..."
+}

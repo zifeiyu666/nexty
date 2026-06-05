@@ -1,0 +1,25 @@
+{
+  "title": "Glossary",
+  "description": "Comprehensive glossary of Next.js SaaS development terms and concepts.",
+  "emptyState": {
+    "title": "No glossary entries",
+    "description": "We are creating exciting content, please stay tuned!"
+  },
+  "loadMorePostsFailed": "Failed to load more glossary entries",
+  "loadMorePosts": "Loading more glossary entries...",
+  "filterPostsFailed": "Failed to load glossary entries",
+  "noPostsFoundForThisTag": "No glossary entries found with this tag",
+  "reachedTheEnd": "You've reached the end of all glossary entries",
+  "GlossaryDetail": {
+    "featured": "Featured Entry",
+    "viewCount": "{count} views",
+    "accessRestricted": "Access Restricted",
+    "unauthorized": "This glossary entry is only available to logged-in users",
+    "premium": "Premium Content",
+    "premiumContent": "This glossary entry is exclusive to subscribers",
+    "signIn": "Sign In",
+    "upgrade": "Upgrade",
+    "backToGlossary": "Back to Glossary List",
+    "notFound": "Glossary Entry Not Found"
+  }
+}

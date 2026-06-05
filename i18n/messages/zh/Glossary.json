@@ -1,0 +1,25 @@
+{
+  "title": "术语表",
+  "description": "Next.js SaaS 开发术语和概念的综合词汇表。",
+  "emptyState": {
+    "title": "暂无术语条目",
+    "description": "我们正在创作精彩内容，敬请期待！"
+  },
+  "loadMorePostsFailed": "加载更多术语条目失败",
+  "loadMorePosts": "加载更多术语条目……",
+  "filterPostsFailed": "加载术语条目失败",
+  "noPostsFoundForThisTag": "暂无此标签的术语条目",
+  "reachedTheEnd": "已加载全部术语条目",
+  "GlossaryDetail": {
+    "featured": "精选条目",
+    "viewCount": "{count} 次阅读",
+    "accessRestricted": "访问受限",
+    "unauthorized": "此术语条目仅对登录用户开放",
+    "premium": "付费内容",
+    "premiumContent": "此术语条目仅对订阅用户开放",
+    "signIn": "登录",
+    "upgrade": "升级",
+    "backToGlossary": "返回术语表列表",
+    "notFound": "术语条目未找到"
+  }
+}

@@ -1,0 +1,210 @@
+/* Code Block Lowlight Syntax Highlighting */
+/* Compatible with Tailwind CSS v4 */
+
+/* Base code block styles & Light Theme (Default) */
+.code-block-lowlight {
+  position: relative;
+  background: oklch(0.97 0.005 265);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 2;
+  border: 1px solid oklch(0.87 0.01 258);
+}
+
+.code-block-lowlight code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: oklch(0.28 0.04 260);
+}
+
+/* Light Theme Token Colors (GitHub inspired) - Default */
+.code-block-lowlight .hljs-comment,
+.code-block-lowlight .hljs-quote {
+  color: oklch(0.55 0.03 260);
+  font-style: italic;
+}
+
+.code-block-lowlight .hljs-keyword,
+.code-block-lowlight .hljs-selector-tag,
+.code-block-lowlight .hljs-built_in,
+.code-block-lowlight .hljs-type {
+  color: oklch(0.55 0.22 300);
+}
+
+.code-block-lowlight .hljs-string,
+.code-block-lowlight .hljs-attr,
+.code-block-lowlight .hljs-template-tag,
+.code-block-lowlight .hljs-template-variable {
+  color: oklch(0.5 0.15 145);
+}
+
+.code-block-lowlight .hljs-number,
+.code-block-lowlight .hljs-literal,
+.code-block-lowlight .hljs-symbol,
+.code-block-lowlight .hljs-bullet {
+  color: oklch(0.55 0.15 55);
+}
+
+.code-block-lowlight .hljs-title,
+.code-block-lowlight .hljs-section {
+  color: oklch(0.5 0.18 265);
+}
+
+.code-block-lowlight .hljs-title.function_ {
+  color: oklch(0.5 0.18 265);
+}
+
+.code-block-lowlight .hljs-variable,
+.code-block-lowlight .hljs-params {
+  color: oklch(0.45 0.12 25);
+}
+
+.code-block-lowlight .hljs-meta {
+  color: oklch(0.5 0.12 200);
+}
+
+.code-block-lowlight .hljs-operator,
+.code-block-lowlight .hljs-punctuation {
+  color: oklch(0.4 0.03 260);
+}
+
+.code-block-lowlight .hljs-property {
+  color: oklch(0.5 0.15 25);
+}
+
+.code-block-lowlight .hljs-class .hljs-title {
+  color: oklch(0.52 0.16 85);
+}
+
+.code-block-lowlight .hljs-tag {
+  color: oklch(0.55 0.18 25);
+}
+
+.code-block-lowlight .hljs-name {
+  color: oklch(0.55 0.18 25);
+}
+
+.code-block-lowlight .hljs-attribute {
+  color: oklch(0.55 0.15 55);
+}
+
+.code-block-lowlight .hljs-selector-class,
+.code-block-lowlight .hljs-selector-id {
+  color: oklch(0.5 0.18 265);
+}
+
+.code-block-lowlight .hljs-emphasis {
+  font-style: italic;
+}
+
+.code-block-lowlight .hljs-strong {
+  font-weight: bold;
+}
+
+.code-block-lowlight .hljs-link {
+  text-decoration: underline;
+}
+
+/* Explicit dark mode styles - Overrides */
+.dark .code-block-lowlight {
+  background: oklch(0.15 0.015 265);
+  border-color: oklch(0.25 0.02 260);
+}
+
+.dark .code-block-lowlight code {
+  color: oklch(0.92 0.01 255);
+}
+
+/* Lowlight/Highlight.js Token Colors - Dark Theme (One Dark Pro inspired) */
+.dark .code-block-lowlight .hljs-comment,
+.dark .code-block-lowlight .hljs-quote {
+  color: oklch(0.58 0.025 260);
+  font-style: italic;
+}
+
+.dark .code-block-lowlight .hljs-keyword,
+.dark .code-block-lowlight .hljs-selector-tag,
+.dark .code-block-lowlight .hljs-built_in,
+.dark .code-block-lowlight .hljs-type {
+  color: oklch(0.78 0.19 300);
+}
+
+.dark .code-block-lowlight .hljs-string,
+.dark .code-block-lowlight .hljs-attr,
+.dark .code-block-lowlight .hljs-template-tag,
+.dark .code-block-lowlight .hljs-template-variable {
+  color: oklch(0.8 0.16 145);
+}
+
+.dark .code-block-lowlight .hljs-number,
+.dark .code-block-lowlight .hljs-literal,
+.dark .code-block-lowlight .hljs-symbol,
+.dark .code-block-lowlight .hljs-bullet {
+  color: oklch(0.8 0.15 55);
+}
+
+.dark .code-block-lowlight .hljs-title,
+.dark .code-block-lowlight .hljs-section {
+  color: oklch(0.8 0.17 230);
+}
+
+.dark .code-block-lowlight .hljs-title.function_ {
+  color: oklch(0.8 0.17 230);
+}
+
+.dark .code-block-lowlight .hljs-variable,
+.dark .code-block-lowlight .hljs-params {
+  color: oklch(0.87 0.09 30);
+}
+
+.dark .code-block-lowlight .hljs-meta {
+  color: oklch(0.77 0.11 200);
+}
+
+.dark .code-block-lowlight .hljs-operator,
+.dark .code-block-lowlight .hljs-punctuation {
+  color: oklch(0.82 0.05 260);
+}
+
+.dark .code-block-lowlight .hljs-property {
+  color: oklch(0.82 0.13 25);
+}
+
+.dark .code-block-lowlight .hljs-class .hljs-title {
+  color: oklch(0.84 0.15 85);
+}
+
+.dark .code-block-lowlight .hljs-tag {
+  color: oklch(0.77 0.16 15);
+}
+
+.dark .code-block-lowlight .hljs-name {
+  color: oklch(0.77 0.16 15);
+}
+
+.dark .code-block-lowlight .hljs-attribute {
+  color: oklch(0.8 0.15 55);
+}
+
+.dark .code-block-lowlight .hljs-selector-class,
+.dark .code-block-lowlight .hljs-selector-id {
+  color: oklch(0.8 0.17 230);
+}
+
+.dark .code-block-lowlight .hljs-emphasis {
+  font-style: italic;
+}
+
+.dark .code-block-lowlight .hljs-strong {
+  font-weight: bold;
+}
+
+.dark .code-block-lowlight .hljs-link {
+  text-decoration: underline;
+}

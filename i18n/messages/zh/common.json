@@ -1,0 +1,473 @@
+{
+  "Home": {
+    "title": "NEXTY.DEV",
+    "tagLine": "多场景 Next.js 全栈 SaaS 开发模板",
+    "description": "Nexty 是一个功能齐全的 Next.js SaaS 全栈模板，让你能够快速构建各种商业网站，无论是内容站、工具站还是集成 AI 能力的付费网站。"
+  },
+  "Login": {
+    "title": "欢迎回来",
+    "description": "你可以通过以下方式登录",
+    "Toast": {
+      "rateLimitTitle": "请求过于频繁",
+      "rateLimitDescription": "请稍等片刻后重试。",
+      "Email": {
+        "successTitle": "邮件已发送",
+        "successDescription": "请检查你的邮箱获取登录链接。",
+        "errorTitle": "错误",
+        "errorDescription": "发送邮件失败，请重试。"
+      },
+      "OTP": {
+        "errorTitle": "错误",
+        "sendSuccessTitle": "验证码已发送！",
+        "sendSuccessDescription": "请检查你的邮箱获取验证码。",
+        "sendErrorDescription": "发送验证码失败，请重试。",
+        "verifySuccessTitle": "登录成功！",
+        "verifySuccessDescription": "欢迎回来。",
+        "verifyErrorDescription": "验证码无效或已过期，请重试。"
+      },
+      "Google": {
+        "errorTitle": "错误",
+        "errorDescription": "使用 Google 登录失败，请重试。"
+      },
+      "Github": {
+        "errorTitle": "错误",
+        "errorDescription": "使用 GitHub 登录失败，请重试。"
+      }
+    },
+    "signInMethods": {
+      "or": "或者",
+      "signInWithGoogle": "使用 Google 登录",
+      "signInWithGithub": "使用 GitHub 登录",
+      "signInWithEmail": "使用邮箱登录",
+      "otpMethod": "验证码",
+      "magicLinkMethod": "魔法链接",
+      "sendOTP": "发送验证码",
+      "verifyOTP": "验证",
+      "resendOTP": "没收到验证码？重新发送",
+      "backToEmail": "返回",
+      "otpSentTo": "验证码已发送至"
+    },
+    "Button": {
+      "signIn": "登录",
+      "signOut": "退出"
+    },
+    "UserMenus": [
+      {
+        "name": "个人设置",
+        "href": "/dashboard/settings",
+        "icon": "Settings"
+      },
+      {
+        "name": "我的订单",
+        "href": "/dashboard/my-orders",
+        "icon": "ShoppingCart"
+      },
+      {
+        "name": "管理订阅",
+        "href": "/dashboard/subscription",
+        "icon": "WalletCards"
+      },
+      {
+        "name": "积分明细",
+        "href": "/dashboard/credit-history",
+        "icon": "Coins"
+      }
+    ],
+    "AdminMenus": [
+      {
+        "name": "概览",
+        "href": "/dashboard/overview",
+        "icon": "LayoutDashboard"
+      },
+      {
+        "name": "用户管理",
+        "href": "/dashboard/users",
+        "icon": "Users"
+      },
+      {
+        "name": "订单管理",
+        "href": "/dashboard/orders",
+        "icon": "ShoppingCart"
+      },
+      {
+        "name": "定价管理",
+        "href": "/dashboard/prices",
+        "icon": "DollarSign"
+      },
+      {
+        "name": "博客管理",
+        "href": "/dashboard/blogs",
+        "icon": "Rss"
+      },
+      {
+        "name": "术语表管理",
+        "href": "/dashboard/glossary",
+        "icon": "BookOpen"
+      },
+      {
+        "name": "R2资源管理",
+        "href": "/dashboard/r2-resources",
+        "icon": "FileBox"
+      }
+    ]
+  },
+  "Blogs": {
+    "title": "博客列表",
+    "description": "分享 Next.js 生态圈和 NEXTY.DEV 模板动态。",
+    "emptyState": {
+      "title": "暂无博客文章",
+      "description": "我们正在创作精彩内容，敬请期待！"
+    },
+    "loadMorePostsFailed": "加载更多博客失败",
+    "loadMorePosts": "加载更多博客……",
+    "filterPostsFailed": "加载博客失败",
+    "noPostsFoundForThisTag": "暂无此标签的博客文章",
+    "reachedTheEnd": "已加载全部博客文章",
+    "BlogDetail": {
+      "featured": "精选文章",
+      "viewCount": "{count} 次阅读",
+      "accessRestricted": "访问受限",
+      "unauthorized": "此文章仅对登录用户开放",
+      "premium": "付费内容",
+      "premiumContent": "此文章仅对订阅用户开放",
+      "signIn": "登录",
+      "upgrade": "升级",
+      "backToBlogs": "返回博客列表",
+      "notFound": "文章未找到"
+    }
+  },
+  "About": {
+    "title": "关于我们",
+    "description": "关于我们"
+  },
+  "AIDemo": {
+    "title": "AI 能力展示",
+    "description": "生产级 AI 组件，包含聊天、图像生成和视频生成功能。",
+    "metaDescription": "探索 AI 能力，包括多提供商的聊天、图像生成和视频生成。",
+    "hub": {
+      "chatTitle": "AI 聊天",
+      "chatDescription": "由 OpenAI、Anthropic、Google、DeepSeek、xAI 和 OpenRouter 的 18+ 语言模型驱动的单轮和多轮对话。",
+      "imageTitle": "AI 图像生成",
+      "imageDescription": "使用 GPT Image、Nano Banana、Grok、Flux（通过 Replicate 和 fal.ai）进行文生图和图生图。",
+      "videoTitle": "AI 视频生成",
+      "videoDescription": "使用 Seedance、Kling 和 Wan（通过 Replicate 和 fal.ai）进行文生视频和图生视频。",
+      "tagline": "即插即用的 AI 组件，助开发者分钟级构建 AI 功能。"
+    },
+    "chat": {
+      "title": "AI 聊天",
+      "metaDescription": "AI 聊天演示，包含单轮和多轮对话。",
+      "singleTurn": "单轮对话",
+      "multiTurn": "多轮对话",
+      "model": "模型",
+      "yourQuestion": "你的问题",
+      "response": "回复",
+      "readyToRespond": "准备回复",
+      "responseAppearHere": "回复将显示在这里",
+      "generateResponse": "生成回复",
+      "generating": "生成中...",
+      "startConversation": "开始对话",
+      "startConversationDescription": "发送消息开始与 AI 聊天",
+      "enterToSend": "回车发送",
+      "shiftEnterNewLine": "Shift+回车换行",
+      "messages": "{count} 条消息",
+      "chars": "{count} 字符",
+      "clearChat": "清除对话",
+      "clear": "清除",
+      "thinking": "思考中...",
+      "typePlaceholder": "输入消息...（回车发送，Shift+回车换行）",
+      "systemPrompt": "系统提示词",
+      "systemPromptPlaceholder": "你是一个有帮助的助手...",
+      "promptPlaceholder": "输入你的消息...",
+      "reasoning": "推理过程",
+      "reasoningDescription": "查看模型的思考过程"
+    },
+    "image": {
+      "title": "AI 图像生成",
+      "metaDescription": "使用多种模型和提供商生成 AI 图像。",
+      "model": "模型",
+      "prompt": "提示词",
+      "promptPlaceholder": "描述你想生成的图像...",
+      "referenceImage": "参考图片",
+      "referenceImageRequired": "此模型需要上传参考图片。",
+      "advancedSettings": "高级设置",
+      "aspectRatio": "宽高比",
+      "size": "尺寸",
+      "resolution": "分辨率",
+      "quality": "质量",
+      "qualityLow": "低",
+      "qualityMedium": "中",
+      "qualityHigh": "高",
+      "background": "背景",
+      "backgroundAuto": "自动",
+      "backgroundOpaque": "不透明",
+      "backgroundTransparent": "透明",
+      "outputFormat": "输出格式",
+      "seed": "种子",
+      "randomSeed": "随机种子",
+      "negativePrompt": "反向提示词",
+      "negativePromptPlaceholder": "描述你不希望出现在图像中的内容...",
+      "guidanceScale": "引导系数",
+      "inferenceSteps": "推理步数",
+      "strength": "强度",
+      "generate": "生成图像",
+      "generating": "生成中...",
+      "generationTime": "{time}秒",
+      "download": "下载",
+      "copyPrompt": "复制提示词",
+      "promptCopied": "已复制！",
+      "emptyStateTitle": "画布已就绪",
+      "emptyState": "输入提示词并点击生成，让你的创意变为现实",
+      "noSettings": "此模型没有高级设置"
+    },
+    "video": {
+      "title": "AI 视频生成",
+      "metaDescription": "AI 视频生成演示，包含文生视频和图生视频。",
+      "textToVideo": "文生视频",
+      "imageToVideo": "图生视频",
+      "model": "模型",
+      "prompt": "提示词",
+      "promptPlaceholder": "描述你想生成的视频...",
+      "motionPlaceholder": "描述运动效果...",
+      "duration": "时长",
+      "seconds": "{count}秒",
+      "referenceImage": "参考图片",
+      "referenceImageRequired": "请上传此模型所需的参考图片。",
+      "generate": "生成视频",
+      "generating": "生成中...",
+      "generationTime": "{time}秒",
+      "download": "下载",
+      "emptyStateTitle": "舞台已就绪",
+      "emptyState": "输入提示词并点击生成，让你的创意变为视频",
+      "aspectRatio": "宽高比",
+      "resolution": "分辨率",
+      "negativePrompt": "反向提示词",
+      "negativePromptPlaceholder": "描述你不想在视频中出现的内容...",
+      "cfgScale": "CFG 比例",
+      "generateAudio": "生成音频",
+      "cameraFixed": "固定镜头",
+      "seed": "种子",
+      "randomSeed": "随机种子",
+      "videoReady": "视频生成成功！",
+      "videoFailed": "视频生成失败"
+    },
+    "common": {
+      "generate": "生成",
+      "stop": "停止",
+      "clear": "清除",
+      "download": "下载",
+      "model": "模型",
+      "prompt": "提示词",
+      "uploadImage": "上传图片",
+      "dragDrop": "拖放或点击上传",
+      "maxSize": "最大大小：{size}MB",
+      "removeImage": "移除图片",
+      "noResult": "暂无结果，开始生成吧！",
+      "error": "发生了错误",
+      "retry": "重试",
+      "backToHub": "返回 AI 演示",
+      "poweredBy": "由 {provider} 提供支持"
+    }
+  },
+  "ErrorPage": {
+    "403": {
+      "title": "403 - 访问被拒绝",
+      "description": "你没有权限访问此页面。",
+      "button": {
+        "name": "返回首页",
+        "href": "/"
+      }
+    },
+    "RedirectError": {
+      "title": "重定向错误",
+      "description": "认证过程中发生错误。",
+      "goToHome": "返回首页",
+      "goToLogin": "返回登录页面",
+      "invalid_params": {
+        "title": "参数错误",
+        "description": "请求缺少必要参数。"
+      },
+      "invalid_redirect": {
+        "title": "重定向错误",
+        "description": "重定向 URL 无效。"
+      },
+      "token_expired": {
+        "title": "令牌过期",
+        "description": "你的验证令牌已过期。请重新登录。"
+      },
+      "invalid_token": {
+        "title": "令牌错误",
+        "description": "提供的验证令牌无效。"
+      },
+      "invalid_link_or_expired": {
+        "title": "链接错误",
+        "description": "邮箱验证链接无效或已过期。"
+      },
+      "server_error": {
+        "title": "服务器错误",
+        "description": "认证过程中服务器发生意外错误。"
+      },
+      "unknown": {
+        "title": "认证错误",
+        "description": "认证过程中发生未知错误。"
+      }
+    },
+    "StripeError": {
+      "goToHome": "返回首页",
+      "goToDashboard": "返回仪表盘",
+      "title": "Payment Portal Error",
+      "description": "支付信息发生错误。"
+    }
+  },
+  "LanguageDetection": {
+    "title": "语言建议",
+    "description": "检测到你的浏览器语言和当前语言不一样，你随时都可切换语言。",
+    "countdown": "将在 {countdown} 秒后关闭",
+    "switchTo": "切换到"
+  },
+  "Header": {
+    "links": [
+      {
+        "name": "功能特性",
+        "href": "/#features"
+      },
+      {
+        "id": "pricing",
+        "name": "定价",
+        "href": "/#pricing"
+      },
+      {
+        "name": "AI Demo",
+        "href": "/ai-demo"
+      },
+      {
+        "name": "博客",
+        "href": "/blog"
+      },
+      {
+        "name": "Demo",
+        "href": "#",
+        "items": [
+          {
+            "name": "Nexty Demo",
+            "href": "https://demo.nexty.dev/",
+            "target": "_blank",
+            "rel": "noopener noreferrer nofollow",
+            "description": "Next.js SaaS Boilerplate"
+          },
+          {
+            "name": "AI Image Generator Demo",
+            "href": "https://flux-kontext.nexty.dev/",
+            "target": "_blank",
+            "rel": "noopener noreferrer nofollow",
+            "description": "AI Image Generator Demo Based on NEXTY.DEV"
+          },
+          {
+            "name": "Directory Boilerplate Demo",
+            "href": "https://dofollow.tools/",
+            "target": "_blank",
+            "rel": "noopener noreferrer nofollow",
+            "description": "Directory Boilerplate Demo Based on NEXTY.DEV"
+          }
+        ]
+      }
+    ]
+  },
+  "Footer": {
+    "Copyright": "版权所有 © {year} {name} 保留所有权利。",
+    "About": "关于",
+    "PrivacyPolicy": "隐私政策",
+    "TermsOfService": "条款与条件",
+    "RefundPolicy": "退款政策",
+    "Newsletter": {
+      "title": "订阅我们的邮件",
+      "description": "获取最新的更新和教程",
+      "subscribe": {
+        "invalidEmail": "请输入有效的邮箱地址",
+        "defaultErrorMessage": "订阅失败，请稍后再试",
+        "successMessage": "订阅成功",
+        "multipleSubmissions": "你已多次提交，请明天再试再试"
+      },
+      "unsubscribe": {
+        "title": "退订邮件通知",
+        "success": "您已成功退订 Nexty 邮件通知。",
+        "emailPrefix": "邮箱：",
+        "regretMessage": "您随时可以重新订阅邮件，获取 Nexty 最新更新和教程。",
+        "errorGeneric": "处理您的退订请求时发生错误",
+        "errorNoToken": "未提供退订令牌",
+        "errorMessage": "请确保您使用了正确的退订链接。如果问题持续存在，请联系我们的客服团队获取帮助。",
+        "contactPrefix": "请发送邮件至：",
+        "contactPrefixSuccess": "如有任何问题，请随时联系我们：",
+        "backToHome": "返回主页",
+        "invalidEmail": "无效的邮箱地址",
+        "notInNewsletter": "该邮箱不在我们的订阅列表中",
+        "confirmTitle": "确认退订",
+        "confirmMessage": "您确定要退订我们的邮件通讯吗？您将不再收到有关新功能和内容的更新。",
+        "confirmButton": "确认退订",
+        "cancelButton": "取消",
+        "processing": "处理中...",
+        "finalWarning": "此操作无法撤销。您可以随时重新订阅。",
+        "errorInvalidToken": "无效的退订链接。链接可能已损坏或过期。"
+      }
+    },
+    "Links": {
+      "groups": [
+        {
+          "title": "产品",
+          "links": [
+            {
+              "href": "/#features",
+              "name": "功能特性"
+            },
+            {
+              "id": "pricing",
+              "href": "/#pricing",
+              "name": "定价"
+            },
+            {
+              "href": "/blog",
+              "name": "博客"
+            },
+            {
+              "href": "/glossary",
+              "name": "术语表"
+            }
+          ]
+        },
+        {
+          "title": "支持",
+          "links": [
+            {
+              "name": "文档",
+              "href": "https://docs.nexty.dev/zh/docs",
+              "target": "_blank"
+            },
+            {
+              "name": "功能路线图",
+              "href": "https://nexty.dev/zh/roadmap"
+            }
+          ]
+        },
+        {
+          "title": "语言",
+          "links": [
+            {
+              "href": "/en",
+              "name": "English",
+              "useA": true
+            },
+            {
+              "href": "/zh",
+              "name": "中文",
+              "useA": true
+            },
+            {
+              "href": "/ja",
+              "name": "日本語",
+              "useA": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "title": "用語集",
+  "description": "Next.js SaaS開発の用語と概念の包括的な用語集。",
+  "emptyState": {
+    "title": "用語エントリがありません",
+    "description": "現在コンテンツを作成中です。もうしばらくお待ちください！"
+  },
+  "loadMorePostsFailed": "用語エントリの読み込みに失敗しました",
+  "loadMorePosts": "用語エントリを読み込み中...",
+  "filterPostsFailed": "用語エントリの読み込みに失敗しました",
+  "noPostsFoundForThisTag": "このタグの用語エントリは見つかりませんでした",
+  "reachedTheEnd": "すべての用語エントリを表示しました",
+  "GlossaryDetail": {
+    "featured": "特集エントリ",
+    "viewCount": "{count} 回閲覧",
+    "accessRestricted": "アクセス制限",
+    "unauthorized": "この用語エントリはログインユーザーのみ閲覧できます",
+    "premium": "プレミアムコンテンツ",
+    "premiumContent": "この用語エントリは有料会員限定です",
+    "signIn": "ログイン",
+    "upgrade": "アップグレード",
+    "backToGlossary": "用語集一覧に戻る",
+    "notFound": "用語エントリが見つかりません"
+  }
+}

@@ -1,0 +1,2 @@
+ALTER TABLE "credit_logs" RENAME COLUMN "one_time_balance_after" TO "one_time_credits_snapshot";--> statement-breakpoint
+ALTER TABLE "credit_logs" RENAME COLUMN "subscription_balance_after" TO "subscription_credits_snapshot";

@@ -1,0 +1,1 @@
+ALTER TABLE "orders" RENAME COLUMN "stripe_refund_id" TO "stripe_charge_id";

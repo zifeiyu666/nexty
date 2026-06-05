@@ -1,0 +1,1 @@
+ALTER TABLE "pricing_plans" ALTER COLUMN "provider" SET DEFAULT 'stripe';

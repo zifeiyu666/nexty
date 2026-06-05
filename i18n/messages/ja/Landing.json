@@ -1,0 +1,397 @@
+{
+  "Hero": {
+    "badge": {
+      "label": "NEW",
+      "text": "Next.js SaaS フルスタックテンプレート",
+      "href": "https://nexty.dev/#pricing"
+    },
+    "title": "モダンな Next.js フルスタック SaaS テンプレート",
+    "description": "認証、Stripe決済、AI統合、CMSなど、すぐに収益化を始めるために必要なすべてを含む、包括的な Next.js テンプレートです。",
+    "getStarted": "今すぐ開始",
+    "getStartedLink": "https://nexty.dev/#pricing",
+    "viewDocs": "ドキュメントを見る",
+    "viewDocsLink": "https://nexty.dev/docs"
+  },
+  "Features": {
+    "badge": {
+      "label": "機能特徴",
+      "text": "プロダクション対応 SaaS 開発キット"
+    },
+    "title": "本格運用対応の Next.js SaaS テンプレート",
+    "description": "この Next.js テンプレートには、現代の SaaS アプリケーションに必要な重要機能がすべて含まれており、独自のビジネスロジックと顧客価値に集中できます。",
+    "items": [
+      {
+        "title": "3つの強力なテンプレート",
+        "description": "一度の購入で、3つの強力なテンプレートを取得できます。",
+        "details": [
+          {
+            "title": "テンプレート1：Nexty",
+            "description": "必要なすべての機能を備えた汎用 SaaS テンプレート。",
+            "href": "https://demo.nexty.dev"
+          },
+          {
+            "title": "テンプレート2：nexty-flux-kontext",
+            "description": "AI 画像生成 SaaS テンプレート。",
+            "href": "https://flux-kontext.nexty.dev"
+          },
+          {
+            "title": "テンプレート3：nexty-directory",
+            "description": "ディレクトリ・リスティングサイトテンプレート。",
+            "href": "https://dofollow.tools"
+          }
+        ],
+        "images": [
+          "/images/features/template1.webp",
+          "/images/features/template2.webp",
+          "/images/features/template3.webp"
+        ]
+      },
+      {
+        "title": "認証システム",
+        "description": "複数のサインインオプションを備えた Better Auth を統合。",
+        "details": [
+          {
+            "title": "ソーシャルサインイン",
+            "description": "Google、GitHub などに対応。"
+          },
+          {
+            "title": "マジックリンク",
+            "description": "マジックリンクによるメール認証。"
+          },
+          {
+            "title": "ボット保護",
+            "description": "Cloudflare Turnstile でアプリをボットから保護。"
+          }
+        ],
+        "images": [
+          "/images/features/login.png"
+        ]
+      },
+      {
+        "title": "データベース",
+        "description": "複数のデータベースオプションに対応した Drizzle ORM を統合。Supabase、Neon、セルフホスト PostgreSQL など。",
+        "details": [
+          {
+            "title": "ワンライン設定",
+            "description": "DATABASE_URL を設定するだけで、最適な設定が自動で完了します。"
+          },
+          {
+            "title": "包括的な組み込みテーブル",
+            "description": "ユーザー管理、料金プラン、注文、コンテンツ管理などの包括的なテーブルセット。"
+          },
+          {
+            "title": "複数のデータベースオプション",
+            "description": "Supabase、Neon、セルフホスト PostgreSQL。"
+          }
+        ],
+        "images": [
+          "/images/features/database-config.webp",
+          "/images/features/database-tables.webp"
+        ]
+      },
+      {
+        "title": "決済システム",
+        "description": "Stripe Checkout と Stripe Billing Portal による完全な請求ソリューション。",
+        "details": [
+          {
+            "title": "すべての決済方法",
+            "description": "Nexty は月額・年額サブスクリプションと一回限りの支払いをサポート。"
+          },
+          {
+            "title": "使用量ベース課金",
+            "description": "Nexty は使用量に基づく課金をサポートし、使用量に応じてユーザーに課金する必要があるアプリに対応。"
+          },
+          {
+            "title": "スマート管理者管理",
+            "description": "Nexty の料金プランは管理ダッシュボードで管理され、Stripe Price ID と連携してインテリジェントで安全、リアルタイムプレビュー機能を提供。"
+          }
+        ],
+        "images": [
+          "/images/features/payment-1.png",
+          "/images/features/payment-2.png"
+        ]
+      },
+      {
+        "title": "AI 機能",
+        "description": "インタラクティブデモ、マルチプロバイダーサポート、デプロイ準備完了の AI 画像生成ウェブサイトテンプレートを含む完全な AI 統合ツールキット。",
+        "details": [
+          {
+            "title": "AI デモハブ",
+            "description": "Nexty にはチャット、text-to-image、image-to-image、動画生成のデモが組み込まれており、開発者が AI ワークフローを学び、モデルを素早くテストできます。"
+          },
+          {
+            "title": "ユニバーサル AI プロバイダーサポート",
+            "description": "Nexty は GPT、Claude、Gemini、DeepSeek、Grok、OpenRouter、Replicate を最大限の柔軟性でサポートする AI SDK 統合を提供。"
+          },
+          {
+            "title": "ボーナス：AI 画像生成ウェブサイト",
+            "description": "Nexty 有料ユーザーは、AI アートプラットフォームの迅速なデプロイメント用の完全な Flux Kontext AI 画像生成ウェブサイトテンプレートを取得。"
+          }
+        ],
+        "images": [
+          "/images/features/ai-1.png",
+          "/images/features/ai-2.png"
+        ]
+      },
+      {
+        "title": "CMS",
+        "description": "基本的なコンテンツ管理を超えた高度な CMS で、ペイウォール保護、AI 翻訳、多目的公開機能を備えています。",
+        "details": [
+          {
+            "title": "コンテンツアクセス制御",
+            "description": "Nexty の CMS は、収益化されたコンテンツサイト用のペイウォール保護を備えた、パブリック、ログインユーザー、購読者専用コンテンツをサポート。"
+          },
+          {
+            "title": "AI パワード翻訳",
+            "description": "Nexty の CMS には多言語コンテンツ作成用の組み込み AI 翻訳と、効率的なコンテンツ制作ワークフロー用の複製機能が含まれています。"
+          },
+          {
+            "title": "多目的公開",
+            "description": "Nexty の CMS は、高度なステータス管理（下書き、公開、アーカイブ）で無料ブログサイトと有料コンテンツプラットフォームの両方を実現。"
+          }
+        ],
+        "images": [
+          "/images/features/cms-1.png",
+          "/images/features/admin-3.png",
+          "/images/features/cms-3.png",
+          "/images/features/cms-4.png",
+          "/images/features/cms-5.png"
+        ]
+      },
+      {
+        "title": "ファイルストレージ",
+        "description": "Cloudflare R2 を活用した企業グレードのファイル管理で、管理ダッシュボード、自動 CDN 配信、最適化されたアップロードワークフローを提供。",
+        "details": [
+          {
+            "title": "管理ファイル管理",
+            "description": "Nexty は、アップロード、削除、整理機能を備えた包括的なファイル管理用の専用管理ダッシュボードを提供。"
+          },
+          {
+            "title": "Cloudflare R2 統合",
+            "description": "Nexty は Cloudflare R2 を活用してコスト効率が高く高性能なファイルストレージと世界中への自動 CDN 配信を実現。"
+          },
+          {
+            "title": "最適化されたアップロード体験",
+            "description": "Nexty はドラッグ&ドロップアップロード、プレビュー機能、自動ファイル処理でシームレスなユーザー体験を提供。"
+          }
+        ],
+        "images": [
+          "/images/features/admin-4.png"
+        ]
+      },
+      {
+        "title": "ビジュアル価格管理",
+        "description": "Nexty のダッシュボード価格管理は安全で便利、コードを触ることなく価格を更新できます。",
+        "details": [
+          {
+            "title": "リアルタイムプレビュー",
+            "description": "Nexty の価格カードエディターにはリアルタイムプレビューが含まれており、保存前に価格カードの表示を確認できます。"
+          },
+          {
+            "title": "Stripe 統合",
+            "description": "Nexty は正確な請求設定のために Stripe から価格データをワンクリック検証で取得。"
+          },
+          {
+            "title": "多言語サポート",
+            "description": "Nexty は価格カード用の AI 駆動翻訳をサポートし、多言語価格コンテンツの簡単な管理を実現。"
+          }
+        ],
+        "images": [
+          "/images/features/admin-2.png",
+          "/images/features/prices-1.png",
+          "/images/features/prices-2.png",
+          "/images/features/prices-3.png",
+          "/images/features/prices-4.png",
+          "/images/features/prices-5.png"
+        ]
+      },
+      {
+        "title": "メールシステム",
+        "description": "Cloudflare ドメインメールと Resend 統合による完全なメールソリューションで、プロフェッショナルなコミュニケーションと購読者管理を実現。",
+        "details": [
+          {
+            "title": "プロフェッショナルドメインメール",
+            "description": "Nexty は Cloudflare を通じてドメインメールを実装し、ブランドをより専門的に見せ、ユーザーとの信頼構築を支援。"
+          },
+          {
+            "title": "高度なメールマーケティング",
+            "description": "Nexty には購読者管理とメールキャンペーン用の Resend 統合、フッターに組み込まれたニュースレター購読モジュールが含まれています。"
+          },
+          {
+            "title": "組み込みメール自動化",
+            "description": "Nexty にはニュースレター購読と支払い失敗通知メール、重要なユーザーコミュニケーション用の事前構築テンプレートが含まれています。"
+          }
+        ],
+        "images": [
+          "/images/features/email-2.png",
+          "/images/features/email-1.png"
+        ]
+      },
+      {
+        "title": "ユーザーダッシュボード",
+        "description": "ユーザーにシームレスな体験を提供する完全なユーザーダッシュボード。",
+        "details": [
+          {
+            "title": "プロフィール管理",
+            "description": "Nexty には包括的なプロフィール設定が含まれています。"
+          },
+          {
+            "title": "サブスクリプション管理",
+            "description": "Nexty は Stripe 統合を通じて請求履歴とプランアップグレードを備えたサブスクリプション管理を提供。"
+          },
+          {
+            "title": "クレジット履歴・使用状況",
+            "description": "Nexty はクレジット付与と使用状況を詳細な履歴で追跡し、一回限りとサブスクリプションベースのクレジットシステムの両方をサポート。"
+          }
+        ],
+        "images": [
+          "/images/features/user-1.png",
+          "/images/features/user-2.png",
+          "/images/features/user-3.png"
+        ]
+      },
+      {
+        "title": "管理ダッシュボード",
+        "description": "完全な SaaS 管理のためのユーザー、価格、コンテンツ、ファイルの完全制御を提供する包括的な管理ダッシュボード。",
+        "details": [
+          {
+            "title": "ユーザー管理",
+            "description": "Nexty はロール制御、Stripe 顧客統合、アカウント管理を備えた完全なユーザー管理を提供。"
+          },
+          {
+            "title": "価格管理",
+            "description": "Nexty は環境分離、Stripe 統合、リアルタイムプレビューを備えたビジュアル価格プラン管理を提供。"
+          },
+          {
+            "title": "CMS・ファイル管理",
+            "description": "Nexty には多言語サポート、アクセス制御を備えたブログ管理と、プレビュー機能付きの R2 ファイル管理が含まれています。"
+          }
+        ],
+        "images": [
+          "/images/features/admin-1.png",
+          "/images/features/admin-2.png",
+          "/images/features/admin-3.png",
+          "/images/features/admin-4.png"
+        ]
+      },
+      {
+        "title": "マーケティング・成長",
+        "description": "国際化、分析、広告、SEO 最適化を備えた完全な成長ツールキットで、グローバルリーチとビジネス成功を実現。",
+        "details": [
+          {
+            "title": "i18n",
+            "description": "Nexty は世界市場へのリーチのために、すぐに使える複数言語をサポートし、簡単な拡張が可能。"
+          },
+          {
+            "title": "分析・AdSense",
+            "description": "Nexty には洞察と収益生成のための Google Analytics、Plausible トラッキング、AdSense 統合が含まれています。"
+          },
+          {
+            "title": "SEO 最適化",
+            "description": "Nexty はより良いランキングのためのメタタグとサイトマップによる包括的な SEO 最適化を提供。"
+          }
+        ],
+        "images": [
+          "/images/features/other-1.png",
+          "/images/features/other-2.png",
+          "/images/features/other-3.png"
+        ]
+      }
+    ]
+  },
+  "UseCases": {
+    "badge": {
+      "label": "使用事例",
+      "text": "複数のソリューションシナリオ"
+    },
+    "title": "1つのテンプレート、複数のソリューション",
+    "description": "AI ツール、コンテンツプラットフォーム、その他の SaaS 製品を構築する場合でも、当社の Next.js SaaS テンプレートは最小限の設定で特定のニーズに適応します。",
+    "cases": [
+      {
+        "title": "AI パワード SaaS ツール",
+        "description": "数か月ではなく数日で本格運用可能な AI アプリケーションを立ち上げ。OpenRouter、Replicate、主要 AI プロバイダーとの組み込み統合。スマートな使用状況追跡、自動課金、AI ワークフローの収益化に必要なすべてを含む。",
+        "image": "/placeholder.webp",
+        "icon": "Bot"
+      },
+      {
+        "title": "コンテンツ・ブログプラットフォーム",
+        "description": "高度な CMS 機能を備えた SEO 最適化されたコンテンツウェブサイトを立ち上げ。Markdown 編集、多言語サポート、ペイウォール保護、AI 翻訳、AdSense 統合を含む機能。プレミアムコンテンツプラットフォーム、ニュースレター、コンテンツ駆動型 SaaS アプリケーション構築に最適。",
+        "image": "/placeholder.webp",
+        "icon": "FileText"
+      },
+      {
+        "title": "サブスクリプション・マーケットプレイスプラットフォーム",
+        "description": "自動課金、顧客管理、支払い処理で継続収益ビジネスを構築。サブスクリプション管理、使用量ベース価格、顧客ポータル、包括的な分析を含む機能。SaaS マーケットプレイス、サブスクリプションサービス、プレミアムツールプラットフォームに最適。",
+        "image": "/placeholder.webp",
+        "icon": "CreditCard"
+      },
+      {
+        "title": "無料ツール・リードマグネット",
+        "description": "大量のオーガニックトラフィックを促進するバイラルな無料ツールを作成。超高速パフォーマンスと SEO 最適化。メールリスト構築、リード生成、次のバイラル計算機/コンバーターツール作成に最適。",
+        "image": "/placeholder.webp",
+        "icon": "Wrench"
+      }
+    ]
+  },
+  "Testimonials": {
+    "badge": {
+      "label": "お客様の声"
+    },
+    "title": "お客様からの評価",
+    "description": "私たちの言葉だけでなく、実際のお客様の声をお聞きください"
+  },
+  "FAQ": {
+    "title": "よくある質問",
+    "description": "Next.js SaaS テンプレートに関するよくある質問と、より良いアプリケーションをより速く構築する方法について",
+    "items": [
+      {
+        "question": "非技術者でもこのテンプレートを使用できますか？",
+        "answer": "絶対に！Nexty は AI アシスタントとシームレスに動作するように特別に設計されており、プログラミング経験がゼロの人でも AI 支援開発を通じて製品を開発できます。コード構造とドキュメントは AI フレンドリーで、AI がコードを理解し変更することが容易になります。技術チームはさらに大きな開発効率の恩恵を受けます。"
+      },
+      {
+        "question": "これが最高の Next.js SaaS テンプレートである理由は？",
+        "answer": "Nexty は利用可能な最も包括的な Next.js SaaS スターターキットです。基本的なコンポーネントのみを提供する他のテンプレートとは異なり、完全なビジネスワークフローを含んでいます：認証、支払い、AI 統合、コンテンツ管理、収益化機能。すべてが本格運用可能で、実際のアプリケーションで実証済みです。"
+      },
+      {
+        "question": "このテンプレートでどのくらい早く SaaS を立ち上げられますか？",
+        "answer": "最初のプロジェクトはテンプレートの機能を学ぶために 3-5 日かかりますが、学習曲線はすぐに報われます。システムをマスターした当社の顧客は、今や完全な SaaS アプリケーションをわずか 1-2 日で立ち上げています。テンプレートがすべての複雑なインフラを処理するため、製品を独特にするものに集中できます。"
+      },
+      {
+        "question": "これは AI パワード SaaS アプリケーションに適していますか？",
+        "answer": "絶対に！当社のテンプレートには、テキスト生成、画像作成、動画処理の実用例を含む包括的な AI SDK 統合が含まれています。OpenAI、Claude、Gemini、Grok、DeepSeek、その他の人気 AI モデルと互換性があります。AI ツールやコンテンツ生成プラットフォーム構築に最適です。"
+      },
+      {
+        "question": "どのような決済方法と課金モデルがサポートされていますか？",
+        "answer": "テンプレートには一回限りの支払い、サブスクリプション、使用量ベース課金、自動更新をサポートする完全な Stripe 統合が含まれています。すぐに収益化を開始できます。"
+      },
+      {
+        "question": "コンテンツ管理システムはどのように動作しますか？",
+        "answer": "組み込み CMS は Markdown とリッチテキスト編集、多言語コンテンツ、SEO 最適化、ペイウォール保護、AI 翻訳をサポートします。ロールベースのアクセス制御を備えた直感的な管理ダッシュボードを通じて記事、ページ、プレミアムコンテンツを管理できます。"
+      },
+      {
+        "question": "テンプレートは SEO 最適化されていますか？",
+        "answer": "はい！テンプレートには包括的な SEO 機能が含まれています：自動メタタグ、構造化データ、XML サイトマップ、OpenGraph サポート、パフォーマンス最適化。検索エンジンの可視性とより高速な読み込み時間のための Next.js ベストプラクティスで構築されています。"
+      },
+      {
+        "question": "どのようなサポートを提供していますか？",
+        "answer": "包括的なドキュメント、コード例、メールサポートを提供しています。他の開発者からヘルプを得てプロジェクトを共有できるパブリック Discord コミュニティもあります。"
+      },
+      {
+        "question": "価格カードはどのように管理しますか？",
+        "answer": "これは Nexty の重要なセールスポイントです。ダッシュボードで価格カードを管理でき、AI 多言語翻訳サポートで価格カードの追加、編集、削除ができ、複雑な多言語ファイル設定を排除します。"
+      }
+    ]
+  },
+  "CTA": {
+    "title": "製品を素早く立ち上げ、素早く収益化",
+    "description": "ゼロから始めるのはやめましょう！Nexty テンプレートを使ってコアアイデアに集中し、迅速に構築・検証して収益化を開始しましょう。",
+    "button": "今すぐテンプレートを取得",
+    "trustText": "世界中の開発者に信頼されています",
+    "features": {
+      "deploy": "🚀 クイックデプロイ",
+      "production": "🔧 本格運用対応",
+      "updates": "💎 生涯アップデート",
+      "i18n": "🌍 国際化"
+    }
+  }
+}

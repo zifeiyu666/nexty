@@ -1,0 +1,17 @@
+{
+  "title": "Credit History",
+  "description": "View the history of all your credit grants and usages here.",
+  "load_error": "Failed to load credit history. Please try again later.",
+  "no_records": "No credit history records found.",
+  "header_date": "Date",
+  "header_type": "Type",
+  "header_details": "Details",
+  "header_amount": "Amount",
+  "header_balance_one_time": "One-Time Credits",
+  "header_balance_subscription": "Subscription Credits",
+  "type_one_time_purchase": "Credit Purchase",
+  "type_subscription_grant": "Subscription Grant",
+  "type_feature_usage": "Feature Usage",
+  "type_refund_revoke": "Refund Revoke",
+  "type_subscription_ended_revoke": "Subscription Ended Revoke"
+}
