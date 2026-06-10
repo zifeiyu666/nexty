@@ -9,7 +9,7 @@ import { authClient } from "@/lib/auth/auth-client";
 import { normalizeEmail } from "@/lib/email";
 import { initializeTracking } from "@/lib/tracking/client";
 import { Turnstile } from "@marsidev/react-turnstile";
-import { Github, Link as LinkIcon, Loader2 } from "lucide-react";
+import { Link as LinkIcon, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -272,7 +272,7 @@ export default function LoginForm({ className = "" }: LoginFormProps) {
             </Badge>
           )}
         </Button>
-        <Button
+        {/* <Button
           variant="outline"
           onClick={() => signInSocial("github")}
           disabled={isGoogleLoading || isGithubLoading}
@@ -292,7 +292,7 @@ export default function LoginForm({ className = "" }: LoginFormProps) {
               Last used
             </Badge>
           )}
-        </Button>
+        </Button> */}
       </div>
 
       <div className="relative">

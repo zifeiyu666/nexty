@@ -21,6 +21,7 @@ import { cookies } from "next/headers";
 
 export const auth = betterAuth({
   appName: siteConfig.name,
+  debug: true,
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || process.env.NEXT_PUBLIC_SITE_URL,
   secret: process.env.BETTER_AUTH_SECRET,
   advanced: {
@@ -155,7 +156,9 @@ export const auth = betterAuth({
   },
   trustedOrigins: process.env.NODE_ENV === 'development' ? [process.env.NEXT_PUBLIC_SITE_URL!, 'http://localhost:3000'] : [process.env.NEXT_PUBLIC_SITE_URL!],
   plugins: [
-    ...(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? [oneTap()] : []),
+    ...(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? [oneTap({
+      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    })] : []),
     ...(process.env.TURNSTILE_SECRET_KEY ? [captcha({
       provider: "cloudflare-turnstile",
       secretKey: process.env.TURNSTILE_SECRET_KEY,
