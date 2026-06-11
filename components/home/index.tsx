@@ -1,4 +1,5 @@
 import CTA from "@/components/home/CTA";
+import CustomerReactions from "@/components/home/CustomerReactions";
 import FAQ from "@/components/home/FAQ";
 import Features from "@/components/home/Features";
 import Hero from "@/components/home/Hero";
@@ -16,6 +17,8 @@ export default async function HomeComponent() {
       <BG1 />
 
       {messages.Landing.Hero && <Hero />}
+
+      {messages.Landing.CustomerReactions && <CustomerReactions />}
 
       {messages.Landing.Features && <Features />}
 

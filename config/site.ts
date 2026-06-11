@@ -11,15 +11,17 @@ const DISCORD_URL = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL
 const EMAIL_URL = ''
 
 export const siteConfig: SiteConfig = {
-  name: "NEXTY.DEV",
+  name: "CustomSong",
+  tagLine: "Custom Song Generator - AI Personalized Song Gifts",
+  description: "Turn your unique story into a custom, studio-quality song in just 2 minutes. The perfect personalized AI song gift for birthdays, weddings, and anniversaries. Try it free now!",
   url: BASE_URL,
   authors: [
     {
-      name: "your-name",
+      name: "Ethan",
       url: BASE_URL,
     }
   ],
-  creator: '@your-handle',
+  creator: '@ethan',
   socialLinks: {
     github: GITHUB_URL,
     twitter: TWITTER_URL,

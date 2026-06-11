@@ -6,11 +6,74 @@
       "href": "https://nexty.dev/#pricing"
     },
     "title": "モダンな Next.js フルスタック SaaS テンプレート",
+    "titleLine": "モダンな Next.js",
+    "titleAccent": "SaaS テンプレート",
     "description": "認証、Stripe決済、AI統合、CMSなど、すぐに収益化を始めるために必要なすべてを含む、包括的な Next.js テンプレートです。",
     "getStarted": "今すぐ開始",
     "getStartedLink": "https://nexty.dev/#pricing",
+    "discord": {
+      "text": "Discord に参加",
+      "href": "https://discord.com/invite/R7bUxWKRqZ"
+    },
     "viewDocs": "ドキュメントを見る",
     "viewDocsLink": "https://nexty.dev/docs"
+  },
+  "CustomerReactions": {
+    "badge": {
+      "label": "リアクション",
+      "text": "本物の GiftSong モーメント"
+    },
+    "title": "GiftSong を受け取った人たちの反応",
+    "description": "<p>ティッシュを近くに置いてご覧ください。ホバーで静音プレビュー、クリックで <strong>GiftSong</strong> を音声付き再生できます。</p>",
+    "playLabel": "{title} を音声付きで再生",
+    "muteLabel": "{title} をミュート",
+    "trustItems": [
+      "無料で試せる",
+      "数分で完成",
+      "音楽スキル不要"
+    ],
+    "videos": [
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
+        "label": "GiftSong",
+        "title": "初めて聴いたお父さん"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "label": "GiftSong",
+        "title": "うれし涙の瞬間"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-4.mp4",
+        "label": "GiftSong",
+        "title": "最高のサプライズ"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
+        "label": "GiftSong",
+        "title": "誕生日に何度も再生"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-6.mp4",
+        "label": "GiftSong",
+        "title": "言葉にならない感動"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-8.mp4",
+        "label": "GiftSong",
+        "title": "ふたりだけの歌"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-9.mp4",
+        "label": "GiftSong",
+        "title": "笑顔が止まらない"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "label": "GiftSong",
+        "title": "もう一度聴きたい"
+      }
+    ]
   },
   "Features": {
     "badge": {

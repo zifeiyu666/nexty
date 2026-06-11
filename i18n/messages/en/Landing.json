@@ -1,16 +1,79 @@
 {
   "Hero": {
     "badge": {
-      "label": "NEW",
-      "text": "Next.js SaaS Full Stack Template",
-      "href": "https://nexty.dev/#pricing"
+      "label": "",
+      "text": "✨ #1 AI Custom Song Gift Maker",
+      "href": ""
     },
-    "title": "A Modern Next.js Full Stack SaaS Boilerplate",
-    "description": "Our Next.js boilerplate includes authentication, Stripe payments, AI integration, CMS, and everything you need to start earning immediately.",
-    "getStarted": "Get Started",
+    "title": "Gift A Custom Song They’ll Cherish Forever.",
+    "titleLine": "Gift A Custom Song They’ll",
+    "titleAccent": "Cherish Forever",
+    "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI instantly transforms your memories into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.</p>",
+    "getStarted": "Start Crafting Free",
     "getStartedLink": "https://nexty.dev/#pricing",
+    "discord": {
+      "text": "Join Discord",
+      "href": "https://discord.com/invite/R7bUxWKRqZ"
+    },
     "viewDocs": "View Documentation",
     "viewDocsLink": "https://nexty.dev/docs"
+  },
+  "CustomerReactions": {
+    "badge": {
+      "label": "REACTIONS",
+      "text": "😭 Tears of Joy"
+    },
+    "title": "Real Personalized Song Reactions",
+    "description": "<p>Grab some tissues before you watch. Hover to preview quietly, then click to hear how a <strong>custom song</strong> creates a lifetime memory.</p>",
+    "playLabel": "Play {title} with sound",
+    "muteLabel": "Mute {title}",
+    "trustItems": [
+      "Free to try",
+      "Ready in minutes",
+      "No musical skills needed"
+    ],
+    "videos": [
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
+        "label": "CustomSong",
+        "title": "Dad's first listen"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "label": "CustomSong",
+        "title": "The happy tears"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-4.mp4",
+        "label": "CustomSong",
+        "title": "Best surprise ever"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
+        "label": "CustomSong",
+        "title": "Birthday replay"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-6.mp4",
+        "label": "CustomSong",
+        "title": "Speechless"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-8.mp4",
+        "label": "CustomSong",
+        "title": "Couple's song"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-9.mp4",
+        "label": "CustomSong",
+        "title": "Couldn't stop smiling"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "label": "CustomSong",
+        "title": "One more listen"
+      }
+    ]
   },
   "Features": {
     "badge": {

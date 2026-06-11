@@ -6,11 +6,74 @@
       "href": "https://nexty.dev/#pricing"
     },
     "title": "多场景全栈 SaaS 开发模板",
+    "titleLine": "多场景全栈 SaaS",
+    "titleAccent": "开发模板",
     "description": "Nexty 是一个功能齐全的 Next.js SaaS 全栈模板，让你能够快速构建各种商业网站，无论是内容站、工具站还是集成 AI 能力的付费网站。",
     "getStarted": "立即开始",
     "getStartedLink": "https://nexty.dev/#pricing",
+    "discord": {
+      "text": "加入 Discord",
+      "href": "https://discord.com/invite/R7bUxWKRqZ"
+    },
     "viewDocs": "查看文档",
     "viewDocsLink": "https://nexty.dev/docs"
+  },
+  "CustomerReactions": {
+    "badge": {
+      "label": "用户反馈",
+      "text": "真实 GiftSong 时刻"
+    },
+    "title": "一些 GiftSong 用户反应",
+    "description": "<p>建议准备好纸巾。悬停可静音预览，点击任意故事即可打开 <strong>GiftSong</strong> 的歌曲声音。</p>",
+    "playLabel": "打开 {title} 的声音",
+    "muteLabel": "静音 {title}",
+    "trustItems": [
+      "免费试用",
+      "几分钟完成",
+      "无需音乐技能"
+    ],
+    "videos": [
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
+        "label": "GiftSong",
+        "title": "爸爸第一次听"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "label": "GiftSong",
+        "title": "开心到落泪"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-4.mp4",
+        "label": "GiftSong",
+        "title": "最惊喜的礼物"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
+        "label": "GiftSong",
+        "title": "生日反复播放"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-6.mp4",
+        "label": "GiftSong",
+        "title": "感动到说不出话"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-8.mp4",
+        "label": "GiftSong",
+        "title": "属于两个人的歌"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-9.mp4",
+        "label": "GiftSong",
+        "title": "笑容停不下来"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "label": "GiftSong",
+        "title": "再听一遍"
+      }
+    ]
   },
   "Features": {
     "badge": {
