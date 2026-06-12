@@ -94,9 +94,6 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
         className={`flex flex-col rounded-3xl p-7 shadow-sm ${testimonial.cardClassName}`}
       >
         <div className="space-y-5">
-          <div className="text-6xl font-serif leading-none text-muted-foreground/25">
-            “
-          </div>
           <div className="flex items-center justify-between gap-3">
             <RatingStars />
             <span className="shrink-0 whitespace-nowrap rounded-full bg-background/70 px-2.5 py-1 text-xs font-medium leading-none text-muted-foreground">

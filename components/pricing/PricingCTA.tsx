@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { DEFAULT_LOCALE, useRouter } from "@/i18n/routing";
 import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
+import { cn } from "@/lib/utils";
 import { Loader2, MousePointerClick } from "lucide-react";
 import { useLocale } from "next-intl";
 import Link from "next/link";
@@ -13,11 +14,16 @@ import { PayPalCheckoutButton } from "./PayPalCheckoutButton";
 type PricingPlan = typeof pricingPlansSchema.$inferSelect;
 
 type Params = {
+  buttonClassName?: string;
   plan: PricingPlan;
   localizedPlan: any;
 };
 
-export default function PricingCTA({ plan, localizedPlan }: Params) {
+export default function PricingCTA({
+  buttonClassName,
+  plan,
+  localizedPlan,
+}: Params) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const locale = useLocale();
@@ -179,11 +185,14 @@ export default function PricingCTA({ plan, localizedPlan }: Params) {
       <Button
         asChild={!!plan.buttonLink}
         disabled={isLoading}
-        className={`w-full flex items-center justify-center gap-2 py-5 font-medium ${
-          plan.isHighlighted
-            ? ""
-            : "bg-gray-900 text-white dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100"
-        } ${allowManualCoupon ? "mb-2" : "mb-6"}`}
+        className={cn(
+          "flex w-full items-center justify-center gap-2 py-5 font-medium",
+          buttonClassName ||
+            (plan.isHighlighted
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "bg-foreground text-primary-foreground hover:bg-foreground/90"),
+          allowManualCoupon ? "mb-2" : "mb-6"
+        )}
         {...(!plan.buttonLink && {
           onClick: () => handleCheckout(),
         })}

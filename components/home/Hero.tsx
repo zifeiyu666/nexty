@@ -70,7 +70,7 @@ export default function Hero() {
               className="h-11 rounded-xl px-8 py-2 text-white border-2 border-primary"
             >
               <I18nLink
-                href={t("getStartedLink") || "#"}
+                href="/create-song"
                 className="flex items-center gap-2"
               >
                 <MousePointerClick className="w-4 h-4" />

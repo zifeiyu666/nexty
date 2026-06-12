@@ -29,6 +29,13 @@ export const REDIS_KEYS_CONFIGS = {
     externalId: (externalId: string) => `${LOWER_CASE_SITE_NAME}:vtask:ext:${externalId}`,
   },
 
+  songTask: {
+    /** @example wenext:stask:{taskId} */
+    task: (taskId: string) => `${LOWER_CASE_SITE_NAME}:stask:${taskId}`,
+    /** @example wenext:song:{songId} */
+    song: (songId: string) => `${LOWER_CASE_SITE_NAME}:song:${songId}`,
+  },
+
   // Add other modules here as needed
   // user: { ... },
   // cache: { ... },
