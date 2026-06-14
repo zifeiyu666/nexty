@@ -6,7 +6,12 @@ import {
 } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { generateText } from "ai";
-import { getMusicTask, submitMusicTask } from "./adapters/kie-suno";
+import { submitMusicTask } from "./adapters/kie-suno";
+import {
+  buildLyricsLineRewritePrompt,
+  normalizeRewrittenLyricLines,
+  SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
+} from "./song-lyrics";
 import {
   assertSongTaskStoreConfigured,
   createExpiresAt,
@@ -35,6 +40,15 @@ export type SongGenerationInput = SongInputContext & {
   } | null;
 };
 
+export type SongLyricsRewriteInput = Pick<
+  SongInputContext,
+  "occasion" | "genre" | "language" | "recipientNames"
+> & {
+  fullLyrics: string;
+  selectedLines: string[];
+  instruction?: string;
+};
+
 function occasionLabel(value: string): string {
   return value
     .split("-")
@@ -48,6 +62,8 @@ export function buildLyricsPrompt(input: SongInputContext): string {
     : "someone special";
 
   return `You are an internationally experienced music producer and elite lyricist. Today I want to write a fully customized song as a gift for ${recipients}.
+
+${SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES}
 
 Please create lyrics strictly according to these customization requirements:
 
@@ -215,6 +231,46 @@ export async function generateSongLyrics(input: SongInputContext): Promise<{
   };
 }
 
+export async function rewriteSongLyricsLines(
+  input: SongLyricsRewriteInput
+): Promise<{ lines: string[] }> {
+  const selectedLines = input.selectedLines
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (!selectedLines.length) {
+    throw new Error("Select at least one lyric line to rewrite.");
+  }
+
+  const modelId = process.env.DEEPSEEK_LYRICS_MODEL || "deepseek-chat";
+  const model = getLanguageModel("deepseek", modelId);
+  const prompt = buildLyricsLineRewritePrompt({
+    ...input,
+    selectedLines,
+  });
+
+  console.log("[DeepSeek Lyrics Rewrite] Request", {
+    model: modelId,
+    selectedLineCount: selectedLines.length,
+    promptLength: prompt.length,
+  });
+
+  const result = await generateText({
+    model,
+    prompt,
+    temperature: 0.75,
+  });
+  const rewrittenLines = normalizeRewrittenLyricLines(result.text);
+
+  if (rewrittenLines.length < selectedLines.length) {
+    throw new Error("The rewrite did not include enough lyric lines.");
+  }
+
+  return {
+    lines: rewrittenLines.slice(0, selectedLines.length),
+  };
+}
+
 export async function createSongGeneration(input: SongGenerationInput): Promise<SongGenerationTask> {
   assertSongTaskStoreConfigured();
   const user = input.sessionUser
@@ -236,6 +292,9 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
     title: input.title,
     lyrics: input.lyrics,
     genre: input.genre,
+    occasion: input.occasion,
+    recipientNames: input.recipientNames,
+    story: input.story,
     vocalGender: input.vocalGender,
     language: input.language,
     versions: [],
@@ -244,19 +303,19 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
     expiresAt: createExpiresAt(now),
   };
 
+  console.log("[songs/generate] Creating song generation task", {
+    songId: task.songId,
+    externalId: task.externalId,
+    userId: task.userId,
+    email: task.email,
+    isSubscriber: task.isSubscriber,
+    title: task.title,
+  });
+
   await songTaskStore.setSong(task);
   return task;
 }
 
 export async function refreshSongGeneration(songId: string): Promise<SongGenerationTask | null> {
-  const task = await songTaskStore.getSong(songId);
-  if (!task) return null;
-  if (task.status !== "processing") return task;
-
-  const result = await getMusicTask(task.externalId);
-  return songTaskStore.updateSong(songId, {
-    status: result.status,
-    versions: result.versions.length ? result.versions : task.versions,
-    error: result.error,
-  });
+  return songTaskStore.getSong(songId);
 }

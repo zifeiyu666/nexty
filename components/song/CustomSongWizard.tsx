@@ -56,9 +56,20 @@ import {
 } from "react";
 import { toast } from "sonner";
 
+import ChooseButton from "@/components/song/ChooseButton";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  applyLyricsLineRewrite,
+  composeLyricsText,
+  createLyricsLineRewriteSuggestions,
+  EditableLyricLine,
+  LyricsLineRewriteSuggestion,
+  parseLyricsText,
+} from "@/lib/ai/song-lyrics";
 import { authClient } from "@/lib/auth/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -575,6 +586,13 @@ export function CustomSongWizard() {
   const [story, setStory] = useState("");
   const [songTitle, setSongTitle] = useState("");
   const [generatedLyrics, setGeneratedLyrics] = useState("");
+  const [selectedLyricLineIds, setSelectedLyricLineIds] = useState<string[]>([]);
+  const [lyricRewriteSuggestions, setLyricRewriteSuggestions] = useState<
+    LyricsLineRewriteSuggestion[]
+  >([]);
+  const [lyricRewriteInstruction, setLyricRewriteInstruction] = useState("");
+  const [lyricRewriteError, setLyricRewriteError] = useState("");
+  const [isRewritingLyricLines, setIsRewritingLyricLines] = useState(false);
   const [lyricsGeneratedBy, setLyricsGeneratedBy] = useState<"ai" | null>(null);
   const [lyricsInputKey, setLyricsInputKey] = useState("");
   const [lyricsRequestInputKey, setLyricsRequestInputKey] = useState("");
@@ -648,10 +666,15 @@ export function CustomSongWizard() {
     story,
     vocalGender,
   });
+  const editableLyricLines = useMemo(
+    () => parseLyricsText(generatedLyrics),
+    [generatedLyrics]
+  );
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const stepFromUrl = slugToStep[params.get("step") || ""] || 1;
+    const queryLyrics = params.get("lyrics") || "";
 
     try {
       const savedDraft = window.localStorage.getItem(draftStorageKey);
@@ -693,6 +716,29 @@ export function CustomSongWizard() {
       }
     } catch (error) {
       console.warn("[CustomSongWizard] Failed to restore draft:", error);
+    }
+
+    if (queryLyrics.trim()) {
+      const queryRecipients = (params.get("recipients") || "")
+        .split(",")
+        .map((name) => name.trim())
+        .filter(Boolean)
+        .slice(0, 3);
+      const queryOccasion = params.get("occasion");
+
+      setGenre(params.get("genre") || "Pop");
+      setVocalGender(params.get("vocalGender") || "Female");
+      setLanguage(params.get("language") || "English");
+      setOccasion(queryOccasion || null);
+      setRecipientNames(queryRecipients.length ? queryRecipients : [""]);
+      setStory(params.get("story") || "");
+      setSongTitle(params.get("title") || "Your Custom Song");
+      setGeneratedLyrics(queryLyrics);
+      setLyricsGeneratedBy("ai");
+      setLyricsStage("editor");
+      setStep(queryOccasion ? 4 : stepFromUrl);
+      setIsHydrated(true);
+      return;
     }
 
     setStep(stepFromUrl);
@@ -907,6 +953,20 @@ export function CustomSongWizard() {
     };
   }, [lyricsStage, lyricsTaskId]);
 
+  useEffect(() => {
+    const lyricLineIds = new Set(
+      editableLyricLines
+        .filter((line) => line.kind === "lyric")
+        .map((line) => line.id)
+    );
+    setSelectedLyricLineIds((current) =>
+      current.filter((lineId) => lyricLineIds.has(lineId))
+    );
+    setLyricRewriteSuggestions((current) =>
+      current.filter((suggestion) => lyricLineIds.has(suggestion.lineId))
+    );
+  }, [editableLyricLines]);
+
   const requestSongGeneration = useCallback(async () => {
     if (!occasion || !songTitle.trim() || !generatedLyrics.trim()) return;
     if (!session?.user && !email.trim()) {
@@ -988,6 +1048,11 @@ export function CustomSongWizard() {
 
         if (result.data.status === "succeeded") {
           const versions = result.data.versions || [];
+          if (result.data.sampleUrl) {
+            router.push(result.data.sampleUrl);
+            return;
+          }
+
           setLeadData({
             userId: session?.user?.id || "guest",
             email: session?.user?.email || email,
@@ -1024,7 +1089,7 @@ export function CustomSongWizard() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [email, session?.user, songStage, songTaskId]);
+  }, [email, router, session?.user, songStage, songTaskId]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -1243,7 +1308,107 @@ export function CustomSongWizard() {
   function rewriteLyrics() {
     setSongTitle("");
     setGeneratedLyrics("");
+    setSelectedLyricLineIds([]);
+    setLyricRewriteSuggestions([]);
+    setLyricRewriteInstruction("");
+    setLyricRewriteError("");
     requestLyricsGeneration();
+  }
+
+  function updateLyricLine(lineId: string, text: string) {
+    setGeneratedLyrics((current) =>
+      composeLyricsText(
+        parseLyricsText(current).map((line) =>
+          line.id === lineId ? { ...line, text } : line
+        )
+      )
+    );
+    setLyricRewriteSuggestions((current) =>
+      current.filter((suggestion) => suggestion.lineId !== lineId)
+    );
+    setLyricRewriteError("");
+  }
+
+  function toggleLyricLineSelection(lineId: string, selected: boolean) {
+    setSelectedLyricLineIds((current) =>
+      selected
+        ? Array.from(new Set([...current, lineId]))
+        : current.filter((id) => id !== lineId)
+    );
+    setLyricRewriteError("");
+  }
+
+  async function rewriteSelectedLyricLines() {
+    const selectedLines = editableLyricLines.filter(
+      (line) => selectedLyricLineIds.includes(line.id) && line.kind === "lyric"
+    );
+
+    if (!selectedLines.length) {
+      setLyricRewriteError("Select at least one lyric line to rewrite.");
+      return;
+    }
+
+    setIsRewritingLyricLines(true);
+    setLyricRewriteError("");
+
+    try {
+      const response = await fetch("/api/songs/lyrics/rewrite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          occasion,
+          genre,
+          language,
+          recipientNames: recipientNameList,
+          fullLyrics: generatedLyrics,
+          selectedLines: selectedLines.map((line) => line.text),
+          instruction: lyricRewriteInstruction,
+        }),
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Unable to rewrite selected lines.");
+      }
+
+      setLyricRewriteSuggestions(
+        createLyricsLineRewriteSuggestions(
+          editableLyricLines,
+          selectedLines.map((line) => line.id),
+          result.data.lines || []
+        )
+      );
+      setSelectedLyricLineIds([]);
+      toast.success("Rewrite suggestions are ready.");
+    } catch (error) {
+      setLyricRewriteError(
+        error instanceof Error ? error.message : "Unable to rewrite selected lines."
+      );
+    } finally {
+      setIsRewritingLyricLines(false);
+    }
+  }
+
+  function acceptLyricRewriteSuggestion(lineId: string) {
+    const suggestion = lyricRewriteSuggestions.find((item) => item.lineId === lineId);
+    if (!suggestion) return;
+
+    setGeneratedLyrics((current) =>
+      composeLyricsText(
+        applyLyricsLineRewrite(parseLyricsText(current), [lineId], [
+          suggestion.rewrittenText,
+        ])
+      )
+    );
+    setLyricRewriteSuggestions((current) =>
+      current.filter((item) => item.lineId !== lineId)
+    );
+  }
+
+  function keepOriginalLyricLine(lineId: string) {
+    setLyricRewriteSuggestions((current) =>
+      current.filter((item) => item.lineId !== lineId)
+    );
   }
 
   function setWizardStep(nextStep: WizardStep, mode: "push" | "replace" = "push") {
@@ -1766,10 +1931,19 @@ export function CustomSongWizard() {
                     label="Lyrics"
                     onAction={rewriteLyrics}
                   >
-                    <Textarea
-                      className="min-h-[280px] resize-none rounded-xl border-0 bg-muted p-3.5 text-sm leading-6 text-foreground shadow-none focus-visible:ring-primary/25"
-                      value={generatedLyrics}
-                      onChange={(event) => setGeneratedLyrics(event.target.value)}
+                    <LyricsLineEditor
+                      error={lyricRewriteError}
+                      instruction={lyricRewriteInstruction}
+                      isRewriting={isRewritingLyricLines}
+                      lines={editableLyricLines}
+                      selectedLineIds={selectedLyricLineIds}
+                      suggestions={lyricRewriteSuggestions}
+                      onAcceptSuggestion={acceptLyricRewriteSuggestion}
+                      onInstructionChange={setLyricRewriteInstruction}
+                      onKeepOriginal={keepOriginalLyricLine}
+                      onLineChange={updateLyricLine}
+                      onRewriteSelected={rewriteSelectedLyricLines}
+                      onSelectionChange={toggleLyricLineSelection}
                     />
                   </EditableBlock>
                 </div>
@@ -1956,19 +2130,18 @@ export function CustomSongWizard() {
                       </div>
 
                       <div className="mt-3 border-t border-border pt-3">
-                        <Button
+                        <ChooseButton
                           className={cn(
                             "h-10 w-full rounded-full text-xs font-black text-primary-foreground",
                             index === 0
                               ? "bg-foreground hover:bg-foreground/90"
                               : "bg-primary hover:bg-primary/90"
                           )}
-                          type="button"
-                          onClick={() => chooseSongVersion(version)}
+                          onChoose={() => chooseSongVersion(version)}
                         >
                           <Gift className="size-4" />
                           Choose this one
-                        </Button>
+                        </ChooseButton>
                       </div>
                     </div>
                     );
@@ -2683,6 +2856,177 @@ function StepHeading({
         {title}
       </h1>
       <p className="mt-5 text-base leading-8 text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
+function LyricsLineEditor({
+  error,
+  instruction,
+  isRewriting,
+  lines,
+  selectedLineIds,
+  suggestions,
+  onAcceptSuggestion,
+  onInstructionChange,
+  onKeepOriginal,
+  onLineChange,
+  onRewriteSelected,
+  onSelectionChange,
+}: {
+  error: string;
+  instruction: string;
+  isRewriting: boolean;
+  lines: EditableLyricLine[];
+  selectedLineIds: string[];
+  suggestions: LyricsLineRewriteSuggestion[];
+  onAcceptSuggestion: (lineId: string) => void;
+  onInstructionChange: (value: string) => void;
+  onKeepOriginal: (lineId: string) => void;
+  onLineChange: (lineId: string, text: string) => void;
+  onRewriteSelected: () => void;
+  onSelectionChange: (lineId: string, selected: boolean) => void;
+}) {
+  const selectedCount = selectedLineIds.length;
+  const suggestionsByLineId = new Map(
+    suggestions.map((suggestion) => [suggestion.lineId, suggestion])
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className="-mx-4 border-y border-border/70 px-4 py-2 sm:-mx-5 sm:px-5">
+        <ScrollArea className="h-[360px]">
+          <div className="space-y-1 py-1">
+            {lines.map((line) => {
+              const isSelectable = line.kind === "lyric";
+              const selected = selectedLineIds.includes(line.id);
+              const suggestion = suggestionsByLineId.get(line.id);
+
+              if (line.kind === "blank") {
+                return <div key={line.id} className="h-1.5" />;
+              }
+
+              if (line.kind === "title") {
+                return null;
+              }
+
+              if (line.kind === "section") {
+                return (
+                  <div
+                    key={line.id}
+                    className="flex min-h-6 items-center px-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground"
+                  >
+                    {line.text}
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={line.id}
+                  className={cn(
+                    "group rounded-lg px-1.5 py-1 transition",
+                    selected || suggestion ? "bg-rose-50/90 dark:bg-rose-950/20" : "bg-transparent"
+                  )}
+                >
+                  <div className="grid grid-cols-[1.35rem_1fr] items-center gap-1.5">
+                    <Checkbox
+                      aria-label="Select lyric line"
+                      checked={selected}
+                      className={cn(
+                        "size-3.5 justify-self-center transition-opacity",
+                        selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                      )}
+                      disabled={!isSelectable || isRewriting}
+                      onCheckedChange={(checked) =>
+                        onSelectionChange(line.id, checked === true)
+                      }
+                    />
+                    <Input
+                      aria-label="Lyric line"
+                      className="h-7 rounded-md border-0 bg-transparent px-1.5 text-sm font-semibold leading-5 text-foreground shadow-none focus-visible:bg-background/80 focus-visible:ring-primary/15"
+                      disabled={isRewriting || Boolean(suggestion)}
+                      value={line.text}
+                      onChange={(event) => onLineChange(line.id, event.target.value)}
+                    />
+                  </div>
+
+                  {suggestion && (
+                    <div className="ml-7 mt-1.5 space-y-2 rounded-lg bg-background/70 p-2.5 shadow-sm">
+                      <div className="grid gap-2 text-sm sm:grid-cols-2">
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+                            Original
+                          </p>
+                          <p className="mt-1 leading-6 text-muted-foreground">
+                            {suggestion.originalText}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">
+                            New
+                          </p>
+                          <p className="mt-1 leading-6 font-semibold text-foreground">
+                            {suggestion.rewrittenText}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <Button
+                          className="h-8 rounded-lg px-3 text-xs font-bold"
+                          size="sm"
+                          type="button"
+                          variant="ghost"
+                          onClick={() => onKeepOriginal(line.id)}
+                        >
+                          Use original
+                        </Button>
+                        <Button
+                          className="h-8 rounded-lg bg-primary px-3 text-xs font-bold text-primary-foreground hover:bg-primary/90"
+                          size="sm"
+                          type="button"
+                          onClick={() => onAcceptSuggestion(line.id)}
+                        >
+                          Use new
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      </div>
+
+      <div className="grid gap-2 rounded-xl bg-muted/60 p-2 sm:grid-cols-[1fr_auto]">
+        <Input
+          className="h-9 rounded-lg border-0 bg-background text-sm shadow-none focus-visible:ring-primary/20"
+          disabled={isRewriting}
+          placeholder="Optional direction, e.g. make selected lines more tender"
+          value={instruction}
+          onChange={(event) => onInstructionChange(event.target.value)}
+        />
+        <Button
+          className="h-9 rounded-lg bg-primary px-4 text-xs font-bold text-primary-foreground hover:bg-primary/90"
+          disabled={!selectedCount || isRewriting}
+          type="button"
+          onClick={onRewriteSelected}
+        >
+          {isRewriting ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Wand2 className="size-4" />
+          )}
+          Rewrite {selectedCount ? selectedCount : ""}
+        </Button>
+      </div>
+
+      {error && (
+        <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

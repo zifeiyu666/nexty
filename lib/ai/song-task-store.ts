@@ -27,6 +27,9 @@ export type SongGenerationTask = {
   title: string;
   lyrics: string;
   genre: string;
+  occasion: string;
+  recipientNames: string[];
+  story: string;
   vocalGender: string;
   language: string;
   versions: KieSongVersion[];
@@ -47,7 +50,21 @@ async function getJson<T>(key: string): Promise<T | null> {
   if (!redis) return null;
   const data = await redis.get<string>(key);
   if (!data) return null;
-  return typeof data === "string" ? JSON.parse(data) : (data as T);
+
+  if (typeof data !== "string") {
+    return data as T;
+  }
+
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    console.warn("[song-task-store] Redis value is not valid JSON, returning raw string", {
+      key,
+      data,
+      error: error instanceof Error ? error.message : error,
+    });
+    return data as unknown as T;
+  }
 }
 
 export function createExpiresAt(createdAt = Date.now()): number {
@@ -79,10 +96,28 @@ export const songTaskStore = {
 
   async setSong(task: SongGenerationTask): Promise<void> {
     await setJson(keys.song(task.songId), task);
+    if (task.externalId) {
+      await setJson(keys.songExternalId(task.externalId), task.songId);
+    }
   },
 
   async getSong(songId: string): Promise<SongGenerationTask | null> {
     return getJson<SongGenerationTask>(keys.song(songId));
+  },
+
+  async getSongByExternalId(externalId: string): Promise<SongGenerationTask | null> {
+    const rawSongId = await getJson<string>(keys.songExternalId(externalId));
+    console.log("[song-task-store] External ID lookup", {
+      externalId,
+      rawSongId,
+      rawSongIdType: typeof rawSongId,
+    });
+
+    if (!rawSongId) {
+      return null;
+    }
+
+    return this.getSong(rawSongId);
   },
 
   async updateSong(songId: string, updates: Partial<SongGenerationTask>): Promise<SongGenerationTask | null> {

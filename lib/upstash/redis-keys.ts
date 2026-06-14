@@ -34,6 +34,14 @@ export const REDIS_KEYS_CONFIGS = {
     task: (taskId: string) => `${LOWER_CASE_SITE_NAME}:stask:${taskId}`,
     /** @example wenext:song:{songId} */
     song: (songId: string) => `${LOWER_CASE_SITE_NAME}:song:${songId}`,
+    /** @example wenext:song:ext:{externalId} */
+    songExternalId: (externalId: string) => `${LOWER_CASE_SITE_NAME}:song:ext:${externalId}`,
+    /** @example wenext:ssample:{songId} */
+    sample: (songId: string) => `${LOWER_CASE_SITE_NAME}:ssample:${songId}`,
+    /** @example wenext:ssamples:user:{userId} */
+    samplesByUser: (userId: string) => `${LOWER_CASE_SITE_NAME}:ssamples:user:${userId}`,
+    /** @example wenext:ssamples:email:{email} */
+    samplesByEmail: (email: string) => `${LOWER_CASE_SITE_NAME}:ssamples:email:${email.toLowerCase()}`,
   },
 
   // Add other modules here as needed

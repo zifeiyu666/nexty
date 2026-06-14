@@ -1,5 +1,5 @@
-import { apiResponse } from "@/lib/api-response";
 import { createSongGeneration } from "@/lib/ai/song";
+import { apiResponse } from "@/lib/api-response";
 import { getSession } from "@/lib/auth/server";
 import { z } from "zod";
 
@@ -43,6 +43,13 @@ export async function POST(req: Request) {
             isAnonymous: (session.user as any).isAnonymous,
           }
         : null,
+    });
+
+    console.log("[songs/generate] Task submitted", {
+      songId: task.songId,
+      externalId: task.externalId,
+      status: task.status,
+      isSubscriber: task.isSubscriber,
     });
 
     return apiResponse.success({

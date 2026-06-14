@@ -46,6 +46,20 @@ function getApiKey(): string {
   return apiKey;
 }
 
+export function buildKieSunoCallbackUrl(): string {
+  const explicitUrl = process.env.KIE_SUNO_CALLBACK_URL?.trim();
+  if (explicitUrl) return explicitUrl;
+
+  const baseUrl = process.env.WEBHOOK_BASE_URL?.trim().replace(/\/+$/, "");
+  if (!baseUrl) {
+    throw new Error(
+      "WEBHOOK_BASE_URL is not configured. KIE Suno music generation requires a public callback URL."
+    );
+  }
+
+  return `${baseUrl}/api/webhooks/kie/suno`;
+}
+
 function logKieRequest(endpoint: string, payload: Record<string, unknown>): void {
   if (process.env.KIE_DEBUG_LOGS === "false") return;
 
@@ -165,6 +179,7 @@ function extractTitle(record: unknown): string | undefined {
 
 function normalizeStatus(rawStatus: unknown, successStatuses: string[]): SongTaskStatus {
   const status = String(rawStatus || "").toUpperCase();
+  if (status === "COMPLETE") return "succeeded";
   if (successStatuses.includes(status)) return "succeeded";
   if (status.includes("FAIL") || status.includes("ERROR")) return "failed";
   return "processing";
@@ -209,7 +224,15 @@ function collectCandidateTracks(input: unknown): any[] {
           (item) =>
             item &&
             typeof item === "object" &&
-            directStringAtKeys(item, ["audioUrl", "sourceAudioUrl", "streamAudioUrl", "url"])
+            directStringAtKeys(item, [
+              "audioUrl",
+              "audio_url",
+              "sourceAudioUrl",
+              "source_audio_url",
+              "streamAudioUrl",
+              "stream_audio_url",
+              "url",
+            ])
         )
       ) {
         candidates.push(...current);
@@ -220,7 +243,17 @@ function collectCandidateTracks(input: unknown): any[] {
     }
 
     const record = current as Record<string, unknown>;
-    if (directStringAtKeys(record, ["audioUrl", "sourceAudioUrl", "streamAudioUrl", "url"])) {
+    if (
+      directStringAtKeys(record, [
+        "audioUrl",
+        "audio_url",
+        "sourceAudioUrl",
+        "source_audio_url",
+        "streamAudioUrl",
+        "stream_audio_url",
+        "url",
+      ])
+    ) {
       candidates.push(record);
       return;
     }
@@ -242,10 +275,14 @@ function asNumber(value: unknown): number | undefined {
 function normalizeTrack(track: any, index: number): KieSongVersion | null {
   const audioUrl = firstStringAtKeys(track, [
     "sourceAudioUrl",
+    "source_audio_url",
     "audioUrl",
+    "audio_url",
     "streamAudioUrl",
+    "stream_audio_url",
     "url",
     "songUrl",
+    "song_url",
   ]);
   if (!audioUrl || !/^https?:\/\//i.test(audioUrl)) return null;
 
@@ -253,7 +290,9 @@ function normalizeTrack(track: any, index: number): KieSongVersion | null {
   const id = firstStringAtKeys(track, ["id", "taskId"]) || `${index + 1}`;
   const imageUrl = firstStringAtKeys(track, [
     "imageUrl",
+    "image_url",
     "coverUrl",
+    "cover_url",
     "imageLargeUrl",
     "image_url",
   ]);
@@ -337,6 +376,7 @@ export async function submitMusicTask(input: SubmitMusicInput): Promise<string> 
     .join(", ");
 
   const payload = {
+    callBackUrl: buildKieSunoCallbackUrl(),
     customMode: true,
     instrumental: false,
     prompt: input.lyrics,
