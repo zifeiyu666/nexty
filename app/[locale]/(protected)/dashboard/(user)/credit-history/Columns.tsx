@@ -46,6 +46,22 @@ const formatLogType = (type: string, t: (key: string) => string) => {
   }
 };
 
+const formatEntitlements = (value: unknown) => {
+  const data = value && typeof value === "object" ? value as any : null;
+  const subscription = data?.subscription || {};
+  const oneTime = data?.oneTime || {};
+  const parts = [
+    ["Songs", (subscription.song || 0) + (oneTime.song || 0)],
+    ["MV", (subscription.mv || 0) + (oneTime.mv || 0)],
+    ["Wall art", (subscription.wallArt || 0) + (oneTime.wallArt || 0)],
+  ] as const;
+
+  return parts
+    .filter(([, amount]) => amount !== 0)
+    .map(([label, amount]) => `${label}: ${amount > 0 ? `+${amount}` : amount}`)
+    .join(" · ") || "-";
+};
+
 export const getColumns = (
   t: (key: string) => string
 ): ColumnDef<CreditLog>[] => [
@@ -83,6 +99,14 @@ export const getColumns = (
     accessorKey: "amount",
     header: "Amount",
     cell: ({ row }) => {
+      const entitlementDelta = row.original.entitlementDeltaJsonb;
+      if (entitlementDelta && Object.keys(entitlementDelta as object).length > 0) {
+        return (
+          <div className="font-medium text-muted-foreground">
+            {formatEntitlements(entitlementDelta)}
+          </div>
+        );
+      }
       const amount = parseFloat(row.getValue("amount"));
       const formatted = amount > 0 ? `+${amount}` : amount.toString();
       return (
@@ -97,20 +121,11 @@ export const getColumns = (
     },
   },
   {
-    accessorKey: "oneTimeCreditsSnapshot",
-    header: "One-Time Balance After",
+    accessorKey: "entitlementSnapshotJsonb",
+    header: "Balance After",
     cell: ({ row }) => (
       <div className="text-muted-foreground">
-        {row.getValue("oneTimeCreditsSnapshot")}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "subscriptionCreditsSnapshot",
-    header: "Subscription Balance After",
-    cell: ({ row }) => (
-      <div className="text-muted-foreground">
-        {row.getValue("subscriptionCreditsSnapshot")}
+        {formatEntitlements(row.getValue("entitlementSnapshotJsonb"))}
       </div>
     ),
   },

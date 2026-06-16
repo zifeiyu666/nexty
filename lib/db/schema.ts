@@ -339,6 +339,56 @@ export const usage = pgTable('usage', {
     .$onUpdate(() => new Date()),
 })
 
+export const songs = pgTable(
+  'songs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .references(() => user.id, { onDelete: 'cascade' })
+      .notNull(),
+    sourceSampleId: text('source_sample_id').notNull(),
+    selectedVersionId: text('selected_version_id').notNull(),
+    title: text('title').notNull(),
+    lyrics: text('lyrics').notNull(),
+    genre: text('genre').notNull(),
+    occasion: text('occasion').notNull(),
+    language: text('language').notNull(),
+    vocalGender: text('vocal_gender').notNull(),
+    recipientNamesJsonb: jsonb('recipient_names_jsonb').default('[]').notNull(),
+    story: text('story').notNull(),
+    audioUrl: text('audio_url').notNull(),
+    imageUrl: text('image_url'),
+    duration: integer('duration'),
+    status: text('status').default('ready').notNull(),
+    shareToken: text('share_token').notNull().unique(),
+    shareEnabled: boolean('share_enabled').default(true).notNull(),
+    sharedAt: timestamp('shared_at', { withTimezone: true }).defaultNow(),
+    wallArtJsonb: jsonb('wall_art_jsonb').default('{}').notNull(),
+    mvJsonb: jsonb('mv_jsonb').default('{}').notNull(),
+    metadataJsonb: jsonb('metadata_jsonb').default('{}').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      userIdx: index('idx_songs_user_id').on(table.userId),
+      sourceSampleIdx: index('idx_songs_source_sample_id').on(table.sourceSampleId),
+      shareTokenIdx: index('idx_songs_share_token').on(table.shareToken),
+      createdAtIdx: index('idx_songs_created_at').on(table.createdAt),
+      userSampleVersionUnique: unique('idx_songs_user_sample_version_unique').on(
+        table.userId,
+        table.sourceSampleId,
+        table.selectedVersionId
+      ),
+    }
+  }
+)
+
 export const creditLogs = pgTable(
   'credit_logs',
   {
@@ -349,6 +399,8 @@ export const creditLogs = pgTable(
     amount: integer('amount').notNull(),
     oneTimeCreditsSnapshot: integer('one_time_credits_snapshot').notNull(),
     subscriptionCreditsSnapshot: integer('subscription_credits_snapshot').notNull(),
+    entitlementDeltaJsonb: jsonb('entitlement_delta_jsonb').default('{}').notNull(),
+    entitlementSnapshotJsonb: jsonb('entitlement_snapshot_jsonb').default('{}').notNull(),
     type: text('type').notNull(),
     notes: text('notes'),
     relatedOrderId: uuid('related_order_id').references(() => orders.id, {

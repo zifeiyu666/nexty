@@ -8,6 +8,7 @@ const keys = REDIS_KEYS_CONFIGS.songTask;
 
 export type SongSample = {
   songId: string;
+  externalId: string;
   userId?: string;
   email?: string;
   title: string;
@@ -23,6 +24,7 @@ export type SongSample = {
   createdAt: number;
   updatedAt: number;
   accessExpiresAt: number;
+  unlockedVersionIds?: string[];
 };
 
 export type SongSampleView = SongSample & {
@@ -74,6 +76,7 @@ export function createSongSampleFromTask(
 ): SongSample {
   return {
     songId: task.songId,
+    externalId: task.externalId,
     userId: task.userId,
     email: task.email,
     title: task.title,
@@ -89,6 +92,7 @@ export function createSongSampleFromTask(
     createdAt: task.createdAt,
     updatedAt: now,
     accessExpiresAt: task.createdAt + ACCESS_WINDOW_MS,
+    unlockedVersionIds: task.isSubscriber ? task.versions.map((version) => version.id) : [],
   };
 }
 
@@ -112,6 +116,21 @@ export const songSampleStore = {
   async get(songId: string): Promise<SongSampleView | null> {
     const sample = await getJson<SongSample>(keys.sample(songId));
     return sample ? sampleToView(sample) : null;
+  },
+
+  async unlockVersion(songId: string, versionId: string): Promise<SongSampleView | null> {
+    const sample = await getJson<SongSample>(keys.sample(songId));
+    if (!sample) return null;
+
+    const unlockedVersionIds = unique([...(sample.unlockedVersionIds || []), versionId]);
+    const updated: SongSample = {
+      ...sample,
+      unlockedVersionIds,
+      previewLimitSeconds: 0,
+      updatedAt: Date.now(),
+    };
+    await this.save(updated);
+    return sampleToView(updated);
   },
 
   async list(input: {

@@ -8,6 +8,20 @@ export type KieSongVersion = {
   audioUrl: string;
   imageUrl?: string;
   duration?: number;
+  timestampedLyrics?: KieTimestampedLyrics;
+};
+
+export type KieAlignedWord = {
+  word: string;
+  startS: number;
+  endS: number;
+};
+
+export type KieTimestampedLyrics = {
+  alignedWords: KieAlignedWord[];
+  waveformData?: number[];
+  hootCer?: number;
+  isStreamed?: boolean;
 };
 
 export type LyricsTaskResult = {
@@ -20,6 +34,15 @@ export type LyricsTaskResult = {
 export type MusicTaskResult = {
   status: SongTaskStatus;
   versions: KieSongVersion[];
+  error?: string;
+};
+
+export type TimestampedLyricsResult = {
+  status: SongTaskStatus;
+  alignedWords: KieAlignedWord[];
+  waveformData?: number[];
+  hootCer?: number;
+  isStreamed?: boolean;
   error?: string;
 };
 
@@ -272,6 +295,65 @@ function asNumber(value: unknown): number | undefined {
   return undefined;
 }
 
+function asBoolean(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    if (value.toLowerCase() === "true") return true;
+    if (value.toLowerCase() === "false") return false;
+  }
+  return undefined;
+}
+
+function normalizeAlignedWords(input: unknown): KieAlignedWord[] {
+  const parsed = maybeParseJson(input);
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed
+    .map((item) => {
+      const current = maybeParseJson(item);
+      if (!current || typeof current !== "object") return null;
+      const record = current as Record<string, unknown>;
+      const word = String(record.word ?? record.text ?? "").trim();
+      const startS = asNumber(record.startS ?? record.start ?? record.startSec);
+      const endS = asNumber(record.endS ?? record.end ?? record.endSec);
+
+      if (!word || startS === undefined || endS === undefined) return null;
+
+      return {
+        word,
+        startS,
+        endS,
+      };
+    })
+    .filter((word): word is KieAlignedWord => Boolean(word));
+}
+
+function findAlignedWords(input: unknown): KieAlignedWord[] {
+  const parsed = maybeParseJson(input);
+  if (!parsed || typeof parsed !== "object") return [];
+
+  if (Array.isArray(parsed)) {
+    for (const item of parsed) {
+      const found = findAlignedWords(item);
+      if (found.length) return found;
+    }
+    return [];
+  }
+
+  const record = parsed as Record<string, unknown>;
+  const direct = normalizeAlignedWords(
+    record.alignedWords ?? record.aligned_words ?? record.words,
+  );
+  if (direct.length) return direct;
+
+  for (const value of Object.values(record)) {
+    const found = findAlignedWords(value);
+    if (found.length) return found;
+  }
+
+  return [];
+}
+
 function normalizeTrack(track: any, index: number): KieSongVersion | null {
   const audioUrl = firstStringAtKeys(track, [
     "sourceAudioUrl",
@@ -320,6 +402,30 @@ export function normalizeKieMusicRecord(record: KieApiResponse): MusicTaskResult
   return {
     status,
     versions,
+    error: status === "failed" ? error : undefined,
+  };
+}
+
+export function normalizeKieTimestampedLyricsRecord(
+  record: KieApiResponse
+): TimestampedLyricsResult {
+  const data = maybeParseJson(record.data);
+  const rawStatus = getRecordStatus(data);
+  const alignedWords = findAlignedWords(data);
+  const status = alignedWords.length
+    ? "succeeded"
+    : normalizeStatus(rawStatus, ["SUCCESS", "SUCCEEDED"]);
+  const error = data?.failMsg || data?.errorMessage || data?.error || record.msg || record.message;
+  const waveformData = Array.isArray(data?.waveformData)
+    ? data.waveformData.map(Number).filter((value: number) => Number.isFinite(value))
+    : undefined;
+
+  return {
+    status,
+    alignedWords,
+    waveformData,
+    hootCer: asNumber(data?.hootCer),
+    isStreamed: asBoolean(data?.isStreamed),
     error: status === "failed" ? error : undefined,
   };
 }
@@ -406,6 +512,28 @@ export async function submitMusicTask(input: SubmitMusicInput): Promise<string> 
     throw new Error("KIE music response did not include a taskId");
   }
   return taskId;
+}
+
+export async function submitTimestampedLyricsTask({
+  taskId,
+  audioId,
+}: {
+  taskId: string;
+  audioId: string;
+}): Promise<TimestampedLyricsResult> {
+  const payload = { taskId, audioId };
+  logKieRequest("/api/v1/generate/get-timestamped-lyrics", payload);
+
+  const response = await fetch(`${KIE_BASE_URL}/api/v1/generate/get-timestamped-lyrics`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${getApiKey()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return normalizeKieTimestampedLyricsRecord(await parseKieResponse(response));
 }
 
 export async function getMusicTask(taskId: string): Promise<MusicTaskResult> {

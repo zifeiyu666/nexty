@@ -4,9 +4,7 @@ import {
 } from "@/components/song/SampleSongPlayer";
 import { Button } from "@/components/ui/button";
 import { Locale } from "@/i18n/routing";
-import { hasActiveSubscription } from "@/lib/ai/song";
 import { songSampleStore } from "@/lib/ai/song-sample-store";
-import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
 import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
@@ -69,15 +67,12 @@ export default async function SampleDetailPage({
     lyrics: sample.lyrics,
   });
 
-  const session = await getSession();
-  const isSubscriber = session?.user ? await hasActiveSubscription(session.user.id) : false;
-
   return (
-    <main className="min-h-screen bg-muted px-4 py-6 text-foreground sm:px-6">
-      <div className="mx-auto max-w-5xl">
+    <main className="min-h-screen w-full bg-[#fbf8f5] px-4 py-6 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-5xl">
         <Button
           asChild
-          className="mb-4 h-10 rounded-full bg-background text-sm font-bold text-muted-foreground shadow-sm hover:text-foreground"
+          className="mb-4 h-10 rounded-full bg-background/80 text-sm font-bold text-muted-foreground shadow-sm hover:text-foreground"
           variant="ghost"
         >
           <Link href="/samples">
@@ -86,13 +81,10 @@ export default async function SampleDetailPage({
           </Link>
         </Button>
 
-        <section className="rounded-3xl border border-border bg-background p-4 shadow-sm sm:p-6">
-          <SampleSongPlayer
-            data={playerData}
-            regenerateHref={`/create-song?${regenerateParams.toString()}`}
-            isSubscriber={isSubscriber}
-          />
-        </section>
+        <SampleSongPlayer
+          data={playerData}
+          regenerateHref={`/create-song?${regenerateParams.toString()}`}
+        />
       </div>
     </main>
   );

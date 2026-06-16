@@ -195,11 +195,51 @@ describe("song samples", () => {
     );
 
     assert.equal(sample.songId, "song-1");
+    assert.equal(sample.externalId, "kie-1");
     assert.equal(sample.previewLimitSeconds, 60);
     assert.equal(
       sample.accessExpiresAt,
       createdAt + 3 * 24 * 60 * 60 * 1000
     );
     assert.deepEqual(sample.recipientNames, ["Sdf"]);
+  });
+
+  test("keeps timestamped lyrics on the sample record", () => {
+    const createdAt = new Date("2026-06-10T00:00:00Z").getTime();
+    const sample = createSongSampleFromTask(
+      {
+        songId: "song-1",
+        externalId: "kie-1",
+        status: "succeeded",
+        email: "guest@example.com",
+        isSubscriber: false,
+        title: "Birthday Melody",
+        lyrics: "[Verse 1]\nHello",
+        genre: "Pop",
+        occasion: "birthday",
+        recipientNames: ["Sdf"],
+        story: "A birthday story",
+        vocalGender: "Female",
+        language: "English",
+        versions: [
+          {
+            id: "a",
+            title: "A",
+            audioUrl: "https://cdn.test/a.mp3",
+            timestampedLyrics: {
+              alignedWords: [{ word: "Hello", startS: 1, endS: 1.5 }],
+            },
+          },
+        ],
+        createdAt,
+        updatedAt: createdAt,
+        expiresAt: createdAt + 1000,
+      },
+      createdAt
+    );
+
+    assert.deepEqual(sample.versions[0]?.timestampedLyrics?.alignedWords, [
+      { word: "Hello", startS: 1, endS: 1.5 },
+    ]);
   });
 });

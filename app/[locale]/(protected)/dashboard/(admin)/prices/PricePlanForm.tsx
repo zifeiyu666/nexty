@@ -1815,7 +1815,7 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
                       </div>
                       <FormControl>
                         <Textarea
-                          placeholder={`{\n  "monthlyCredits": 1000,\n  "oneTimeCredits": 1000,\n  "totalMonths": 12\n}`}
+                          placeholder={`{\n  "entitlements": {\n    "song": 10,\n    "mv": 5,\n    "wallArt": 5\n  },\n  "totalMonths": 12\n}`}
                           {...field}
                           value={field.value ?? ""}
                           rows={8}
@@ -2085,19 +2085,19 @@ function BenefitsTemplateButtons({
 }: BenefitsTemplateButtonsProps) {
   const templates = [
     {
-      label: "One-time Credits",
-      title: "One-time Credits Template",
-      data: { oneTimeCredits: 1000 },
+      label: "One-time Counts",
+      title: "One-time Counts Template",
+      data: { entitlements: { song: 1, mv: 0, wallArt: 0 } },
     },
     {
-      label: "Monthly Credits",
-      title: "Monthly Credits Template",
-      data: { monthlyCredits: 1000 },
+      label: "Monthly Counts",
+      title: "Monthly Counts Template",
+      data: { entitlements: { song: 10, mv: 5, wallArt: 5 } },
     },
     {
-      label: "Yearly Credits",
-      title: "Yearly Credits Template",
-      data: { totalMonths: 12, monthlyCredits: 1000 },
+      label: "Yearly Counts",
+      title: "Yearly Counts Template",
+      data: { totalMonths: 12, entitlements: { song: 10, mv: 5, wallArt: 5 } },
     },
   ];
 

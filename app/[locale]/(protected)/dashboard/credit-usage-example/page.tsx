@@ -1,7 +1,7 @@
 "use client";
 
 import { UserBenefits } from "@/actions/usage/benefits";
-import { deductCredits, getClientUserBenefits } from "@/actions/usage/deduct";
+import { deductEntitlement, getClientUserBenefits } from "@/actions/usage/deduct";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const CREDITS_TO_DEDUCT = 10;
+const SONGS_TO_DEDUCT = 1;
 
 export default function CreditUsageExamplePage() {
   const [benefits, setBenefits] = useState<UserBenefits | null>(null);
@@ -55,19 +55,20 @@ export default function CreditUsageExamplePage() {
     setIsDeducting(true);
 
     try {
-      const result = await deductCredits(
-        CREDITS_TO_DEDUCT,
-        `Used feature from example page`
-      );
+      const result = await deductEntitlement({
+        entitlement: "song",
+        amount: SONGS_TO_DEDUCT,
+        notes: `Used song feature from example page`,
+      });
 
       if (!result.success) {
-        toast.error(result.error || "Could not deduct credits.");
+        toast.error(result.error || "Could not deduct entitlement.");
         await fetchBenefitsAndSetState();
         return;
       }
 
       if (result.success && result.data) {
-        toast.success(result.data.message || `Successfully deducted credits.`);
+        toast.success(result.data.message || `Successfully deducted entitlement.`);
         setBenefits(result.data.updatedBenefits);
       }
     } catch (error) {
@@ -97,11 +98,11 @@ export default function CreditUsageExamplePage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Credit Usage Example</CardTitle>
+          <CardTitle>Entitlement Usage Example</CardTitle>
           <CardDescription>
-            This page demonstrates how to deduct credits for using a feature.
-            The button simulates using a feature that costs {CREDITS_TO_DEDUCT}{" "}
-            credits. (Only for development)
+            This page demonstrates how to deduct fixed generation counts for
+            using a feature. The button simulates using a feature that costs{" "}
+            {SONGS_TO_DEDUCT} song count. (Only for development)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -114,16 +115,13 @@ export default function CreditUsageExamplePage() {
           ) : benefits ? (
             <div>
               <p>
-                <strong>Total Available Credits:</strong>{" "}
-                {benefits.totalAvailableCredits}
+                <strong>Songs:</strong> {benefits.totalEntitlements.song}
               </p>
               <p>
-                <strong>One-Time Credits:</strong>{" "}
-                {benefits.oneTimeCreditsBalance}
+                <strong>MV:</strong> {benefits.totalEntitlements.mv}
               </p>
               <p>
-                <strong>Subscription Credits:</strong>{" "}
-                {benefits.subscriptionCreditsBalance}
+                <strong>Wall Art:</strong> {benefits.totalEntitlements.wallArt}
               </p>
             </div>
           ) : (
@@ -140,7 +138,7 @@ export default function CreditUsageExamplePage() {
           >
             {isDeducting
               ? "Deducting..."
-              : `Use Feature & Deduct ${CREDITS_TO_DEDUCT} Credits`}
+              : `Use Feature & Deduct ${SONGS_TO_DEDUCT} Song`}
           </Button>
         </CardFooter>
       </Card>
@@ -151,19 +149,19 @@ export default function CreditUsageExamplePage() {
         </CardHeader>
         <CardContent className="text-sm space-y-2">
           <p>
-            <strong>Unified Credit Deduction Logic:</strong>
+            <strong>Unified Entitlement Deduction Logic:</strong>
           </p>
           <ul className="list-disc pl-5 space-y-1">
             <li>
-              The system now uses a single, unified method for deduction:{" "}
+              The system now uses a typed method for deduction:{" "}
               <code className="bg-gray-200 dark:bg-gray-800">
-                deductCredits(amount, notes)
+                deductEntitlement({`{ entitlement, amount, notes }`})
               </code>
               .
             </li>
             <li>
               This method automatically prioritizes deducting from subscription
-              credits first, then from one-time credits.
+              counts first, then from one-time counts.
             </li>
             <li>
               Every deduction is now recorded in the{" "}

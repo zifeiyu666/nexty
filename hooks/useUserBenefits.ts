@@ -2,6 +2,7 @@
 
 import { getClientUserBenefits, UserBenefits } from "@/actions/usage/benefits";
 import { authClient } from "@/lib/auth/auth-client";
+import type { EntitlementKey } from "@/lib/payments/entitlements";
 import useSWR from "swr";
 
 const benefitsFetcher = async ([userId]: [string | undefined]) => {
@@ -56,11 +57,40 @@ export function useUserBenefits() {
     mutate(optimisticData, { revalidate: false });
   };
 
+  const optimisticDeductEntitlement = (entitlement: EntitlementKey, amount = 1) => {
+    if (!data) return;
+
+    const optimisticData: UserBenefits = JSON.parse(JSON.stringify(data));
+    let remainingToDeduct = amount;
+
+    const subDeduction = Math.min(
+      optimisticData.entitlementBalances.subscription[entitlement],
+      remainingToDeduct
+    );
+    optimisticData.entitlementBalances.subscription[entitlement] -= subDeduction;
+    remainingToDeduct -= subDeduction;
+
+    if (remainingToDeduct > 0) {
+      const oneTimeDeduction = Math.min(
+        optimisticData.entitlementBalances.oneTime[entitlement],
+        remainingToDeduct
+      );
+      optimisticData.entitlementBalances.oneTime[entitlement] -= oneTimeDeduction;
+    }
+
+    optimisticData.totalEntitlements[entitlement] =
+      optimisticData.entitlementBalances.subscription[entitlement] +
+      optimisticData.entitlementBalances.oneTime[entitlement];
+
+    mutate(optimisticData, { revalidate: false });
+  };
+
   return {
     benefits: data,
     isLoading,
     isError: error,
     mutate,
     optimisticDeduct,
+    optimisticDeductEntitlement,
   };
-} 
+}

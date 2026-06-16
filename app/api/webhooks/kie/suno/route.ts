@@ -1,10 +1,54 @@
-import { normalizeKieMusicRecord } from "@/lib/ai/adapters/kie-suno";
+import {
+  normalizeKieMusicRecord,
+  submitTimestampedLyricsTask,
+  type KieSongVersion,
+} from "@/lib/ai/adapters/kie-suno";
 import { songSampleEmail } from "@/lib/ai/song-sample-email";
 import {
   createSongSampleFromTask,
   songSampleStore,
 } from "@/lib/ai/song-sample-store";
 import { songTaskStore } from "@/lib/ai/song-task-store";
+
+async function attachTimestampedLyricsToVersions({
+  taskId,
+  versions,
+}: {
+  taskId: string;
+  versions: KieSongVersion[];
+}): Promise<KieSongVersion[]> {
+  return Promise.all(
+    versions.map(async (version) => {
+      try {
+        const result = await submitTimestampedLyricsTask({
+          taskId,
+          audioId: version.id,
+        });
+
+        if (result.status !== "succeeded" || result.alignedWords.length === 0) {
+          return version;
+        }
+
+        return {
+          ...version,
+          timestampedLyrics: {
+            alignedWords: result.alignedWords,
+            waveformData: result.waveformData,
+            hootCer: result.hootCer,
+            isStreamed: result.isStreamed,
+          },
+        };
+      } catch (error) {
+        console.warn("[KIE Suno Callback] Failed to fetch timestamped lyrics", {
+          taskId,
+          audioId: version.id,
+          error,
+        });
+        return version;
+      }
+    }),
+  );
+}
 
 export async function POST(req: Request) {
   try {
@@ -67,13 +111,20 @@ export async function POST(req: Request) {
     }
 
     if (result.status === "succeeded" && result.versions.length) {
+      const versions = await attachTimestampedLyricsToVersions({
+        taskId: task.externalId || taskId,
+        versions: result.versions,
+      });
       const updated = await songTaskStore.updateSong(task.songId, {
         status: "succeeded",
-        versions: result.versions,
+        versions,
       });
       console.log("[KIE Suno Callback] Marked task succeeded", {
         songId: task.songId,
-        versions: result.versions.length,
+        versions: versions.length,
+        timestampedLyrics: versions.filter(
+          (version) => version.timestampedLyrics?.alignedWords?.length,
+        ).length,
         isSubscriber: updated?.isSubscriber,
       });
 

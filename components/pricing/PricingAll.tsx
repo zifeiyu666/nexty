@@ -174,14 +174,14 @@ export default async function PricingAll() {
 
   return (
     <section id="pricing" className="py-8 sm:py-10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-3 lg:items-stretch">
           {displayPlans.map((plan) => (
             <PricingGiftCard key={plan.id} plan={plan} />
           ))}
         </div>
 
-        <section className="mt-10 px-3 py-8 sm:px-6 lg:px-8">
+        <section className="mt-10 py-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-black tracking-normal text-foreground md:text-3xl">
               Pay-as-you-go add-ons
@@ -193,7 +193,7 @@ export default async function PricingAll() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
             {addOns.map((item) => {
               const Icon = item.icon;
 

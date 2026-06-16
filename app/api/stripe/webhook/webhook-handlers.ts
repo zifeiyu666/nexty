@@ -134,68 +134,68 @@ export async function handleInvoicePaid(invoice: Stripe.Invoice) {
     ))
     .limit(1);
 
-  if (existingOrderResults.length > 0) {
-    // order exists, but we still want to sync subscription and potentially grant credits
-  } else {
+  const existingOrderId = existingOrderResults[0]?.id ?? null;
 
-    if (!stripe) {
-      console.error('Stripe is not initialized. Please check your environment variables.');
-      return;
+  if (!stripe) {
+    console.error('Stripe is not initialized. Please check your environment variables.');
+    return;
+  }
+
+  let userId: string | null = null;
+  let planId: string | null = null;
+  let priceId: string | null = null;
+  let productId: string | null = null;
+  let subscription: Stripe.Subscription | null = null;
+
+  try {
+    subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    userId = subscription.metadata?.userId;
+
+    if (subscription.items.data.length > 0) {
+      priceId = subscription.items.data[0].price.id;
+      productId = typeof subscription.items.data[0].price.product === 'string'
+        ? subscription.items.data[0].price.product
+        : (subscription.items.data[0].price.product as Stripe.Product)?.id;
+
+      if (priceId) {
+        const planDataResults = await db
+          .select({ id: pricingPlansSchema.id })
+          .from(pricingPlansSchema)
+          .where(eq(pricingPlansSchema.stripePriceId, priceId))
+          .limit(1);
+        planId = planDataResults[0]?.id ?? null;
+      }
     }
 
-    let userId: string | null = null;
-    let planId: string | null = null;
-    let priceId: string | null = null;
-    let productId: string | null = null;
-    let subscription: Stripe.Subscription | null = null;
-
-    try {
-      subscription = await stripe.subscriptions.retrieve(subscriptionId);
-      userId = subscription.metadata?.userId;
-
-      if (subscription.items.data.length > 0) {
-        priceId = subscription.items.data[0].price.id;
-        productId = typeof subscription.items.data[0].price.product === 'string'
-          ? subscription.items.data[0].price.product
-          : (subscription.items.data[0].price.product as Stripe.Product)?.id;
-
-        if (priceId) {
-          const planDataResults = await db
-            .select({ id: pricingPlansSchema.id })
-            .from(pricingPlansSchema)
-            .where(eq(pricingPlansSchema.stripePriceId, priceId))
-            .limit(1);
-          planId = planDataResults[0]?.id ?? null;
-        }
-      }
-
-      // fallback
-      if (!planId) {
-        planId = subscription.metadata?.planId ?? null;
-      }
-
-      if (!userId && customerId) {
-        const customer = await stripe.customers.retrieve(customerId);
-        if (customer && !customer.deleted) {
-          userId = customer.metadata?.userId ?? null;
-        }
-      }
-    } catch (subError) {
-      console.error(`Error fetching subscription ${subscriptionId} or related data during invoice.paid handling:`, subError);
-      if (!userId) {
-        throw new Error(`Failed to retrieve subscription ${subscriptionId} and cannot determine userId for invoice ${invoiceId}.`);
-      }
-      console.warn(`Could not fully populate order details for invoice ${invoiceId} due to error: ${subError instanceof Error ? subError.message : subError}`);
-    }
-
-    if (!userId) {
-      console.error(`FATAL: User ID could not be determined for invoice ${invoiceId}. Cannot create order.`);
-      throw new Error(`User ID determination failed for invoice ${invoiceId}.`);
-    }
+    // fallback
     if (!planId) {
-      console.warn(`Could not determine planId for subscription ${subscriptionId} from invoice ${invoiceId}. Order created, but credit grant may fail.`);
+      planId = subscription.metadata?.planId ?? null;
     }
 
+    if (!userId && customerId) {
+      const customer = await stripe.customers.retrieve(customerId);
+      if (customer && !customer.deleted) {
+        userId = customer.metadata?.userId ?? null;
+      }
+    }
+  } catch (subError) {
+    console.error(`Error fetching subscription ${subscriptionId} or related data during invoice.paid handling:`, subError);
+    if (!userId) {
+      throw new Error(`Failed to retrieve subscription ${subscriptionId} and cannot determine userId for invoice ${invoiceId}.`);
+    }
+    console.warn(`Could not fully populate order details for invoice ${invoiceId} due to error: ${subError instanceof Error ? subError.message : subError}`);
+  }
+
+  if (!userId) {
+    console.error(`FATAL: User ID could not be determined for invoice ${invoiceId}. Cannot create order.`);
+    throw new Error(`User ID determination failed for invoice ${invoiceId}.`);
+  }
+  if (!planId) {
+    console.warn(`Could not determine planId for subscription ${subscriptionId} from invoice ${invoiceId}. Order created, but credit grant may fail.`);
+  }
+
+  let orderId = existingOrderId;
+  if (!orderId) {
     const invoiceData = await stripe!.invoices.retrieve(invoice.id as string, { expand: ['payments'] });
     const paymentIntentId = invoiceData.payments?.data[0]?.payment.payment_intent as string | null;
 
@@ -237,21 +237,22 @@ export async function handleInvoicePaid(invoice: Stripe.Invoice) {
       throw new Error('Could not insert order');
     }
 
-    if (planId && userId && subscription) {
-      // --- [custom] Upgrade ---
-      const orderId = insertedOrder.id;
-      try {
-        const currentPeriodStart = subscription.items.data[0].current_period_start * 1000;
-        await upgradeSubscriptionCredits(userId, planId, orderId, currentPeriodStart);
-      } catch (error) {
-        console.error(`CRITICAL: Failed to upgrade subscription credits for user ${userId}, order ${orderId}:`, error);
-        await sendCreditUpgradeFailedEmail({ userId, orderId, planId, error });
-        throw error;
-      }
-      // --- End: [custom] Upgrade ---
-    } else {
-      console.warn(`Cannot grant subscription credits for invoice ${invoiceId} because planId (${planId}) or userId (${userId}) is unknown.`);
+    orderId = insertedOrder.id;
+  }
+
+  if (planId && userId && subscription && orderId) {
+    // --- [custom] Upgrade ---
+    try {
+      const currentPeriodStart = subscription.items.data[0].current_period_start * 1000;
+      await upgradeSubscriptionCredits(userId, planId, orderId, currentPeriodStart);
+    } catch (error) {
+      console.error(`CRITICAL: Failed to upgrade subscription credits for user ${userId}, order ${orderId}:`, error);
+      await sendCreditUpgradeFailedEmail({ userId, orderId, planId, error });
+      throw error;
     }
+    // --- End: [custom] Upgrade ---
+  } else {
+    console.warn(`Cannot grant subscription credits for invoice ${invoiceId} because planId (${planId}), userId (${userId}), subscription, or orderId (${orderId}) is unknown.`);
   }
 
   try {

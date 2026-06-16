@@ -169,10 +169,6 @@ export async function handleCreemInvoicePaid(
     orderId
   );
 
-  if (existed) {
-    return;
-  }
-
   if (!insertedOrder) {
     console.warn(
       `[Creem webhook] Skipping credit grant for subscription ${subscriptionId}`
@@ -194,7 +190,7 @@ export async function handleCreemInvoicePaid(
     // --- End: [custom] Upgrade the user's benefits ---
   } catch (error) {
     console.error(
-      `[Creem webhook] Failed to upgrade subscription credits for user ${userId}, order ${insertedOrder.id}`,
+      `[Creem webhook] Failed to ${existed ? 'recover' : 'upgrade'} subscription credits for user ${userId}, order ${insertedOrder.id}`,
       error
     );
     throw error;

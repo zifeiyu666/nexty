@@ -6,6 +6,8 @@ import {
   extractLyricsText,
   normalizeKieLyricsRecord,
   normalizeKieMusicRecord,
+  normalizeKieTimestampedLyricsRecord,
+  submitTimestampedLyricsTask,
   submitMusicTask,
 } from "../../../../lib/ai/adapters/kie-suno";
 
@@ -168,5 +170,53 @@ describe("KIE Suno adapter normalization", () => {
     assert.equal(normalized.versions.length, 1);
     assert.equal(normalized.versions[0]?.audioUrl, "https://cdn.kie.ai/a.mp3");
     assert.equal(normalized.versions[0]?.imageUrl, "https://cdn.kie.ai/a.jpg");
+  });
+
+  test("normalizes timestamped lyrics records with aligned words", () => {
+    const normalized = normalizeKieTimestampedLyricsRecord({
+      code: 200,
+      msg: "success",
+      data: {
+        alignedWords: [
+          { word: "Hello", startS: 0.42, endS: 0.8 },
+          { word: "world", startS: 0.82, endS: 1.2 },
+        ],
+        waveformData: [0, 1, 0.5],
+      },
+    });
+
+    assert.equal(normalized.status, "succeeded");
+    assert.deepEqual(normalized.alignedWords, [
+      { word: "Hello", startS: 0.42, endS: 0.8 },
+      { word: "world", startS: 0.82, endS: 1.2 },
+    ]);
+  });
+
+  test("requests timestamped lyrics with taskId and audioId", async () => {
+    process.env.KIE_API_KEY = "test-key";
+
+    let url = "";
+    let payload: any;
+    globalThis.fetch = (async (input, init) => {
+      url = String(input);
+      payload = JSON.parse(String(init?.body));
+      return new Response(
+        JSON.stringify({
+          code: 200,
+          data: { alignedWords: [{ word: "Hi", startS: 1, endS: 1.4 }] },
+        }),
+        { status: 200 }
+      );
+    }) as typeof fetch;
+
+    const result = await submitTimestampedLyricsTask({
+      taskId: "kie-task",
+      audioId: "audio-a",
+    });
+
+    assert.match(url, /\/api\/v1\/generate\/get-timestamped-lyrics$/);
+    assert.deepEqual(payload, { taskId: "kie-task", audioId: "audio-a" });
+    assert.equal(result.status, "succeeded");
+    assert.equal(result.alignedWords[0]?.word, "Hi");
   });
 });

@@ -1,6 +1,86 @@
 @import 'tailwindcss';
 @import '@fontsource/science-gothic/latin.css';
 
+@font-face {
+  font-family: 'Parisienne';
+  src: url('/fonts/wallart/parisienne-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Great Vibes';
+  src: url('/fonts/wallart/great-vibes-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Savate';
+  src: url('/fonts/wallart/savate-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Limelight';
+  src: url('/fonts/wallart/limelight-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Sigmar One';
+  src: url('/fonts/wallart/sigmar-one-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Mountains of Christmas';
+  src: url('/fonts/wallart/mountains-of-christmas-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Mountains of Christmas';
+  src: url('/fonts/wallart/mountains-of-christmas-700.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'Berkshire Swash';
+  src: url('/fonts/wallart/berkshire-swash-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Shadows Into Light';
+  src: url('/fonts/wallart/shadows-into-light-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'UnifrakturMaguntia';
+  src: url('/fonts/wallart/unifraktur-maguntia-400.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
 @theme inline {
   --font-science-gothic: 'Science Gothic', sans-serif;
 

@@ -4,6 +4,13 @@ import { actionResponse, ActionResult } from '@/lib/action-response';
 import { getSession } from '@/lib/auth/server';
 import { db } from '@/lib/db';
 import { creditLogs as creditLogsSchema, subscriptions as subscriptionsSchema, usage as usageSchema } from '@/lib/db/schema';
+import {
+  emptyEntitlements,
+  EntitlementBalances,
+  EntitlementMap,
+  normalizeEntitlementBalances,
+  sumEntitlements,
+} from '@/lib/payments/entitlements';
 import { desc, eq } from 'drizzle-orm';
 
 export interface UserBenefits {
@@ -14,6 +21,8 @@ export interface UserBenefits {
   totalAvailableCredits: number;
   subscriptionCreditsBalance: number;
   oneTimeCreditsBalance: number;
+  entitlementBalances: EntitlementBalances;
+  totalEntitlements: EntitlementMap;
   // Add other plan-specific benefits if needed, fetched via planId
 }
 
@@ -37,6 +46,11 @@ const defaultUserBenefits: UserBenefits = {
   totalAvailableCredits: 0,
   subscriptionCreditsBalance: 0,
   oneTimeCreditsBalance: 0,
+  entitlementBalances: {
+    subscription: emptyEntitlements(),
+    oneTime: emptyEntitlements(),
+  },
+  totalEntitlements: emptyEntitlements(),
 };
 
 function createUserBenefitsFromData(
@@ -47,6 +61,8 @@ function createUserBenefitsFromData(
   const subCredits = (usageData?.subscriptionCreditsBalance ?? 0) as number;
   const oneTimeCredits = (usageData?.oneTimeCreditsBalance ?? 0) as number;
   const totalCredits = subCredits + oneTimeCredits;
+  const entitlementBalances = normalizeEntitlementBalances((usageData?.balanceJsonb as any)?.entitlements);
+  const totalEntitlements = sumEntitlements(entitlementBalances);
 
   const currentPeriodEnd = subscription?.currentPeriodEnd ?? null;
   const nextCreditDate = currentYearlyDetails?.nextCreditDate ?? null;
@@ -64,6 +80,8 @@ function createUserBenefitsFromData(
     totalAvailableCredits: totalCredits,
     subscriptionCreditsBalance: subCredits,
     oneTimeCreditsBalance: oneTimeCredits,
+    entitlementBalances,
+    totalEntitlements,
   };
 }
 
@@ -208,6 +226,9 @@ async function processYearlySubscriptionCatchUp(
 
       finalUsageData = usage as UsageData;
       const yearlyDetails = (usage.balanceJsonb as any)?.yearlyAllocationDetails;
+      if (!yearlyDetails?.monthlyCredits) {
+        return false;
+      }
 
       if (
         !yearlyDetails ||

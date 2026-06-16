@@ -286,10 +286,12 @@ export interface LocalizedPricingContent {
  * 权益结构，用于 benefitsJsonb 字段。
  */
 export interface PricingBenefits {
-  /** One-time credits granted on purchase / 购买时授予的一次性积分 */
-  oneTimeCredits?: number
-  /** Monthly credits for subscriptions / 订阅的月度积分 */
-  monthlyCredits?: number
+  /** Fixed generation counts / 固定生成次数 */
+  entitlements?: {
+    song?: number
+    mv?: number
+    wallArt?: number
+  }
   /** Total months for yearly plans / 年度计划的总月数 */
   totalMonths?: number
   /** Custom fields / 自定义字段 */

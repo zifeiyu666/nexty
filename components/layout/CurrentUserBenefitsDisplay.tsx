@@ -2,7 +2,7 @@
 
 import { useUserBenefits } from "@/hooks/useUserBenefits";
 import dayjs from "dayjs";
-import { Calendar, Coins } from "lucide-react";
+import { Calendar, Film, ImageIcon, Music2 } from "lucide-react";
 import { BiCoinStack } from "react-icons/bi";
 
 export default function CurrentUserBenefitsDisplay() {
@@ -27,11 +27,13 @@ export default function CurrentUserBenefitsDisplay() {
     );
   }
 
-  if (
-    benefits.totalAvailableCredits > 0 ||
-    benefits.subscriptionStatus === "trialing" ||
-    benefits.subscriptionStatus === "active"
-  ) {
+  const totalEntitlements = benefits.totalEntitlements;
+  const hasEntitlements =
+    totalEntitlements.song > 0 ||
+    totalEntitlements.mv > 0 ||
+    totalEntitlements.wallArt > 0;
+
+  if (hasEntitlements || benefits.subscriptionStatus === "trialing" || benefits.subscriptionStatus === "active") {
     return (
       <div className="flex flex-col gap-2 text-sm">
         {benefits.currentPeriodEnd ? (
@@ -44,9 +46,19 @@ export default function CurrentUserBenefitsDisplay() {
         ) : (
           <></>
         )}
-        <div className="flex items-center gap-2">
-          <Coins className="w-4 h-4 text-primary" />
-          <span>Credits: {benefits.totalAvailableCredits}</span>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="flex items-center gap-2">
+            <Music2 className="w-4 h-4 text-primary" />
+            Songs: {totalEntitlements.song}
+          </span>
+          <span className="flex items-center gap-2">
+            <Film className="w-4 h-4 text-primary" />
+            MV: {totalEntitlements.mv}
+          </span>
+          <span className="flex items-center gap-2">
+            <ImageIcon className="w-4 h-4 text-primary" />
+            Wall art: {totalEntitlements.wallArt}
+          </span>
         </div>
       </div>
     );
