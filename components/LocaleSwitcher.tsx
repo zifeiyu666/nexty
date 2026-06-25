@@ -23,7 +23,7 @@ import { useParams } from "next/navigation";
 import { useTransition } from "react";
 
 type LocaleSwitcherProps = {
-  variant?: "dropdown" | "group";
+  variant?: "dropdown" | "group" | "adaptive";
   className?: string;
 };
 
@@ -88,6 +88,8 @@ export default function LocaleSwitcher({
     );
   }
 
+  const isAdaptive = variant === "adaptive";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -95,17 +97,32 @@ export default function LocaleSwitcher({
           type="button"
           aria-label="Select language"
           className={cn(
-            "group inline-flex h-8 items-center gap-1.5 rounded-full pl-2.5 pr-2 text-sm font-medium",
-            "border border-border/60 bg-background/40 text-foreground/80 backdrop-blur-sm",
+            "group inline-flex h-8 items-center gap-1.5 rounded-full pl-2.5 pr-2 text-sm font-medium border-0",
+            isAdaptive
+              ? "bg-white/10 text-white group-data-[scrolled=true]/header:bg-zinc-950/5 group-data-[scrolled=true]/header:text-zinc-900"
+              : "border border-border/60 bg-background/40 text-foreground/80 backdrop-blur-sm",
             "shadow-xs transition-all duration-200",
-            "hover:border-border hover:bg-accent hover:text-accent-foreground",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background",
-            "data-[state=open]:border-primary/30 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:shadow-sm",
+            isAdaptive
+              ? "shadow-none hover:bg-white/15 hover:text-white group-data-[scrolled=true]/header:hover:bg-zinc-950/10 group-data-[scrolled=true]/header:hover:text-zinc-900"
+              : "hover:border-border hover:bg-accent hover:text-accent-foreground",
+            isAdaptive
+              ? "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent group-data-[scrolled=true]/header:focus-visible:ring-ring/40"
+              : "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+            isAdaptive
+              ? "data-[state=open]:bg-white/15 data-[state=open]:text-white group-data-[scrolled=true]/header:data-[state=open]:bg-zinc-950/10 group-data-[scrolled=true]/header:data-[state=open]:text-zinc-900"
+              : "data-[state=open]:border-primary/30 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground data-[state=open]:shadow-sm",
             isPending && "opacity-70",
             className
           )}
         >
-          <Languages className="h-3.5 w-3.5 text-primary/80 transition-colors group-hover:text-primary group-data-[state=open]:text-primary" />
+          <Languages
+            className={cn(
+              "h-3.5 w-3.5 transition-colors",
+              isAdaptive
+                ? "text-current"
+                : "text-primary/80 group-hover:text-primary group-data-[state=open]:text-primary"
+            )}
+          />
           <span className="leading-none tracking-tight">
             {LOCALE_NAMES[locale] ?? locale}
           </span>

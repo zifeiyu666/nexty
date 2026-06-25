@@ -1,5 +1,6 @@
 import { GoogleOneTap } from "@/components/auth/GoogleOneTap";
 import { LanguageDetectionAlert } from "@/components/LanguageDetectionAlert";
+import { GlobalMusicController } from "@/components/music/GlobalMusicController";
 import ConsentBanner from "@/components/shared/CookieConsent/ConsentBanner";
 import ConsentGate from "@/components/shared/CookieConsent/ConsentGate";
 import CrispChat from "@/components/support/CrispChat";
@@ -92,8 +93,9 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
             attribute="class"
-            defaultTheme={siteConfig.defaultNextTheme}
-            enableSystem
+            defaultTheme="light"
+            enableSystem={false}
+            forcedTheme="light"
           >
             <PostHogProvider>
               {messages.LanguageDetection && <LanguageDetectionAlert />}
@@ -104,6 +106,7 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
         <GoogleOneTap />
         <CrispChat />
+        <GlobalMusicController />
         <Toaster richColors />
         <TailwindIndicator />
         <>

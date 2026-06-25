@@ -1,0 +1,140 @@
+"use client";
+
+import { MusicVideoEditorDrawer } from "@/components/song/MusicVideoEditorDrawer";
+import type { FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
+import { Button } from "@/components/ui/button";
+import type { MusicVideoRender } from "@/lib/music-video/renders";
+import { ArrowRight, Download, Film, Loader2, Video } from "lucide-react";
+import Link from "next/link";
+
+type GeneratedContentTabsProps = {
+  locale: string;
+  song: FinalSongPlayerData;
+  videos: MusicVideoRender[];
+};
+
+export function GeneratedContentTabs({
+  locale,
+  song,
+  videos,
+}: GeneratedContentTabsProps) {
+  return (
+    <section className="mt-6 rounded-[24px] border border-black/10 bg-white/86 p-5 shadow-sm backdrop-blur">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-stone-500">
+            Music Video Exports
+          </p>
+          <h2 className="mt-1 text-2xl font-black">Music Video History</h2>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+          {videos.length ? (
+            <GenerateMusicVideoButton placement="header" song={song} />
+          ) : null}
+          <Button asChild className="rounded-full bg-white/70" variant="outline">
+            <Link href="/musicvideos">View all</Link>
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        {videos.length ? (
+          <div className="grid gap-3 md:grid-cols-2">
+            {videos.map((video) => (
+              <article
+                key={video.id}
+                className="grid gap-3 rounded-[18px] border border-black/10 bg-white/72 p-3 shadow-sm sm:grid-cols-[112px_1fr]"
+              >
+                <div className="relative aspect-square overflow-hidden rounded-xl bg-[#171412] sm:aspect-[9/12]">
+                  {video.videoUrl ? (
+                    <video
+                      className="size-full object-cover"
+                      controls
+                      src={video.videoUrl}
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center">
+                      {video.status === "rendering" ? (
+                        <Loader2 className="size-7 animate-spin text-white/70" />
+                      ) : (
+                        <Film className="size-8 text-white/70" />
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="min-w-0">
+                  <p className="line-clamp-1 text-base font-black">
+                    {video.title}
+                  </p>
+                  <p className="mt-1 text-xs font-bold uppercase text-stone-500">
+                    {video.status}
+                  </p>
+                  <p className="mt-2 text-xs text-stone-500">
+                    {new Intl.DateTimeFormat(locale, {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    }).format(video.createdAt)}
+                  </p>
+                  {video.videoUrl ? (
+                    <Button asChild className="mt-3 rounded-full" size="sm">
+                      <a download href={video.videoUrl}>
+                        <Download className="size-4" />
+                        Download MP4
+                      </a>
+                    </Button>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[18px] border border-dashed border-black/15 bg-white/60 p-8 text-center">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#fff1ed] text-primary">
+              <Video className="size-6" />
+            </div>
+            <h3 className="mt-4 text-lg font-black">No music videos yet</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+              Turn this song into a vertical lyric video with the music video
+              editor.
+            </p>
+            <GenerateMusicVideoButton placement="empty" song={song} />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function GenerateMusicVideoButton({
+  placement,
+  song,
+}: {
+  placement: "empty" | "header";
+  song: FinalSongPlayerData;
+}) {
+  const buttonClassName =
+    placement === "header"
+      ? "inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-black text-white shadow-sm transition hover:gap-3 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/55 focus-visible:ring-offset-2"
+      : "mx-auto mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-black text-white shadow-sm transition hover:gap-3 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/55 focus-visible:ring-offset-2";
+
+  return (
+    <MusicVideoEditorDrawer
+      audioUrl={song.audioUrl}
+      duration={song.duration}
+      imageUrl={song.imageUrl}
+      lyrics={song.lyrics}
+      songId={song.id}
+      songTitle={song.title}
+      timestampedLyrics={song.timestampedLyrics}
+      trigger={
+        <button className={buttonClassName} type="button">
+          Generate Music Video
+          <ArrowRight className="size-4" />
+        </button>
+      }
+    />
+  );
+}

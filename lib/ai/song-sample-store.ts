@@ -20,21 +20,37 @@ export type SongSample = {
   recipientNames: string[];
   story: string;
   versions: KieSongVersion[];
-  previewLimitSeconds: number;
+  previewLimitSeconds: number | null;
   createdAt: number;
   updatedAt: number;
-  accessExpiresAt: number;
-  unlockedVersionIds?: string[];
+  accessExpiresAt: number | null;
 };
 
 export type SongSampleView = SongSample & {
   isExpired: boolean;
 };
 
-function sampleToView(sample: SongSample, now = Date.now()): SongSampleView {
+type SampleAccessOptions = {
+  hasActiveSubscription?: boolean;
+};
+
+export function getSampleAccessExpiresAt(
+  sample: Pick<SongSample, "accessExpiresAt" | "createdAt">
+): number {
+  return sample.accessExpiresAt ?? sample.createdAt + ACCESS_WINDOW_MS;
+}
+
+function sampleToView(
+  sample: SongSample,
+  now = Date.now(),
+  options: SampleAccessOptions = {}
+): SongSampleView {
+  const accessExpiresAt = getSampleAccessExpiresAt(sample);
+
   return {
     ...sample,
-    isExpired: now > sample.accessExpiresAt,
+    accessExpiresAt,
+    isExpired: options.hasActiveSubscription ? false : now > accessExpiresAt,
   };
 }
 
@@ -88,11 +104,10 @@ export function createSongSampleFromTask(
     recipientNames: task.recipientNames,
     story: task.story,
     versions: task.versions,
-    previewLimitSeconds: 60,
+    previewLimitSeconds: task.isSubscriber ? null : 60,
     createdAt: task.createdAt,
     updatedAt: now,
     accessExpiresAt: task.createdAt + ACCESS_WINDOW_MS,
-    unlockedVersionIds: task.isSubscriber ? task.versions.map((version) => version.id) : [],
   };
 }
 
@@ -113,30 +128,19 @@ export const songSampleStore = {
     }
   },
 
-  async get(songId: string): Promise<SongSampleView | null> {
+  async get(
+    songId: string,
+    options: SampleAccessOptions = {}
+  ): Promise<SongSampleView | null> {
     const sample = await getJson<SongSample>(keys.sample(songId));
-    return sample ? sampleToView(sample) : null;
-  },
-
-  async unlockVersion(songId: string, versionId: string): Promise<SongSampleView | null> {
-    const sample = await getJson<SongSample>(keys.sample(songId));
-    if (!sample) return null;
-
-    const unlockedVersionIds = unique([...(sample.unlockedVersionIds || []), versionId]);
-    const updated: SongSample = {
-      ...sample,
-      unlockedVersionIds,
-      previewLimitSeconds: 0,
-      updatedAt: Date.now(),
-    };
-    await this.save(updated);
-    return sampleToView(updated);
+    return sample ? sampleToView(sample, Date.now(), options) : null;
   },
 
   async list(input: {
     userId?: string;
     email?: string;
     limit?: number;
+    hasActiveSubscription?: boolean;
   }): Promise<SongSampleView[]> {
     if (!redis) return [];
 
@@ -145,7 +149,13 @@ export const songSampleStore = {
       ...((input.email ? await getJson<string[]>(keys.samplesByEmail(input.email)) : null) || []),
     ]);
 
-    const samples = await Promise.all(ids.map((songId) => this.get(songId)));
+    const samples = await Promise.all(
+      ids.map((songId) =>
+        this.get(songId, {
+          hasActiveSubscription: input.hasActiveSubscription,
+        })
+      )
+    );
     return samples
       .filter((sample): sample is SongSampleView => Boolean(sample))
       .sort((a, b) => b.createdAt - a.createdAt)

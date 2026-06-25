@@ -1,5 +1,6 @@
 import { PricingAll } from "@/components/pricing";
 import { Locale } from "@/i18n/routing";
+import { parseUnlockSongContext } from "@/lib/ai/song-unlock-after-payment";
 import { constructMetadata } from "@/lib/metadata";
 import { shouldHidePricingHero } from "@/lib/pricing/page-hero";
 import { ChevronRight } from "lucide-react";
@@ -32,6 +33,7 @@ export default async function PricingPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const hideHero = shouldHidePricingHero(resolvedSearchParams);
+  const unlockSongContext = parseUnlockSongContext(resolvedSearchParams);
 
   return (
     <main className="min-h-screen bg-background text-foreground w-full">
@@ -62,7 +64,7 @@ export default async function PricingPage({
         </section>
       )}
 
-      <PricingAll />
+      <PricingAll unlockSongContext={unlockSongContext} />
     </main>
   );
 }

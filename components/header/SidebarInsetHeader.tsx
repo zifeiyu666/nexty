@@ -1,5 +1,3 @@
-import LocaleSwitcher from "@/components/LocaleSwitcher";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import HeaderLinks from "@/components/header/HeaderLinks";
 import MobileMenu from "@/components/header/MobileMenu";
 import { Separator } from "@/components/ui/separator";
@@ -16,13 +14,6 @@ export default async function SidebarInsetHeader() {
         </div>
 
         <div className="flex items-center gap-x-2 flex-1 justify-end">
-          {/* PC */}
-          <div className="hidden lg:flex items-center gap-x-2">
-            <LocaleSwitcher />
-            <ThemeToggle />
-          </div>
-
-          {/* Mobile */}
           <div className="flex lg:hidden">
             <MobileMenu />
           </div>

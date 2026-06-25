@@ -4,13 +4,28 @@ import {
   songs as songsSchema,
   usage as usageSchema,
 } from "@/lib/db/schema";
-import { deductEntitlementFromBalances, normalizeEntitlementBalances } from "@/lib/payments/entitlements";
 import { getErrorMessage } from "@/lib/error-utils";
-import { and, eq } from "drizzle-orm";
+import {
+  deductEntitlementFromBalances,
+  normalizeEntitlementBalances,
+} from "@/lib/payments/entitlements";
+import { getURL } from "@/lib/url";
+import { and, desc, eq } from "drizzle-orm";
 import type { KieSongVersion, KieTimestampedLyrics } from "./adapters/kie-suno";
 import type { SongSampleView } from "./song-sample-store";
 
 export type FinalSong = typeof songsSchema.$inferSelect;
+
+type FinalSongsDbClient = {
+  select: () => any;
+};
+
+type FinalizeSongDbClient = {
+  transaction: <T>(callback: (tx: any) => Promise<T>) => Promise<T>;
+};
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type FinalizeSongResult =
   | { success: true; song: FinalSong; alreadyFinalized: boolean }
@@ -18,7 +33,7 @@ export type FinalizeSongResult =
 
 export function findSampleVersion(
   versions: KieSongVersion[],
-  versionId: string
+  versionId: string,
 ): KieSongVersion | null {
   const direct = versions.find((version) => version.id === versionId);
   if (direct) return direct;
@@ -32,11 +47,43 @@ export function findSampleVersion(
 
 export function createSongShareToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
-  const token = Buffer.from(bytes)
-    .toString("base64url")
-    .replace(/=+$/g, "");
+  const token = Buffer.from(bytes).toString("base64url").replace(/=+$/g, "");
 
   return `song_${token}`;
+}
+
+export function encodeSongShortShareCode(songId: string): string | null {
+  if (!UUID_REGEX.test(songId)) return null;
+
+  return Buffer.from(songId.replace(/-/g, ""), "hex").toString("base64url");
+}
+
+export function decodeSongShortShareCode(shortCode: string): string | null {
+  if (!/^[A-Za-z0-9_-]{20,30}$/.test(shortCode)) return null;
+
+  try {
+    const hex = Buffer.from(shortCode, "base64url").toString("hex");
+    if (hex.length !== 32) return null;
+
+    const songId = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(
+      12,
+      16,
+    )}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+
+    return UUID_REGEX.test(songId) ? songId : null;
+  } catch {
+    return null;
+  }
+}
+
+export function buildSongShareUrl(
+  song: Pick<FinalSong, "id" | "shareToken">,
+): string {
+  const shortCode = encodeSongShortShareCode(song.id);
+
+  return getURL(
+    shortCode ? `s/${shortCode}` : `shared/songs/${song.shareToken}`,
+  );
 }
 
 export function normalizeSongDuration(duration: unknown): number | null {
@@ -48,7 +95,7 @@ export function normalizeSongDuration(duration: unknown): number | null {
 }
 
 export function getVersionTimestampedLyrics(
-  version: KieSongVersion | null | undefined
+  version: KieSongVersion | null | undefined,
 ): KieTimestampedLyrics | null {
   const timestampedLyrics = version?.timestampedLyrics;
   if (!timestampedLyrics?.alignedWords?.length) return null;
@@ -58,7 +105,7 @@ export function getVersionTimestampedLyrics(
 
 export async function getSongForOwner(
   songId: string,
-  userId: string
+  userId: string,
 ): Promise<FinalSong | null> {
   const [song] = await db
     .select()
@@ -69,44 +116,151 @@ export async function getSongForOwner(
   return song ?? null;
 }
 
-export async function getSharedSong(shareToken: string): Promise<FinalSong | null> {
+export async function getFinalSongsForOwner(
+  userId: string,
+  {
+    dbClient = db,
+    limit = 60,
+  }: {
+    dbClient?: FinalSongsDbClient;
+    limit?: number;
+  } = {},
+): Promise<FinalSong[]> {
+  const safeLimit = Math.min(Math.max(Math.floor(limit), 1), 100);
+
+  return dbClient
+    .select()
+    .from(songsSchema)
+    .where(and(eq(songsSchema.userId, userId), eq(songsSchema.status, "ready")))
+    .orderBy(desc(songsSchema.createdAt))
+    .limit(safeLimit);
+}
+
+export async function getFinalSongsForSampleOwner(
+  userId: string,
+  sourceSampleId: string,
+  {
+    dbClient = db,
+  }: {
+    dbClient?: FinalSongsDbClient;
+  } = {},
+): Promise<FinalSong[]> {
+  return dbClient
+    .select()
+    .from(songsSchema)
+    .where(
+      and(
+        eq(songsSchema.userId, userId),
+        eq(songsSchema.sourceSampleId, sourceSampleId),
+        eq(songsSchema.status, "ready"),
+      ),
+    );
+}
+
+export async function getSharedSong(
+  shareToken: string,
+): Promise<FinalSong | null> {
   const [song] = await db
     .select()
     .from(songsSchema)
-    .where(and(eq(songsSchema.shareToken, shareToken), eq(songsSchema.shareEnabled, true)))
+    .where(
+      and(
+        eq(songsSchema.shareToken, shareToken),
+        eq(songsSchema.shareEnabled, true),
+      ),
+    )
+    .limit(1);
+
+  return song ?? null;
+}
+
+export async function getSharedSongByShortCode(
+  shortCode: string,
+): Promise<FinalSong | null> {
+  const songId = decodeSongShortShareCode(shortCode);
+  if (!songId) return null;
+
+  const [song] = await db
+    .select()
+    .from(songsSchema)
+    .where(and(eq(songsSchema.id, songId), eq(songsSchema.shareEnabled, true)))
     .limit(1);
 
   return song ?? null;
 }
 
 export async function finalizeSongFromSample({
+  dbClient = db,
   sample,
   userId,
   versionId,
 }: {
+  dbClient?: FinalizeSongDbClient;
   sample: SongSampleView;
   userId: string;
   versionId: string;
 }): Promise<FinalizeSongResult> {
-  if (sample.userId && sample.userId !== userId) {
-    return { success: false, status: 403, error: "You cannot finalize this song sample." };
-  }
+  console.log("[final-song] Finalize sample input", {
+    sampleId: sample.songId,
+    userId,
+    sampleUserId: sample.userId,
+    versionId,
+    sampleVersionIds: sample.versions.map((version) => version.id),
+    isExpired: sample.isExpired,
+    previewLimitSeconds: sample.previewLimitSeconds,
+    accessExpiresAt: sample.accessExpiresAt,
+  });
 
-  if (sample.isExpired) {
-    return { success: false, status: 400, error: "This song sample has expired." };
+  if (sample.userId && sample.userId !== userId) {
+    console.warn("[final-song] Finalize forbidden: sample owner mismatch", {
+      sampleId: sample.songId,
+      userId,
+      sampleUserId: sample.userId,
+    });
+    return {
+      success: false,
+      status: 403,
+      error: "You cannot finalize this song sample.",
+    };
   }
 
   const selectedVersion = findSampleVersion(sample.versions, versionId);
   if (!selectedVersion) {
+    console.warn("[final-song] Finalize rejected: version not found", {
+      sampleId: sample.songId,
+      userId,
+      versionId,
+      sampleVersionIds: sample.versions.map((version) => version.id),
+    });
     return { success: false, status: 400, error: "Song version not found." };
   }
 
   if (!selectedVersion.audioUrl) {
-    return { success: false, status: 409, error: "Selected song version is missing audio." };
+    console.warn(
+      "[final-song] Finalize rejected: selected version missing audio",
+      {
+        sampleId: sample.songId,
+        userId,
+        versionId,
+        selectedVersionId: selectedVersion.id,
+      },
+    );
+    return {
+      success: false,
+      status: 409,
+      error: "Selected song version is missing audio.",
+    };
   }
 
+  console.log("[final-song] Selected version resolved", {
+    sampleId: sample.songId,
+    userId,
+    requestedVersionId: versionId,
+    selectedVersionId: selectedVersion.id,
+  });
+
   try {
-    const result = await db.transaction(async (tx) => {
+    const result = await dbClient.transaction(async (tx) => {
       const [existingSong] = await tx
         .select()
         .from(songsSchema)
@@ -114,12 +268,18 @@ export async function finalizeSongFromSample({
           and(
             eq(songsSchema.userId, userId),
             eq(songsSchema.sourceSampleId, sample.songId),
-            eq(songsSchema.selectedVersionId, selectedVersion.id)
-          )
+            eq(songsSchema.selectedVersionId, selectedVersion.id),
+          ),
         )
         .limit(1);
 
       if (existingSong) {
+        console.log("[final-song] Existing finalized song found", {
+          sampleId: sample.songId,
+          userId,
+          selectedVersionId: selectedVersion.id,
+          songId: existingSong.id,
+        });
         return { song: existingSong, alreadyFinalized: true };
       }
 
@@ -133,14 +293,39 @@ export async function finalizeSongFromSample({
 
       const usage = usageResults[0];
       if (!usage) {
+        console.warn(
+          "[final-song] No usage row found for entitlement deduction",
+          {
+            sampleId: sample.songId,
+            userId,
+            selectedVersionId: selectedVersion.id,
+          },
+        );
         throw new Error("INSUFFICIENT_SONG_ENTITLEMENT");
       }
 
-      const balanceJsonb = (usage.balanceJsonb ?? {}) as Record<string, unknown>;
+      const balanceJsonb = (usage.balanceJsonb ?? {}) as Record<
+        string,
+        unknown
+      >;
       const balances = normalizeEntitlementBalances(balanceJsonb.entitlements);
       const deduction = deductEntitlementFromBalances(balances, "song", 1);
+      console.log("[final-song] Entitlement deduction check", {
+        sampleId: sample.songId,
+        userId,
+        selectedVersionId: selectedVersion.id,
+        balances,
+        deduction,
+      });
 
       if (!deduction.success) {
+        console.warn("[final-song] Insufficient song entitlement", {
+          sampleId: sample.songId,
+          userId,
+          selectedVersionId: selectedVersion.id,
+          balances,
+          deduction,
+        });
         throw new Error("INSUFFICIENT_SONG_ENTITLEMENT");
       }
 
@@ -200,7 +385,9 @@ export async function finalizeSongFromSample({
             .returning();
           song = insertedSong;
         } catch (insertError) {
-          if (!getErrorMessage(insertError).includes("songs_share_token_unique")) {
+          if (
+            !getErrorMessage(insertError).includes("songs_share_token_unique")
+          ) {
             throw insertError;
           }
         }
@@ -215,11 +402,22 @@ export async function finalizeSongFromSample({
 
     return { success: true, ...result };
   } catch (error) {
-    if (error instanceof Error && error.message === "INSUFFICIENT_SONG_ENTITLEMENT") {
-      return { success: false, status: 400, error: "Insufficient song balance." };
+    if (
+      error instanceof Error &&
+      error.message === "INSUFFICIENT_SONG_ENTITLEMENT"
+    ) {
+      return {
+        success: false,
+        status: 400,
+        error: "Insufficient song balance.",
+      };
     }
     if (error instanceof Error && error.message === "SHARE_TOKEN_COLLISION") {
-      return { success: false, status: 500, error: "Failed to create a share link." };
+      return {
+        success: false,
+        status: 500,
+        error: "Failed to create a share link.",
+      };
     }
 
     console.error("[final-song] Failed to finalize song", {

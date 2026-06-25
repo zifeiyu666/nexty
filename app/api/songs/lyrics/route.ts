@@ -6,7 +6,21 @@ const lyricsSchema = z.object({
   occasion: z.string().trim().min(1).max(120),
   genre: z.string().trim().min(1).max(120),
   language: z.string().trim().min(1).max(80),
+  recipients: z
+    .array(
+      z.object({
+        name: z.string().trim().max(80).default(""),
+        relationship: z.string().trim().max(80).default(""),
+      })
+    )
+    .max(3)
+    .optional(),
   recipientNames: z.array(z.string().trim().min(1).max(80)).max(3).default([]),
+  recipientRelationships: z
+    .array(z.string().trim().max(80))
+    .max(3)
+    .default([]),
+  revisionInstruction: z.string().trim().max(500).optional(),
   story: z.string().trim().min(10).max(5000),
   vocalGender: z.string().trim().min(1).max(80),
 });
@@ -25,7 +39,10 @@ export async function POST(req: Request) {
   }
 
   try {
-    const task = await createLyricsGeneration(input);
+    const task = await createLyricsGeneration({
+      ...input,
+      userRevisionInstruction: input.revisionInstruction,
+    });
     return apiResponse.success({
       taskId: task.taskId,
       status: task.status,

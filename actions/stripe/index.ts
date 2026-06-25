@@ -7,6 +7,11 @@ import { FraudRefundUserEmail } from '@/emails/fraud-refund-user';
 import { FraudWarningAdminEmail } from '@/emails/fraud-warning-admin';
 import { InvoicePaymentFailedEmail } from '@/emails/invoice-payment-failed';
 import { getSession } from '@/lib/auth/server';
+import {
+  appendUnlockSongParams,
+  buildUnlockSongMetadata,
+  type UnlockSongContext,
+} from '@/lib/ai/song-unlock-after-payment';
 import { db } from '@/lib/db';
 import {
   pricingPlans as pricingPlansSchema,
@@ -90,8 +95,9 @@ export async function createStripeCheckoutSession(params: {
   priceId: string;
   couponCode?: string;
   referral?: string;
+  unlockSongContext?: UnlockSongContext | null;
 }): Promise<{ sessionId: string; url?: string }> {
-  const { userId, priceId, couponCode, referral } = params;
+  const { userId, priceId, couponCode, referral, unlockSongContext } = params;
 
   const customerId = await getOrCreateStripeCustomer(userId);
 
@@ -117,6 +123,7 @@ export async function createStripeCheckoutSession(params: {
   const mode: Stripe.Checkout.SessionCreateParams.Mode = isSubscription
     ? 'subscription'
     : 'payment';
+  const unlockMetadata = buildUnlockSongMetadata(unlockSongContext);
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     customer: customerId,
@@ -128,15 +135,24 @@ export async function createStripeCheckoutSession(params: {
     ],
     mode,
     success_url: getURL(
-      `payment/success?session_id={CHECKOUT_SESSION_ID}&provider=stripe`
+      appendUnlockSongParams(
+        `payment/success?session_id={CHECKOUT_SESSION_ID}&provider=stripe`,
+        unlockSongContext
+      )
     ),
-    cancel_url: getURL(process.env.NEXT_PUBLIC_PRICING_PATH!),
+    cancel_url: getURL(
+      appendUnlockSongParams(
+        process.env.NEXT_PUBLIC_PRICING_PATH || 'pricing',
+        unlockSongContext
+      )
+    ),
     metadata: {
       userId,
       planId: plan.id,
       planName: plan.cardTitle,
       priceId,
       ...(referral && { tolt_referral: referral }),
+      ...unlockMetadata,
     },
   };
 
@@ -154,6 +170,7 @@ export async function createStripeCheckoutSession(params: {
         planId: plan.id,
         planName: plan.cardTitle,
         priceId,
+        ...unlockMetadata,
       },
     };
   } else {
@@ -163,6 +180,7 @@ export async function createStripeCheckoutSession(params: {
         planId: plan.id,
         planName: plan.cardTitle,
         priceId,
+        ...unlockMetadata,
       },
     };
   }
@@ -669,4 +687,3 @@ export async function sendFraudRefundUserEmail({
     console.error(`Failed to send fraud refund user email for charge ${charge.id}:`, emailError);
   }
 }
-

@@ -1,8 +1,8 @@
 {
   "Home": {
     "title": "CustomSong",
-    "tagLine": "A Modern Next.js Full-Stack SaaS Template",
-    "description": "A production-ready Next.js and Supabase starter template for building modern SaaS applications. Launch your content, AI, or subscription service faster."
+    "tagLine": "<strong>Say it with a custom song.</strong><br></br>Gift an unforgettable track for birthdays, anniversaries, or just because.",
+    "description": "Turn your memories into studio-quality custom songs in minutes. Create a personalized music gift for birthdays, weddings, anniversaries, and more."
   },
   "Login": {
     "title": "Welcome back",
@@ -327,48 +327,20 @@
   "Header": {
     "links": [
       {
-        "name": "Features",
-        "href": "/#features"
+        "name": "My Songs",
+        "href": "/songs"
       },
       {
-        "id": "pricing",
+        "name": "My Samples",
+        "href": "/samples"
+      },
+      {
         "name": "Pricing",
         "href": "/pricing"
       },
       {
-        "name": "AI Demo",
-        "href": "/ai-demo"
-      },
-      {
         "name": "Blog",
         "href": "/blog"
-      },
-      {
-        "name": "Demo",
-        "href": "#",
-        "items": [
-          {
-            "name": "Nexty Demo",
-            "href": "https://demo.nexty.dev/",
-            "target": "_blank",
-            "rel": "noopener noreferrer nofollow",
-            "description": "Next.js SaaS Boilerplate"
-          },
-          {
-            "name": "AI Image Generator Demo",
-            "href": "https://flux-kontext.nexty.dev/",
-            "target": "_blank",
-            "rel": "noopener noreferrer nofollow",
-            "description": "AI Image Generator Demo Based on NEXTY.DEV"
-          },
-          {
-            "name": "Directory Boilerplate Demo",
-            "href": "https://dofollow.tools/",
-            "target": "_blank",
-            "rel": "noopener noreferrer nofollow",
-            "description": "Directory Boilerplate Demo Based on NEXTY.DEV"
-          }
-        ]
       }
     ]
   },
@@ -444,26 +416,6 @@
             {
               "name": "Roadmap",
               "href": "https://nexty.dev/roadmap"
-            }
-          ]
-        },
-        {
-          "title": "Languages",
-          "links": [
-            {
-              "href": "/en",
-              "name": "English",
-              "useA": true
-            },
-            {
-              "href": "/zh",
-              "name": "中文",
-              "useA": true
-            },
-            {
-              "href": "/ja",
-              "name": "日本語",
-              "useA": true
             }
           ]
         }

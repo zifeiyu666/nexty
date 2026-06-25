@@ -1,54 +1,8 @@
 import {
   normalizeKieMusicRecord,
-  submitTimestampedLyricsTask,
-  type KieSongVersion,
 } from "@/lib/ai/adapters/kie-suno";
-import { songSampleEmail } from "@/lib/ai/song-sample-email";
-import {
-  createSongSampleFromTask,
-  songSampleStore,
-} from "@/lib/ai/song-sample-store";
+import { completeSongTaskFromKieResult } from "@/lib/ai/kie-suno-song-completion";
 import { songTaskStore } from "@/lib/ai/song-task-store";
-
-async function attachTimestampedLyricsToVersions({
-  taskId,
-  versions,
-}: {
-  taskId: string;
-  versions: KieSongVersion[];
-}): Promise<KieSongVersion[]> {
-  return Promise.all(
-    versions.map(async (version) => {
-      try {
-        const result = await submitTimestampedLyricsTask({
-          taskId,
-          audioId: version.id,
-        });
-
-        if (result.status !== "succeeded" || result.alignedWords.length === 0) {
-          return version;
-        }
-
-        return {
-          ...version,
-          timestampedLyrics: {
-            alignedWords: result.alignedWords,
-            waveformData: result.waveformData,
-            hootCer: result.hootCer,
-            isStreamed: result.isStreamed,
-          },
-        };
-      } catch (error) {
-        console.warn("[KIE Suno Callback] Failed to fetch timestamped lyrics", {
-          taskId,
-          audioId: version.id,
-          error,
-        });
-        return version;
-      }
-    }),
-  );
-}
 
 export async function POST(req: Request) {
   try {
@@ -99,9 +53,12 @@ export async function POST(req: Request) {
     });
 
     if (body?.code === 501 || result.status === "failed") {
-      await songTaskStore.updateSong(task.songId, {
-        status: "failed",
-        error: result.error || body?.msg || "KIE song generation failed.",
+      await completeSongTaskFromKieResult({
+        result: {
+          ...result,
+          error: result.error || body?.msg || "KIE song generation failed.",
+        },
+        task,
       });
       console.log("[KIE Suno Callback] Marked task failed", {
         songId: task.songId,
@@ -111,33 +68,19 @@ export async function POST(req: Request) {
     }
 
     if (result.status === "succeeded" && result.versions.length) {
-      const versions = await attachTimestampedLyricsToVersions({
-        taskId: task.externalId || taskId,
-        versions: result.versions,
-      });
-      const updated = await songTaskStore.updateSong(task.songId, {
-        status: "succeeded",
-        versions,
-      });
+      const updated = await completeSongTaskFromKieResult({ result, task });
+      const r2PublicUrl = process.env.R2_PUBLIC_URL;
       console.log("[KIE Suno Callback] Marked task succeeded", {
         songId: task.songId,
-        versions: versions.length,
-        timestampedLyrics: versions.filter(
+        versions: updated?.versions.length,
+        r2Media: r2PublicUrl
+          ? updated?.versions.filter((version) => version.audioUrl.startsWith(r2PublicUrl)).length
+          : undefined,
+        timestampedLyrics: updated?.versions.filter(
           (version) => version.timestampedLyrics?.alignedWords?.length,
         ).length,
         isSubscriber: updated?.isSubscriber,
       });
-
-      if (updated && !updated.isSubscriber) {
-        const sample = createSongSampleFromTask(updated);
-        await songSampleStore.save(sample);
-        console.log("[KIE Suno Callback] Saved song sample", {
-          songId: sample.songId,
-          userId: sample.userId,
-          email: sample.email,
-        });
-        await songSampleEmail.sendSongSampleReadyEmail(sample);
-      }
     }
 
     return Response.json({ ok: true });

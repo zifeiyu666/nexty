@@ -1,4 +1,9 @@
 import {
+  finalizeAndRecordOrderUnlockSong,
+  parseUnlockSongMetadata,
+  recordUnlockSongResultForOrderAndSubscription,
+} from '@/lib/ai/song-unlock-after-payment';
+import {
   sendCreditUpgradeFailedEmail,
   sendFraudRefundUserEmail,
   sendFraudWarningAdminEmail,
@@ -100,6 +105,19 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
       console.error(`CRITICAL: Failed to upgrade one-time credits for user ${userId}, order ${orderId}:`, error);
       await sendCreditUpgradeFailedEmail({ userId, orderId, planId, error });
       throw error;
+    }
+
+    try {
+      await finalizeAndRecordOrderUnlockSong({
+        userId,
+        context: parseUnlockSongMetadata(session.metadata),
+        orderId,
+      });
+    } catch (error) {
+      console.error(
+        `[Stripe webhook] Failed to finalize unlock song for order ${orderId}:`,
+        error
+      );
     }
     // --- End: [custom] Upgrade the user's benefits ---
   }
@@ -249,6 +267,32 @@ export async function handleInvoicePaid(invoice: Stripe.Invoice) {
       console.error(`CRITICAL: Failed to upgrade subscription credits for user ${userId}, order ${orderId}:`, error);
       await sendCreditUpgradeFailedEmail({ userId, orderId, planId, error });
       throw error;
+    }
+
+    try {
+      const unlockContext =
+        parseUnlockSongMetadata(subscription.metadata) ||
+        parseUnlockSongMetadata(invoice.metadata);
+      const unlockResult = await finalizeAndRecordOrderUnlockSong({
+        userId,
+        context: unlockContext,
+        orderId,
+      });
+      await recordUnlockSongResultForOrderAndSubscription({
+        orderId,
+        subscriptionId,
+        result: unlockResult,
+      });
+      if (unlockResult) {
+        console.log(
+          `[Stripe webhook] Unlock song processing completed for invoice ${invoiceId}: ${unlockResult.status}`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `[Stripe webhook] Failed to finalize unlock song for invoice ${invoiceId}:`,
+        error
+      );
     }
     // --- End: [custom] Upgrade ---
   } else {

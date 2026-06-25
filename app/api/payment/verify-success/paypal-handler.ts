@@ -4,6 +4,7 @@
 
 import { syncPayPalSubscriptionData } from "@/actions/paypal";
 import { apiResponse } from "@/lib/api-response";
+import { getUnlockSongResult } from "@/lib/ai/song-unlock-after-payment";
 import { db } from "@/lib/db";
 import { subscriptions as subscriptionsSchema } from "@/lib/db/schema";
 import { getPayPalSubscription } from "@/lib/paypal";
@@ -77,12 +78,18 @@ export async function verifyPayPalPayment(
       });
     }
 
+    const unlockSong = getUnlockSongResult(subscriptionRecord.metadata);
+
     return apiResponse.success({
       subscriptionId: subscriptionRecord.id,
       planName: (subscriptionRecord.metadata as any)?.planName,
       planId: subscriptionRecord.planId,
       status: subscriptionRecord.status,
-      message: "Subscription verified and active.",
+      unlockSong,
+      message:
+        unlockSong?.status === "completed"
+          ? "Subscription verified and your song is unlocked."
+          : "Subscription verified and active.",
     });
   } catch (error: any) {
     console.error(`[Verify API] Error verifying PayPal payment:`, error);

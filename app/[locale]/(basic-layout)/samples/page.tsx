@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Locale } from "@/i18n/routing";
+import { getUserBenefits } from "@/actions/usage/benefits";
 import { songSampleStore } from "@/lib/ai/song-sample-store";
 import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
@@ -30,7 +31,7 @@ export async function generateMetadata({
   return constructMetadata({
     title: "Your Song Samples",
     description:
-      "Browse your generated song samples and unlock them within 3 days.",
+      "Browse your generated song samples and choose your favorite version.",
     locale: locale as Locale,
     path: "/samples",
   });
@@ -54,9 +55,13 @@ export default async function SamplesPage({
 }) {
   const session = await getSession();
   const { email = "", q = "", occasion = "all" } = await searchParams;
+  const benefits = session?.user?.id ? await getUserBenefits(session.user.id) : null;
+  const hasActiveSubscription =
+    benefits?.subscriptionStatus === "active" || benefits?.subscriptionStatus === "trialing";
   const samples = await songSampleStore.list({
     userId: session?.user?.id,
     email: session?.user?.email || email,
+    hasActiveSubscription,
   });
   const filteredSamples = samples.filter((sample) => {
     const matchesOccasion =
@@ -83,12 +88,12 @@ export default async function SamplesPage({
       <section className="mx-auto max-w-7xl px-4 pb-12 pt-8 sm:px-6">
         <div className="max-w-4xl">
           <h1 className="font-serif text-5xl font-black leading-[0.94] tracking-normal text-primary md:text-7xl">
-            Your samples, ready to unlock
+            Your samples, ready to choose
           </h1>
           <p className="mt-5 max-w-3xl text-xl leading-8 text-muted-foreground md:text-2xl md:leading-10">
-            Previews of the songs you&apos;ve created. Unlock within{" "}
-            <strong className="text-foreground">72 hours</strong> to download,
-            share, and turn them into a video gift.
+            Every generated song lands here first. Subscribers keep samples
+            permanently; guests and non-subscribers can unlock within{" "}
+            <strong className="text-foreground">72 hours</strong>.
           </p>
         </div>
 
@@ -97,11 +102,11 @@ export default async function SamplesPage({
             <Clock3 className="mt-0.5 size-5 shrink-0 text-primary" />
             <div>
               <h2 className="text-base font-black text-foreground">
-                3-Day Access Window
+                Sample Library
               </h2>
               <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                You have 3 days to unlock each sample after creation. After
-                that, samples become subscriber-only.
+                Subscribers get permanent access to generated samples. Other
+                samples keep a 3-day preview window before they expire.
               </p>
             </div>
           </div>
@@ -176,7 +181,7 @@ export default async function SamplesPage({
                   {artworkName(sample.recipientNames)}
                 </p>
                 <span className="absolute bottom-4 right-4 rounded-full bg-primary/75 px-3 py-1.5 text-xs font-black text-primary-foreground">
-                  1:00 preview
+                  {sample.previewLimitSeconds ? "1:00 preview" : "Full song"}
                 </span>
               </div>
 
@@ -236,7 +241,7 @@ export default async function SamplesPage({
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
               Create a song sample first, then it will appear here for your
-              3-day access window.
+              sample library.
             </p>
             <Button asChild className="mt-5 rounded-full">
               <Link href="/create-song">Create a sample</Link>

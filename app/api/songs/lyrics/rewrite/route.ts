@@ -6,7 +6,20 @@ const rewriteSchema = z.object({
   occasion: z.string().trim().min(1).max(120),
   genre: z.string().trim().min(1).max(120),
   language: z.string().trim().min(1).max(80),
+  recipients: z
+    .array(
+      z.object({
+        name: z.string().trim().max(80).default(""),
+        relationship: z.string().trim().max(80).default(""),
+      })
+    )
+    .max(3)
+    .optional(),
   recipientNames: z.array(z.string().trim().min(1).max(80)).max(3).default([]),
+  recipientRelationships: z
+    .array(z.string().trim().max(80))
+    .max(3)
+    .default([]),
   fullLyrics: z.string().trim().min(20).max(6000),
   selectedLines: z.array(z.string().trim().min(1).max(500)).min(1).max(8),
   instruction: z.string().trim().max(500).optional(),

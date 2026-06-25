@@ -8,7 +8,7 @@ import type { VideoGenerationTask } from "./video";
 //     - Write to DB first (single source of truth)
 //     - Write to Redis as a hot cache for polling
 //     - On cache miss in `get()`, fall back to DB query
-//   See the `ai_video_tasks` table suggestion in app/api/ai-demo/video/route.ts.
+//   If video generation needs durable history, persist task state in a database table.
 
 // TODO [Task List API]: To support a task history dashboard page, add a `list` method:
 //   async list(userId: string, limit = 20): Promise<VideoGenerationTask[]>

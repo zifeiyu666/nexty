@@ -11,10 +11,7 @@
     "description": "認証、Stripe決済、AI統合、CMSなど、すぐに収益化を始めるために必要なすべてを含む、包括的な Next.js テンプレートです。",
     "getStarted": "今すぐ開始",
     "getStartedLink": "https://nexty.dev/#pricing",
-    "discord": {
-      "text": "Discord に参加",
-      "href": "https://discord.com/invite/R7bUxWKRqZ"
-    },
+    "howItWorksCta": "仕組み",
     "viewDocs": "ドキュメントを見る",
     "viewDocsLink": "https://nexty.dev/docs"
   },
@@ -27,11 +24,7 @@
     "description": "<p>ティッシュを近くに置いてご覧ください。ホバーで静音プレビュー、クリックで <strong>GiftSong</strong> を音声付き再生できます。</p>",
     "playLabel": "{title} を音声付きで再生",
     "muteLabel": "{title} をミュート",
-    "trustItems": [
-      "無料で試せる",
-      "数分で完成",
-      "音楽スキル不要"
-    ],
+    "trustItems": ["無料で試せる", "数分で完成", "音楽スキル不要"],
     "videos": [
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
@@ -74,6 +67,57 @@
         "title": "もう一度聴きたい"
       }
     ]
+  },
+  "HowItWorks": {
+    "eyebrow": "How It Works",
+    "title": "ひとつの思い出を、数分で涙を誘う歌へ",
+    "description": "心からパーソナルな <strong>custom song</strong> を作成し、無料でプレビュー。その後、<strong>music video</strong> と印刷できる <strong>wall art</strong> まで含むギフトセットをアンロックできます。",
+    "steps": {
+      "story": {
+        "title": "ストーリーを伝える",
+        "description": "誕生日、結婚式、記念日などのシーンを選び、ジャンルと大切な思い出を入力してください。AI がその言葉を美しく詩的な歌詞へ変換します。",
+        "cta": "Craft My Song"
+      },
+      "preview": {
+        "title": "無料で試聴し、理想に近づける",
+        "description": "スタジオ品質の 30 秒プレビューをすぐに試聴できます。完璧でなければ、ダッシュボードで歌詞を調整したりジャンルを切り替えたりして、自由に仕上げられます。"
+      },
+      "gift": {
+        "title": "究極のギフトとして届ける",
+        "description": "フル尺の <strong>custom song</strong> をアンロックすると、無料のカスタム <strong>music video</strong> と編集可能な <strong>wall art</strong> ポスターも付属します。個別に送ることも、SNS で共有することもできます。"
+      }
+    }
+  },
+  "OurProducts": {
+    "eyebrow": "Our Products",
+    "title": "Custom Song だけで終わらないギフト",
+    "description": "ひとつの大切な物語を、AI custom song、共有しやすい music video gift、印刷できる digital wall art までそろった personalized music gift に。誕生日、結婚式、記念日、忘れたくない瞬間に最適です。",
+    "items": {
+      "customSong": {
+        "label": "Signature",
+        "title": "Personalized Song",
+        "price": "From $29.99",
+        "description": "思い出、名前、日付、伝えたい言葉からスタジオ品質の custom song を作成。無料プレビューを聴いて歌詞を調整し、何度でも聴き返せる一曲として届けられます。",
+        "cta": "Create a song",
+        "imageAlt": "スマートフォンで personalized custom song gift を聴くカップル"
+      },
+      "videoGift": {
+        "label": "Add-on",
+        "title": "Music Video Gift",
+        "price": "From $23.99",
+        "description": "custom song に写真、歌詞シーン、感動的な動画テンプレートを組み合わせます。テキスト、メール、SNS で共有しやすい music video gift です。",
+        "cta": "Create video styles",
+        "imageAlt": "家族写真と custom song の歌詞を使った personalized music video gift"
+      },
+      "wallArt": {
+        "label": "Add-on",
+        "title": "Digital Wall Art",
+        "price": "From $7.99",
+        "description": "歌詞を印刷可能な digital wall art、レコード風ポスター、写真レイアウトに変換。高解像度データをダウンロードして、自宅やプリントショップで形にできます。",
+        "cta": "Create wall art",
+        "imageAlt": "custom song の歌詞から作られた印刷可能な digital wall art ポスター"
+      }
+    }
   },
   "Features": {
     "badge": {
@@ -126,9 +170,7 @@
             "description": "Cloudflare Turnstile でアプリをボットから保護。"
           }
         ],
-        "images": [
-          "/images/features/login.png"
-        ]
+        "images": ["/images/features/login.png"]
       },
       {
         "title": "データベース",
@@ -191,10 +233,7 @@
             "description": "Nexty 有料ユーザーは、AI アートプラットフォームの迅速なデプロイメント用の完全な Flux Kontext AI 画像生成ウェブサイトテンプレートを取得。"
           }
         ],
-        "images": [
-          "/images/features/ai-1.png",
-          "/images/features/ai-2.png"
-        ]
+        "images": ["/images/features/ai-1.png", "/images/features/ai-2.png"]
       },
       {
         "title": "CMS",
@@ -238,9 +277,7 @@
             "description": "Nexty はドラッグ&ドロップアップロード、プレビュー機能、自動ファイル処理でシームレスなユーザー体験を提供。"
           }
         ],
-        "images": [
-          "/images/features/admin-4.png"
-        ]
+        "images": ["/images/features/admin-4.png"]
       },
       {
         "title": "ビジュアル価格管理",
@@ -364,35 +401,111 @@
   },
   "UseCases": {
     "badge": {
-      "label": "使用事例",
-      "text": "複数のソリューションシナリオ"
+      "label": "CORE FEATURES",
+      "text": "Personalized Music Gift"
     },
-    "title": "1つのテンプレート、複数のソリューション",
-    "description": "AI ツール、コンテンツプラットフォーム、その他の SaaS 製品を構築する場合でも、当社の Next.js SaaS テンプレートは最小限の設定で特定のニーズに適応します。",
+    "title": "Why Craft Your Song with Us?",
+    "description": "The absolute best way to send a song that touches hearts. Unmatched value, studio quality, and boundless personalization.",
     "cases": [
       {
-        "title": "AI パワード SaaS ツール",
-        "description": "数か月ではなく数日で本格運用可能な AI アプリケーションを立ち上げ。OpenRouter、Replicate、主要 AI プロバイダーとの組み込み統合。スマートな使用状況追跡、自動課金、AI ワークフローの収益化に必要なすべてを含む。",
+        "title": "Ready in 2 Minutes",
+        "description": "Answer a few simple questions and watch our AI instantly transform your memories into a custom song sample in just 2 minutes. No musical skills required.",
         "image": "/placeholder.webp",
-        "icon": "Bot"
+        "icon": "Zap"
       },
       {
-        "title": "コンテンツ・ブログプラットフォーム",
-        "description": "高度な CMS 機能を備えた SEO 最適化されたコンテンツウェブサイトを立ち上げ。Markdown 編集、多言語サポート、ペイウォール保護、AI 翻訳、AdSense 統合を含む機能。プレミアムコンテンツプラットフォーム、ニュースレター、コンテンツ駆動型 SaaS アプリケーション構築に最適。",
+        "title": "Studio-Grade Quality",
+        "description": "Real-sounding emotional vocals, professional instruments, and crystal-clear production. Your personalized song sounds exactly like a hit track recorded in a real studio.",
         "image": "/placeholder.webp",
-        "icon": "FileText"
+        "icon": "Mic2"
       },
       {
-        "title": "サブスクリプション・マーケットプレイスプラットフォーム",
-        "description": "自動課金、顧客管理、支払い処理で継続収益ビジネスを構築。サブスクリプション管理、使用量ベース価格、顧客ポータル、包括的な分析を含む機能。SaaS マーケットプレイス、サブスクリプションサービス、プレミアムツールプラットフォームに最適。",
+        "title": "Premium Quality, Better Price",
+        "description": "Why pay more for the same magic? We offer top-tier AI songwriting and studio-quality generation at the most competitive price on the market, giving you premium value for less.",
         "image": "/placeholder.webp",
-        "icon": "CreditCard"
+        "icon": "CircleDollarSign"
       },
       {
-        "title": "無料ツール・リードマグネット",
-        "description": "大量のオーガニックトラフィックを促進するバイラルな無料ツールを作成。超高速パフォーマンスと SEO 最適化。メールリスト構築、リード生成、次のバイラル計算機/コンバーターツール作成に最適。",
+        "title": "Try 100% Free Before You Buy",
+        "description": "Listen to your custom preview without handing over your credit card. Tweak the lyrics, switch genres, and only unlock the full high-res track when you're deeply moved.",
         "image": "/placeholder.webp",
-        "icon": "Wrench"
+        "icon": "Sparkles"
+      },
+      {
+        "title": "Free Custom Wall Art & Video Templates",
+        "description": "Get way more than just audio. Every song comes packed with a massive library of free music video and printable wall art templates to create the ultimate personalized music gift combo.",
+        "image": "/placeholder.webp",
+        "icon": "Palette"
+      },
+      {
+        "title": "Built-in Personalization Editors",
+        "description": "Take complete control. Use our intuitive interactive editors to fully customize your music video or layout your wall art lyrics. Add your personal photos, dates, and love notes effortlessly.",
+        "image": "/placeholder.webp",
+        "icon": "SlidersHorizontal"
+      }
+    ]
+  },
+  "SongfinchComparison": {
+    "eyebrow": "Why Users Switch from Songfinch to Us",
+    "title": "<us>customsong.top</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "subtitle": "1 曲に <price>$200 以上</price>を払う必要はありません。<underline>はるかに手頃な価格で</underline>、<strong>スタジオ品質の制作</strong>と自由なカスタマイズを手に入れられます。",
+    "tableHeaders": {
+      "feature": "Feature / Benefit",
+      "songfinch": "Songfinch",
+      "us": "customsong.top (Us)"
+    },
+    "rows": [
+      {
+        "feature": "Starting Price",
+        "songfinch": "$199+ per song",
+        "us": "Ultra affordable, unbeatable price"
+      },
+      {
+        "feature": "Delivery Time",
+        "songfinch": "4 to 7 days, long wait",
+        "us": "Just 2 minutes, instant preview"
+      },
+      {
+        "feature": "Risk-Free Trial",
+        "songfinch": "Pay upfront, no preview",
+        "us": "100% free preview, pay only when happy"
+      },
+      {
+        "feature": "Lyrics Revisions",
+        "songfinch": "Restricted or extra fees",
+        "us": "Unlimited edits with complete control"
+      },
+      {
+        "feature": "Free Music Video",
+        "songfinch": "Not included",
+        "us": "Included free with customizable templates"
+      },
+      {
+        "feature": "Free Printable Wall Art",
+        "songfinch": "Not included",
+        "us": "Included free with lyric poster editors"
+      }
+    ],
+    "painPoints": [
+      {
+        "icon": "value",
+        "title": "Absolute Best Value, No Wallet Pain",
+        "description": "Songfinch charges a hefty upfront fee of $199 minimum. We believe everyone deserves to celebrate their love without breaking the bank. We offer the exact same musical magic at the most competitive price on the market."
+      },
+      {
+        "icon": "speed",
+        "title": "From Memories to Music in 2 Minutes",
+        "description": "Why wait a whole week for your anniversary or birthday gift? Our next-gen AI pipeline allows you to create a custom song sample in just 2 minutes. Perfect for last-minute lifesavers and instant emotional impacts."
+      },
+      {
+        "icon": "edits",
+        "title": "Unlimited Edits & Tweak Till It’s Perfect",
+        "description": "With traditional services, changing a lyric or switching a genre means endless back-and-forth emails and extra fees. With our interactive dashboard, you can tweak the lyrics and switch genres instantly with total creative freedom."
+      },
+      {
+        "icon": "bundle",
+        "title": "A Complete Personalized Music Gift Bundle",
+        "description": "A song is great, but a multimedia memory is legendary. Every unlocked track comes with free customizable music video creators and printable wall art templates. It's a complete personalized music gift ecosystem that Songfinch simply doesn't offer."
       }
     ]
   },
@@ -404,57 +517,53 @@
     "description": "私たちの言葉だけでなく、実際のお客様の声をお聞きください"
   },
   "FAQ": {
-    "title": "よくある質問",
-    "description": "Next.js SaaS テンプレートに関するよくある質問と、より良いアプリケーションをより速く構築する方法について",
+    "title": "カスタムソングに関するよくある質問",
+    "description": "大切な人がずっと宝物にしたくなる曲を作って贈る前に、知っておきたいことをまとめました。",
     "items": [
       {
-        "question": "非技術者でもこのテンプレートを使用できますか？",
-        "answer": "絶対に！Nexty は AI アシスタントとシームレスに動作するように特別に設計されており、プログラミング経験がゼロの人でも AI 支援開発を通じて製品を開発できます。コード構造とドキュメントは AI フレンドリーで、AI がコードを理解し変更することが容易になります。技術チームはさらに大きな開発効率の恩恵を受けます。"
+        "question": "customsong.top はどのように使いますか？",
+        "answer": "まるで魔法のように簡単です。いくつかの質問に答えてあなたのストーリーを伝え、好きな音楽ジャンルを選ぶだけで、AI がすぐにオリジナル曲を作ります。まずは無料で 30 秒のスタジオ品質プレビューを受け取れます。気に入ったらフルソングをアンロックし、無料の動画エディターとプリント用エディターも利用できます！"
       },
       {
-        "question": "これが最高の Next.js SaaS テンプレートである理由は？",
-        "answer": "Nexty は利用可能な最も包括的な Next.js SaaS スターターキットです。基本的なコンポーネントのみを提供する他のテンプレートとは異なり、完全なビジネスワークフローを含んでいます：認証、支払い、AI 統合、コンテンツ管理、収益化機能。すべてが本格運用可能で、実際のアプリケーションで実証済みです。"
+        "question": "他のカスタムソングサービスと何が違いますか？",
+        "answer": "私たちは音声ファイルを渡すだけではありません。市場でも非常に競争力のある価格に加え、すべての曲で無料かつ無制限に使えるカスタマイズ可能なミュージックビデオテンプレートと、印刷できるウォールアートテンプレートを利用できます。内蔵のインタラクティブエディターで、自分の写真や愛のメッセージを加えて仕上げられます。"
       },
       {
-        "question": "このテンプレートでどのくらい早く SaaS を立ち上げられますか？",
-        "answer": "最初のプロジェクトはテンプレートの機能を学ぶために 3-5 日かかりますが、学習曲線はすぐに報われます。システムをマスターした当社の顧客は、今や完全な SaaS アプリケーションをわずか 1-2 日で立ち上げています。テンプレートがすべての複雑なインフラを処理するため、製品を独特にするものに集中できます。"
+        "question": "歌詞を編集したり、音楽ジャンルを変更したりできますか？",
+        "answer": "もちろんです！あなたが完全にコントロールできます。高解像度のフルトラックをアンロックする前に、ダッシュボード内で歌詞を調整したり、音楽スタイルを変更したり、ボーカルの雰囲気を切り替えたりして、理想にぴったり合うまで編集できます。"
       },
       {
-        "question": "これは AI パワード SaaS アプリケーションに適していますか？",
-        "answer": "絶対に！当社のテンプレートには、テキスト生成、画像作成、動画処理の実用例を含む包括的な AI SDK 統合が含まれています。OpenAI、Claude、Gemini、Grok、DeepSeek、その他の人気 AI モデルと互換性があります。AI ツールやコンテンツ生成プラットフォーム構築に最適です。"
+        "question": "パーソナライズされた音楽ギフトはどうやって共有できますか？",
+        "answer": "すべての曲には、SMS、メール、SNS で送れる美しい専用シェアページが付きます。このページには個人写真や心のこもったメッセージを追加でき、回転するレコードプレーヤーであなたのオリジナル曲が再生されます。受け取った人が驚く瞬間を作るためのページです。"
       },
       {
-        "question": "どのような決済方法と課金モデルがサポートされていますか？",
-        "answer": "テンプレートには一回限りの支払い、サブスクリプション、使用量ベース課金、自動更新をサポートする完全な Stripe 統合が含まれています。すぐに収益化を開始できます。"
+        "question": "隠れた料金はありますか？支払いは安全ですか？",
+        "answer": "隠れた料金は一切ありません。プレビューに完全に満足した場合のみお支払いいただきます。すべての支払いは Stripe を通じて暗号化され、安全に処理されます（PCI 準拠）。クレジットカード情報を当社サーバーに保存することはありません。"
       },
       {
-        "question": "コンテンツ管理システムはどのように動作しますか？",
-        "answer": "組み込み CMS は Markdown とリッチテキスト編集、多言語コンテンツ、SEO 最適化、ペイウォール保護、AI 翻訳をサポートします。ロールベースのアクセス制御を備えた直感的な管理ダッシュボードを通じて記事、ページ、プレミアムコンテンツを管理できます。"
+        "question": "作成したカスタムソングはどのくらい保存されますか？",
+        "answer": "購入済みのトラック、カスタムミュージックビデオ、ウォールアートのレイアウトは、アカウント内に安全かつ無期限に保存されます。いつでもログインしてストリーミング、再生、高品質 MP3 での再ダウンロードができます。"
       },
       {
-        "question": "テンプレートは SEO 最適化されていますか？",
-        "answer": "はい！テンプレートには包括的な SEO 機能が含まれています：自動メタタグ、構造化データ、XML サイトマップ、OpenGraph サポート、パフォーマンス最適化。検索エンジンの可視性とより高速な読み込み時間のための Next.js ベストプラクティスで構築されています。"
+        "question": "ログイン要件はありますか？",
+        "answer": "できるだけ手間なく始められるようにしています。プレビューを作り始めるだけなら登録すら不要です！「遅延登録」システムを採用しており、プレビューを聴くためにメールアドレスを入力すると、ゲストアカウントが自動で作成されます。あとからいつでも Google またはメールでサインインできます。"
       },
       {
-        "question": "どのようなサポートを提供していますか？",
-        "answer": "包括的なドキュメント、コード例、メールサポートを提供しています。他の開発者からヘルプを得てプロジェクトを共有できるパブリック Discord コミュニティもあります。"
-      },
-      {
-        "question": "価格カードはどのように管理しますか？",
-        "answer": "これは Nexty の重要なセールスポイントです。ダッシュボードで価格カードを管理でき、AI 多言語翻訳サポートで価格カードの追加、編集、削除ができ、複雑な多言語ファイル設定を排除します。"
+        "question": "曲の生成が止まってしまった場合はどうすればいいですか？",
+        "answer": "次世代 AI パイプラインは非常に安定していますが、ネットワークの不具合が起きることもあります。止まった場合はページを更新してください。問題が続く場合は、24 時間年中無休のサポートチームがすぐに手動で再生成し、トラックを最適化します。"
       }
     ]
   },
   "CTA": {
-    "title": "製品を素早く立ち上げ、素早く収益化",
-    "description": "ゼロから始めるのはやめましょう！Nexty テンプレートを使ってコアアイデアに集中し、迅速に構築・検証して収益化を開始しましょう。",
-    "button": "今すぐテンプレートを取得",
-    "trustText": "世界中の開発者に信頼されています",
+    "title": "ずっと大切にしたくなるオリジナル曲を贈ろう",
+    "description": "あなたのストーリーを教えてください。AI が思い出をスタジオ品質の<strong>オリジナル曲</strong>に変え、誕生日、結婚式、記念日にぴったりの<strong>パーソナライズ音楽ギフト</strong>として<strong>曲を贈る</strong>体験をつくります。",
+    "button": "曲を作成する",
+    "trustText": "忘れられない瞬間のために",
     "features": {
-      "deploy": "🚀 クイックデプロイ",
-      "production": "🔧 本格運用対応",
-      "updates": "💎 生涯アップデート",
-      "i18n": "🌍 国際化"
+      "deploy": "🎵 スタジオ品質のAIソング",
+      "production": "🎁 すぐ贈れるパーソナルギフト",
+      "updates": "⚡ 無料プレビューを即作成",
+      "i18n": "💌 簡単に送信・共有"
     }
   }
 }

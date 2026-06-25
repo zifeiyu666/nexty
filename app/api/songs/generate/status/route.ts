@@ -1,5 +1,4 @@
 import { refreshSongGeneration } from "@/lib/ai/song";
-import { songSampleStore } from "@/lib/ai/song-sample-store";
 import { apiResponse } from "@/lib/api-response";
 
 export async function GET(req: Request) {
@@ -25,21 +24,6 @@ export async function GET(req: Request) {
       isSubscriber: task.isSubscriber,
     });
 
-    // Only expose a sample URL when a saved sample is actually available.
-    let sampleUrl: string | null = null;
-    if (!task.isSubscriber) {
-      try {
-        const sample = await songSampleStore.get(task.songId);
-        if (sample) {
-          sampleUrl = `/samples/${task.songId}`;
-        } else {
-          console.log("[songs/generate/status] Sample not yet saved", { songId: task.songId });
-        }
-      } catch (err) {
-        console.warn("[songs/generate/status] Failed checking sample store", { songId: task.songId, err });
-      }
-    }
-
     return apiResponse.success({
       songId: task.songId,
       status: task.status,
@@ -47,7 +31,6 @@ export async function GET(req: Request) {
       lyrics: task.lyrics,
       versions: task.versions,
       previewLimitSeconds: task.isSubscriber ? null : 60,
-      sampleUrl,
       error: task.error,
       expiresAt: new Date(task.expiresAt).toISOString(),
     });

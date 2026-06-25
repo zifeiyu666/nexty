@@ -1,7 +1,7 @@
 import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { Link as I18nLink } from "@/i18n/routing";
-import { MousePointerClick } from "lucide-react";
+import { Gift } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function CTA() {
@@ -30,22 +30,24 @@ export default function CTA() {
                 <div className="absolute bottom-8 right-8 w-2 h-2 bg-linear-to-r from-indigo-500 to-purple-500 rounded-full"></div>
               </div>
 
-              <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
+              <h2 className="preset-title">
                 <span className="text-primary">{t("title")}</span>
               </h2>
 
-              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-                {t("description")}
+              <p className="cta-subtitle mx-auto mb-10 mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+                {t.rich("description", {
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
 
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <I18nLink
-                  href="/#pricing"
+                  href="/create-song"
                   className="flex items-center gap-2"
                   prefetch={true}
                 >
                   <RainbowButton>
-                    <MousePointerClick className="w-5 h-5" />
+                    <Gift className="w-5 h-5" />
                     {t("button")}
                   </RainbowButton>
                 </I18nLink>

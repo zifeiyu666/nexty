@@ -1,5 +1,12 @@
 import { savePayPalPayerId } from "@/actions/paypal";
 import { apiResponse } from "@/lib/api-response";
+import {
+  buildPendingUnlockSongResult,
+  finalizeAndRecordOrderUnlockSong,
+  getUnlockSongResult,
+  parseUnlockSongMetadata,
+  recordOrderUnlockSongResult,
+} from "@/lib/ai/song-unlock-after-payment";
 import { getSession } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 import { orders as ordersSchema } from "@/lib/db/schema";
@@ -22,13 +29,18 @@ interface CaptureOrderRequest {
  * Build an API response from an existing order record based on its status.
  */
 function orderStatusResponse(
-  record: { id: string; status: string },
+  record: { id: string; status: string; metadata?: unknown },
   planName: string
 ) {
+  const unlockSong = getUnlockSongResult(record.metadata);
+
   if (record.status === ORDER_STATUSES.SUCCEEDED) {
     return apiResponse.success({
       orderId: record.id,
       planName,
+      unlockSong,
+      songUrl:
+        unlockSong?.status === "completed" ? unlockSong.songUrl : undefined,
       message: "Payment already captured and order confirmed.",
     });
   }
@@ -37,6 +49,7 @@ function orderStatusResponse(
       orderId: record.id,
       planName,
       pending: true,
+      unlockSong,
       message: "Your payment is being processed. Please check back in a moment.",
     });
   }
@@ -57,7 +70,7 @@ async function insertPayPalOrderWithIdempotency(params: {
   amount: string;
   currency: string;
   metadata: Record<string, unknown>;
-}): Promise<{ id: string; status: string }> {
+}): Promise<{ id: string; status: string; metadata?: unknown }> {
   try {
     const [insertedOrder] = await db
       .insert(ordersSchema)
@@ -82,7 +95,11 @@ async function insertPayPalOrderWithIdempotency(params: {
     if (!insertedOrder) {
       throw new Error("Failed to create order record.");
     }
-    return { id: insertedOrder.id, status: params.status };
+    return {
+      id: insertedOrder.id,
+      status: params.status,
+      metadata: params.metadata,
+    };
   } catch (dbError: any) {
     // Catch the unique-constraint violation: a concurrent request already inserted the record
     if (
@@ -90,7 +107,11 @@ async function insertPayPalOrderWithIdempotency(params: {
       dbError?.message?.includes("unique constraint")
     ) {
       const recoveredOrder = await db
-        .select({ id: ordersSchema.id, status: ordersSchema.status })
+        .select({
+          id: ordersSchema.id,
+          status: ordersSchema.status,
+          metadata: ordersSchema.metadata,
+        })
         .from(ordersSchema)
         .where(
           and(
@@ -169,6 +190,7 @@ export async function POST(req: Request) {
     }
 
     const { userId, planId } = customIdData;
+    const unlockSongContext = parseUnlockSongMetadata(customIdData);
 
     // 6. Verify the decoded userId matches the currently signed-in user
     if (userId !== user.id) {
@@ -204,7 +226,11 @@ export async function POST(req: Request) {
 
     // 8. Idempotency check - use the capture ID as providerOrderId
     const existingOrder = await db
-      .select({ id: ordersSchema.id, status: ordersSchema.status })
+      .select({
+        id: ordersSchema.id,
+        status: ordersSchema.status,
+        metadata: ordersSchema.metadata,
+      })
       .from(ordersSchema)
       .where(
         and(
@@ -217,7 +243,45 @@ export async function POST(req: Request) {
     const planName = purchaseUnit?.description || "Plan";
 
     if (existingOrder.length > 0) {
-      return orderStatusResponse(existingOrder[0], planName);
+      const existing = existingOrder[0];
+      if (
+        existing.status === ORDER_STATUSES.SUCCEEDED &&
+        unlockSongContext &&
+        !getUnlockSongResult(existing.metadata)
+      ) {
+        let creditsGranted = false;
+        if (planId) {
+          try {
+            await upgradeOneTimeCredits(userId, planId, existing.id);
+            creditsGranted = true;
+          } catch (creditError) {
+            console.error(
+              `[PayPal Capture] Failed to recover one-time credits for existing order ${existing.id}:`,
+              creditError
+            );
+          }
+        }
+
+        const unlockSong = creditsGranted
+          ? await finalizeAndRecordOrderUnlockSong({
+              userId,
+              context: unlockSongContext,
+              orderId: existing.id,
+            })
+          : buildPendingUnlockSongResult(unlockSongContext);
+        await recordOrderUnlockSongResult(existing.id, unlockSong);
+
+        return apiResponse.success({
+          orderId: existing.id,
+          planName,
+          unlockSong,
+          songUrl:
+            unlockSong?.status === "completed" ? unlockSong.songUrl : undefined,
+          message: "Payment already captured and order confirmed.",
+        });
+      }
+
+      return orderStatusResponse(existing, planName);
     }
 
     // 9. Build shared insert parameters
@@ -227,6 +291,9 @@ export async function POST(req: Request) {
       paypalPayerId: captureResult.payer?.payer_id,
       planId,
       planName: purchaseUnit?.description,
+      ...(customIdData.paypalUnlock && {
+        paypalUnlock: customIdData.paypalUnlock,
+      }),
     };
 
     const amount = capture?.amount?.value || "0";
@@ -254,9 +321,11 @@ export async function POST(req: Request) {
       }
 
       // 12. Grant the one-time credits for this plan (mirrors Stripe/Creem)
+      let creditsGranted = false;
       if (planId) {
         try {
           await upgradeOneTimeCredits(userId, planId, record.id);
+          creditsGranted = true;
         } catch (creditError) {
           console.error(
             `[PayPal Capture] Failed to upgrade one-time credits for order ${record.id}:`,
@@ -265,10 +334,22 @@ export async function POST(req: Request) {
         }
       }
 
+      const unlockSong = creditsGranted
+        ? await finalizeAndRecordOrderUnlockSong({
+            userId,
+            context: unlockSongContext,
+            orderId: record.id,
+          })
+        : buildPendingUnlockSongResult(unlockSongContext);
+      await recordOrderUnlockSongResult(record.id, unlockSong);
+
       // 13. Return the success result
       return apiResponse.success({
         orderId: record.id,
         planName,
+        unlockSong,
+        songUrl:
+          unlockSong?.status === "completed" ? unlockSong.songUrl : undefined,
         message: "Payment captured and order confirmed.",
       });
     }

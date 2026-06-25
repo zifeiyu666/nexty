@@ -31,10 +31,7 @@ async function creemRequest<T>(
     );
   }
 
-  // const url = new URL(path, CREEM_API_BASE_URL);
   const url = CREEM_API_BASE_URL + path;
-  console.log('creemRequest', url.toString());
-  console.log('CREEM_API_KEY:', CREEM_API_KEY);
 
   const headers: Record<string, string> = {
     'x-api-key': CREEM_API_KEY,
@@ -53,7 +50,12 @@ async function creemRequest<T>(
           ? init.body
           : JSON.stringify(init.body),
   });
-  console.log('Creem API Response:', response);
+  console.log('Creem API Response:', {
+    method: init.method ?? 'GET',
+    path,
+    status: response.status,
+    ok: response.ok,
+  });
 
   if (!response.ok) {
     let errorMessage = `Creem API responded with status ${response.status}`;
@@ -127,8 +129,10 @@ export async function createCreemCheckoutSession(params: CreemCheckoutSessionCre
 export async function retrieveCreemCheckoutSession(
   checkoutId: string
 ): Promise<CreemCheckout> {
+  const searchParams = new URLSearchParams({ checkout_id: checkoutId });
+
   try {
-    return await creemRequest<CreemCheckout>(`/checkouts?checkout_id=${checkoutId}`, {
+    return await creemRequest<CreemCheckout>(`/checkouts?${searchParams.toString()}`, {
       method: 'GET',
     });
   } catch (error) {

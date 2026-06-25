@@ -1,12 +1,14 @@
-import { getLanguageModel } from "@/config/ai-providers";
 import { db } from "@/lib/db";
 import {
   subscriptions as subscriptionsSchema,
   user as userSchema,
 } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { generateText } from "ai";
 import { submitMusicTask } from "./adapters/kie-suno";
+import {
+  generateTextWithReplicateGpt5,
+  getReplicateGpt5LyricsModel,
+} from "./adapters/replicate-gpt5";
 import {
   buildLyricsLineRewritePrompt,
   normalizeRewrittenLyricLines,
@@ -19,13 +21,20 @@ import {
   SongLyricsTask,
   songTaskStore,
 } from "./song-task-store";
+import { refreshProcessingSongTaskFromKie } from "./kie-suno-song-completion";
 
 export type SongInputContext = {
   occasion: string;
   genre: string;
   language: string;
+  recipients?: Array<{
+    name: string;
+    relationship: string;
+  }>;
   recipientNames: string[];
+  recipientRelationships?: string[];
   story: string;
+  userRevisionInstruction?: string;
   vocalGender: string;
 };
 
@@ -42,7 +51,12 @@ export type SongGenerationInput = SongInputContext & {
 
 export type SongLyricsRewriteInput = Pick<
   SongInputContext,
-  "occasion" | "genre" | "language" | "recipientNames"
+  | "occasion"
+  | "genre"
+  | "language"
+  | "recipients"
+  | "recipientNames"
+  | "recipientRelationships"
 > & {
   fullLyrics: string;
   selectedLines: string[];
@@ -56,10 +70,35 @@ function occasionLabel(value: string): string {
     .join(" ");
 }
 
+function formatRecipientsForPrompt(input: {
+  recipients?: Array<{ name: string; relationship: string }>;
+  recipientNames: string[];
+  recipientRelationships?: string[];
+}): string {
+  const recipients =
+    input.recipients?.length
+      ? input.recipients
+      : input.recipientNames.map((name, index) => ({
+          name,
+          relationship: input.recipientRelationships?.[index] || "",
+        }));
+  const labels = recipients
+    .map((recipient) => {
+      const name = recipient.name.trim();
+      const relationship = recipient.relationship.trim();
+      if (!name && !relationship) return "";
+      if (!relationship) return name;
+      if (!name) return relationship;
+      return `${name} (${relationship})`;
+    })
+    .filter(Boolean);
+
+  return labels.length ? labels.join(", ") : "someone special";
+}
+
 export function buildLyricsPrompt(input: SongInputContext): string {
-  const recipients = input.recipientNames.length
-    ? input.recipientNames.join(", ")
-    : "someone special";
+  const recipients = formatRecipientsForPrompt(input);
+  const revisionInstruction = input.userRevisionInstruction?.trim();
 
   return `You are an internationally experienced music producer and elite lyricist. Today I want to write a fully customized song as a gift for ${recipients}.
 
@@ -78,6 +117,15 @@ Please create lyrics strictly according to these customization requirements:
 ${input.story.trim()}
 2. Core blessing / heartfelt message to express:
 Turn the story above into a sincere, specific, emotionally resonant message for ${recipients}.
+
+${
+  revisionInstruction
+    ? `[Additional New Version Direction]
+The user wants this newly generated version to follow this extra direction:
+${revisionInstruction}
+`
+    : ""
+}
 
 [Lyric Formatting And Generation Rules]
 - Must include English structure tags that Suno can recognize. Use only English tags, for example: [Verse 1], [Verse 2], [Chorus], [Bridge], [Outro].
@@ -206,25 +254,24 @@ export async function generateSongLyrics(input: SongInputContext): Promise<{
   title: string;
   lyrics: string;
 }> {
-  const model = getLanguageModel(
-    "deepseek",
-    process.env.DEEPSEEK_LYRICS_MODEL || "deepseek-chat"
-  );
+  const model = getReplicateGpt5LyricsModel();
   const prompt = buildLyricsPrompt(input);
 
-  console.log("[DeepSeek Lyrics] Request", {
-    model: process.env.DEEPSEEK_LYRICS_MODEL || "deepseek-chat",
+  console.log("[Replicate GPT-5 Lyrics] Request", {
+    model,
     prompt,
     promptLength: prompt.length,
   });
 
-  const result = await generateText({
+  const lyrics = await generateTextWithReplicateGpt5({
     model,
     prompt,
-    temperature: 0.85,
+    maxCompletionTokens: 2200,
+    systemPrompt:
+      "You are a careful, original lyric-writing assistant. Follow safety and output-format instructions exactly.",
+    verbosity: "medium",
   });
 
-  const lyrics = result.text.trim();
   return {
     title: inferTitleFromLyrics(lyrics),
     lyrics,
@@ -242,25 +289,27 @@ export async function rewriteSongLyricsLines(
     throw new Error("Select at least one lyric line to rewrite.");
   }
 
-  const modelId = process.env.DEEPSEEK_LYRICS_MODEL || "deepseek-chat";
-  const model = getLanguageModel("deepseek", modelId);
+  const model = getReplicateGpt5LyricsModel();
   const prompt = buildLyricsLineRewritePrompt({
     ...input,
     selectedLines,
   });
 
-  console.log("[DeepSeek Lyrics Rewrite] Request", {
-    model: modelId,
+  console.log("[Replicate GPT-5 Lyrics Rewrite] Request", {
+    model,
     selectedLineCount: selectedLines.length,
     promptLength: prompt.length,
   });
 
-  const result = await generateText({
+  const rewrittenText = await generateTextWithReplicateGpt5({
     model,
     prompt,
-    temperature: 0.75,
+    maxCompletionTokens: 800,
+    systemPrompt:
+      "You are a careful, original lyric editor. Return only the requested lyric lines.",
+    verbosity: "low",
   });
-  const rewrittenLines = normalizeRewrittenLyricLines(result.text);
+  const rewrittenLines = normalizeRewrittenLyricLines(rewrittenText);
 
   if (rewrittenLines.length < selectedLines.length) {
     throw new Error("The rewrite did not include enough lyric lines.");
@@ -280,6 +329,12 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
       : null;
   const isSubscriber =
     user && !user.isAnonymous ? await hasActiveSubscription(user.id) : false;
+  console.log("[songs/generate] Subscription check", {
+    userId: user?.id,
+    email: user?.email || input.email,
+    isAnonymous: user?.isAnonymous,
+    isSubscriber: Boolean(isSubscriber),
+  });
   const now = Date.now();
   const externalId = await submitMusicTask(input);
   const task: SongGenerationTask = {
@@ -317,5 +372,10 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
 }
 
 export async function refreshSongGeneration(songId: string): Promise<SongGenerationTask | null> {
-  return songTaskStore.getSong(songId);
+  const task = await songTaskStore.getSong(songId);
+  if (!task || task.status !== "processing") {
+    return task;
+  }
+
+  return refreshProcessingSongTaskFromKie(task);
 }

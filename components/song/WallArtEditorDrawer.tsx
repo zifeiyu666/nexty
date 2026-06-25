@@ -44,6 +44,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { wallArtFontFiles, wallArtFonts } from "@/lib/wall-art/fonts";
 import {
@@ -117,6 +118,7 @@ type ActiveTarget =
   | "print"
   | "heart";
 type WallArtTemplateKey = "spiral" | "template2" | "heart" | "imageLyrics";
+type PresetPanelKey = "imageLyrics" | "template2" | "spiral";
 
 type TextStyle = {
   fontFamily: string;
@@ -138,6 +140,7 @@ type CustomTextLayer = {
 type WallArtTemplateSettings = {
   activePresetIndex: number;
   template2PresetIndex: number;
+  imageLyricPresetIndex: number;
   posterBackground: string;
   discColor: string;
   printSizeId: string;
@@ -175,11 +178,17 @@ type WallArtTemplateSettings = {
 };
 
 type WallArtEditorDrawerProps = {
-  songTitle: string;
+  initialSong?: WallArtSongOption;
+  songOptions?: WallArtSongOption[];
+  trigger: ReactNode;
+};
+
+export type WallArtSongOption = {
+  id: string;
+  title: string;
   lyrics: string;
   imageUrl?: string | null;
   shareUrl?: string;
-  trigger: ReactNode;
 };
 
 type ImageCropDraft = {
@@ -233,6 +242,11 @@ const template2PresetImages = Array.from({ length: 15 }, (_, index) => ({
   name: `Design ${index + 1}`,
   src: `/wallart/color_preset/template2_preset/color_preset${index + 1}.png`,
 }));
+const lyricPortraitPresetImages = Array.from({ length: 4 }, (_, index) => ({
+  name: `Design ${index + 1}`,
+  src: `/wallart/color_preset/lytric_fill_template/color_preset${index + 1}.png`,
+  originSrc: `/wallart/color_preset/lytric_fill_template/color_preset_origin${index + 1}.jpg`,
+}));
 const heartTemplatePreview = "/wallart/heart_lyrics.jpg";
 const textTargets: EditableTextKey[] = [
   "lyrics",
@@ -275,8 +289,8 @@ const heartTemplateShape = {
   width: 960,
 };
 const heartTitleFont = '"Shadows Into Light", cursive';
-const imageLyricPreview =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%23f8f5ee'/%3E%3Cg font-family='Georgia' font-size='9' font-weight='700'%3E%3Cscript/%3E%3Ctext fill='%230f0f0f' opacity='.16' x='18' y='32'%3EToday is gonna be the day by now you should%3C/text%3E%3Ctext fill='%232f2b25' opacity='.28' x='18' y='48'%3ERealized what you gotta do I don't believe%3C/text%3E%3Ctext fill='%237e6a55' opacity='.5' x='18' y='64'%3EAnybody feels the way I do about you now%3C/text%3E%3Ctext fill='%239b624d' opacity='.74' x='18' y='80'%3EBackbeat the word is on the street%3C/text%3E%3Ctext fill='%23111111' opacity='.92' x='18' y='96'%3EThat the fire in your heart is out%3C/text%3E%3C/g%3E%3Ccircle cx='208' cy='206' r='116' fill='none' stroke='%23111111' stroke-width='84' stroke-opacity='.13'/%3E%3Cpath d='M150 126c34-40 108-30 130 22 26 62-16 146-83 174-50-34-76-90-63-138 5-20 8-37 16-58z' fill='%23111111' opacity='.2'/%3E%3Cg font-family='Georgia' font-size='8' font-weight='700' fill='%23111111'%3E%3Ctext opacity='.18' x='18' y='350'%3EAnd all the roads we have to walk are winding%3C/text%3E%3Ctext opacity='.36' x='18' y='366'%3EThere are many things that I would like to say%3C/text%3E%3Ctext opacity='.68' x='18' y='382'%3EYou're gonna be the one that saves me%3C/text%3E%3Ctext opacity='.92' x='18' y='398'%3EYou're my wonderwall%3C/text%3E%3C/g%3E%3C/svg%3E";
+const presetHoverBridgeClassName =
+  "fixed left-[176px] top-[110px] z-40 h-[calc(100svh-126px)] w-[28px] opacity-0";
 const wallArtFontFaceCss = wallArtFontFiles
   .map(
     ([family, src, weight]) =>
@@ -427,6 +441,7 @@ function createWallArtTemplateSettings(
   return {
     activePresetIndex: 0,
     template2PresetIndex: 0,
+    imageLyricPresetIndex: 0,
     posterBackground: isHeart ? "#ffffff" : preset.posterBackground,
     discColor: preset.discColor,
     printSizeId: "a4",
@@ -451,7 +466,10 @@ function createWallArtTemplateSettings(
     imageLyricContrast: 1.45,
     imageLyricOpacity: 0.96,
     imageLyricInvert: false,
-    imageLyricUploadedImage: "",
+    imageLyricUploadedImage:
+      template === "imageLyrics"
+        ? (lyricPortraitPresetImages[0]?.originSrc ?? "")
+        : "",
     title: songTitle || "Song Name",
     template2TitleLine1: titleLine1,
     template2TitleLine2: titleLine2,
@@ -720,23 +738,47 @@ function FontWeightSelect({
 }
 
 export function WallArtEditorDrawer({
-  songTitle,
-  lyrics,
-  imageUrl,
-  shareUrl,
+  initialSong,
+  songOptions,
   trigger,
 }: WallArtEditorDrawerProps) {
   const spiralId = useId().replace(/:/g, "");
   const template2Id = useId().replace(/:/g, "");
   const imageLyricUploadInputId = `${template2Id}-image-lyric-upload`;
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const presetPanelCloseTimeoutRef = useRef<number | null>(null);
+  const selectableSongs = useMemo(() => {
+    const seen = new Set<string>();
+    const options = [initialSong, ...(songOptions ?? [])].filter(
+      (song): song is WallArtSongOption => Boolean(song),
+    );
+
+    return options.filter((song) => {
+      if (seen.has(song.id)) return false;
+      seen.add(song.id);
+      return true;
+    });
+  }, [initialSong, songOptions]);
+  const fallbackSong = selectableSongs[0] ?? null;
+  const fallbackSongId = fallbackSong?.id ?? "";
+  const [selectedSongId, setSelectedSongId] = useState(fallbackSongId);
+  const selectedSong =
+    selectableSongs.find((song) => song.id === selectedSongId) ??
+    fallbackSong;
+  const hasSongs = selectableSongs.length > 0;
+  const activeSongTitle = selectedSong?.title ?? "";
+  const activeLyrics = selectedSong?.lyrics ?? "";
+  const activeImageUrl = selectedSong?.imageUrl ?? null;
+  const activeShareUrl = selectedSong?.shareUrl;
   const initialTemplateSettings = useMemo(
-    () => createWallArtTemplateSettingsMap(songTitle, lyrics),
-    [songTitle, lyrics],
+    () => createWallArtTemplateSettingsMap(activeSongTitle, activeLyrics),
+    [activeLyrics, activeSongTitle],
   );
   const [activeTarget, setActiveTarget] = useState<ActiveTarget>("lyrics");
   const [activeTemplate, setActiveTemplate] =
     useState<WallArtTemplateKey>("template2");
+  const [openPresetPanel, setOpenPresetPanel] =
+    useState<PresetPanelKey | null>(null);
   const [templateSettings, setTemplateSettings] = useState<
     Record<WallArtTemplateKey, WallArtTemplateSettings>
   >(() => initialTemplateSettings);
@@ -746,6 +788,9 @@ export function WallArtEditorDrawer({
   );
   const [template2PresetIndex, setTemplate2PresetIndex] = useState(
     initialCurrentSettings.template2PresetIndex,
+  );
+  const [imageLyricPresetIndex, setImageLyricPresetIndex] = useState(
+    initialCurrentSettings.imageLyricPresetIndex,
   );
   const [posterBackground, setPosterBackground] = useState(
     initialCurrentSettings.posterBackground,
@@ -852,6 +897,11 @@ export function WallArtEditorDrawer({
   );
   const [customTextDragStart, setCustomTextDragStart] =
     useState<CustomTextDragState | null>(null);
+  useEffect(() => {
+    if (selectableSongs.some((song) => song.id === selectedSongId)) return;
+    setSelectedSongId(fallbackSongId);
+  }, [fallbackSongId, selectableSongs, selectedSongId]);
+
   const selectedPrintSize =
     printSizePresets.find((item) => item.id === printSizeId) ??
     printSizePresets[0];
@@ -1007,7 +1057,7 @@ export function WallArtEditorDrawer({
     () => splitTemplate2TitleLines(title),
     [title],
   );
-  const centerImage = uploadedImage || imageUrl || "";
+  const centerImage = uploadedImage || activeImageUrl || "";
   const imageLyricSourceImage = imageLyricUploadedImage;
   const activeTextTarget = isEditableTextKey(activeTarget)
     ? activeTarget
@@ -1055,6 +1105,14 @@ export function WallArtEditorDrawer({
   const qrCodeY = qrCodePlacement.defaultY + safeQrCodeOffsetY;
   const qrCodeInnerPadding = Math.max(7, Math.round(qrCodeSize * 0.08));
   const qrCodeInnerSize = qrCodeSize - qrCodeInnerPadding * 2;
+
+  useEffect(() => {
+    return () => {
+      if (presetPanelCloseTimeoutRef.current) {
+        window.clearTimeout(presetPanelCloseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!imageLyricSourceImage) {
@@ -1112,6 +1170,7 @@ export function WallArtEditorDrawer({
     return {
       activePresetIndex,
       template2PresetIndex,
+      imageLyricPresetIndex,
       posterBackground,
       discColor,
       printSizeId,
@@ -1152,6 +1211,7 @@ export function WallArtEditorDrawer({
   function applyTemplateSettings(settings: WallArtTemplateSettings) {
     setActivePresetIndex(settings.activePresetIndex);
     setTemplate2PresetIndex(settings.template2PresetIndex);
+    setImageLyricPresetIndex(settings.imageLyricPresetIndex);
     setPosterBackground(settings.posterBackground);
     setDiscColor(settings.discColor);
     setPrintSizeId(settings.printSizeId);
@@ -1187,6 +1247,40 @@ export function WallArtEditorDrawer({
     setStyles(settings.styles);
     setCustomTexts(settings.customTexts);
     setActiveCustomTextId(settings.customTexts[0]?.id ?? null);
+  }
+
+  function handleSongSelection(nextSongId: string) {
+    const nextSong = selectableSongs.find((song) => song.id === nextSongId);
+    if (!nextSong) return;
+
+    const nextTemplateSettings = createWallArtTemplateSettingsMap(
+      nextSong.title,
+      nextSong.lyrics,
+    );
+
+    setSelectedSongId(nextSong.id);
+    setTemplateSettings(nextTemplateSettings);
+    applyTemplateSettings(nextTemplateSettings[activeTemplate]);
+    setImageCropDraft(null);
+    setMaskedLyricImage("");
+  }
+
+  function keepPresetPanelOpen(panel: PresetPanelKey) {
+    if (presetPanelCloseTimeoutRef.current) {
+      window.clearTimeout(presetPanelCloseTimeoutRef.current);
+      presetPanelCloseTimeoutRef.current = null;
+    }
+    setOpenPresetPanel(panel);
+  }
+
+  function schedulePresetPanelClose() {
+    if (presetPanelCloseTimeoutRef.current) {
+      window.clearTimeout(presetPanelCloseTimeoutRef.current);
+    }
+    presetPanelCloseTimeoutRef.current = window.setTimeout(() => {
+      setOpenPresetPanel(null);
+      presetPanelCloseTimeoutRef.current = null;
+    }, 180);
   }
 
   function updateStyle(key: EditableTextKey, patch: Partial<TextStyle>) {
@@ -1352,6 +1446,15 @@ export function WallArtEditorDrawer({
         style: { ...item.style, color: preset.titleColor },
       })),
     );
+  }
+
+  function applyImageLyricPreset(index: number) {
+    const preset = lyricPortraitPresetImages[index];
+    if (!preset) return;
+
+    setImageLyricPresetIndex(index);
+    setImageLyricUploadedImage(preset.originSrc);
+    setImageCropDraft(null);
   }
 
   function switchTemplate(template: WallArtTemplateKey) {
@@ -2047,22 +2150,44 @@ export function WallArtEditorDrawer({
       <SheetContent className="w-screen max-w-none gap-0 overflow-hidden p-0 sm:max-w-none">
         <style>{wallArtFontFaceCss}</style>
         <SheetHeader className="border-b bg-background/95 px-5 py-2 backdrop-blur">
-          <div className="flex min-w-0 items-center gap-3 pr-10">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Disc3 className="size-4" />
+          <div className="flex min-w-0 items-center justify-between gap-4 pr-10">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Disc3 className="size-4" />
+              </div>
+              <div className="flex min-w-0 items-baseline gap-3">
+                <SheetTitle className="shrink-0 text-xl font-black">
+                  Wall Art Studio
+                </SheetTitle>
+                <SheetDescription className="truncate text-sm">
+                  Choose a template, edit the spiral lyrics, and tune the poster
+                  details.
+                </SheetDescription>
+              </div>
             </div>
-            <div className="flex min-w-0 items-baseline gap-3">
-              <SheetTitle className="shrink-0 text-xl font-black">
-                Wall Art Studio
-              </SheetTitle>
-              <SheetDescription className="truncate text-sm">
-                Choose a template, edit the spiral lyrics, and tune the poster
-                details.
-              </SheetDescription>
-            </div>
+
+            <Select value={selectedSongId} onValueChange={handleSongSelection}>
+              <SelectTrigger
+                aria-label="Choose song"
+                className="h-10 w-[280px] shrink-0 rounded-lg border-primary/40 bg-white text-left font-bold shadow-sm"
+                disabled={!hasSongs}
+              >
+                <SelectValue placeholder={hasSongs ? "Choose song" : "No songs yet"} />
+              </SelectTrigger>
+              <SelectContent align="end" className="w-[280px]">
+                {selectableSongs.map((song) => (
+                  <SelectItem key={song.id} value={song.id}>
+                    <span className="block max-w-[220px] truncate">
+                      {song.title || "Untitled song"}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </SheetHeader>
 
+        {hasSongs ? (
         <div className="grid min-h-0 flex-1 overflow-hidden bg-[#f2eee7] lg:grid-cols-[190px_minmax(0,1fr)_340px]">
           <aside className="flex min-h-0 flex-col border-b bg-white/80 p-2 lg:border-b-0 lg:border-r">
             <div className="flex shrink-0 items-center gap-2 text-sm font-black text-foreground">
@@ -2070,7 +2195,11 @@ export function WallArtEditorDrawer({
               Templates
             </div>
             <div className="mt-2.5 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
-              <div className="group relative">
+              <div
+                className="group relative"
+                onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
+                onMouseLeave={schedulePresetPanelClose}
+              >
                 <button
                   className={cn(
                     "w-full rounded-lg border p-1 text-left transition hover:border-primary/50 hover:bg-primary/15",
@@ -2083,9 +2212,15 @@ export function WallArtEditorDrawer({
                 >
                   <div className="mx-auto aspect-[4/5] max-h-44 overflow-hidden rounded-md border bg-muted">
                     <img
-                      alt="Image lyric portrait"
+                      alt={
+                        lyricPortraitPresetImages[imageLyricPresetIndex]
+                          ?.name ?? "Image lyric portrait"
+                      }
                       className="size-full object-cover"
-                      src={imageLyricPreview}
+                      src={
+                        lyricPortraitPresetImages[imageLyricPresetIndex]?.src ??
+                        lyricPortraitPresetImages[0].src
+                      }
                     />
                   </div>
                   <div className="mt-1 flex items-center justify-between gap-2">
@@ -2095,12 +2230,66 @@ export function WallArtEditorDrawer({
                     )}
                   </div>
                   <p className="mt-0.5 text-[9px] leading-3 text-muted-foreground">
-                    Image made from lyric color and light.
+                    Hover to switch portrait presets.
                   </p>
                 </button>
+
+                <div
+                  className={cn(
+                    presetHoverBridgeClassName,
+                    openPresetPanel === "imageLyrics"
+                      ? "pointer-events-auto"
+                      : "pointer-events-none",
+                  )}
+                  onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
+                  onMouseLeave={schedulePresetPanelClose}
+                />
+                <div
+                  className={cn(
+                    "fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 shadow-2xl transition",
+                    openPresetPanel === "imageLyrics"
+                      ? "visible opacity-100"
+                      : "invisible opacity-0",
+                  )}
+                  onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
+                  onMouseLeave={schedulePresetPanelClose}
+                >
+                  <div className="grid grid-cols-2 gap-1">
+                    {lyricPortraitPresetImages.map((preset, index) => (
+                      <button
+                        key={preset.src}
+                        className={cn(
+                          "overflow-hidden rounded-md border bg-muted transition hover:border-primary",
+                          activeTemplate === "imageLyrics" &&
+                            imageLyricPresetIndex === index
+                            ? "border-primary ring-2 ring-primary/20"
+                            : "border-border",
+                        )}
+                        type="button"
+                        onClick={() => {
+                          switchTemplate("imageLyrics");
+                          applyImageLyricPreset(index);
+                        }}
+                      >
+                        <img
+                          alt={preset.name}
+                          className="aspect-[4/5] w-full object-cover"
+                          src={preset.src}
+                        />
+                        <span className="block bg-background px-1 py-0.5 text-[9px] font-bold">
+                          {preset.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="group relative">
+              <div
+                className="group relative"
+                onMouseEnter={() => keepPresetPanelOpen("template2")}
+                onMouseLeave={schedulePresetPanelClose}
+              >
                 <button
                   className={cn(
                     "w-full rounded-lg border p-1 text-left transition hover:border-primary/50 hover:bg-primary/15",
@@ -2165,8 +2354,26 @@ export function WallArtEditorDrawer({
                   </p>
                 </button>
 
-                <div className="invisible fixed left-[190px] top-[110px] z-40 h-[calc(100svh-126px)] w-4 opacity-0 group-hover:visible" />
-                <div className="invisible fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 opacity-0 shadow-2xl transition group-hover:visible group-hover:opacity-100">
+                <div
+                  className={cn(
+                    presetHoverBridgeClassName,
+                    openPresetPanel === "template2"
+                      ? "pointer-events-auto"
+                      : "pointer-events-none",
+                  )}
+                  onMouseEnter={() => keepPresetPanelOpen("template2")}
+                  onMouseLeave={schedulePresetPanelClose}
+                />
+                <div
+                  className={cn(
+                    "fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 shadow-2xl transition",
+                    openPresetPanel === "template2"
+                      ? "visible opacity-100"
+                      : "invisible opacity-0",
+                  )}
+                  onMouseEnter={() => keepPresetPanelOpen("template2")}
+                  onMouseLeave={schedulePresetPanelClose}
+                >
                   <div className="grid grid-cols-3 gap-1">
                     {template2PresetImages.map((preset, index) => (
                       <button
@@ -2198,7 +2405,11 @@ export function WallArtEditorDrawer({
                 </div>
               </div>
 
-              <div className="group relative">
+              <div
+                className="group relative"
+                onMouseEnter={() => keepPresetPanelOpen("spiral")}
+                onMouseLeave={schedulePresetPanelClose}
+              >
                 <button
                   className={cn(
                     "w-full rounded-lg border p-1 text-left transition hover:border-primary/50 hover:bg-primary/15",
@@ -2232,8 +2443,26 @@ export function WallArtEditorDrawer({
                   </p>
                 </button>
 
-                <div className="invisible fixed left-[190px] top-[110px] z-40 h-[calc(100svh-126px)] w-4 opacity-0 group-hover:visible" />
-                <div className="invisible fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 opacity-0 shadow-2xl transition group-hover:visible group-hover:opacity-100">
+                <div
+                  className={cn(
+                    presetHoverBridgeClassName,
+                    openPresetPanel === "spiral"
+                      ? "pointer-events-auto"
+                      : "pointer-events-none",
+                  )}
+                  onMouseEnter={() => keepPresetPanelOpen("spiral")}
+                  onMouseLeave={schedulePresetPanelClose}
+                />
+                <div
+                  className={cn(
+                    "fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 shadow-2xl transition",
+                    openPresetPanel === "spiral"
+                      ? "visible opacity-100"
+                      : "invisible opacity-0",
+                  )}
+                  onMouseEnter={() => keepPresetPanelOpen("spiral")}
+                  onMouseLeave={schedulePresetPanelClose}
+                >
                   <div className="grid grid-cols-3 gap-1">
                     {presetImages.map((preset, index) => (
                       <button
@@ -2778,7 +3007,7 @@ export function WallArtEditorDrawer({
                           </text>
                         </>
                       )}
-                      {showQrCode && shareUrl && (
+                      {showQrCode && activeShareUrl && (
                         <g transform={`translate(${qrCodeX} ${qrCodeY})`}>
                           <rect
                             fill="#ffffff"
@@ -2795,7 +3024,7 @@ export function WallArtEditorDrawer({
                               includeMargin={false}
                               level="M"
                               size={qrCodeInnerSize}
-                              value={shareUrl}
+                              value={activeShareUrl}
                             />
                           </g>
                         </g>
@@ -3194,11 +3423,11 @@ export function WallArtEditorDrawer({
                     </div>
                     <Switch
                       checked={showQrCode}
-                      disabled={!shareUrl}
+                      disabled={!activeShareUrl}
                       onCheckedChange={setShowQrCode}
                     />
                   </div>
-                  {!shareUrl && (
+                  {!activeShareUrl && (
                     <p className="text-xs leading-5 text-muted-foreground">
                       This song does not have a share link yet.
                     </p>
@@ -3622,6 +3851,25 @@ export function WallArtEditorDrawer({
             </div>
           </aside>
         </div>
+        ) : (
+          <div className="flex min-h-0 flex-1 items-center justify-center bg-[#f2eee7] px-6 py-12">
+            <div className="w-full max-w-md rounded-2xl border border-black/10 bg-white/90 p-6 text-center shadow-sm">
+              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Disc3 className="size-5" />
+              </div>
+              <h3 className="mt-4 text-2xl font-black text-foreground">
+                Create a song first
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Wall Art Studio uses your finalized song title, lyrics, cover
+                art, and share link to build printable keepsakes.
+              </p>
+              <Button asChild className="mt-5 rounded-full">
+                <Link href="/create-song">Create Song</Link>
+              </Button>
+            </div>
+          </div>
+        )}
       </SheetContent>
       </Sheet>
     </>

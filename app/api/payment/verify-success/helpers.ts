@@ -3,6 +3,7 @@
  */
 
 import { apiResponse } from '@/lib/api-response';
+import { getUnlockSongResult } from '@/lib/ai/song-unlock-after-payment';
 import { db } from '@/lib/db';
 import { orders as ordersSchema, subscriptions as subscriptionsSchema } from '@/lib/db/schema';
 import { and, eq } from 'drizzle-orm';
@@ -99,6 +100,7 @@ export function validateUserIdMatch(
  */
 export function buildSubscriptionResponse(subscription: SubscriptionData): NextResponse {
   const metadata = subscription.metadata as any;
+  const unlockSong = getUnlockSongResult(metadata);
 
   if (subscription.status === 'active' || subscription.status === 'trialing') {
     return apiResponse.success({
@@ -106,7 +108,10 @@ export function buildSubscriptionResponse(subscription: SubscriptionData): NextR
       planName: metadata?.planName,
       planId: subscription.planId,
       status: subscription.status,
-      message: 'Subscription verified and active.',
+      unlockSong,
+      message: unlockSong?.status === 'completed'
+        ? 'Subscription verified and your song is unlocked.'
+        : 'Subscription verified and active.',
     });
   }
 
@@ -117,6 +122,7 @@ export function buildSubscriptionResponse(subscription: SubscriptionData): NextR
   }
 
   return apiResponse.success({
+    unlockSong,
     message:
       'Subscription found but not active yet. Please allow a few moments and refresh, or contact support if the problem persists.',
   });
@@ -127,13 +133,17 @@ export function buildSubscriptionResponse(subscription: SubscriptionData): NextR
  */
 export function buildOrderResponse(order: OrderData): NextResponse {
   const metadata = order.metadata as any;
+  const unlockSong = getUnlockSongResult(metadata);
 
   if (order.status === 'succeeded') {
     return apiResponse.success({
       orderId: order.id,
       planName: metadata?.planName,
       planId: metadata?.planId,
-      message: 'Payment verified and order confirmed.',
+      unlockSong,
+      message: unlockSong?.status === 'completed'
+        ? 'Payment verified and your song is unlocked.'
+        : 'Payment verified and order confirmed.',
     });
   }
 
@@ -144,8 +154,8 @@ export function buildOrderResponse(order: OrderData): NextResponse {
   }
 
   return apiResponse.success({
+    unlockSong,
     message:
       'Payment recorded but not finalized yet. Please refresh in a moment, or contact support if the problem persists.',
   });
 }
-

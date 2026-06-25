@@ -10,6 +10,7 @@ import {
   Edit3,
   Gift,
   Heart,
+  Loader2,
   LockKeyhole,
   Pause,
   Play,
@@ -42,9 +43,9 @@ export type SampleSongPlayerData = {
   story: string;
   versions: SampleVersion[];
   previewLimitSeconds?: number | null;
-  accessExpiresAt?: number;
+  accessExpiresAt?: number | null;
   isExpired?: boolean;
-  unlockedVersionIds?: string[];
+  finalizedVersions?: Record<string, { songId: string; songUrl: string }>;
 };
 
 function labelize(value: string): string {
@@ -78,11 +79,14 @@ export function SampleSongPlayer({
   const [unlockingVersion, setUnlockingVersion] = useState<string | null>(null);
   const displayDuration =
     data.previewLimitSeconds || data.versions[0]?.duration || 60;
+  const hasPermanentAccess = data.accessExpiresAt === null;
   const occasionLabel = labelize(data.occasion || "sample");
   const recipientLabel = data.recipientNames.join(" and ") || "someone special";
   const router = useRouter();
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [selectedVersionForPaywall, setSelectedVersionForPaywall] = useState<"A" | "B">("A");
+  const [selectedProviderVersionForPaywall, setSelectedProviderVersionForPaywall] = useState("");
 
   function togglePlayback(version: string, audioUrl: string) {
     if (data.isExpired || !audioUrl) return;
@@ -126,7 +130,9 @@ export function SampleSongPlayer({
         </span>
         <span className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-amber-700">
           <Clock3 className="size-4" />
-          {data.accessExpiresAt
+          {hasPermanentAccess
+            ? "Saved to your account"
+            : data.accessExpiresAt
             ? `Preview until ${new Date(data.accessExpiresAt).toLocaleDateString()}`
             : "Preview expires in 3 days"}
         </span>
@@ -190,6 +196,9 @@ export function SampleSongPlayer({
       <div className="mx-auto mt-7 grid w-full gap-5 md:grid-cols-2">
         {["A", "B"].map((version, index) => {
           const songVersion = data.versions[index];
+          const finalizedVersion = songVersion?.id
+            ? data.finalizedVersions?.[songVersion.id]
+            : undefined;
           const isActiveVersion = activeVersion === version;
           const isThisPlaying = isActiveVersion && isPlaying;
           const isVersionB = version === "B";
@@ -267,9 +276,13 @@ export function SampleSongPlayer({
                     const v = version === "A" ? "A" : "B";
                     const providerVersionId = songVersion?.id || v;
 
-                    if (data.isExpired || !songVersion?.audioUrl) {
-                      setSelectedVersionForPaywall(v as "A" | "B");
-                      setIsPaywallOpen(true);
+                    if (finalizedVersion) {
+                      router.push(finalizedVersion.songUrl);
+                      return;
+                    }
+
+                    if (!songVersion?.audioUrl) {
+                      toast.error("This song version is not ready yet.");
                       return;
                     }
 
@@ -287,9 +300,10 @@ export function SampleSongPlayer({
                       if (!response.ok || !result.success) {
                         if (result.error === "Insufficient song balance.") {
                           setSelectedVersionForPaywall(v as "A" | "B");
+                          setSelectedProviderVersionForPaywall(providerVersionId);
                           setIsPaywallOpen(true);
                         } else {
-                          toast.error(result.error || "Unable to unlock this song.");
+                          toast.error(result.error || "Unable to save this song.");
                         }
                         return;
                       }
@@ -299,7 +313,11 @@ export function SampleSongPlayer({
                     }
                   }}
                 >
-                  {unlockingVersion === version ? "Unlocking..." : "Choose this one"}
+                  {finalizedVersion
+                    ? "Go to this song"
+                    : unlockingVersion === version
+                    ? "Saving..."
+                    : "Choose this one"}
                 </ChooseButton>
               </div>
             </div>
@@ -318,7 +336,13 @@ export function SampleSongPlayer({
                   <p className="mt-1 text-xs text-muted-foreground">Version · {selectedVersionForPaywall} · for {recipientLabel}</p>
                 </div>
               </div>
-              <button aria-label="Close paywall" className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground" type="button" onClick={() => setIsPaywallOpen(false)}>
+              <button
+                aria-label="Close paywall"
+                className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground disabled:pointer-events-none disabled:opacity-50"
+                disabled={isCheckoutLoading}
+                type="button"
+                onClick={() => setIsPaywallOpen(false)}
+              >
                 <X className="size-5" />
               </button>
             </div>
@@ -337,20 +361,41 @@ export function SampleSongPlayer({
             </div>
 
             <div className="flex items-center gap-3 border-t border-border bg-background/95 p-4">
-              <Button className="h-10 rounded-full bg-muted px-6 text-sm font-bold text-muted-foreground" type="button" variant="ghost" onClick={() => setIsPaywallOpen(false)}>Not yet</Button>
+              <Button
+                className="h-10 rounded-full bg-muted px-6 text-sm font-bold text-muted-foreground"
+                disabled={isCheckoutLoading}
+                type="button"
+                variant="ghost"
+                onClick={() => setIsPaywallOpen(false)}
+              >
+                Not yet
+              </Button>
               <Button
                 className="h-10 flex-1 rounded-full bg-primary text-sm font-bold text-primary-foreground"
+                aria-busy={isCheckoutLoading}
+                disabled={isCheckoutLoading}
                 type="button"
                 onClick={() => {
+                  if (isCheckoutLoading) return;
+
+                  setIsCheckoutLoading(true);
                   const params = new URLSearchParams({
                     type: "unlock_song",
                     songId: data.songId,
+                    versionId:
+                      selectedProviderVersionForPaywall ||
+                      selectedVersionForPaywall,
                     returnTo: `/samples/${data.songId}`,
                   });
                   router.push(`/pricing?${params.toString()}`);
                 }}
               >
-                <LockKeyhole className="size-4" /> Continue to checkout
+                {isCheckoutLoading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <LockKeyhole className="size-4" />
+                )}
+                {isCheckoutLoading ? "Opening checkout..." : "Continue to checkout"}
               </Button>
             </div>
           </div>

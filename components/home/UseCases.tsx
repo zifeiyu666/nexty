@@ -25,13 +25,13 @@ const UseCaseCard = ({ useCase }: { useCase: UseCase }) => {
         <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-background p-6 shadow-xs dark:shadow-[0px_0px_27px_0px_rgba(45,45,45,0.3)] md:p-6">
           <div className="relative flex flex-1 flex-col justify-between gap-3">
             <div className="space-y-3">
-              <h3 className="flex items-center gap-2 text-xl lg:text-2xl font-semibold font-sans">
+              <h3 className="flex items-center gap-2 font-sans text-base font-semibold leading-snug text-foreground/90 sm:text-lg lg:text-xl">
                 <div className="w-fit rounded-lg border-border p-2 bg-primary text-white dark:text-white">
                   <DynamicIcon name={useCase.icon} className="w-4 h-4" />
                 </div>
                 {useCase.title}
               </h3>
-              <p className="md:[&_b]:font-semibold md:[&_strong]:font-semibold font-sans text-sm leading-4.5 md:text-base md:leading-5.5 text-muted-foreground">
+              <p className="font-sans text-xs leading-5 text-muted-foreground md:text-sm md:leading-6 md:[&_b]:font-semibold md:[&_strong]:font-semibold">
                 {useCase.description}
               </p>
             </div>
@@ -61,15 +61,15 @@ export default function UseCases() {
             text={t("badge.text")}
             className="mb-8"
           />
-          <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
-            <span className="title-gradient">{t("title")}</span>
+          <h2 className="preset-title">
+            <span >{t("title")}</span>
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="mx-auto mt-4 max-w-2xl font-['Bradley_Hand','Comic_Sans_MS',cursive] text-base leading-7 text-muted-foreground md:text-lg">
             {t("description")}
           </p>
         </div>
 
-        <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+        <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {useCases.map((useCase) => (
             <UseCaseCard key={useCase.title} useCase={useCase} />
           ))}

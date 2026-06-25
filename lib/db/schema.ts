@@ -389,6 +389,64 @@ export const songs = pgTable(
   }
 )
 
+export const musicVideoStatusEnum = pgEnum('music_video_status', [
+  'queued',
+  'rendering',
+  'completed',
+  'failed',
+])
+export type MusicVideoStatus = (typeof musicVideoStatusEnum.enumValues)[number]
+
+export const musicVideos = pgTable(
+  'music_videos',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .references(() => user.id, { onDelete: 'cascade' })
+      .notNull(),
+    songId: uuid('song_id')
+      .references(() => songs.id, { onDelete: 'cascade' })
+      .notNull(),
+    templateId: text('template_id').notNull(),
+    title: text('title').notNull(),
+    status: musicVideoStatusEnum('status').default('queued').notNull(),
+    timelineJsonb: jsonb('timeline_jsonb').default('{}').notNull(),
+    inputPropsJsonb: jsonb('input_props_jsonb').default('{}').notNull(),
+    renderId: text('render_id'),
+    lambdaBucketName: text('lambda_bucket_name'),
+    lambdaOutputKey: text('lambda_output_key'),
+    r2Key: text('r2_key'),
+    videoUrl: text('video_url'),
+    thumbnailUrl: text('thumbnail_url'),
+    duration: integer('duration'),
+    width: integer('width').default(1080).notNull(),
+    height: integer('height').default(1920).notNull(),
+    fps: integer('fps').default(30).notNull(),
+    error: text('error'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      userIdx: index('idx_music_videos_user_id').on(table.userId),
+      songIdx: index('idx_music_videos_song_id').on(table.songId),
+      statusIdx: index('idx_music_videos_status').on(table.status),
+      createdAtIdx: index('idx_music_videos_created_at').on(table.createdAt),
+      userSongCreatedAtIdx: index('idx_music_videos_user_song_created_at').on(
+        table.userId,
+        table.songId,
+        table.createdAt
+      ),
+    }
+  }
+)
+
 export const creditLogs = pgTable(
   'credit_logs',
   {

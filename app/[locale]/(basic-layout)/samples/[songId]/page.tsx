@@ -4,8 +4,11 @@ import {
 } from "@/components/song/SampleSongPlayer";
 import { Button } from "@/components/ui/button";
 import { Locale } from "@/i18n/routing";
+import { getFinalSongsForSampleOwner } from "@/lib/ai/final-song";
 import { songSampleStore } from "@/lib/ai/song-sample-store";
+import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
+import { getUserBenefits } from "@/actions/usage/benefits";
 import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -36,9 +39,28 @@ export default async function SampleDetailPage({
   params: Params;
 }) {
   const { songId } = await params;
-  const sample = await songSampleStore.get(songId);
+  const session = await getSession();
+  const benefits = session?.user?.id ? await getUserBenefits(session.user.id) : null;
+  const hasActiveSubscription =
+    benefits?.subscriptionStatus === "active" || benefits?.subscriptionStatus === "trialing";
+  const sample = await songSampleStore.get(songId, {
+    hasActiveSubscription,
+  });
 
   if (!sample) notFound();
+
+  const finalizedSongs = session?.user?.id
+    ? await getFinalSongsForSampleOwner(session.user.id, sample.songId)
+    : [];
+  const finalizedVersions = Object.fromEntries(
+    finalizedSongs.map((song) => [
+      song.selectedVersionId,
+      {
+        songId: song.id,
+        songUrl: `/songs/${song.id}`,
+      },
+    ])
+  );
 
   const playerData: SampleSongPlayerData = {
     songId: sample.songId,
@@ -54,6 +76,7 @@ export default async function SampleDetailPage({
     previewLimitSeconds: sample.previewLimitSeconds,
     accessExpiresAt: sample.accessExpiresAt,
     isExpired: sample.isExpired,
+    finalizedVersions,
   };
   const regenerateParams = new URLSearchParams({
     step: "style",

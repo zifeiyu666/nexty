@@ -1,4 +1,11 @@
 import { savePayPalPayerId, syncPayPalSubscriptionData } from "@/actions/paypal";
+import {
+  buildPendingUnlockSongResult,
+  finalizeAndRecordOrderUnlockSong,
+  parseUnlockSongMetadata,
+  recordOrderUnlockSongResult,
+  recordUnlockSongResultForOrderAndSubscription,
+} from "@/lib/ai/song-unlock-after-payment";
 import { db } from "@/lib/db";
 import {
   orders as ordersSchema,
@@ -133,6 +140,7 @@ export async function handlePayPalCaptureCompleted(
     );
     return;
   }
+  const unlockSongContext = parseUnlockSongMetadata(data);
 
   // 3. Idempotency check
   const existingOrder = await db
@@ -166,15 +174,33 @@ export async function handlePayPalCaptureCompleted(
         `[PayPal Webhook] Updated order ${orderRecord.id} from pending to succeeded`
       );
 
+      let creditsGranted = false;
       if (userId && planId) {
         try {
           await upgradeOneTimeCredits(userId, planId, orderRecord.id);
+          creditsGranted = true;
         } catch (error) {
           console.error(
             `[PayPal Webhook] Failed to upgrade one-time credits for order ${orderRecord.id}:`,
             error
           );
         }
+      }
+
+      try {
+        const unlockResult = creditsGranted
+          ? await finalizeAndRecordOrderUnlockSong({
+              userId: userId!,
+              context: unlockSongContext,
+              orderId: orderRecord.id,
+            })
+          : buildPendingUnlockSongResult(unlockSongContext);
+        await recordOrderUnlockSongResult(orderRecord.id, unlockResult);
+      } catch (error) {
+        console.error(
+          `[PayPal Webhook] Failed to finalize unlock song for existing order ${orderRecord.id}:`,
+          error
+        );
       }
     }
     return;
@@ -206,6 +232,7 @@ export async function handlePayPalCaptureCompleted(
         paypalCaptureId: capture.id,
         customId: capture.custom_id,
         planId,
+        ...(data?.paypalUnlock && { paypalUnlock: data.paypalUnlock }),
       },
     })
     .returning({ id: ordersSchema.id });
@@ -221,11 +248,29 @@ export async function handlePayPalCaptureCompleted(
 
   // 5. Grant credits only when COMPLETED
   if (capture.status === "COMPLETED" && userId && planId) {
+    let creditsGranted = false;
     try {
       await upgradeOneTimeCredits(userId, planId, insertedOrder.id);
+      creditsGranted = true;
     } catch (error) {
       console.error(
         `[PayPal Webhook] Failed to upgrade one-time credits for order ${insertedOrder.id}:`,
+        error
+      );
+    }
+
+    try {
+      const unlockResult = creditsGranted
+        ? await finalizeAndRecordOrderUnlockSong({
+            userId,
+            context: unlockSongContext,
+            orderId: insertedOrder.id,
+          })
+        : buildPendingUnlockSongResult(unlockSongContext);
+      await recordOrderUnlockSongResult(insertedOrder.id, unlockResult);
+    } catch (error) {
+      console.error(
+        `[PayPal Webhook] Failed to finalize unlock song for order ${insertedOrder.id}:`,
         error
       );
     }
@@ -515,6 +560,9 @@ export async function handlePayPalSaleCompleted(
 
     // 2. Resolve metadata (first from sale.custom_id/custom, falling back to the subscription metadata)
     const decoded = decodePayPalCustomId(customField);
+    const unlockSongContext =
+      parseUnlockSongMetadata(decoded) ||
+      parseUnlockSongMetadata(subscription.metadata);
 
     // 3. Idempotency check
     const existingOrder = await db
@@ -591,6 +639,7 @@ export async function handlePayPalSaleCompleted(
 
     // 6. Grant subscription credits (mirrors Stripe/Creem subscription payment flow)
     if (subscription.userId && subscription.planId) {
+      let creditsGranted = false;
       try {
         const currentPeriodStart = sale.create_time
           ? new Date(sale.create_time).getTime()
@@ -601,10 +650,31 @@ export async function handlePayPalSaleCompleted(
           insertedOrder.id,
           currentPeriodStart
         );
+        creditsGranted = true;
       } catch (creditError) {
         console.error(
           `[PayPal Webhook] Failed to upgrade subscription credits for order ${insertedOrder.id}:`,
           creditError
+        );
+      }
+
+      try {
+        const unlockResult = creditsGranted
+          ? await finalizeAndRecordOrderUnlockSong({
+              userId: subscription.userId,
+              context: unlockSongContext,
+              orderId: insertedOrder.id,
+            })
+          : buildPendingUnlockSongResult(unlockSongContext);
+        await recordUnlockSongResultForOrderAndSubscription({
+          orderId: insertedOrder.id,
+          subscriptionId: subscriptionProviderId,
+          result: unlockResult,
+        });
+      } catch (error) {
+        console.error(
+          `[PayPal Webhook] Failed to finalize unlock song for sale ${sale.id}:`,
+          error
         );
       }
     }

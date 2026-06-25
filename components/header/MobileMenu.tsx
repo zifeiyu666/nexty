@@ -1,7 +1,6 @@
 "use client";
 
-import LocaleSwitcher from "@/components/LocaleSwitcher";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import BrandWordmark from "@/components/header/BrandWordmark";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +14,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link as I18nLink } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 import { HeaderLink } from "@/types/common";
 import { Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
-export default function MobileMenu() {
+type MobileMenuProps = {
+  variant?: "default" | "adaptive";
+};
+
+export default function MobileMenu({ variant = "default" }: MobileMenuProps) {
   const t = useTranslations("Home");
   const tHeader = useTranslations("Header");
 
@@ -32,7 +36,15 @@ export default function MobileMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="p-2" aria-label="Open menu">
+      <DropdownMenuTrigger
+        className={cn(
+          "rounded-full p-2 transition-colors",
+          variant === "adaptive"
+            ? "text-white hover:bg-white/10 group-data-[scrolled=true]/header:text-zinc-900 group-data-[scrolled=true]/header:hover:bg-zinc-950/5"
+            : "text-foreground hover:bg-accent hover:text-accent-foreground"
+        )}
+        aria-label="Open menu"
+      >
         <Menu className="h-5 w-5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
@@ -50,7 +62,11 @@ export default function MobileMenu() {
               width={32}
               height={32}
             />
-            <span>{t("title")}</span>
+            <BrandWordmark
+              title={t("title")}
+              className="text-sm"
+              heartClassName="drop-shadow-none"
+            />
           </I18nLink>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -104,11 +120,6 @@ export default function MobileMenu() {
             )
           )}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <div className="flex items-center justify-between px-2 py-1.5">
-          <LocaleSwitcher variant="group" />
-          <ThemeToggle />
-        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

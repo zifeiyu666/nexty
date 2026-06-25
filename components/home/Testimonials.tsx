@@ -1,6 +1,9 @@
-import FeatureBadge from "@/components/shared/FeatureBadge";
+"use client";
+
+import { gsap } from "gsap";
 import { Star } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect, useRef } from "react";
 
 type Testimonial = {
   badge: string;
@@ -77,6 +80,10 @@ const testimonials: Testimonial[] = [
   },
 ];
 
+const BASE_MARQUEE_DURATION = 48;
+const SCROLL_FOLLOW_MULTIPLIER = 1.4;
+const IDLE_SCROLL_DELAY = 160;
+
 const RatingStars = () => {
   return (
     <div className="flex shrink-0 items-center gap-0.5 text-yellow-400">
@@ -89,34 +96,34 @@ const RatingStars = () => {
 
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
-    <li className="w-[300px] shrink-0 list-none sm:w-[360px] lg:w-[420px]">
+    <li className="w-[260px] shrink-0 list-none sm:w-[300px] lg:w-[340px]">
       <figure
-        className={`flex flex-col rounded-3xl p-7 shadow-sm ${testimonial.cardClassName}`}
+        className={`flex h-full transform-gpu flex-col rounded-2xl p-5 shadow-sm transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.015] hover:shadow-xl sm:p-6 ${testimonial.cardClassName}`}
       >
-        <div className="space-y-5">
-          <div className="flex items-center justify-between gap-3">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-2">
             <RatingStars />
-            <span className="shrink-0 whitespace-nowrap rounded-full bg-background/70 px-2.5 py-1 text-xs font-medium leading-none text-muted-foreground">
+            <span className="shrink-0 whitespace-nowrap rounded-full bg-background/70 px-2.5 py-1 text-[11px] font-medium leading-none text-muted-foreground">
               {testimonial.badge}
             </span>
           </div>
-          <blockquote className="text-base font-medium leading-7 text-foreground/85">
+          <blockquote className="text-sm font-medium leading-6 text-foreground/85 sm:text-[15px]">
             “{testimonial.quote}”
           </blockquote>
         </div>
-        <figcaption className="flex items-center gap-3 pt-8">
+        <figcaption className="flex items-center gap-2.5 pt-6">
           <img
             src={testimonial.avatar}
             alt={testimonial.author}
-            width={44}
-            height={44}
-            className="h-11 w-11 rounded-full object-cover"
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-full object-cover"
           />
           <div>
-            <p className="text-base font-semibold text-foreground">
+            <p className="text-sm font-semibold text-foreground">
               {testimonial.author}
             </p>
-            <p className="text-sm text-muted-foreground">{testimonial.badge}</p>
+            <p className="text-xs text-muted-foreground">{testimonial.badge}</p>
           </div>
         </figcaption>
       </figure>
@@ -127,24 +134,133 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
 export default function Testimonials() {
   const t = useTranslations("Landing.Testimonials");
   const marqueeTestimonials = [...testimonials, ...testimonials];
+  const marqueeRef = useRef<HTMLUListElement | null>(null);
+  const lastScrollYRef = useRef(0);
+  const positionRef = useRef(0);
+  const loopWidthRef = useRef(0);
+  const baseVelocityRef = useRef(0);
+  const isPageScrollingRef = useRef(false);
+  const isMarqueeHoveredRef = useRef(false);
+  const idleTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const marquee = marqueeRef.current;
+
+    if (!marquee) return;
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reducedMotion) return;
+
+    const setX = gsap.quickSetter(marquee, "x", "px");
+
+    const normalizePosition = () => {
+      const loopWidth = loopWidthRef.current;
+
+      if (loopWidth <= 0) return;
+
+      while (positionRef.current <= -loopWidth) {
+        positionRef.current += loopWidth;
+      }
+
+      while (positionRef.current > 0) {
+        positionRef.current -= loopWidth;
+      }
+    };
+
+    const updateLoopWidth = () => {
+      loopWidthRef.current = marquee.scrollWidth / 2;
+      baseVelocityRef.current = loopWidthRef.current / BASE_MARQUEE_DURATION;
+      normalizePosition();
+      setX(positionRef.current);
+    };
+
+    updateLoopWidth();
+    lastScrollYRef.current = window.scrollY;
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+
+      if (scrollY === lastScrollYRef.current) return;
+
+      const scrollDelta = scrollY - lastScrollYRef.current;
+      lastScrollYRef.current = scrollY;
+
+      if (isMarqueeHoveredRef.current) return;
+
+      isPageScrollingRef.current = true;
+      positionRef.current -= scrollDelta * SCROLL_FOLLOW_MULTIPLIER;
+      normalizePosition();
+      setX(positionRef.current);
+
+      if (idleTimeoutRef.current) {
+        window.clearTimeout(idleTimeoutRef.current);
+      }
+
+      idleTimeoutRef.current = window.setTimeout(() => {
+        isPageScrollingRef.current = false;
+      }, IDLE_SCROLL_DELAY);
+    };
+
+    const tick = (_time: number, deltaTime: number) => {
+      const loopWidth = loopWidthRef.current;
+
+      if (loopWidth <= 0) return;
+      if (isMarqueeHoveredRef.current) return;
+      if (isPageScrollingRef.current) return;
+
+      positionRef.current -= baseVelocityRef.current * (deltaTime / 1000);
+      normalizePosition();
+      setX(positionRef.current);
+    };
+
+    window.addEventListener("resize", updateLoopWidth);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    gsap.ticker.add(tick);
+
+    return () => {
+      gsap.ticker.remove(tick);
+      window.removeEventListener("resize", updateLoopWidth);
+      window.removeEventListener("scroll", handleScroll);
+
+      if (idleTimeoutRef.current) {
+        window.clearTimeout(idleTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleMarqueeMouseEnter = () => {
+    isMarqueeHoveredRef.current = true;
+  };
+
+  const handleMarqueeMouseLeave = () => {
+    isMarqueeHoveredRef.current = false;
+    lastScrollYRef.current = window.scrollY;
+  };
 
   return (
-    <section id="testimonials" className="overflow-hidden py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <FeatureBadge label={t("badge.label")} className="mb-8" />
-          <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
+    <section id="testimonials" className="overflow-hidden py-12 md:py-18">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center md:mb-12">
+          {/* <FeatureBadge label={t("badge.label")} className="mb-6" /> */}
+          <h2 className="preset-title">
             <span className="title-gradient">{t("title")}</span>
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="mx-auto mt-4 max-w-2xl font-['Bradley_Hand','Comic_Sans_MS',cursive] text-base leading-7 text-muted-foreground md:text-lg">
             {t("description")}
           </p>
         </div>
       </div>
-      <div className="relative">
+      <div
+        className="relative"
+        onMouseEnter={handleMarqueeMouseEnter}
+        onMouseLeave={handleMarqueeMouseLeave}
+      >
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-background to-transparent sm:w-32" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-background to-transparent sm:w-32" />
-        <ul className="flex w-max items-start gap-6 [animation:testimonials-marquee_48s_linear_infinite] hover:[animation-play-state:paused]">
+        <ul ref={marqueeRef} className="flex w-max items-start gap-4 sm:gap-5">
           {marqueeTestimonials.map((testimonial, index) => (
             <TestimonialCard
               key={`${testimonial.author}-${index}`}
@@ -153,16 +269,6 @@ export default function Testimonials() {
           ))}
         </ul>
       </div>
-      <style>{`
-        @keyframes testimonials-marquee {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(calc(-50% - 0.75rem));
-          }
-        }
-      `}</style>
     </section>
   );
 }

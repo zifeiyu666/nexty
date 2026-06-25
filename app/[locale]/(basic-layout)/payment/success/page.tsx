@@ -16,6 +16,7 @@ import {
   Receipt,
   RefreshCw,
   ShieldCheck,
+  Music2,
   XCircle,
 } from "lucide-react";
 import { useLocale } from "next-intl";
@@ -62,6 +63,8 @@ function SuccessContent() {
   const subscriptionId = searchParams.get("subscription_id");
   const orderId = searchParams.get("order_id");
   const provider = searchParams.get("provider");
+  const oneTimeSongUrl = searchParams.get("song_url");
+  const returnTo = searchParams.get("returnTo");
 
   const [status, setStatus] = useState<
     "verifying" | "pending" | "success" | "error"
@@ -71,9 +74,25 @@ function SuccessContent() {
     orderId?: string;
     subscriptionId?: string;
     planName?: string;
+    unlockSong?: {
+      status: "completed" | "pending" | "failed";
+      songId?: string;
+      songUrl?: string;
+      sampleSongId?: string;
+      versionId?: string;
+      returnTo?: string;
+      error?: string;
+    } | null;
   }>({
     message: "Verifying your payment details...",
   });
+
+  const resolvedSongUrl =
+    paymentData.unlockSong?.status === "completed"
+      ? paymentData.unlockSong.songUrl
+      : oneTimeSongUrl;
+  const resolvedReturnTo =
+    paymentData.unlockSong?.returnTo || returnTo || "/samples";
 
   useEffect(() => {
     if (provider === "stripe" && !sessionId) {
@@ -114,9 +133,17 @@ function SuccessContent() {
       });
       setStatus("success");
       setPaymentData({
-        message: "Payment successful! Your plan has been updated.",
+        message: oneTimeSongUrl
+          ? "Payment successful! Your song is unlocked."
+          : "Payment successful! Your plan has been updated.",
         orderId: orderId,
         planName: "PayPal Payment",
+        unlockSong: oneTimeSongUrl
+          ? {
+              status: "completed",
+              songUrl: oneTimeSongUrl,
+            }
+          : null,
       });
       revalidateBenefits();
       return;
@@ -152,13 +179,21 @@ function SuccessContent() {
         });
 
         setStatus("success");
+        const unlockSong = result.data.unlockSong ?? null;
         setPaymentData({
           message:
-            result.data.message ||
-            "Your payment has been confirmed. Your plan has been updated.",
+            unlockSong?.status === "completed"
+              ? "Payment received. Your selected song version has been saved."
+              : unlockSong?.status === "failed"
+                ? "Payment received, but we could not finish saving your song automatically."
+                : unlockSong
+                  ? "Payment received. We are finishing your song in the background."
+                  : result.data.message ||
+                    "Your payment has been confirmed. Your plan has been updated.",
           orderId: result.data.orderId,
           subscriptionId: result.data.subscriptionId,
           planName: result.data.planName,
+          unlockSong,
         });
         revalidateBenefits();
       } catch (error) {
@@ -298,6 +333,18 @@ function SuccessContent() {
                   {paymentData.planName || "Premium Plan"}
                 </span>
               </div>
+              {paymentData.unlockSong && (
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-muted-foreground">Song unlock</span>
+                  <span className="font-bold text-primary">
+                    {paymentData.unlockSong.status === "completed"
+                      ? "Ready"
+                      : paymentData.unlockSong.status === "failed"
+                        ? "Needs retry"
+                        : "Finishing"}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -311,14 +358,26 @@ function SuccessContent() {
             asChild
             size="lg"
           >
-            <I18nLink href="/" title="Back to Home" prefetch={true}>
-              <Home className="w-4 h-4" />
-              <span>Back to Home</span>
+            <I18nLink
+              href={resolvedSongUrl || "/"}
+              title={resolvedSongUrl ? "Open Song" : "Back to Home"}
+              prefetch={true}
+            >
+              {resolvedSongUrl ? (
+                <Music2 className="w-4 h-4" />
+              ) : (
+                <Home className="w-4 h-4" />
+              )}
+              <span>{resolvedSongUrl ? "Open Song" : "Back to Home"}</span>
             </I18nLink>
           </Button>
           <Button className="flex-1" asChild variant="outline" size="lg">
-            <I18nLink href="/dashboard" title="Go to Dashboard" prefetch={true}>
-              <span>Dashboard</span>
+            <I18nLink
+              href={resolvedSongUrl ? "/songs" : resolvedReturnTo}
+              title={resolvedSongUrl ? "All Songs" : "Back to Sample"}
+              prefetch={true}
+            >
+              <span>{resolvedSongUrl ? "All Songs" : "Back to Sample"}</span>
               <ArrowRight className="w-4 h-4 ml-1" />
             </I18nLink>
           </Button>
@@ -383,8 +442,12 @@ function SuccessContent() {
           className="flex flex-col sm:flex-row gap-3 w-full"
         >
           <Button variant="outline" className="flex-1" asChild>
-            <I18nLink href="/dashboard" title="Go to Dashboard" prefetch={true}>
-              Go to Dashboard <ArrowRight className="w-4 h-4 ml-1" />
+            <I18nLink
+              href={resolvedReturnTo}
+              title="Back to Sample"
+              prefetch={true}
+            >
+              Back to Sample <ArrowRight className="w-4 h-4 ml-1" />
             </I18nLink>
           </Button>
           <Button className="flex-1" onClick={() => router.refresh()}>

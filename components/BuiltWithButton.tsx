@@ -32,7 +32,7 @@ export default function BuiltWithButton() {
 function LogoNexty({ className }: { className?: string }) {
   return (
     <img
-      src="/logo_nexty.png"
+      src="/logo.png"
       alt="Logo"
       title="Logo"
       width={96}

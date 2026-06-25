@@ -1,4 +1,5 @@
 const KIE_BASE_URL = "https://api.kie.ai";
+const DEFAULT_MOCK_KIE_SUNO_TASK_ID = "de2f8263ef5a1238d1b4570b88dcc8fb";
 
 export type SongTaskStatus = "processing" | "succeeded" | "failed";
 
@@ -90,6 +91,182 @@ function logKieRequest(endpoint: string, payload: Record<string, unknown>): void
     endpoint,
     payload,
   });
+}
+
+export function getMockKieSunoTaskId(): string | null {
+  const configuredTaskId = process.env.KIE_SUNO_MOCK_TASK_ID?.trim();
+  if (configuredTaskId === "false") return null;
+  if (configuredTaskId) return configuredTaskId;
+
+  return DEFAULT_MOCK_KIE_SUNO_TASK_ID;
+}
+
+function escapeControlCharactersInsideJsonStrings(input: string): string {
+  let escaped = "";
+  let inString = false;
+  let escaping = false;
+
+  for (const char of input) {
+    if (!inString) {
+      if (char === '"') inString = true;
+      escaped += char;
+      continue;
+    }
+
+    if (escaping) {
+      escaped += char;
+      escaping = false;
+      continue;
+    }
+
+    if (char === "\\") {
+      escaped += char;
+      escaping = true;
+      continue;
+    }
+
+    if (char === '"') {
+      escaped += char;
+      inString = false;
+      continue;
+    }
+
+    if (char === "\n") {
+      escaped += "\\n";
+      continue;
+    }
+
+    if (char === "\r") {
+      escaped += "\\r";
+      continue;
+    }
+
+    if (char === "\t") {
+      escaped += "\\t";
+      continue;
+    }
+
+    escaped += char;
+  }
+
+  return escaped;
+}
+
+function insertMissingCommasBetweenJsonStringProperties(input: string): string {
+  return input.replace(
+    /("(?:\\.|[^"\\])*")(\s+)(?="(?:\\.|[^"\\])*"\s*:)/g,
+    "$1,$2"
+  );
+}
+
+function parseMockJson(value: string): unknown {
+  const escapedControlCharacters = escapeControlCharactersInsideJsonStrings(value);
+  const candidates = [
+    value,
+    escapedControlCharacters,
+    insertMissingCommasBetweenJsonStringProperties(escapedControlCharacters),
+  ];
+
+  let lastError: unknown;
+  for (const candidate of [...new Set(candidates)]) {
+    try {
+      return JSON.parse(candidate);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError;
+}
+
+function getMockVersionsFromSimpleEnv(): KieSongVersion[] {
+  return [
+    {
+      id: process.env.KIE_SUNO_MOCK_AUDIO_ID_A?.trim() || "mock-a",
+      title: process.env.KIE_SUNO_MOCK_TITLE_A?.trim() || "Version A",
+      audioUrl: process.env.KIE_SUNO_MOCK_AUDIO_URL_A?.trim() || "",
+      imageUrl: process.env.KIE_SUNO_MOCK_IMAGE_URL_A?.trim() || undefined,
+      duration: asNumber(process.env.KIE_SUNO_MOCK_DURATION_A),
+    },
+    {
+      id: process.env.KIE_SUNO_MOCK_AUDIO_ID_B?.trim() || "mock-b",
+      title: process.env.KIE_SUNO_MOCK_TITLE_B?.trim() || "Version B",
+      audioUrl: process.env.KIE_SUNO_MOCK_AUDIO_URL_B?.trim() || "",
+      imageUrl: process.env.KIE_SUNO_MOCK_IMAGE_URL_B?.trim() || undefined,
+      duration: asNumber(process.env.KIE_SUNO_MOCK_DURATION_B),
+    },
+  ].filter((version) => /^https?:\/\//i.test(version.audioUrl));
+}
+
+export function getMockKieSunoMusicResult(taskId: string): MusicTaskResult | null {
+  const mockTaskId = getMockKieSunoTaskId();
+  if (!mockTaskId || taskId !== mockTaskId) {
+    return null;
+  }
+
+  const simpleVersions = getMockVersionsFromSimpleEnv();
+  if (simpleVersions.length) {
+    return {
+      status: "succeeded",
+      versions: simpleVersions.slice(0, 2),
+    };
+  }
+
+  const rawResult = process.env.KIE_SUNO_MOCK_RESULT_JSON?.trim();
+  if (rawResult) {
+    try {
+      return normalizeKieMusicRecord(parseMockJson(rawResult) as KieApiResponse);
+    } catch (error) {
+      return {
+        status: "failed",
+        versions: [],
+        error:
+          error instanceof Error
+            ? `Invalid KIE_SUNO_MOCK_RESULT_JSON: ${error.message}`
+            : "Invalid KIE_SUNO_MOCK_RESULT_JSON.",
+      };
+    }
+  }
+
+  const rawVersions = process.env.KIE_SUNO_MOCK_VERSIONS_JSON?.trim();
+  if (rawVersions) {
+    try {
+      const versions = parseMockJson(rawVersions);
+      if (!Array.isArray(versions)) {
+        throw new Error("Expected an array of song versions.");
+      }
+
+      const normalizedVersions = versions
+        .map((version, index) => normalizeTrack(version, index))
+        .filter((version): version is KieSongVersion => Boolean(version))
+        .slice(0, 2);
+
+      if (!normalizedVersions.length) {
+        throw new Error("No valid versions with http(s) audioUrl were found.");
+      }
+
+      return {
+        status: "succeeded",
+        versions: normalizedVersions,
+      };
+    } catch (error) {
+      return {
+        status: "failed",
+        versions: [],
+        error:
+          error instanceof Error
+            ? `Invalid KIE_SUNO_MOCK_VERSIONS_JSON: ${error.message}`
+            : "Invalid KIE_SUNO_MOCK_VERSIONS_JSON.",
+      };
+    }
+  }
+
+  return {
+    status: "failed",
+    versions: [],
+    error:
+      "KIE Suno mock mode is enabled, but no offline mock result is configured. Set KIE_SUNO_MOCK_AUDIO_URL_A/B, KIE_SUNO_MOCK_VERSIONS_JSON, or KIE_SUNO_MOCK_RESULT_JSON.",
+  };
 }
 
 async function parseKieResponse(response: Response): Promise<KieApiResponse> {
@@ -472,6 +649,15 @@ export async function getLyricsTask(taskId: string): Promise<LyricsTaskResult> {
 }
 
 export async function submitMusicTask(input: SubmitMusicInput): Promise<string> {
+  const mockTaskId = getMockKieSunoTaskId();
+  if (mockTaskId) {
+    console.log("[KIE Suno] Mock music generation enabled", {
+      taskId: mockTaskId,
+      title: input.title,
+    });
+    return mockTaskId;
+  }
+
   const style = [
     input.genre,
     `${input.vocalGender} vocal`,

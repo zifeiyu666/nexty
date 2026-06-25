@@ -22,10 +22,12 @@ export function UserAvatar({ user }: { user: User }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="focus:outline-hidden">
-        <Avatar className="h-8 w-8">
+      <DropdownMenuTrigger className="rounded-full transition-transform active:scale-[0.98] focus:outline-hidden">
+        <Avatar className="h-8 w-8 bg-white/10 transition-colors group-data-[scrolled=true]/header:bg-zinc-950/5">
           <AvatarImage src={user.image || undefined} />
-          <AvatarFallback>{fallbackLetter}</AvatarFallback>
+          <AvatarFallback className="bg-transparent text-white transition-colors group-data-[scrolled=true]/header:text-zinc-900">
+            {fallbackLetter}
+          </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

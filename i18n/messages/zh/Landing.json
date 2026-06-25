@@ -11,10 +11,7 @@
     "description": "Nexty 是一个功能齐全的 Next.js SaaS 全栈模板，让你能够快速构建各种商业网站，无论是内容站、工具站还是集成 AI 能力的付费网站。",
     "getStarted": "立即开始",
     "getStartedLink": "https://nexty.dev/#pricing",
-    "discord": {
-      "text": "加入 Discord",
-      "href": "https://discord.com/invite/R7bUxWKRqZ"
-    },
+    "howItWorksCta": "如何运作",
     "viewDocs": "查看文档",
     "viewDocsLink": "https://nexty.dev/docs"
   },
@@ -27,11 +24,7 @@
     "description": "<p>建议准备好纸巾。悬停可静音预览，点击任意故事即可打开 <strong>GiftSong</strong> 的歌曲声音。</p>",
     "playLabel": "打开 {title} 的声音",
     "muteLabel": "静音 {title}",
-    "trustItems": [
-      "免费试用",
-      "几分钟完成",
-      "无需音乐技能"
-    ],
+    "trustItems": ["免费试用", "几分钟完成", "无需音乐技能"],
     "videos": [
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
@@ -74,6 +67,57 @@
         "title": "再听一遍"
       }
     ]
+  },
+  "HowItWorks": {
+    "eyebrow": "How It Works",
+    "title": "把一段回忆，在几分钟内变成让人落泪的歌",
+    "description": "创作一首真正私人的 <strong>custom song</strong>，免费试听预览，再解锁附带 <strong>music video</strong> 和可打印 <strong>wall art</strong> 的完整礼物套装。",
+    "steps": {
+      "story": {
+        "title": "告诉我们你的故事",
+        "description": "选择生日、婚礼或纪念日等场景，挑选曲风，再写下几个最珍贵的回忆。AI 会把你的原始文字变成细腻动人的歌词。",
+        "cta": "Craft My Song"
+      },
+      "preview": {
+        "title": "免费试听并打磨到完美",
+        "description": "即时试听 30 秒录音室级预览。不够满意？你可以在控制台里自由修改歌词、切换曲风，直到它真正符合你的心意。"
+      },
+      "gift": {
+        "title": "释放终极礼物惊喜",
+        "description": "解锁完整 <strong>custom song</strong>，并免费获得定制 <strong>music video</strong> 与可编辑 <strong>wall art</strong> 海报组合。私密发送或分享到社交平台，等着看 TA 感动落泪。"
+      }
+    }
+  },
+  "OurProducts": {
+    "eyebrow": "Our Products",
+    "title": "不止是一首 Custom Song",
+    "description": "把一个真实故事变成完整的 personalized music gift：AI custom song、可分享的 music video gift，以及可打印的 digital wall art。适合生日、婚礼、纪念日和所有值得被记住的时刻。",
+    "items": {
+      "customSong": {
+        "label": "主打产品",
+        "title": "Personalized Song",
+        "price": "From $29.99",
+        "description": "用你们的回忆、名字、日期和心意生成录音室级 custom song。先免费试听预览，再调整歌词，把一首可以反复播放的歌送给 TA。",
+        "cta": "Create a song",
+        "imageAlt": "情侣正在手机上聆听个性化 custom song 礼物"
+      },
+      "videoGift": {
+        "label": "Add-on",
+        "title": "Music Video Gift",
+        "price": "From $23.99",
+        "description": "把 custom song 搭配照片、歌词画面和情绪化视频模板，做成可通过短信、邮件或社交平台分享的 music video gift。",
+        "cta": "Create video styles",
+        "imageAlt": "带家庭照片和 custom song 歌词的个性化 music video gift"
+      },
+      "wallArt": {
+        "label": "Add-on",
+        "title": "Digital Wall Art",
+        "price": "From $7.99",
+        "description": "把歌词变成可打印的 digital wall art、唱片风海报或照片排版。下载高清文件，在家打印或交给打印店制作纪念装饰。",
+        "cta": "Create wall art",
+        "imageAlt": "由 custom song 歌词制作的可打印 digital wall art 海报"
+      }
+    }
   },
   "Features": {
     "badge": {
@@ -126,9 +170,7 @@
             "description": "使用 Cloudflare Turnstile 保护应用免受机器人攻击。"
           }
         ],
-        "images": [
-          "/images/features/login.png"
-        ]
+        "images": ["/images/features/login.png"]
       },
       {
         "title": "数据库",
@@ -191,10 +233,7 @@
             "description": "Nexty 付费用户可获得完整的 Flux Kontext AI 图像生成网站模板，用于快速部署 AI 艺术平台。"
           }
         ],
-        "images": [
-          "/images/features/ai-1.png",
-          "/images/features/ai-2.png"
-        ]
+        "images": ["/images/features/ai-1.png", "/images/features/ai-2.png"]
       },
       {
         "title": "CMS",
@@ -238,9 +277,7 @@
             "description": "Nexty 支持拖拽上传、预览功能和自动文件处理，提供无缝的用户体验。"
           }
         ],
-        "images": [
-          "/images/features/admin-4.png"
-        ]
+        "images": ["/images/features/admin-4.png"]
       },
       {
         "title": "可视化定价管理",
@@ -364,35 +401,111 @@
   },
   "UseCases": {
     "badge": {
-      "label": "使用场景",
-      "text": "多场景解决方案"
+      "label": "核心特点",
+      "text": "个性化音乐礼物"
     },
-    "title": "一套模板，多种解决方案",
-    "description": "无论您是构建 AI 工具、内容平台还是其他 SaaS 产品，我们的 Next.js SaaS 模板都能以最少的配置适应您的特定需求。",
+    "title": "为什么要和我们一起雕琢你的歌？",
+    "description": "送出一首触动人心的歌曲的绝佳方式。无可比拟的性价比、录音室品质以及无限的个性化定制。",
     "cases": [
       {
-        "title": "AI 驱动的 SaaS 工具",
-        "description": "在几天内而非几个月内启动生产级 AI 应用程序。内置与 OpenRouter、Replicate 和领先 AI 供应商的集成。包含智能使用跟踪、自动计费以及变现 AI 工作流程所需的一切。",
+        "title": "2 分钟即可生成",
+        "description": "回答几个简单问题，看着我们的 AI 瞬间将你的回忆在 2 分钟内转化为定制歌曲样本。无需音乐技巧。",
         "image": "/placeholder.webp",
-        "icon": "Bot"
+        "icon": "Zap"
       },
       {
-        "title": "内容和博客平台",
-        "description": "启动具有高级 CMS 功能的 SEO 优化内容网站。功能包括 Markdown 编辑、多语言支持、付费墙保护、AI 翻译和 AdSense 集成。非常适合构建高端内容平台、时事通讯或内容驱动的 SaaS 应用程序。",
+        "title": "录音室级品质",
+        "description": "听感真实的深情唱腔、专业的乐器演奏以及清澈的后期制作。你的个性化歌曲听起来完全就像在真正的录音室里录制的打榜热歌。",
         "image": "/placeholder.webp",
-        "icon": "FileText"
+        "icon": "Mic2"
       },
       {
-        "title": "订阅和市场平台",
-        "description": "通过自动计费、客户管理和支付处理构建经常性收入业务。功能包括订阅管理、基于使用量的定价、客户门户和全面的分析。非常适合 SaaS 市场、订阅服务或高端工具平台。",
+        "title": "顶级品质，更优价格",
+        "description": "为什么要为同样的魔法支付更多？我们以市场上最具竞争力的价格提供顶尖的 AI 作词和录音室级生成，让你花更少的钱享受尊贵的价值。",
         "image": "/placeholder.webp",
-        "icon": "CreditCard"
+        "icon": "CircleDollarSign"
       },
       {
-        "title": "免费工具和引流磁铁",
-        "description": "创建能带来大量自然流量的病毒式免费工具。闪电般的性能和 SEO 优化。非常适合构建邮件列表、生成潜在客户或创造下一个病毒式计算器/转换器工具。",
+        "title": "购买前 100% 免费试用",
+        "description": "无需绑定信用卡即可聆听你的定制预览。微调歌词、切换曲风，只有当你被深深打动时，再去解锁完整的高清音轨。",
         "image": "/placeholder.webp",
-        "icon": "Wrench"
+        "icon": "Sparkles"
+      },
+      {
+        "title": "免费定制壁画与视频模板",
+        "description": "得到的远不止是音频。每首歌都附带一个海量的免费音乐视频和可打印壁画模板库，为你打造终极的个性化音乐礼物组合。",
+        "image": "/placeholder.webp",
+        "icon": "Palette"
+      },
+      {
+        "title": "内置个性化编辑器",
+        "description": "掌控一切。使用我们直观的互动编辑器，完全自定义你的音乐视频或排版你的壁画歌词。毫不费力地添加你的私人照片、重要日期和甜蜜留言。",
+        "image": "/placeholder.webp",
+        "icon": "SlidersHorizontal"
+      }
+    ]
+  },
+  "SongfinchComparison": {
+    "eyebrow": "为什么用户纷纷从 Songfinch 转向我们",
+    "title": "<us>customsong.top</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "subtitle": "不要为一首歌支付 <price>200 多美元</price>。以<underline>极低的价格</underline>获取具备<strong>无限自由度的顶级录音室品质制作</strong>。",
+    "tableHeaders": {
+      "feature": "功能 / 权益",
+      "songfinch": "Songfinch",
+      "us": "customsong.top（我们）"
+    },
+    "rows": [
+      {
+        "feature": "起步价格",
+        "songfinch": "199 美元以上 / 首",
+        "us": "超高性价比，价格极具竞争力"
+      },
+      {
+        "feature": "交付时间",
+        "songfinch": "4 到 7 天，等待很久",
+        "us": "只需 2 分钟，即时预览"
+      },
+      {
+        "feature": "无风险试用",
+        "songfinch": "先付款，没有预览",
+        "us": "100% 免费预览，满意后再付款"
+      },
+      {
+        "feature": "歌词修改",
+        "songfinch": "受限制或需额外费用",
+        "us": "无限编辑，完全掌控"
+      },
+      {
+        "feature": "免费音乐视频",
+        "songfinch": "不包含",
+        "us": "免费包含，可自定义模板"
+      },
+      {
+        "feature": "免费可打印壁画",
+        "songfinch": "不包含",
+        "us": "免费包含，附歌词海报编辑器"
+      }
+    ],
+    "painPoints": [
+      {
+        "icon": "value",
+        "title": "极致性价比，不再钱包刺痛",
+        "description": "Songfinch 至少收取 199 美元的昂贵预付款。我们认为每个人都应该有能力去庆祝他们的爱，而无需承担沉重的财政负担。我们以市场上最具竞争力的价格，提供完全相同的音乐魔法。"
+      },
+      {
+        "icon": "speed",
+        "title": "从回忆到音乐，只需 2 分钟",
+        "description": "为什么要为你的纪念日或生日礼物苦苦等待一整周？我们次世代的 AI 流程让你能在短短 2 分钟内创作一首定制歌曲样本，完美拯救临门一脚的送礼刚需。"
+      },
+      {
+        "icon": "edits",
+        "title": "无限编辑，调整到完美为止",
+        "description": "使用传统服务，修改一句歌词或切换一种曲风意味着无休止的邮件沟通和额外费用。而在我们的互动控制台里，你拥有完全的创作自由，可以瞬间微调歌词并切换流派。"
+      },
+      {
+        "icon": "bundle",
+        "title": "完整的个性化音乐礼物套装",
+        "description": "一首歌固然很好，但多媒体的回忆才是传奇。每一首解锁的音轨都附带免费的自定义音乐视频生成器和可打印壁画模板。这是一个 Songfinch 根本无法提供的完整个性化音乐礼物生态系统。"
       }
     ]
   },
@@ -404,57 +517,53 @@
     "description": "不要只听我们的，看看客户怎么说"
   },
   "FAQ": {
-    "title": "常见问题",
-    "description": "关于我们的 Next.js SaaS 模板以及它如何帮助您更快地构建更好应用程序的常见问题",
+    "title": "关于定制歌曲的常见问题",
+    "description": "在创作并送出一首让对方永远珍藏的歌曲前，你需要了解的一切。",
     "items": [
       {
-        "question": "非技术人员可以使用这个模板吗？",
-        "answer": "当然可以！Nexty 专门设计为与 AI 助手无缝协作，即使是零编程经验的人也能通过 AI 辅助开发来开发产品。我们的代码结构和文档对 AI 友好，使 AI 更容易理解和修改代码。技术团队将从更高的开发效率中受益更多。"
+        "question": "customsong.top 是如何工作的？",
+        "answer": "这就像魔法一样简单。只需回答几个问题告诉我们你的故事，选择喜欢的音乐风格，我们的 AI 就会即时创作一首专属歌曲。你会先获得一段免费的 30 秒录音室级预览。如果你喜欢，再解锁完整版歌曲，并免费使用我们的视频和打印编辑器！"
       },
       {
-        "question": "为什么这是最好的 Next.js SaaS 模板？",
-        "answer": "Nexty 是最全面的 Next.js SaaS 启动套件。与其他只提供基本组件的模板不同，我们包含完整的业务工作流程：身份验证、支付、AI 集成、内容管理和变现功能。一切都是生产就绪的，并在实际应用中经过实战测试。"
+        "question": "你们和其他定制歌曲平台有什么不同？",
+        "answer": "我们不只是给你一个音频文件。我们提供极具竞争力的市场价格，而且每首歌都会解锁无限量免费、可自定义的音乐视频模板和可打印墙面艺术模板。你可以用内置互动编辑器加入自己的照片和情书，让礼物更有温度。"
       },
       {
-        "question": "使用这个模板能多快启动我的 SaaS？",
-        "answer": "您的第一个项目在学习模板功能时需要 3-5 天，但学习曲线很快就会有回报。掌握系统的客户现在只需 1-2 天就能启动完整的 SaaS 应用程序。模板处理所有复杂的基础设施，因此您可以专注于让产品独特的部分。"
+        "question": "我可以编辑歌词或更换音乐风格吗？",
+        "answer": "当然可以！你拥有完整控制权。在解锁高清完整版音轨前，你可以在后台调整歌词、更换音乐风格，或切换人声氛围，直到它完全符合你的想象。"
       },
       {
-        "question": "这适合 AI 驱动的 SaaS 应用程序吗？",
-        "answer": "绝对适合！我们的模板包含全面的 AI SDK 集成，提供文本生成、图像创建和视频处理的工作示例。它兼容 OpenAI、Claude、Gemini、Grok、DeepSeek 和其他流行的 AI 模型。非常适合构建 AI 工具或内容生成平台。"
+        "question": "我该如何分享这份个性化音乐礼物？",
+        "answer": "每首歌都会附带一个精美的专属分享页面，你可以通过短信、邮件或社交媒体发送。这个页面可以自定义个人图片、真挚留言，并用旋转黑胶唱机播放你的专属歌曲，专为制造惊喜时刻而设计。"
       },
       {
-        "question": "支持哪些支付方式和计费模式？",
-        "answer": "模板包含完整的 Stripe 集成，支持一次性付款、订阅、基于使用量的计费和自动续订。您可以立即开始变现。"
+        "question": "会有隐藏费用吗？付款安全吗？",
+        "answer": "没有任何隐藏费用。只有当你完全满意预览后才需要付款。所有支付都通过 Stripe 加密并安全处理，符合 PCI 合规要求。我们绝不会在服务器上存储你的信用卡信息。"
       },
       {
-        "question": "内容管理系统如何工作？",
-        "answer": "我们的内置 CMS 支持 Markdown 和富文本编辑、多语言内容、SEO 优化、付费墙保护和 AI 翻译。您可以通过具有基于角色的访问控制的直观管理后台管理文章、页面和高端内容。"
+        "question": "我的定制歌曲会保存多久？",
+        "answer": "你购买的音轨、定制音乐视频和墙面艺术版式都会安全、长期地保存在你的账户中。你可以随时登录在线播放、回听，或重新下载高质量 MP3 文件。"
       },
       {
-        "question": "模板是否经过 SEO 优化？",
-        "answer": "是的！模板包含全面的 SEO 功能：自动元标签、结构化数据、XML 站点地图、OpenGraph 支持和性能优化。它采用 Next.js 最佳实践构建，提高搜索引擎可见性和更快的加载时间。"
+        "question": "登录要求是什么？",
+        "answer": "我们尽可能减少阻力。开始制作预览甚至不需要注册！我们采用“懒注册”系统：只需输入邮箱即可试听预览，系统会自动为你创建访客账户。之后你也可以随时通过 Google 或邮箱登录。"
       },
       {
-        "question": "您提供什么样的支持？",
-        "answer": "我们提供全面的文档、代码示例和邮件支持。我们还有一个公共 Discord 社区，您可以从其他开发者那里获得帮助并分享您的项目。"
-      },
-      {
-        "question": "如何管理定价卡片？",
-        "answer": "这是 Nexty 的一个关键卖点。您可以在后台管理定价卡片，包括添加、编辑和删除定价卡片，支持 AI 多语言翻译，消除复杂的多语言文件配置。"
+        "question": "如果我的歌曲生成卡住了怎么办？",
+        "answer": "我们的新一代 AI 流程非常稳定，但偶尔也可能遇到网络波动。如果生成卡住，只需刷新页面即可。如果问题仍然存在，我们的 24/7 支持团队会立即为你手动重新生成并优化音轨。"
       }
     ]
   },
   "CTA": {
-    "title": "快速推出产品，快速赚钱",
-    "description": "不要从零开始！使用 Nexty 模板专注于您的核心想法，快速构建、验证并开始赚钱。",
-    "button": "立即获取模板",
-    "trustText": "受到全球开发者信赖",
+    "title": "送一首让 TA 永远珍藏的定制歌曲",
+    "description": "告诉我们你的故事。AI 会立即把回忆变成录音室级的<strong>定制歌曲</strong>，帮你创作并<strong>送出一首歌</strong>，作为生日、婚礼或纪念日的完美<strong>个性化音乐礼物</strong>。",
+    "button": "创建你的歌曲",
+    "trustText": "为难忘时刻而生",
     "features": {
-      "deploy": "🚀 快速部署",
-      "production": "🔧 生产就绪",
-      "updates": "💎 终生更新",
-      "i18n": "🌍 国际化"
+      "deploy": "🎵 录音室级 AI 歌曲",
+      "production": "🎁 个性化礼物就绪",
+      "updates": "⚡ 即时免费预览",
+      "i18n": "💌 轻松发送分享"
     }
   }
 }

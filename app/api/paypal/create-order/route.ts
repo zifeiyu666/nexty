@@ -1,4 +1,8 @@
 import { apiResponse } from "@/lib/api-response";
+import {
+  parseUnlockSongContext,
+  serializeUnlockSongForPayPal,
+} from "@/lib/ai/song-unlock-after-payment";
 import { getSession } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
@@ -20,7 +24,8 @@ export async function POST(req: Request) {
   }
 
   // 3. Parse the request body
-  const { planId } = await req.json();
+  const { planId, unlockSongContext } = await req.json();
+  const parsedUnlockSongContext = parseUnlockSongContext(unlockSongContext);
 
   if (!planId) {
     return apiResponse.badRequest("Missing planId.");
@@ -76,6 +81,7 @@ export async function POST(req: Request) {
         userId: user.id,
         planId: plan.id,
         submitProductId: null,
+        paypalUnlock: serializeUnlockSongForPayPal(parsedUnlockSongContext),
       },
     });
 

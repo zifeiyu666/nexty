@@ -41,7 +41,7 @@ export interface VideoGenerationTask {
 
 /**
  * Submit a video generation task (async).
- * Returns a taskId; the client polls for results via /api/ai-demo/video/status?taskId=xxx.
+ * Returns a taskId that callers can use to query video task status.
  */
 export async function submitVideoGeneration(
   input: VideoGenerationInput

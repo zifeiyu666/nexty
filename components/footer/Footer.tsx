@@ -1,4 +1,3 @@
-import BuiltWithButton from "@/components/BuiltWithButton";
 import { Newsletter } from "@/components/footer/Newsletter";
 import { TwitterX } from "@/components/social-icons/icons";
 import { siteConfig } from "@/config/site";
@@ -8,6 +7,7 @@ import { GithubIcon, InstagramIcon, MailIcon, Youtube } from "lucide-react";
 import { getMessages, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { SiDiscord, SiTiktok } from "react-icons/si";
 
 export default async function Footer() {
@@ -43,7 +43,16 @@ export default async function Footer() {
                   </div>
                 </div>
 
-                <p className="text-sm p4-4 md:pr-12">{t("tagLine")}</p>
+                <p className="text-sm p4-4 md:pr-12">
+                  {t.rich("tagLine", {
+                    strong: (chunks: ReactNode) => (
+                      <strong className="font-semibold text-gray-50">
+                        {chunks}
+                      </strong>
+                    ),
+                    br: () => <br />,
+                  })}
+                </p>
 
                 <div className="flex items-center gap-2">
                   {siteConfig.socialLinks?.github && (
@@ -139,7 +148,7 @@ export default async function Footer() {
                   )}
                 </div>
 
-                <BuiltWithButton />
+                {/* <BuiltWithButton /> */}
               </div>
             </div>
 

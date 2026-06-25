@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import type { UnlockSongContext } from "@/lib/ai/song-unlock-after-payment";
 import { buildPayPalOptions } from "@/lib/paypal/script-options";
 import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
 import {
@@ -18,10 +19,16 @@ interface Props {
     orderId: string;
     planName: string;
     pending?: boolean;
+    songUrl?: string;
   }) => void;
+  unlockSongContext?: UnlockSongContext | null;
 }
 
-export function PayPalCheckoutButton({ plan, onSuccess }: Props) {
+export function PayPalCheckoutButton({
+  plan,
+  onSuccess,
+  unlockSongContext,
+}: Props) {
   const router = useRouter();
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
@@ -46,6 +53,7 @@ export function PayPalCheckoutButton({ plan, onSuccess }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           planId: plan.id,
+          unlockSongContext,
         }),
       });
       const result = await response.json();

@@ -14,7 +14,11 @@ import { HeaderLink } from "@/types/common";
 import { ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-const HeaderLinks = () => {
+type HeaderLinksProps = {
+  variant?: "default" | "adaptive";
+};
+
+const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
   const tHeader = useTranslations("Header");
   const pathname = usePathname();
 
@@ -24,6 +28,21 @@ const HeaderLinks = () => {
     pricingLink.href = process.env.NEXT_PUBLIC_PRICING_PATH!;
   }
 
+  const triggerClassName =
+    variant === "adaptive"
+      ? "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-normal text-white/82 transition-colors hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950 group-data-[scrolled=true]/header:data-[state=open]:bg-zinc-950/5 group-data-[scrolled=true]/header:data-[state=open]:text-zinc-950"
+      : "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 hover:bg-accent-foreground/10 hover:text-accent-foreground text-sm font-normal text-muted-foreground";
+
+  const linkClassName =
+    variant === "adaptive"
+      ? "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-normal text-white/82 transition-colors hover:bg-white/10 hover:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950"
+      : "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-normal text-muted-foreground hover:bg-accent-foreground/10 hover:text-accent-foreground";
+
+  const activeClassName =
+    variant === "adaptive"
+      ? "bg-white/10 font-semibold text-white group-data-[scrolled=true]/header:bg-zinc-950/5 group-data-[scrolled=true]/header:text-zinc-950"
+      : "font-medium text-accent-foreground";
+
   return (
     <NavigationMenu viewport={false} className="hidden lg:block">
       <NavigationMenuList className="flex-wrap">
@@ -31,7 +50,7 @@ const HeaderLinks = () => {
           <NavigationMenuItem key={link.name}>
             {link.items ? (
               <>
-                <NavigationMenuTrigger className="bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 hover:bg-accent-foreground/10 hover:text-accent-foreground text-sm font-normal text-muted-foreground">
+                <NavigationMenuTrigger className={triggerClassName}>
                   {link.name}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -87,8 +106,8 @@ const HeaderLinks = () => {
                 target={link.target || "_self"}
                 rel={link.rel || undefined}
                 className={cn(
-                  "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-normal text-muted-foreground hover:bg-accent-foreground/10 hover:text-accent-foreground",
-                  pathname === link.href && "font-medium text-accent-foreground"
+                  linkClassName,
+                  pathname === link.href && activeClassName
                 )}
               >
                 {link.name}

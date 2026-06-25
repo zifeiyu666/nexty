@@ -11,10 +11,7 @@
     "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI instantly transforms your memories into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.</p>",
     "getStarted": "Start Crafting Free",
     "getStartedLink": "https://nexty.dev/#pricing",
-    "discord": {
-      "text": "Join Discord",
-      "href": "https://discord.com/invite/R7bUxWKRqZ"
-    },
+    "howItWorksCta": "How It Works",
     "viewDocs": "View Documentation",
     "viewDocsLink": "https://nexty.dev/docs"
   },
@@ -36,76 +33,213 @@
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
         "label": "CustomSong",
-        "title": "Dad's first listen"
+        "title": "Mother's first listen"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-13.mp4",
         "label": "CustomSong",
         "title": "The happy tears"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-4.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-14.mp4",
         "label": "CustomSong",
         "title": "Best surprise ever"
       },
       {
+        "src": "/cass_demo/optimized/giftsong-slide-15.mp4",
+        "label": "CustomSong",
+        "title": "wedding replay"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
+        "label": "CustomSong",
+        "title": "Anniversary Surprise"
+      },
+      {
         "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
-        "label": "CustomSong",
-        "title": "Birthday replay"
-      },
-      {
-        "src": "/cass_demo/optimized/giftsong-slide-6.mp4",
-        "label": "CustomSong",
-        "title": "Speechless"
-      },
-      {
-        "src": "/cass_demo/optimized/giftsong-slide-8.mp4",
         "label": "CustomSong",
         "title": "Couple's song"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-9.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-18.mp4",
         "label": "CustomSong",
-        "title": "Couldn't stop smiling"
+        "title": "From shock to joy"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-3.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
         "label": "CustomSong",
         "title": "One more listen"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-17.mp4",
+        "label": "CustomSong",
+        "title": "Father's first listen"
+      },
+      {
+        "src": "/cass_demo/optimized/giftsong-slide-16.mp4",
+        "label": "CustomSong",
+        "title": "Cry tears of joy"
       }
     ]
   },
+  "HowItWorks": {
+    "eyebrow": "How It Works",
+    "title": "From one memory to a tear-worthy song in minutes",
+    "description": "Create a deeply personal <strong>custom song</strong>, preview it for free, then unlock a complete gift bundle with a <strong>music video</strong> and printable <strong>wall art</strong>.",
+    "steps": {
+      "story": {
+        "title": "Tell Us Your Story",
+        "description": "Pick an occasion, select a genre, and drop a few favorite memories. Our AI transforms your raw text into beautifully poetic lyrics.",
+        "cta": "Craft My Song"
+      },
+      "preview": {
+        "title": "Preview & Perfect for Free",
+        "description": "Listen to your studio-quality 30-second preview instantly. Not 100% happy? Use our dashboard to tweak lyrics or swap genres with total creative freedom."
+      },
+      "gift": {
+        "title": "Unleash the Ultimate Gift",
+        "description": "Unlock the full <strong>custom song</strong> and get a free custom <strong>music video</strong> plus customizable <strong>wall art</strong> poster combo. Send it privately or post on socials to watch them cry tears of joy."
+      }
+    }
+  },
+  "OurProducts": {
+    "eyebrow": "Our Products",
+    "title": "More Than a Custom Song",
+    "description": "Turn one personal story into a complete personalized music gift: an AI custom song, a shareable music video gift, and printable digital wall art made for birthdays, weddings, anniversaries, and once-in-a-lifetime moments.",
+    "items": {
+      "customSong": {
+        "label": "Signature",
+        "title": "Personalized Song",
+        "price": "From $29.99",
+        "description": "Create a studio-quality custom song from your memories, names, dates, and message. Preview it free, refine the lyrics, then send a song they can replay forever.",
+        "cta": "Create a song",
+        "imageAlt": "Couple listening to a personalized custom song gift on a phone"
+      },
+      "videoGift": {
+        "label": "Add-on",
+        "title": "Music Video Gift",
+        "price": "From $23.99",
+        "description": "Pair your custom song with photos, lyric scenes, and emotional video templates. A music video gift is easy to share by text, email, or social media.",
+        "cta": "Create video styles",
+        "imageAlt": "Personalized music video gift with family photo and custom song lyrics"
+      },
+      "wallArt": {
+        "label": "Add-on",
+        "title": "Digital Wall Art",
+        "price": "From $7.99",
+        "description": "Transform your lyrics into printable wall art, record-style posters, or photo layouts. Download a high-resolution keepsake for home printing or a print shop.",
+        "cta": "Create wall art",
+        "imageAlt": "Printable digital wall art posters made from custom song lyrics"
+      }
+    }
+  },
   "UseCases": {
     "badge": {
-      "label": "USE CASES",
-      "text": "Multiple Solution Scenarios"
+      "label": "CORE FEATURES",
+      "text": "Personalized Music Gift"
     },
-    "title": "One Boilerplate, Multiple Solutions",
-    "description": "Whether you're building AI tools, content platforms, or other SaaS products, our Next.js SaaS boilerplate adapts to your specific needs with minimal configuration required.",
+    "title": "Why Craft Your Song with Us?",
+    "description": "The absolute best way to send a song that touches hearts. Unmatched value, studio quality, and boundless personalization.",
     "cases": [
       {
-        "title": "AI-Powered SaaS Tools",
-        "description": "Launch production-ready AI applications in days, not months. Built-in integrations with OpenRouter, Replicate, and leading AI providers. Includes smart usage tracking, automated billing, and everything you need to monetize AI workflows.",
+        "title": "Ready in 2 Minutes",
+        "description": "Answer a few simple questions and watch our AI instantly transform your memories into a custom song sample in just 2 minutes. No musical skills required.",
         "image": "/placeholder.webp",
-        "icon": "Bot"
+        "icon": "Zap"
       },
       {
-        "title": "Content & Blog Platforms",
-        "description": "Launch SEO-optimized content websites with advanced CMS capabilities. Features include Markdown editing, multilingual support, paywall protection, AI translation, and AdSense integration. Perfect for building premium content platforms, newsletters, or content-driven SaaS applications.",
+        "title": "Studio-Grade Quality",
+        "description": "Real-sounding emotional vocals, professional instruments, and crystal-clear production. Your personalized song sounds exactly like a hit track recorded in a real studio.",
         "image": "/placeholder.webp",
-        "icon": "FileText"
+        "icon": "Mic2"
       },
       {
-        "title": "Subscription & Marketplace Platforms",
-        "description": "Build recurring revenue businesses with automated billing, customer management, and payment processing. Features include subscription management, usage-based pricing, customer portals, and comprehensive analytics. Perfect for SaaS marketplaces, subscription services, or premium tool platforms.",
+        "title": "Premium Quality, Better Price",
+        "description": "Why pay more for the same magic? We offer top-tier AI songwriting and studio-quality generation at the most competitive price on the market, giving you premium value for less.",
         "image": "/placeholder.webp",
-        "icon": "CreditCard"
+        "icon": "CircleDollarSign"
       },
       {
-        "title": "Free Tools & Lead Magnets",
-        "description": "Create viral free tools that drive massive organic traffic. Lightning-fast performance and SEO optimization. Perfect for building your email list, generating leads, or creating the next viral calculator/converter tool.",
+        "title": "Try 100% Free Before You Buy",
+        "description": "Listen to your custom preview without handing over your credit card. Tweak the lyrics, switch genres, and only unlock the full high-res track when you're deeply moved.",
         "image": "/placeholder.webp",
-        "icon": "Wrench"
+        "icon": "Sparkles"
+      },
+      {
+        "title": "Free Custom Wall Art & Video Templates",
+        "description": "Get way more than just audio. Every song comes packed with a massive library of free music video and printable wall art templates to create the ultimate personalized music gift combo.",
+        "image": "/placeholder.webp",
+        "icon": "Palette"
+      },
+      {
+        "title": "Built-in Personalization Editors",
+        "description": "Take complete control. Use our intuitive interactive editors to fully customize your music video or layout your wall art lyrics. Add your personal photos, dates, and love notes effortlessly.",
+        "image": "/placeholder.webp",
+        "icon": "SlidersHorizontal"
+      }
+    ]
+  },
+  "SongfinchComparison": {
+    "eyebrow": "Why Users Switch from Songfinch to customsong.top",
+    "title": "<us>customsong.top</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "subtitle": "Don’t pay <price>$200+</price> for a single song. Get <strong>elite studio-quality production</strong> with unlimited freedom <underline>at a fraction of the cost.</underline>",
+    "tableHeaders": {
+      "feature": "Feature / Benefit",
+      "songfinch": "Songfinch",
+      "us": "customsong.top (Us)"
+    },
+    "rows": [
+      {
+        "feature": "Starting Price",
+        "songfinch": "$199+ per song",
+        "us": "Ultra affordable, unbeatable price"
+      },
+      {
+        "feature": "Delivery Time",
+        "songfinch": "4 to 7 days, long wait",
+        "us": "Just 2 minutes, instant preview"
+      },
+      {
+        "feature": "Risk-Free Trial",
+        "songfinch": "Pay upfront, no preview",
+        "us": "100% free preview, pay only when happy"
+      },
+      {
+        "feature": "Lyrics Revisions",
+        "songfinch": "Restricted or extra fees",
+        "us": "Unlimited edits with complete control"
+      },
+      {
+        "feature": "Free Music Video",
+        "songfinch": "Not included",
+        "us": "Included free with customizable templates"
+      },
+      {
+        "feature": "Free Printable Wall Art",
+        "songfinch": "Not included",
+        "us": "Included free with lyric poster editors"
+      }
+    ],
+    "painPoints": [
+      {
+        "icon": "value",
+        "title": "Absolute Best Value, No Wallet Pain",
+        "description": "Songfinch charges a hefty upfront fee of $199 minimum. We believe everyone deserves to celebrate their love without breaking the bank. We offer the exact same musical magic at the most competitive price on the market."
+      },
+      {
+        "icon": "speed",
+        "title": "From Memories to Music in 2 Minutes",
+        "description": "Why wait a whole week for your anniversary or birthday gift? Our next-gen AI pipeline allows you to create a custom song sample in just 2 minutes. Perfect for last-minute lifesavers and instant emotional impacts."
+      },
+      {
+        "icon": "edits",
+        "title": "Unlimited Edits & Tweak Till It’s Perfect",
+        "description": "With traditional services, changing a lyric or switching a genre means endless back-and-forth emails and extra fees. With our interactive dashboard, you can tweak the lyrics and switch genres instantly with total creative freedom."
+      },
+      {
+        "icon": "bundle",
+        "title": "A Complete Personalized Music Gift Bundle",
+        "description": "A song is great, but a multimedia memory is legendary. Every unlocked track comes with free customizable music video creators and printable wall art templates. It's a complete personalized music gift ecosystem that Songfinch simply doesn't offer."
       }
     ]
   },
@@ -117,57 +251,53 @@
     "description": "Don't just take our word for it"
   },
   "FAQ": {
-    "title": "Frequently Asked Questions",
-    "description": "Common questions about our Next.js SaaS boilerplate and how it can help you build better applications faster",
+    "title": "Common Questions About Our Custom Songs",
+    "description": "Everything you need to know before you create and send a song they’ll cherish forever.",
     "items": [
       {
-        "question": "Can I use this boilerplate as a non-technical person?",
-        "answer": "Absolutely! Nexty is specifically designed to work seamlessly with AI assistants, allowing even those with zero programming experience to develop products through AI-assisted development. Our code structure and documentation are AI-friendly, making it easier for AI to understand and modify the code. Technical teams will benefit from even greater development efficiency."
+        "question": "How does customsong.top work?",
+        "answer": "It’s pure magic. Just tell us your story by answering a few simple questions, choose your favorite music genre, and our AI will craft a custom song instantly. You will get a free 30-second studio-quality preview. If you love it, unlock the full song and get access to our free video and print editors!"
       },
       {
-        "question": "What makes this the best Next.js SaaS boilerplate?",
-        "answer": "Nexty is the most comprehensive Next.js SaaS starter kit available. Unlike other templates that only provide basic components, we include complete business workflows: authentication, payments, AI integration, content management, and monetization features. Everything is production-ready and battle-tested in real applications."
+        "question": "What makes you different from other custom song platforms?",
+        "answer": "We don't just give you an audio file. We offer the most competitive pricing on the market, plus every song unlocks an unlimited library of free, customizable music video and printable wall art templates. You can use our built-in interactive editors to personalize them with your own photos and love notes."
       },
       {
-        "question": "How quickly can I launch my SaaS with this boilerplate?",
-        "answer": "Your first project will take 3-5 days as you learn the boilerplate's features, but the learning curve pays off quickly. Our customers who've mastered the system now launch complete SaaS applications in just 1-2 days. The boilerplate handles all the complex infrastructure, so you can focus on what makes your product unique."
+        "question": "Can I edit the lyrics or change the music genre?",
+        "answer": "Absolutely! You are in complete control. Before unlocking the full high-res track, you can tweak the lyrics, change the musical style, or switch the vocal vibe inside our dashboard until it perfectly matches your vision."
       },
       {
-        "question": "Is this suitable for AI-powered SaaS applications?",
-        "answer": "Absolutely! Our boilerplate includes comprehensive AI SDK integration with working examples for text generation, image creation, and video processing. It's compatible with OpenAI, Claude, Gemini, Grok, DeepSeek, and other popular AI models. Perfect for building AI tools or content generation platforms."
+        "question": "How can I share my personalized music gift?",
+        "answer": "Every song comes with a stunning, dedicated sharing page that you can send via text, email, or social media. You can fully customize this page with a personal image, a heartfelt note, and your personalized song playing on a spinning vinyl player. It's built to create a real wow-moment."
       },
       {
-        "question": "What payment methods and billing models are supported?",
-        "answer": "The boilerplate includes complete Stripe integration supporting one-time payments, subscriptions, usage-based billing, and automated renewals. You can start monetizing immediately."
+        "question": "Are there any hidden fees, and is my payment secure?",
+        "answer": "Zero hidden fees. You only pay when you are completely happy with your preview. All payments are encrypted and securely processed through Stripe (PCI-compliant). We never store your credit card details on our servers."
       },
       {
-        "question": "How does the content management system work?",
-        "answer": "Our built-in CMS supports Markdown and rich text editing, multilingual content, SEO optimization, paywall protection, and AI translation. You can manage articles, pages, and premium content through an intuitive admin dashboard with role-based access control."
+        "question": "How long are my custom songs stored?",
+        "answer": "Your purchased tracks, custom music videos, and wall art layouts are stored on your account securely and indefinitely. You can log in to stream, replay, or re-download them in high-quality MP3 format at any time."
       },
       {
-        "question": "Is the boilerplate SEO-optimized?",
-        "answer": "Yes! The boilerplate includes comprehensive SEO features: automatic meta tags, structured data, XML sitemaps, OpenGraph support, and performance optimization. It's built with Next.js best practices for search engine visibility and faster loading times."
+        "question": "What are the login requirements?",
+        "answer": "We keep it completely frictionless. You don't even need to register to start crafting your preview! We use a \"lazy registration\" system - simply enter your email to listen to your preview, and a guest account is silently created for you. You can sign in via Google or Email later anytime."
       },
       {
-        "question": "What kind of support do you provide?",
-        "answer": "We provide comprehensive documentation, code examples, and email support. We also have a public Discord community where you can get help from other developers and share your projects."
-      },
-      {
-        "question": "How do I manage pricing cards?",
-        "answer": "This is a key selling point of Nexty. You can manage pricing cards in the Dashboard, including adding, editing, and deleting pricing cards with AI multilingual translation support, eliminating complex multilingual file configuration."
+        "question": "What if my song generation gets stuck?",
+        "answer": "Our next-gen AI pipeline is incredibly stable, but network glitches can happen. If it gets stuck, simply refresh the page. If the issue persists, our 24/7 support team will manually regenerate and optimize your track right away."
       }
     ]
   },
   "CTA": {
-    "title": "Launch Your Product Fast, and Earn Money Fast",
-    "description": "Stop starting from scratch! Use Nexty templates to focus on your core idea, rapidly build, validate, and start earning.",
-    "button": "Get Template Now",
-    "trustText": "Trusted by developers worldwide",
+    "title": "Gift A Custom Song They’ll Cherish Forever",
+    "description": "Tell us your story. Our AI instantly transforms your memories into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.",
+    "button": "Create Your Song",
+    "trustText": "Made for unforgettable moments",
     "features": {
-      "deploy": "🚀 Quick Deploy",
-      "production": "🔧 Production Ready",
-      "updates": "💎 Lifetime Updates",
-      "i18n": "🌍 Internationalization"
+      "deploy": "🎵 Studio-Quality AI Song",
+      "production": "🎁 Personalized Gift Ready",
+      "updates": "⚡ Instant Free Preview",
+      "i18n": "💌 Easy to Send & Share"
     }
   }
 }

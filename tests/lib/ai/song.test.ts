@@ -2,6 +2,11 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import {
+  DEFAULT_REPLICATE_GPT5_MODEL,
+  getReplicateGpt5LyricsModel,
+  normalizeReplicateTextOutput,
+} from "../../../lib/ai/adapters/replicate-gpt5";
+import {
   applyLyricsLineRewrite,
   buildLyricsLineRewritePrompt,
   composeLyricsText,
@@ -10,10 +15,13 @@ import {
   parseLyricsText,
 } from "../../../lib/ai/song-lyrics";
 import { buildLyricsPrompt } from "../../../lib/ai/song";
-import { createSongSampleFromTask } from "../../../lib/ai/song-sample-store";
+import {
+  createSongSampleFromTask,
+  getSampleAccessExpiresAt,
+} from "../../../lib/ai/song-sample-store";
 
 describe("song lyrics prompt", () => {
-  test("builds an English DeepSeek lyric prompt with user customization", () => {
+  test("builds an English lyric prompt with user customization", () => {
     const prompt = buildLyricsPrompt({
       occasion: "mothers-day",
       genre: "Acoustic Folk",
@@ -37,6 +45,52 @@ describe("song lyrics prompt", () => {
     assert.match(prompt, /\[Verse 1\]/);
     assert.match(prompt, /\[Chorus\]/);
     assert.match(prompt, /She always sang while cooking dinner/);
+  });
+
+  test("adds optional new-version direction to the lyric prompt", () => {
+    const prompt = buildLyricsPrompt({
+      occasion: "birthday",
+      genre: "Romantic Ballad",
+      language: "English",
+      recipientNames: ["Maya"],
+      story: "Maya lights up every room and loves late-night piano songs.",
+      vocalGender: "Female",
+      userRevisionInstruction:
+        "Add Maya's name to the title and make the whole song more romantic.",
+    });
+
+    assert.match(prompt, /Additional New Version Direction/i);
+    assert.match(prompt, /Add Maya's name to the title/);
+    assert.match(prompt, /more romantic/);
+  });
+});
+
+describe("Replicate GPT-5 lyrics adapter", () => {
+  test("defaults create-song lyrics to openai/gpt-5", () => {
+    const previousModel = process.env.REPLICATE_LYRICS_MODEL;
+    delete process.env.REPLICATE_LYRICS_MODEL;
+
+    try {
+      assert.equal(getReplicateGpt5LyricsModel(), DEFAULT_REPLICATE_GPT5_MODEL);
+    } finally {
+      if (previousModel === undefined) {
+        delete process.env.REPLICATE_LYRICS_MODEL;
+      } else {
+        process.env.REPLICATE_LYRICS_MODEL = previousModel;
+      }
+    }
+  });
+
+  test("normalizes Replicate text outputs from strings and arrays", () => {
+    assert.equal(normalizeReplicateTextOutput("Title: One"), "Title: One");
+    assert.equal(
+      normalizeReplicateTextOutput(["Title: ", "One", "\n[Verse 1]"]),
+      "Title: One\n[Verse 1]"
+    );
+    assert.equal(
+      normalizeReplicateTextOutput({ output: ["Line ", "one"] }),
+      "Line one"
+    );
   });
 });
 
@@ -140,7 +194,7 @@ Original second line`);
     );
   });
 
-  test("builds a DeepSeek prompt for selected line rewrites", () => {
+  test("builds a prompt for selected line rewrites", () => {
     const prompt = buildLyricsLineRewritePrompt({
       fullLyrics: "[Verse 1]\nOld line\nA line that can repeat later",
       selectedLines: ["Old line"],
@@ -241,5 +295,54 @@ describe("song samples", () => {
     assert.deepEqual(sample.versions[0]?.timestampedLyrics?.alignedWords, [
       { word: "Hello", startS: 1, endS: 1.5 },
     ]);
+  });
+
+  test("creates full-preview sample records for subscribers without unlocking versions", () => {
+    const createdAt = new Date("2026-06-10T00:00:00Z").getTime();
+    const sample = createSongSampleFromTask(
+      {
+        songId: "song-1",
+        externalId: "kie-1",
+        status: "succeeded",
+        userId: "user-1",
+        email: "subscriber@example.com",
+        isSubscriber: true,
+        title: "Birthday Melody",
+        lyrics: "[Verse 1]\nHello",
+        genre: "Pop",
+        occasion: "birthday",
+        recipientNames: ["Sdf"],
+        story: "A birthday story",
+        vocalGender: "Female",
+        language: "English",
+        versions: [
+          { id: "a", title: "A", audioUrl: "https://cdn.test/a.mp3" },
+          { id: "b", title: "B", audioUrl: "https://cdn.test/b.mp3" },
+        ],
+        createdAt,
+        updatedAt: createdAt,
+        expiresAt: createdAt + 1000,
+      },
+      createdAt
+    );
+
+    assert.equal(sample.previewLimitSeconds, null);
+    assert.equal(
+      sample.accessExpiresAt,
+      createdAt + 3 * 24 * 60 * 60 * 1000
+    );
+    assert.equal("unlockedVersionIds" in sample, false);
+  });
+
+  test("derives an access expiry for historical permanent samples", () => {
+    const createdAt = new Date("2026-06-10T00:00:00Z").getTime();
+
+    assert.equal(
+      getSampleAccessExpiresAt({
+        accessExpiresAt: null,
+        createdAt,
+      }),
+      createdAt + 3 * 24 * 60 * 60 * 1000
+    );
   });
 });

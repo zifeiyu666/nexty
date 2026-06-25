@@ -2,12 +2,17 @@ import {
   FinalSongOwnerPlayer,
   type FinalSongPlayerData,
 } from "@/components/song/FinalSongPlayer";
+import { GeneratedContentTabs } from "@/components/song/GeneratedContentTabs";
 import { Button } from "@/components/ui/button";
 import { Locale } from "@/i18n/routing";
-import { getSongForOwner } from "@/lib/ai/final-song";
+import {
+  buildSongShareUrl,
+  getFinalSongsForOwner,
+  getSongForOwner,
+} from "@/lib/ai/final-song";
 import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
-import { getURL } from "@/lib/url";
+import { listMusicVideosForSong } from "@/lib/music-video/renders";
 import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -15,11 +20,15 @@ import { notFound, redirect } from "next/navigation";
 
 type Params = Promise<{ locale: string; songId: string }>;
 
-function getTimestampedLyrics(metadata: unknown): FinalSongPlayerData["timestampedLyrics"] {
+function getTimestampedLyrics(
+  metadata: unknown,
+): FinalSongPlayerData["timestampedLyrics"] {
   if (!metadata || typeof metadata !== "object") return null;
-  const timestampedLyrics = (metadata as Record<string, unknown>).timestampedLyrics;
+  const timestampedLyrics = (metadata as Record<string, unknown>)
+    .timestampedLyrics;
   if (!timestampedLyrics || typeof timestampedLyrics !== "object") return null;
-  const alignedWords = (timestampedLyrics as Record<string, unknown>).alignedWords;
+  const alignedWords = (timestampedLyrics as Record<string, unknown>)
+    .alignedWords;
   if (!Array.isArray(alignedWords)) return null;
 
   return {
@@ -41,7 +50,9 @@ function getTimestampedLyrics(metadata: unknown): FinalSongPlayerData["timestamp
   };
 }
 
-function toPlayerData(song: NonNullable<Awaited<ReturnType<typeof getSongForOwner>>>): FinalSongPlayerData {
+function toPlayerData(
+  song: NonNullable<Awaited<ReturnType<typeof getSongForOwner>>>,
+): FinalSongPlayerData {
   return {
     id: song.id,
     title: song.title,
@@ -52,13 +63,15 @@ function toPlayerData(song: NonNullable<Awaited<ReturnType<typeof getSongForOwne
     language: song.language,
     vocalGender: song.vocalGender,
     recipientNames: Array.isArray(song.recipientNamesJsonb)
-      ? song.recipientNamesJsonb.filter((value): value is string => typeof value === "string")
+      ? song.recipientNamesJsonb.filter(
+          (value): value is string => typeof value === "string",
+        )
       : [],
     story: song.story,
     audioUrl: song.audioUrl,
     imageUrl: song.imageUrl,
     duration: song.duration,
-    shareUrl: getURL(`shared/songs/${song.shareToken}`),
+    shareUrl: buildSongShareUrl(song),
   };
 }
 
@@ -77,12 +90,8 @@ export async function generateMetadata({
   });
 }
 
-export default async function SongDetailPage({
-  params,
-}: {
-  params: Params;
-}) {
-  const { songId } = await params;
+export default async function SongDetailPage({ params }: { params: Params }) {
+  const { locale, songId } = await params;
   const session = await getSession();
 
   if (!session?.user) {
@@ -91,13 +100,21 @@ export default async function SongDetailPage({
 
   const song = await getSongForOwner(songId, session.user.id);
   if (!song) notFound();
+  const musicVideos = await listMusicVideosForSong({
+    songId,
+    userId: session.user.id,
+  });
+  const playerData = toPlayerData(song);
+  const songOptions = (await getFinalSongsForOwner(session.user.id)).map(
+    toPlayerData,
+  );
 
   return (
-    <main className="min-h-screen bg-muted px-4 py-6 text-foreground sm:px-6">
+    <main className="min-h-screen w-full bg-[#f7f1e8] px-4 py-6 text-foreground sm:px-6">
       <div className="mx-auto max-w-6xl">
         <Button
           asChild
-          className="mb-4 h-10 rounded-full bg-background text-sm font-bold text-muted-foreground shadow-sm hover:text-foreground"
+          className="mb-4 h-10 rounded-full bg-white/80 text-sm font-bold text-stone-600 shadow-sm hover:text-foreground"
           variant="ghost"
         >
           <Link href="/samples">
@@ -106,7 +123,12 @@ export default async function SongDetailPage({
           </Link>
         </Button>
 
-        <FinalSongOwnerPlayer data={toPlayerData(song)} />
+        <FinalSongOwnerPlayer data={playerData} songOptions={songOptions} />
+        <GeneratedContentTabs
+          locale={locale}
+          song={playerData}
+          videos={musicVideos}
+        />
       </div>
     </main>
   );

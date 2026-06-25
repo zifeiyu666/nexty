@@ -1,6 +1,7 @@
 import { getPublicPricingPlans } from "@/actions/prices/public";
 import PricingCTA from "@/components/pricing/PricingCTA";
 import { DEFAULT_LOCALE } from "@/i18n/routing";
+import type { UnlockSongContext } from "@/lib/ai/song-unlock-after-payment";
 import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { PricingPlanFeature, PricingPlanLangJsonb } from "@/types/pricing";
@@ -11,9 +12,8 @@ import {
   ImageIcon,
   RefreshCw,
   ShieldCheck,
-  Tag,
   Video,
-  X,
+  X
 } from "lucide-react";
 import { getLocale } from "next-intl/server";
 
@@ -88,7 +88,7 @@ const fallbackPlans: DisplayPlan[] = [
   {
     buttonText: "Go Platinum - Best Value",
     cardDescription: "Unlimited songs + videos. Everything in Pro, and more.",
-    displayPrice: "$219.99",
+    displayPrice: "$199.99",
     features: [
       { description: "Create Unlimited songs", included: true, bold: true },
       { description: "10 video styles per month", included: true },
@@ -115,49 +115,53 @@ const fallbackPlans: DisplayPlan[] = [
 const addOns = [
   {
     description:
-      "Turn your song into a beautiful video with your own photos and memories. Perfect for sharing or keeping forever.",
+      "Transform your custom song into a breathtaking visual story with your own memories. ",
     icon: Video,
     price: "From $23.99",
     suffix: "per video",
-    title: "Video Gift",
+    title: "Cinematic Music Video",
   },
   {
     description:
-      "A beautifully designed print of your song's lyrics. Download, print at home or send to your favourite print shop.",
+      "A high-resolution digital design of your custom song lyrics. Ready to download, print, and frame",
     icon: ImageIcon,
     price: "From $7.99",
     suffix: "per print",
-    title: "Digital Wall Art",
+    title: "Digital Lyrics Wall Art",
   },
   {
     description:
-      "Get a high-quality MP3 download of your song to keep offline, transfer to devices, and own forever.",
+      "Get a high-quality MP3 download of your custom song . Keep it offline and play it on any device forever.",
     icon: Download,
     price: "From $7",
     suffix: "per song",
-    title: "Download Song",
+    title: "Studio-Quality MP3",
   },
 ];
 
 const trustItems = [
   {
-    description: "All payments processed safely with Stripe",
+    description: "Safe and instant verification via Creem",
     icon: ShieldCheck,
-    title: "Secure checkout",
+    title: "Secure Checkout",
   },
   {
-    description: "Not happy with your song? We'll remake it, free.",
+    description: "Tweak your track for free until you’re completely satisfied.",
     icon: RefreshCw,
-    title: "Happiness guarantee",
+    title: "100% Satisfaction",
   },
   {
-    description: "We're here if you need a hand along the way",
+    description: "We're always here if you need a hand along the way",
     icon: Headphones,
-    title: "Real human support",
+    title: "Dedicated Support",
   },
 ];
 
-export default async function PricingAll() {
+export default async function PricingAll({
+  unlockSongContext,
+}: {
+  unlockSongContext?: UnlockSongContext | null;
+} = {}) {
   const locale = await getLocale();
   const result = await getPublicPricingPlans();
   const dbPlans = result.success ? result.data || [] : [];
@@ -177,14 +181,18 @@ export default async function PricingAll() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-3 lg:items-stretch">
           {displayPlans.map((plan) => (
-            <PricingGiftCard key={plan.id} plan={plan} />
+            <PricingGiftCard
+              key={plan.id}
+              plan={plan}
+              unlockSongContext={unlockSongContext}
+            />
           ))}
         </div>
 
         <section className="mt-10 py-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-black tracking-normal text-foreground md:text-3xl">
-              Pay-as-you-go add-ons
+              限时免费
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Buy these one-off on any song, on any plan. Pro & Platinum
@@ -284,8 +292,10 @@ function toDisplayPlan(
 
 function PricingGiftCard({
   plan,
+  unlockSongContext,
 }: {
   plan: DisplayPlan & { rawPlan?: PricingPlan };
+  unlockSongContext?: UnlockSongContext | null;
 }) {
   const isPro = plan.tone === "pro";
   const isPlatinum = plan.tone === "platinum";
@@ -424,6 +434,7 @@ function PricingGiftCard({
               buttonText: plan.buttonText,
             }}
             plan={plan.rawPlan}
+            unlockSongContext={unlockSongContext}
           />
         ) : (
           <button

@@ -117,8 +117,8 @@ export function deductEntitlementFromBalances(
   nextBalances.oneTime[entitlement] -= fromOneTime;
 
   const delta = zeroDelta;
-  delta.subscription[entitlement] = -fromSubscription;
-  delta.oneTime[entitlement] = -fromOneTime;
+  delta.subscription[entitlement] = fromSubscription > 0 ? -fromSubscription : 0;
+  delta.oneTime[entitlement] = fromOneTime > 0 ? -fromOneTime : 0;
 
   return {
     success: true,

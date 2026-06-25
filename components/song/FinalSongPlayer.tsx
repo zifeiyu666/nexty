@@ -2,7 +2,10 @@
 
 import CopyButton from "@/components/shared/CopyButton";
 import { MusicVideoEditorDrawer } from "@/components/song/MusicVideoEditorDrawer";
-import { WallArtEditorDrawer } from "@/components/song/WallArtEditorDrawer";
+import {
+  WallArtEditorDrawer,
+  type WallArtSongOption,
+} from "@/components/song/WallArtEditorDrawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,21 +16,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { buildLrcFileName, buildLrcText } from "@/lib/music-player/lrc-export";
 import { cn } from "@/lib/utils";
 import {
+  ArrowRight,
+  Check,
+  Copy,
   Disc3,
   Download,
+  ExternalLink,
   FileText,
-  ImageIcon,
   Pause,
   Play,
   QrCode,
   Share2,
   Sparkles,
-  Video,
+  Volume2,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TwitterX } from "@/components/social-icons/icons";
 
 export type FinalSongPlayerData = {
   id: string;
@@ -105,15 +113,18 @@ function PlaybackControls({
   data,
   onPlayingChange,
   onTimeChange,
+  variant = "default",
 }: {
   data: FinalSongPlayerData;
   onPlayingChange?: (isPlaying: boolean) => void;
   onTimeChange?: (currentTime: number, duration: number) => void;
+  variant?: "default" | "poster";
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(data.duration || 0);
+  const [volume, setVolume] = useState(0.72);
 
   function togglePlayback() {
     const audio = audioRef.current;
@@ -142,6 +153,12 @@ function PlaybackControls({
   const progress = effectiveDuration
     ? Math.min(currentTime / effectiveDuration, 1) * 100
     : 0;
+  const isPoster = variant === "poster";
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.volume = volume;
+  }, [volume]);
 
   return (
     <div>
@@ -164,32 +181,96 @@ function PlaybackControls({
           setCurrentTime(nextTime);
           onTimeChange?.(nextTime, effectiveDuration);
         }}
+        onVolumeChange={(event) => {
+          setVolume(event.currentTarget.volume);
+        }}
       />
-      <div className="flex items-center gap-3">
+      <div className={cn("flex items-center gap-3", isPoster && "gap-4")}>
+        {isPoster ? (
+          <div className="w-12 text-xs font-semibold text-white/80">
+            {formatTime(currentTime)}
+          </div>
+        ) : null}
+        <div className="min-w-0 flex-1">
+          <div
+            className={cn(
+              "h-2 overflow-hidden rounded-full",
+              isPoster ? "bg-white/30" : "bg-muted",
+            )}
+          >
+            <div
+              className={cn(
+                "h-full rounded-full",
+                isPoster ? "bg-white" : "bg-primary",
+              )}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          {isPoster ? null : (
+            <div className="mt-1.5 flex justify-between text-xs font-medium text-muted-foreground">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(effectiveDuration)}</span>
+            </div>
+          )}
+        </div>
+        {isPoster ? (
+          <div className="w-12 text-right text-xs font-semibold text-white/80">
+            {formatTime(effectiveDuration)}
+          </div>
+        ) : null}
+      </div>
+
+      <div
+        className={cn(
+          "mt-3 flex items-center",
+          isPoster ? "justify-center gap-5" : "gap-3",
+        )}
+      >
         <button
           aria-label={isPlaying ? "Pause song" : "Play song"}
-          className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90"
+          className={cn(
+            "flex shrink-0 items-center justify-center rounded-full transition",
+            isPoster
+              ? "size-14 bg-white text-stone-950 shadow-2xl shadow-black/35 hover:bg-white/90"
+              : "size-12 bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
+          )}
           type="button"
           onClick={togglePlayback}
         >
           {isPlaying ? (
-            <Pause className="size-5 fill-current" />
+            <Pause
+              className={cn("fill-current", isPoster ? "size-6" : "size-5")}
+            />
           ) : (
-            <Play className="ml-0.5 size-5 fill-current" />
+            <Play
+              className={cn(
+                "ml-0.5 fill-current",
+                isPoster ? "size-6" : "size-5",
+              )}
+            />
           )}
         </button>
-        <div className="min-w-0 flex-1">
-          <div className="h-2 overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-primary"
-              style={{ width: `${progress}%` }}
+        {isPoster ? (
+          <div className="flex items-center gap-2 text-white/85">
+            <Volume2 className="size-4" />
+            <input
+              aria-label="Volume"
+              className="h-1 w-20 accent-white"
+              max="1"
+              min="0"
+              step="0.01"
+              type="range"
+              value={volume}
+              onChange={(event) => {
+                const nextVolume = Number(event.currentTarget.value);
+                setVolume(nextVolume);
+                if (audioRef.current) {
+                  audioRef.current.volume = nextVolume;
+                }
+              }}
             />
           </div>
-          <div className="mt-1.5 flex justify-between text-xs font-medium text-muted-foreground">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(effectiveDuration)}</span>
-          </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );
@@ -296,16 +377,20 @@ function SongFacts({ data }: { data: FinalSongPlayerData }) {
 }
 
 function SharePanel({ shareUrl, title }: { shareUrl: string; title: string }) {
-  async function nativeShare() {
-    if (!navigator.share) return;
-    await navigator.share({
-      title,
-      url: shareUrl,
-    });
+  const [copied, setCopied] = useState(false);
+  const tweetUrl = `https://twitter.com/intent/tweet?${new URLSearchParams({
+    text: `Listen to "${title}"`,
+    url: shareUrl,
+  }).toString()}`;
+
+  async function copyShareUrl() {
+    await navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+    <div className="rounded-[20px] border border-black/10 bg-white/86 p-4 shadow-sm backdrop-blur">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">
@@ -316,9 +401,19 @@ function SharePanel({ shareUrl, title }: { shareUrl: string; title: string }) {
           </h2>
         </div>
         <div className="flex gap-2">
+          <Button
+            asChild
+            className="rounded-full bg-white/70"
+            variant="outline"
+          >
+            <a href={shareUrl} rel="noreferrer" target="_blank">
+              <ExternalLink className="size-4" />
+              Preview
+            </a>
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="rounded-full" variant="outline">
+              <Button className="rounded-full bg-white/70" variant="outline">
                 <QrCode className="size-4" />
                 QR
               </Button>
@@ -340,18 +435,73 @@ function SharePanel({ shareUrl, title }: { shareUrl: string; title: string }) {
               </div>
             </DialogContent>
           </Dialog>
-          <Button
-            className="rounded-full"
-            type="button"
-            variant="outline"
-            onClick={nativeShare}
-          >
-            <Share2 className="size-4" />
-            Share
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                className="rounded-full bg-white/70"
+                type="button"
+                variant="outline"
+              >
+                <Share2 className="size-4" />
+                Share
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[min(720px,calc(100svh-2rem))] overflow-hidden border-black/10 bg-[#fffaf4] p-0 sm:max-w-2xl">
+              <div className="border-b border-black/10 bg-white/75 px-6 py-5">
+                <DialogHeader>
+                  <DialogTitle>Share this song</DialogTitle>
+                  <DialogDescription>
+                    Copy the private link, post it on X, or preview the shared
+                    page.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+              <div className="min-w-0 space-y-4 overflow-y-auto px-6 pb-6">
+                <div className="min-w-0 rounded-2xl border border-black/10 bg-white/80 p-3">
+                  <p className="break-all text-sm font-semibold leading-6 text-stone-700 sm:truncate sm:break-normal">
+                    {shareUrl}
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  <Button
+                    className="h-11 justify-start rounded-xl bg-stone-950 text-white hover:bg-stone-800"
+                    type="button"
+                    onClick={copyShareUrl}
+                  >
+                    {copied ? (
+                      <Check className="size-4" />
+                    ) : (
+                      <Copy className="size-4" />
+                    )}
+                    {copied ? "Copied link" : "Copy link"}
+                  </Button>
+                  <Button
+                    asChild
+                    className="h-11 justify-start rounded-xl border-black/10 bg-white/80"
+                    variant="outline"
+                  >
+                    <a href={tweetUrl} rel="noreferrer" target="_blank">
+                      <TwitterX className="size-4" />
+                      Share to X
+                    </a>
+                  </Button>
+                  <Button
+                    asChild
+                    className="h-11 justify-start rounded-xl border-black/10 bg-white/80"
+                    variant="outline"
+                  >
+                    <a href={shareUrl} rel="noreferrer" target="_blank">
+                      <ExternalLink className="size-4" />
+                      Preview share page
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
-      <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
+      <div className="mt-4 flex items-center gap-2 rounded-xl border border-black/10 bg-white/60 px-3 py-2">
         <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
           {shareUrl}
         </p>
@@ -394,31 +544,66 @@ function StoryDialogButton({ story }: { story: string }) {
   );
 }
 
-function SongCreationTools({ data }: { data: FinalSongPlayerData }) {
+function downloadLrcLyrics(data: FinalSongPlayerData) {
+  const blob = new Blob(
+    [
+      buildLrcText({
+        title: data.title,
+        lyrics: data.lyrics,
+        duration: data.duration,
+        timestampedLyrics: data.timestampedLyrics,
+      }),
+    ],
+    { type: "text/plain;charset=utf-8" },
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = buildLrcFileName(data.title);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function SongCreationTools({
+  data,
+  songOptions,
+}: {
+  data: FinalSongPlayerData;
+  songOptions?: FinalSongPlayerData[];
+}) {
+  const initialSong: WallArtSongOption = {
+    id: data.id,
+    title: data.title,
+    lyrics: data.lyrics,
+    imageUrl: data.imageUrl,
+    shareUrl: data.shareUrl,
+  };
+
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <WallArtEditorDrawer
-        imageUrl={data.imageUrl}
-        lyrics={data.lyrics}
-        shareUrl={data.shareUrl}
-        songTitle={data.title}
+        initialSong={initialSong}
+        songOptions={songOptions}
         trigger={
           <button
-            className="rounded-2xl border border-primary/25 bg-primary/5 p-4 text-left transition hover:border-primary/45 hover:bg-primary/10"
+            className="group relative flex w-full cursor-pointer items-center justify-between gap-3 overflow-hidden rounded-[16px] border border-primary/35 bg-[#fff1ed]/90 px-4 py-3 text-left shadow-[0_8px_22px_rgba(244,63,94,0.1)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/70 hover:bg-[#ffe7df] hover:shadow-[0_14px_32px_rgba(244,63,94,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/55 focus-visible:ring-offset-2 active:translate-y-0"
             type="button"
           >
-            <div className="flex items-center justify-between gap-3">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-background text-primary">
-                <ImageIcon className="size-5" />
-              </span>
-              <Badge variant="secondary">Editor</Badge>
+            <div className="min-w-0">
+              <h3 className="text-base font-black text-foreground">
+                Generate Wall Art
+              </h3>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                Generate a lyric poster and cover artwork set for this song.
+              </p>
             </div>
-            <h3 className="mt-4 text-base font-black text-foreground">
-              Wall Art
-            </h3>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Generate a lyric poster and cover artwork set for this song.
-            </p>
+            <span className="hidden shrink-0 items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-black text-white shadow-sm transition duration-200 group-hover:gap-3 sm:inline-flex">
+              Open editor
+              <ArrowRight className="size-3.5 transition duration-200 group-hover:translate-x-0.5" />
+            </span>
           </button>
         }
       />
@@ -428,25 +613,26 @@ function SongCreationTools({ data }: { data: FinalSongPlayerData }) {
         duration={data.duration}
         imageUrl={data.imageUrl}
         lyrics={data.lyrics}
+        songId={data.id}
         songTitle={data.title}
         timestampedLyrics={data.timestampedLyrics}
         trigger={
           <button
-            className="rounded-2xl border border-primary/25 bg-primary/5 p-4 text-left transition hover:border-primary/45 hover:bg-primary/10"
+            className="group relative flex w-full cursor-pointer items-center justify-between gap-3 overflow-hidden rounded-[16px] border border-primary/35 bg-[#fff1ed]/90 px-4 py-3 text-left shadow-[0_8px_22px_rgba(244,63,94,0.1)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/70 hover:bg-[#ffe7df] hover:shadow-[0_14px_32px_rgba(244,63,94,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/55 focus-visible:ring-offset-2 active:translate-y-0"
             type="button"
           >
-            <div className="flex items-center justify-between gap-3">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-background text-primary">
-                <Video className="size-5" />
-              </span>
-              <Badge variant="secondary">Editor</Badge>
+            <div className="min-w-0">
+              <h3 className="text-base font-black text-foreground">
+                Generate Music Video
+              </h3>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                Turn the song story, lyrics, and artwork into a short video.
+              </p>
             </div>
-            <h3 className="mt-4 text-base font-black text-foreground">
-              Music Video
-            </h3>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Turn the song story, lyrics, and artwork into a short video.
-            </p>
+            <span className="hidden shrink-0 items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-black text-white shadow-sm transition duration-200 group-hover:gap-3 sm:inline-flex">
+              Open editor
+              <ArrowRight className="size-3.5 transition duration-200 group-hover:translate-x-0.5" />
+            </span>
           </button>
         }
       />
@@ -454,47 +640,137 @@ function SongCreationTools({ data }: { data: FinalSongPlayerData }) {
   );
 }
 
-export function FinalSongOwnerPlayer({ data }: { data: FinalSongPlayerData }) {
+function ImmersiveSongPlayerCard({
+  data,
+  isPlaying,
+  onPlayingChange,
+}: {
+  data: FinalSongPlayerData;
+  isPlaying: boolean;
+  onPlayingChange: (isPlaying: boolean) => void;
+}) {
+  const lyricLines = getLyricLines(data.lyrics).slice(0, 10);
+  const featureLine =
+    lyricLines[Math.min(4, Math.max(0, lyricLines.length - 1))];
+
+  return (
+    <section className="relative min-h-[680px] overflow-hidden rounded-[28px] border border-white/25 bg-stone-950 text-white shadow-2xl shadow-stone-950/25 lg:sticky lg:top-6 lg:h-[calc(100svh-3rem)] lg:min-h-[720px]">
+      {data.imageUrl ? (
+        <img
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 size-full scale-110 object-cover blur-2xl"
+          src={data.imageUrl}
+        />
+      ) : null}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.18),transparent_28%),linear-gradient(180deg,rgba(5,8,14,0.72),rgba(5,8,14,0.58)_45%,rgba(5,8,14,0.9))]" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-white/10 blur-3xl" />
+
+      <div className="relative flex h-full min-h-[680px] flex-col px-5 py-6 lg:min-h-[720px]">
+        <div className="mx-auto mt-2 w-full max-w-[300px]">
+          <RecordArtwork
+            imageUrl={data.imageUrl}
+            isPlaying={isPlaying}
+            title={data.title}
+          />
+        </div>
+
+        <div className="mt-auto flex min-h-0 flex-1 flex-col justify-end pt-8">
+          <div className="mx-auto w-full max-w-[290px] text-center">
+            <h2 className="mt-2 line-clamp-2 text-balance text-2xl font-bold leading-tight text-white">
+              {data.title}
+            </h2>
+          </div>
+
+          <div className="mt-6 max-h-[260px] overflow-hidden text-center [mask-image:linear-gradient(180deg,transparent,black_18%,black_78%,transparent)]">
+            <div className="space-y-3 py-8">
+              {lyricLines.map((line, index) => (
+                <p
+                  key={`${line}-${index}`}
+                  className={cn(
+                    "text-sm font-semibold leading-7 text-white/58",
+                    line === featureLine && "text-xl font-black text-white",
+                  )}
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <PlaybackControls
+              data={data}
+              variant="poster"
+              onPlayingChange={onPlayingChange}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function FinalSongOwnerPlayer({
+  data,
+  songOptions,
+}: {
+  data: FinalSongPlayerData;
+  songOptions?: FinalSongPlayerData[];
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[360px_1fr]">
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
-        <RecordArtwork
-          imageUrl={data.imageUrl}
-          isPlaying={isPlaying}
-          title={data.title}
-        />
-        <div className="mt-6">
-          <PlaybackControls data={data} onPlayingChange={setIsPlaying} />
-        </div>
-      </section>
+    <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
+      <ImmersiveSongPlayerCard
+        data={data}
+        isPlaying={isPlaying}
+        onPlayingChange={setIsPlaying}
+      />
 
       <section className="space-y-5">
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
-          <p className="font-[cursive] text-lg text-primary">final song</p>
-          <h1 className="mt-1 text-3xl font-black leading-tight text-foreground md:text-5xl">
+        <div className="rounded-[24px] border border-black/10 bg-white/86 p-5 shadow-sm backdrop-blur">
+          <h1 className="mt-1 text-5xl font-bold  leading-tight text-foreground ">
             {data.title}
           </h1>
           <div className="mt-4">
             <SongFacts data={data} />
           </div>
-          <Button asChild className="mt-5 rounded-full" variant="outline">
-            <a href={data.audioUrl} rel="noreferrer" target="_blank">
-              <Download className="size-4" />
-              Open audio
-            </a>
-          </Button>
         </div>
 
         {data.shareUrl && (
           <SharePanel shareUrl={data.shareUrl} title={data.title} />
         )}
-        <SongCreationTools data={data} />
+        <SongCreationTools data={data} songOptions={songOptions} />
 
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
-          <h2 className="text-xl font-black text-foreground">Lyrics</h2>
-          <pre className="mt-4 max-h-[520px] overflow-y-auto whitespace-pre-wrap text-sm leading-7 text-foreground">
+        <div className="rounded-[24px] border border-black/10 bg-white/86 p-5 shadow-sm backdrop-blur">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-2xl font-black text-foreground">Lyrics</h2>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                className="rounded-full"
+                size="sm"
+                type="button"
+                variant="outline"
+                onClick={() => downloadLrcLyrics(data)}
+              >
+                <FileText className="size-4" />
+                Export LRC
+              </Button>
+              <Button
+                asChild
+                className="rounded-full"
+                size="sm"
+                variant="outline"
+              >
+                <a href={data.audioUrl} rel="noreferrer" target="_blank">
+                  <Download className="size-4" />
+                  Open audio
+                </a>
+              </Button>
+            </div>
+          </div>
+          <pre className="mt-4 max-h-[560px] overflow-y-auto whitespace-pre-wrap rounded-2xl bg-white/45 p-1 text-sm font-semibold leading-8 text-stone-950">
             {data.lyrics}
           </pre>
         </div>

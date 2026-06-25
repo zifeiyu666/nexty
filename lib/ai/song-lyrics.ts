@@ -19,7 +19,12 @@ type LyricsLineRewritePromptInput = {
   language: string;
   genre: string;
   occasion: string;
+  recipients?: Array<{
+    name: string;
+    relationship: string;
+  }>;
   recipientNames: string[];
+  recipientRelationships?: string[];
 };
 
 export const SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES = `# Core Safety & Compliance Guidelines (Highest-Priority Red Lines)
@@ -44,6 +49,32 @@ function occasionLabel(value: string): string {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function formatRecipientsForPrompt(input: {
+  recipients?: Array<{ name: string; relationship: string }>;
+  recipientNames: string[];
+  recipientRelationships?: string[];
+}): string {
+  const recipients =
+    input.recipients?.length
+      ? input.recipients
+      : input.recipientNames.map((name, index) => ({
+          name,
+          relationship: input.recipientRelationships?.[index] || "",
+        }));
+  const labels = recipients
+    .map((recipient) => {
+      const name = recipient.name.trim();
+      const relationship = recipient.relationship.trim();
+      if (!name && !relationship) return "";
+      if (!relationship) return name;
+      if (!name) return relationship;
+      return `${name} (${relationship})`;
+    })
+    .filter(Boolean);
+
+  return labels.length ? labels.join(", ") : "someone special";
 }
 
 function lyricLineKind(text: string): EditableLyricLineKind {
@@ -123,9 +154,7 @@ export function createLyricsLineRewriteSuggestions(
 export function buildLyricsLineRewritePrompt(
   input: LyricsLineRewritePromptInput
 ): string {
-  const recipients = input.recipientNames.length
-    ? input.recipientNames.join(", ")
-    : "someone special";
+  const recipients = formatRecipientsForPrompt(input);
   const instruction = input.instruction?.trim()
     ? input.instruction.trim()
     : "Improve emotional specificity, imagery, rhyme, rhythm, and singability while keeping the original meaning.";

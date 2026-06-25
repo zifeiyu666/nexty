@@ -1,5 +1,10 @@
 import { syncCreemSubscriptionData } from '@/actions/creem';
 import {
+  finalizeAndRecordOrderUnlockSong,
+  parseUnlockSongMetadata,
+  recordUnlockSongResultForOrderAndSubscription,
+} from '@/lib/ai/song-unlock-after-payment';
+import {
   CreemCheckoutCompletedEvent,
   CreemRefundCreatedEvent,
   CreemSubscriptionActiveEvent,
@@ -104,6 +109,19 @@ export async function handleCreemPaymentSucceeded(
     );
     throw error;
   }
+
+  try {
+    await finalizeAndRecordOrderUnlockSong({
+      userId,
+      context: parseUnlockSongMetadata(metadata),
+      orderId: insertedOrder.id,
+    });
+  } catch (error) {
+    console.error(
+      `[Creem webhook] Failed to finalize unlock song for order ${insertedOrder.id}`,
+      error
+    );
+  }
 }
 
 export async function handleCreemInvoicePaid(
@@ -194,6 +212,25 @@ export async function handleCreemInvoicePaid(
       error
     );
     throw error;
+  }
+
+  try {
+    const unlockContext = parseUnlockSongMetadata(metadata);
+    const unlockResult = await finalizeAndRecordOrderUnlockSong({
+      userId,
+      context: unlockContext,
+      orderId: insertedOrder.id,
+    });
+    await recordUnlockSongResultForOrderAndSubscription({
+      orderId: insertedOrder.id,
+      subscriptionId,
+      result: unlockResult,
+    });
+  } catch (error) {
+    console.error(
+      `[Creem webhook] Failed to finalize unlock song for subscription ${subscriptionId}`,
+      error
+    );
   }
 
   try {

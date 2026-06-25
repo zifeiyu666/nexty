@@ -17,6 +17,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       Pricing: (await import(`./messages/${locale}/Pricing.json`)).default,
       NotFound: (await import(`./messages/${locale}/NotFound.json`)).default,
       Glossary: (await import(`./messages/${locale}/Glossary.json`)).default,
+      Songs: (await import(`./messages/${locale}/Songs.json`)).default,
 
       // Dashboard - User
       Settings: (await import(`./messages/${locale}/Dashboard/User/Settings.json`)).default,

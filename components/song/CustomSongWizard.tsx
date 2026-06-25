@@ -6,6 +6,7 @@ import {
   ArrowRight,
   AudioLines,
   Cake,
+  CalendarHeart,
   Check,
   ChevronDown,
   Clock3,
@@ -13,11 +14,15 @@ import {
   Disc3,
   Edit3,
   Flame,
+  Flower2,
+  Gem,
   Gift,
   Globe2,
   Guitar,
+  HandHeart,
   Headphones,
   Heart,
+  HeartPulse,
   ImageIcon,
   Keyboard,
   Languages,
@@ -35,14 +40,16 @@ import {
   Play,
   Plus,
   RefreshCw,
+  Ribbon,
   ShieldCheck,
   Sparkles,
   Trash2,
+  Trophy,
   Upload,
   UserRound,
   Wand2,
   X,
-  Zap
+  Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -59,7 +66,28 @@ import { toast } from "sonner";
 import ChooseButton from "@/components/song/ChooseButton";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -91,6 +119,13 @@ type SongVersion = {
   duration?: number;
 };
 
+type LyricsVersionComparison = {
+  originalTitle: string;
+  originalLyrics: string;
+  newTitle: string;
+  newLyrics: string;
+};
+
 type CaptureLeadResponse = {
   userId: string;
   email: string;
@@ -115,7 +150,35 @@ type LanguageOption = {
   label: string;
 };
 
+type RecipientInput = {
+  name: string;
+  relationship: string;
+};
+
 const draftStorageKey = "custom-song-wizard-draft-v1";
+const defaultGenre = "You Choose For Me";
+const defaultVocalGender = "Pick for me";
+const defaultLanguage = "English";
+const relationshipOptions = [
+  "Mother",
+  "Father",
+  "Partner",
+  "Wife",
+  "Husband",
+  "Girlfriend",
+  "Boyfriend",
+  "Daughter",
+  "Son",
+  "Sister",
+  "Brother",
+  "Grandmother",
+  "Grandfather",
+  "Best friend",
+  "Friend",
+  "Colleague",
+  "Teacher",
+  "Mentor",
+];
 
 const stepSlugs: Record<WizardStep, string> = {
   1: "style",
@@ -130,7 +193,7 @@ const slugToStep = Object.entries(stepSlugs).reduce(
     acc[slug] = Number(stepValue) as WizardStep;
     return acc;
   },
-  {} as Record<string, WizardStep>
+  {} as Record<string, WizardStep>,
 );
 
 type StoredDraft = {
@@ -141,7 +204,9 @@ type StoredDraft = {
   lyricsGeneratedBy?: "ai";
   lyricsInputKey?: string;
   occasion?: Occasion | null;
+  recipients?: RecipientInput[];
   recipientNames?: string[];
+  recipientRelationships?: string[];
   songStage?: SongStage;
   songTitle?: string;
   story?: string;
@@ -157,6 +222,12 @@ const steps: Array<{ id: WizardStep; label: string }> = [
 ];
 
 const genres: GenreOption[] = [
+  {
+    value: "You Choose For Me",
+    label: "You Choose For Me",
+    icon: <Sparkles className="size-6" />,
+    accent: "text-accent-foreground",
+  },
   {
     value: "Pop",
     label: "Pop",
@@ -295,15 +366,9 @@ const genres: GenreOption[] = [
     icon: <Headphones className="size-6" />,
     accent: "text-accent-foreground",
   },
-  {
-    value: "You Choose For Me",
-    label: "You Choose For Me",
-    icon: <Sparkles className="size-6" />,
-    accent: "text-accent-foreground",
-  },
 ];
 
-const vocalGenderOptions = ["Male", "Female", "Pick for me"];
+const vocalGenderOptions = [defaultVocalGender, "Male", "Female"];
 
 const featuredLanguages: LanguageOption[] = [
   { code: "EN", label: "English" },
@@ -359,7 +424,7 @@ const occasions: Array<{
 }> = [
   {
     value: "mothers-day",
-    icon: <Leaf className="size-6" />,
+    icon: <Flower2 className="size-6" />,
     title: "Mother's Day",
     subtitle: "A warm thank-you song for mom.",
   },
@@ -377,19 +442,19 @@ const occasions: Array<{
   },
   {
     value: "anniversary",
-    icon: <Heart className="size-6" />,
+    icon: <CalendarHeart className="size-6" />,
     title: "Anniversary",
     subtitle: "A romantic keepsake for your story.",
   },
   {
     value: "wedding",
-    icon: <PartyPopper className="size-6" />,
+    icon: <Gem className="size-6" />,
     title: "Wedding",
     subtitle: "A heartfelt song for the big day.",
   },
   {
     value: "fathers-day",
-    icon: <UserRound className="size-6" />,
+    icon: <ShieldCheck className="size-6" />,
     title: "Father's Day",
     subtitle: "A gratitude song for dad.",
   },
@@ -401,25 +466,25 @@ const occasions: Array<{
   },
   {
     value: "congratulations",
-    icon: <Gift className="size-6" />,
+    icon: <Trophy className="size-6" />,
     title: "Congratulations",
     subtitle: "Celebrate a milestone or big win.",
   },
   {
     value: "get-well-soon",
-    icon: <Heart className="size-6" />,
+    icon: <HeartPulse className="size-6" />,
     title: "Get Well Soon",
     subtitle: "A gentle song for comfort and hope.",
   },
   {
     value: "thank-you",
-    icon: <Heart className="size-6" />,
+    icon: <HandHeart className="size-6" />,
     title: "Thank You",
     subtitle: "Say what ordinary words cannot.",
   },
   {
     value: "in-memoriam",
-    icon: <Leaf className="size-6" />,
+    icon: <Ribbon className="size-6" />,
     title: "In Memoriam",
     subtitle: "A respectful song for remembrance.",
   },
@@ -430,6 +495,26 @@ const occasions: Array<{
     subtitle: "Use your own context and details.",
   },
 ];
+
+const customOccasionValue = "something-else";
+const suggestedCustomOccasions = [
+  "Retirement",
+  "Housewarming",
+  "Graduation",
+  "New Baby",
+  "Friendship",
+  "Apology",
+  "Long Distance",
+  "New Job",
+];
+
+function isCustomOccasion(value: Occasion | null | undefined) {
+  return Boolean(
+    value &&
+      value !== customOccasionValue &&
+      !occasions.some((item) => item.value === value),
+  );
+}
 
 const storyPlaceholders: Record<string, string> = {
   anniversary:
@@ -548,14 +633,14 @@ function createLyricsInputKey({
   genre,
   language,
   occasion,
-  recipientNames,
+  recipients,
   story,
   vocalGender,
 }: {
   genre: string;
   language: string;
   occasion: Occasion | null;
-  recipientNames: string[];
+  recipients: RecipientInput[];
   story: string;
   vocalGender: string;
 }) {
@@ -563,10 +648,59 @@ function createLyricsInputKey({
     genre,
     language,
     occasion,
-    recipientNames: recipientNames.map((name) => name.trim()).filter(Boolean),
+    recipients: cleanRecipients(recipients),
     story: story.trim(),
     vocalGender,
   });
+}
+
+function isLegacyEmptyStyleDraft(draft: StoredDraft) {
+  const hasRecipients =
+    draft.recipients?.some(
+      (recipient) =>
+        recipient.name.trim() || recipient.relationship.trim(),
+    ) || draft.recipientNames?.some((name) => name.trim());
+  const hasProgress = Boolean(
+    draft.generatedLyrics?.trim() ||
+      draft.lyricsGeneratedBy ||
+      draft.lyricsInputKey ||
+      draft.occasion ||
+      hasRecipients ||
+      draft.songTitle?.trim() ||
+      draft.story?.trim(),
+  );
+
+  return (
+    !hasProgress &&
+    draft.genre === "Pop" &&
+    draft.vocalGender === "Female" &&
+    (!draft.language || draft.language === defaultLanguage)
+  );
+}
+
+function normalizeRecipientsFromDraft(draft: StoredDraft): RecipientInput[] {
+  const recipients =
+    draft.recipients?.map((recipient) => ({
+      name: recipient.name || "",
+      relationship: recipient.relationship || "",
+    })) ||
+    draft.recipientNames?.map((name, index) => ({
+      name,
+      relationship: draft.recipientRelationships?.[index] || "",
+    })) ||
+    [];
+
+  const normalized = recipients.slice(0, 3);
+  return normalized.length ? normalized : [{ name: "", relationship: "" }];
+}
+
+function cleanRecipients(recipients: RecipientInput[]) {
+  return recipients
+    .map((recipient) => ({
+      name: recipient.name.trim(),
+      relationship: recipient.relationship.trim(),
+    }))
+    .filter((recipient) => recipient.name);
 }
 
 export function CustomSongWizard() {
@@ -575,18 +709,32 @@ export function CustomSongWizard() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const storyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const speechRecognitionRef = useRef<any>(null);
+  const customOccasionInputRef = useRef<HTMLInputElement | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [step, setStep] = useState<WizardStep>(1);
-  const [genre, setGenre] = useState("Pop");
-  const [vocalGender, setVocalGender] = useState("Female");
-  const [language, setLanguage] = useState("English");
+  const [genre, setGenre] = useState(defaultGenre);
+  const [vocalGender, setVocalGender] = useState(defaultVocalGender);
+  const [language, setLanguage] = useState(defaultLanguage);
   const [showAllLanguages, setShowAllLanguages] = useState(false);
   const [occasion, setOccasion] = useState<Occasion | null>(null);
-  const [recipientNames, setRecipientNames] = useState<string[]>([""]);
+  const [customOccasionInput, setCustomOccasionInput] = useState("");
+  const [recipients, setRecipients] = useState<RecipientInput[]>([
+    { name: "", relationship: "" },
+  ]);
   const [story, setStory] = useState("");
   const [songTitle, setSongTitle] = useState("");
   const [generatedLyrics, setGeneratedLyrics] = useState("");
-  const [selectedLyricLineIds, setSelectedLyricLineIds] = useState<string[]>([]);
+  const [isNewLyricsVersionDialogOpen, setIsNewLyricsVersionDialogOpen] =
+    useState(false);
+  const [newLyricsVersionInstruction, setNewLyricsVersionInstruction] =
+    useState("");
+  const [pendingLyricsComparisonSource, setPendingLyricsComparisonSource] =
+    useState<{ lyrics: string; title: string } | null>(null);
+  const [lyricsVersionComparison, setLyricsVersionComparison] =
+    useState<LyricsVersionComparison | null>(null);
+  const [selectedLyricLineIds, setSelectedLyricLineIds] = useState<string[]>(
+    [],
+  );
   const [lyricRewriteSuggestions, setLyricRewriteSuggestions] = useState<
     LyricsLineRewriteSuggestion[]
   >([]);
@@ -616,23 +764,42 @@ export function CustomSongWizard() {
   const [audioDuration, setAudioDuration] = useState(60);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [finalizingVersion, setFinalizingVersion] = useState<string | null>(null);
   const [selectedVersion, setSelectedVersion] = useState("A");
+  const [selectedProviderVersion, setSelectedProviderVersion] = useState("A");
   const [activeVersion, setActiveVersion] = useState("A");
   const [isStoryHelperOpen, setIsStoryHelperOpen] = useState(false);
   const [storyHelperStep, setStoryHelperStep] = useState(0);
   const [storyHelperAnswers, setStoryHelperAnswers] = useState<string[]>(
-    Array(storyHelperSteps.length).fill("")
+    Array(storyHelperSteps.length).fill(""),
   );
   const [isCreatingStory, setIsCreatingStory] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
 
-  const selectedOccasion = useMemo(
-    () => occasions.find((item) => item.value === occasion),
-    [occasion]
-  );
+  const selectedOccasion = useMemo(() => {
+    const matchedOccasion = occasions.find((item) => item.value === occasion);
+    if (matchedOccasion) return matchedOccasion;
+    if (!isCustomOccasion(occasion)) return undefined;
+
+    return {
+      value: occasion as Occasion,
+      icon: <Plus className="size-6" />,
+      title: occasion as string,
+      subtitle: "A custom reason for this song.",
+    };
+  }, [occasion]);
+  const showCustomOccasionInput =
+    occasion === customOccasionValue || isCustomOccasion(occasion);
+  const cleanRecipientList = useMemo(() => cleanRecipients(recipients), [
+    recipients,
+  ]);
   const recipientNameList = useMemo(
-    () => recipientNames.map((name) => name.trim()).filter(Boolean),
-    [recipientNames]
+    () => cleanRecipientList.map((recipient) => recipient.name).filter(Boolean),
+    [cleanRecipientList],
+  );
+  const recipientRelationshipList = useMemo(
+    () => cleanRecipientList.map((recipient) => recipient.relationship),
+    [cleanRecipientList],
   );
   const recipientLabel = recipientNameList.join(" and ") || "your";
   const isLoggedIn = Boolean(session?.user);
@@ -652,23 +819,29 @@ export function CustomSongWizard() {
   const currentVersion = songVersions[currentVersionIndex] || songVersions[0];
   const previewLimitSeconds = leadData?.previewLimitSeconds ?? null;
   const displayDuration =
-    previewLimitSeconds ||
-    currentVersion?.duration ||
-    audioDuration;
+    previewLimitSeconds || currentVersion?.duration || audioDuration;
   const storyWordCount = story.trim()
     ? story.trim().split(/\s+/).filter(Boolean).length
     : 0;
+  const hasSelectedOccasion = Boolean(
+    occasion &&
+      (occasion !== customOccasionValue || customOccasionInput.trim()),
+  );
+  const selectedOccasionTitle =
+    selectedOccasion?.title || "For someone special";
+  const selectedOccasionShortTitle =
+    selectedOccasionTitle.split("/")[0].trim() || "recipient";
   const currentLyricsInputKey = createLyricsInputKey({
     genre,
     language,
     occasion,
-    recipientNames,
+    recipients,
     story,
     vocalGender,
   });
   const editableLyricLines = useMemo(
     () => parseLyricsText(generatedLyrics),
-    [generatedLyrics]
+    [generatedLyrics],
   );
 
   useEffect(() => {
@@ -681,23 +854,33 @@ export function CustomSongWizard() {
       if (savedDraft) {
         const draft = JSON.parse(savedDraft) as StoredDraft;
 
-        if (draft.genre) setGenre(draft.genre);
-        if (draft.vocalGender) setVocalGender(draft.vocalGender);
-        if (draft.language) setLanguage(draft.language);
-        if (draft.occasion !== undefined) setOccasion(draft.occasion || null);
-        if (draft.recipientNames?.length) {
-          setRecipientNames(draft.recipientNames.slice(0, 3));
+        const legacyEmptyStyleDraft = isLegacyEmptyStyleDraft(draft);
+        const draftGenre = legacyEmptyStyleDraft ? defaultGenre : draft.genre;
+        const draftVocalGender = legacyEmptyStyleDraft
+          ? defaultVocalGender
+          : draft.vocalGender;
+        const draftLanguage = draft.language || defaultLanguage;
+
+        if (draftGenre) setGenre(draftGenre);
+        if (draftVocalGender) setVocalGender(draftVocalGender);
+        setLanguage(draftLanguage);
+        if (draft.occasion !== undefined) {
+          const draftOccasion = draft.occasion || null;
+          setOccasion(draftOccasion);
+          if (draftOccasion && isCustomOccasion(draftOccasion)) {
+            setCustomOccasionInput(draftOccasion);
+          }
         }
+        const draftRecipients = normalizeRecipientsFromDraft(draft);
+        setRecipients(draftRecipients);
         if (draft.story !== undefined) setStory(draft.story);
         const restoredLyricsInputKey = createLyricsInputKey({
-          genre: draft.genre || "Pop",
-          language: draft.language || "English",
+          genre: draftGenre || defaultGenre,
+          language: draftLanguage,
           occasion: draft.occasion || null,
-          recipientNames: draft.recipientNames?.length
-            ? draft.recipientNames.slice(0, 3)
-            : [""],
+          recipients: draftRecipients,
           story: draft.story || "",
-          vocalGender: draft.vocalGender || "Female",
+          vocalGender: draftVocalGender || defaultVocalGender,
         });
         const canRestoreLyrics =
           draft.lyricsGeneratedBy === "ai" &&
@@ -724,13 +907,27 @@ export function CustomSongWizard() {
         .map((name) => name.trim())
         .filter(Boolean)
         .slice(0, 3);
+      const queryRelationships = (params.get("relationships") || "")
+        .split(",")
+        .map((relationship) => relationship.trim())
+        .slice(0, 3);
       const queryOccasion = params.get("occasion");
 
-      setGenre(params.get("genre") || "Pop");
-      setVocalGender(params.get("vocalGender") || "Female");
-      setLanguage(params.get("language") || "English");
+      setGenre(params.get("genre") || defaultGenre);
+      setVocalGender(params.get("vocalGender") || defaultVocalGender);
+      setLanguage(params.get("language") || defaultLanguage);
       setOccasion(queryOccasion || null);
-      setRecipientNames(queryRecipients.length ? queryRecipients : [""]);
+      if (queryOccasion && isCustomOccasion(queryOccasion)) {
+        setCustomOccasionInput(queryOccasion);
+      }
+      setRecipients(
+        queryRecipients.length
+          ? queryRecipients.map((name, index) => ({
+              name,
+              relationship: queryRelationships[index] || "",
+            }))
+          : [{ name: "", relationship: "" }],
+      );
       setStory(params.get("story") || "");
       setSongTitle(params.get("title") || "Your Custom Song");
       setGeneratedLyrics(queryLyrics);
@@ -750,7 +947,11 @@ export function CustomSongWizard() {
 
     const url = new URL(window.location.href);
     url.searchParams.set("step", stepSlugs[step]);
-    window.history.replaceState({ step }, "", `${url.pathname}?${url.searchParams.toString()}`);
+    window.history.replaceState(
+      { step },
+      "",
+      `${url.pathname}?${url.searchParams.toString()}`,
+    );
   }, [isHydrated, step]);
 
   useEffect(() => {
@@ -764,7 +965,9 @@ export function CustomSongWizard() {
       lyricsGeneratedBy: lyricsGeneratedBy || undefined,
       lyricsInputKey,
       occasion,
-      recipientNames,
+      recipients,
+      recipientNames: recipientNameList,
+      recipientRelationships: recipientRelationshipList,
       songStage,
       songTitle,
       story,
@@ -781,7 +984,9 @@ export function CustomSongWizard() {
     lyricsGeneratedBy,
     lyricsInputKey,
     occasion,
-    recipientNames,
+    recipientNameList,
+    recipientRelationshipList,
+    recipients,
     songStage,
     songTitle,
     story,
@@ -804,17 +1009,28 @@ export function CustomSongWizard() {
     }
   }, [email, session?.user?.email]);
 
-  const requestLyricsGeneration = useCallback(async () => {
+  const requestLyricsGeneration = useCallback(async ({
+    comparisonSource,
+    revisionInstruction = "",
+  }: {
+    comparisonSource?: { lyrics: string; title: string } | null;
+    revisionInstruction?: string;
+  } = {}) => {
     if (!occasion || story.trim().length < 10) return;
+    const trimmedRevisionInstruction = revisionInstruction.trim();
+    const isComparisonGeneration = Boolean(comparisonSource);
 
     setLyricsStage("loading");
     setLyricsError("");
     setLyricsTaskId("");
-    setLyricsGeneratedBy(null);
-    setLyricsInputKey("");
+    if (!isComparisonGeneration) {
+      setLyricsGeneratedBy(null);
+      setLyricsInputKey("");
+      setSongTitle("");
+      setGeneratedLyrics("");
+    }
+    setPendingLyricsComparisonSource(comparisonSource ?? null);
     setLyricsRequestInputKey(currentLyricsInputKey);
-    setSongTitle("");
-    setGeneratedLyrics("");
     setLyricLoadingStep(0);
 
     try {
@@ -825,7 +1041,10 @@ export function CustomSongWizard() {
           occasion,
           genre,
           language,
-          recipientNames: recipientNames.map((name) => name.trim()).filter(Boolean),
+          recipients: cleanRecipientList,
+          recipientNames: recipientNameList,
+          recipientRelationships: recipientRelationshipList,
+          revisionInstruction: trimmedRevisionInstruction || undefined,
           story,
           vocalGender,
         }),
@@ -835,10 +1054,24 @@ export function CustomSongWizard() {
         throw new Error(result.error || "Unable to start lyrics generation.");
       }
       if (result.data.status === "succeeded") {
+        if (comparisonSource) {
+          setLyricsVersionComparison({
+            originalTitle: comparisonSource.title,
+            originalLyrics: comparisonSource.lyrics,
+            newTitle: result.data.title || "Your Custom Song",
+            newLyrics: result.data.lyrics || "",
+          });
+          setPendingLyricsComparisonSource(null);
+          setLyricsRequestInputKey("");
+          setLyricsStage("editor");
+          return;
+        }
+
         setSongTitle(result.data.title || "Your Custom Song");
         setGeneratedLyrics(result.data.lyrics || "");
         setLyricsGeneratedBy("ai");
         setLyricsInputKey(currentLyricsInputKey);
+        setPendingLyricsComparisonSource(null);
         setLyricsRequestInputKey("");
         setLyricsStage("editor");
         return;
@@ -846,9 +1079,12 @@ export function CustomSongWizard() {
       setLyricsTaskId(result.data.taskId);
     } catch (error) {
       setLyricsError(
-        error instanceof Error ? error.message : "Unable to start lyrics generation."
+        error instanceof Error
+          ? error.message
+          : "Unable to start lyrics generation.",
       );
       setLyricsRequestInputKey("");
+      setPendingLyricsComparisonSource(null);
       setLyricsStage("editor");
     }
   }, [
@@ -856,7 +1092,9 @@ export function CustomSongWizard() {
     genre,
     language,
     occasion,
-    recipientNames,
+    cleanRecipientList,
+    recipientNameList,
+    recipientRelationshipList,
     story,
     vocalGender,
   ]);
@@ -864,7 +1102,10 @@ export function CustomSongWizard() {
   useEffect(() => {
     if (step !== 4) return;
     if (lyricsError) return;
-    if (lyricsStage === "loading" && lyricsRequestInputKey === currentLyricsInputKey) {
+    if (
+      lyricsStage === "loading" &&
+      lyricsRequestInputKey === currentLyricsInputKey
+    ) {
       return;
     }
 
@@ -897,7 +1138,7 @@ export function CustomSongWizard() {
 
     const timer = window.setInterval(() => {
       setLyricLoadingStep((current) =>
-        Math.min(lyricGenerationSteps.length - 1, current + 1)
+        Math.min(lyricGenerationSteps.length - 1, current + 1),
       );
     }, 2500);
 
@@ -911,7 +1152,7 @@ export function CustomSongWizard() {
     const poll = async () => {
       try {
         const response = await fetch(
-          `/api/songs/lyrics/status?taskId=${encodeURIComponent(lyricsTaskId)}`
+          `/api/songs/lyrics/status?taskId=${encodeURIComponent(lyricsTaskId)}`,
         );
         const result = await response.json();
         if (cancelled) return;
@@ -921,10 +1162,25 @@ export function CustomSongWizard() {
         }
 
         if (result.data.status === "succeeded") {
+          if (pendingLyricsComparisonSource) {
+            setLyricsVersionComparison({
+              originalTitle: pendingLyricsComparisonSource.title,
+              originalLyrics: pendingLyricsComparisonSource.lyrics,
+              newTitle: result.data.title || "Your Custom Song",
+              newLyrics: result.data.lyrics || "",
+            });
+            setPendingLyricsComparisonSource(null);
+            setLyricsRequestInputKey("");
+            setLyricsStage("editor");
+            setLyricsTaskId("");
+            return;
+          }
+
           setSongTitle(result.data.title || "Your Custom Song");
           setGeneratedLyrics(result.data.lyrics || "");
           setLyricsGeneratedBy("ai");
           setLyricsInputKey(currentLyricsInputKey);
+          setPendingLyricsComparisonSource(null);
           setLyricsRequestInputKey("");
           setLyricsStage("editor");
           setLyricsTaskId("");
@@ -937,9 +1193,10 @@ export function CustomSongWizard() {
       } catch (error) {
         if (cancelled) return;
         setLyricsError(
-          error instanceof Error ? error.message : "Unable to generate lyrics."
+          error instanceof Error ? error.message : "Unable to generate lyrics.",
         );
         setLyricsRequestInputKey("");
+        setPendingLyricsComparisonSource(null);
         setLyricsStage("editor");
       }
     };
@@ -951,19 +1208,24 @@ export function CustomSongWizard() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [lyricsStage, lyricsTaskId]);
+  }, [
+    currentLyricsInputKey,
+    lyricsStage,
+    lyricsTaskId,
+    pendingLyricsComparisonSource,
+  ]);
 
   useEffect(() => {
     const lyricLineIds = new Set(
       editableLyricLines
         .filter((line) => line.kind === "lyric")
-        .map((line) => line.id)
+        .map((line) => line.id),
     );
     setSelectedLyricLineIds((current) =>
-      current.filter((lineId) => lyricLineIds.has(lineId))
+      current.filter((lineId) => lyricLineIds.has(lineId)),
     );
     setLyricRewriteSuggestions((current) =>
-      current.filter((suggestion) => lyricLineIds.has(suggestion.lineId))
+      current.filter((suggestion) => lyricLineIds.has(suggestion.lineId)),
     );
   }, [editableLyricLines]);
 
@@ -991,7 +1253,9 @@ export function CustomSongWizard() {
           occasion,
           genre,
           language,
-          recipientNames: recipientNames.map((name) => name.trim()).filter(Boolean),
+          recipients: cleanRecipientList,
+          recipientNames: recipientNameList,
+          recipientRelationships: recipientRelationshipList,
           story,
           title: songTitle,
           lyrics: generatedLyrics,
@@ -1006,7 +1270,9 @@ export function CustomSongWizard() {
       setProgress(18);
     } catch (error) {
       setSongError(
-        error instanceof Error ? error.message : "Unable to start song generation."
+        error instanceof Error
+          ? error.message
+          : "Unable to start song generation.",
       );
     }
   }, [
@@ -1015,7 +1281,9 @@ export function CustomSongWizard() {
     genre,
     language,
     occasion,
-    recipientNames,
+    cleanRecipientList,
+    recipientNameList,
+    recipientRelationshipList,
     session?.user,
     songTitle,
     story,
@@ -1035,7 +1303,7 @@ export function CustomSongWizard() {
     const poll = async () => {
       try {
         const response = await fetch(
-          `/api/songs/generate/status?songId=${encodeURIComponent(songTaskId)}`
+          `/api/songs/generate/status?songId=${encodeURIComponent(songTaskId)}`,
         );
         const result = await response.json();
         if (cancelled) return;
@@ -1048,10 +1316,6 @@ export function CustomSongWizard() {
 
         if (result.data.status === "succeeded") {
           const versions = result.data.versions || [];
-          if (result.data.sampleUrl) {
-            router.push(result.data.sampleUrl);
-            return;
-          }
 
           setLeadData({
             userId: session?.user?.id || "guest",
@@ -1078,7 +1342,9 @@ export function CustomSongWizard() {
         }
       } catch (error) {
         if (cancelled) return;
-        setSongError(error instanceof Error ? error.message : "Unable to generate song.");
+        setSongError(
+          error instanceof Error ? error.message : "Unable to generate song.",
+        );
       }
     };
 
@@ -1124,6 +1390,11 @@ export function CustomSongWizard() {
   }, [leadData?.previewLimitSeconds, leadData?.previewAudioUrl]);
 
   useEffect(() => {
+    if (!showCustomOccasionInput) return;
+    window.requestAnimationFrame(() => customOccasionInputRef.current?.focus());
+  }, [showCustomOccasionInput]);
+
+  useEffect(() => {
     return () => {
       speechRecognitionRef.current?.stop?.();
     };
@@ -1135,9 +1406,13 @@ export function CustomSongWizard() {
 
   const canContinue =
     (step === 1 && Boolean(genre)) ||
-    (step === 2 && Boolean(occasion) && recipientNames.some((name) => name.trim())) ||
+    (step === 2 &&
+      hasSelectedOccasion &&
+      cleanRecipientList.some((recipient) => recipient.name)) ||
     (step === 3 && story.trim().length >= 10) ||
-    (step === 4 && songTitle.trim().length > 0 && generatedLyrics.trim().length > 0);
+    (step === 4 &&
+      songTitle.trim().length > 0 &&
+      generatedLyrics.trim().length > 0);
 
   function appendHelperText(text: string) {
     setStory((current) => {
@@ -1159,8 +1434,10 @@ export function CustomSongWizard() {
       const end = textarea.selectionEnd ?? current.length;
       const before = current.slice(0, start);
       const after = current.slice(end);
-      const leadingSpace = before && !before.endsWith(" ") && !before.endsWith("\n") ? " " : "";
-      const trailingSpace = after && !after.startsWith(" ") && !after.startsWith("\n") ? " " : "";
+      const leadingSpace =
+        before && !before.endsWith(" ") && !before.endsWith("\n") ? " " : "";
+      const trailingSpace =
+        after && !after.startsWith(" ") && !after.startsWith("\n") ? " " : "";
       const nextStory = `${before}${leadingSpace}${text}${trailingSpace}${after}`;
 
       window.requestAnimationFrame(() => {
@@ -1188,8 +1465,8 @@ export function CustomSongWizard() {
   function updateStoryHelperAnswer(value: string) {
     setStoryHelperAnswers((current) =>
       current.map((answer, index) =>
-        index === storyHelperStep ? value : answer
-      )
+        index === storyHelperStep ? value : answer,
+      ),
     );
   }
 
@@ -1245,7 +1522,8 @@ export function CustomSongWizard() {
     }
 
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       toast.info("Speech recognition is not available in this browser.");
@@ -1286,45 +1564,116 @@ export function CustomSongWizard() {
     setIsRecording(true);
   }
 
-  function updateRecipientName(index: number, value: string) {
-    setRecipientNames((current) =>
-      current.map((name, itemIndex) => (itemIndex === index ? value : name))
+  function updateRecipient(
+    index: number,
+    field: keyof RecipientInput,
+    value: string,
+  ) {
+    setRecipients((current) =>
+      current.map((recipient, itemIndex) =>
+        itemIndex === index ? { ...recipient, [field]: value } : recipient,
+      ),
     );
   }
 
+  function selectOccasion(value: Occasion) {
+    if (value === customOccasionValue) {
+      setOccasion(customOccasionInput.trim() || customOccasionValue);
+      return;
+    }
+
+    setOccasion(value);
+  }
+
+  function selectCustomOccasion(value: string) {
+    setCustomOccasionInput(value);
+    setOccasion(value.trim() || customOccasionValue);
+  }
+
   function addRecipientName() {
-    setRecipientNames((current) =>
-      current.length >= 3 ? current : [...current, ""]
+    setRecipients((current) =>
+      current.length >= 3
+        ? current
+        : [...current, { name: "", relationship: "" }],
     );
   }
 
   function removeRecipientName(index: number) {
-    setRecipientNames((current) => {
-      if (current.length === 1) return [""];
+    setRecipients((current) => {
+      if (current.length === 1) return [{ name: "", relationship: "" }];
       return current.filter((_, itemIndex) => itemIndex !== index);
     });
   }
 
-  function rewriteLyrics() {
+  function resetLyricsForGeneration() {
     setSongTitle("");
     setGeneratedLyrics("");
     setSelectedLyricLineIds([]);
     setLyricRewriteSuggestions([]);
     setLyricRewriteInstruction("");
     setLyricRewriteError("");
+    setLyricsVersionComparison(null);
+  }
+
+  function rewriteLyrics() {
+    resetLyricsForGeneration();
     requestLyricsGeneration();
+  }
+
+  function openNewLyricsVersionDialog() {
+    setNewLyricsVersionInstruction("");
+    setLyricsVersionComparison(null);
+    setIsNewLyricsVersionDialogOpen(true);
+  }
+
+  function generateNewLyricsVersion() {
+    const revisionInstruction = newLyricsVersionInstruction;
+    const comparisonSource = {
+      title: songTitle || "Your Custom Song",
+      lyrics: generatedLyrics,
+    };
+
+    setIsNewLyricsVersionDialogOpen(false);
+    setSelectedLyricLineIds([]);
+    setLyricRewriteSuggestions([]);
+    setLyricRewriteInstruction("");
+    setLyricRewriteError("");
+    setNewLyricsVersionInstruction("");
+    requestLyricsGeneration({
+      comparisonSource,
+      revisionInstruction,
+    });
+  }
+
+  function keepOriginalLyricsVersion() {
+    setLyricsVersionComparison(null);
+  }
+
+  function useNewLyricsVersion() {
+    if (!lyricsVersionComparison) return;
+
+    setSongTitle(lyricsVersionComparison.newTitle);
+    setGeneratedLyrics(lyricsVersionComparison.newLyrics);
+    setLyricsGeneratedBy("ai");
+    setLyricsInputKey(currentLyricsInputKey);
+    setLyricsVersionComparison(null);
+    setSelectedLyricLineIds([]);
+    setLyricRewriteSuggestions([]);
+    setLyricRewriteInstruction("");
+    setLyricRewriteError("");
+    toast.success("New lyrics version applied.");
   }
 
   function updateLyricLine(lineId: string, text: string) {
     setGeneratedLyrics((current) =>
       composeLyricsText(
         parseLyricsText(current).map((line) =>
-          line.id === lineId ? { ...line, text } : line
-        )
-      )
+          line.id === lineId ? { ...line, text } : line,
+        ),
+      ),
     );
     setLyricRewriteSuggestions((current) =>
-      current.filter((suggestion) => suggestion.lineId !== lineId)
+      current.filter((suggestion) => suggestion.lineId !== lineId),
     );
     setLyricRewriteError("");
   }
@@ -1333,14 +1682,14 @@ export function CustomSongWizard() {
     setSelectedLyricLineIds((current) =>
       selected
         ? Array.from(new Set([...current, lineId]))
-        : current.filter((id) => id !== lineId)
+        : current.filter((id) => id !== lineId),
     );
     setLyricRewriteError("");
   }
 
   async function rewriteSelectedLyricLines() {
     const selectedLines = editableLyricLines.filter(
-      (line) => selectedLyricLineIds.includes(line.id) && line.kind === "lyric"
+      (line) => selectedLyricLineIds.includes(line.id) && line.kind === "lyric",
     );
 
     if (!selectedLines.length) {
@@ -1359,7 +1708,9 @@ export function CustomSongWizard() {
           occasion,
           genre,
           language,
+          recipients: cleanRecipientList,
           recipientNames: recipientNameList,
+          recipientRelationships: recipientRelationshipList,
           fullLyrics: generatedLyrics,
           selectedLines: selectedLines.map((line) => line.text),
           instruction: lyricRewriteInstruction,
@@ -1375,14 +1726,16 @@ export function CustomSongWizard() {
         createLyricsLineRewriteSuggestions(
           editableLyricLines,
           selectedLines.map((line) => line.id),
-          result.data.lines || []
-        )
+          result.data.lines || [],
+        ),
       );
       setSelectedLyricLineIds([]);
       toast.success("Rewrite suggestions are ready.");
     } catch (error) {
       setLyricRewriteError(
-        error instanceof Error ? error.message : "Unable to rewrite selected lines."
+        error instanceof Error
+          ? error.message
+          : "Unable to rewrite selected lines.",
       );
     } finally {
       setIsRewritingLyricLines(false);
@@ -1390,35 +1743,50 @@ export function CustomSongWizard() {
   }
 
   function acceptLyricRewriteSuggestion(lineId: string) {
-    const suggestion = lyricRewriteSuggestions.find((item) => item.lineId === lineId);
+    const suggestion = lyricRewriteSuggestions.find(
+      (item) => item.lineId === lineId,
+    );
     if (!suggestion) return;
 
     setGeneratedLyrics((current) =>
       composeLyricsText(
-        applyLyricsLineRewrite(parseLyricsText(current), [lineId], [
-          suggestion.rewrittenText,
-        ])
-      )
+        applyLyricsLineRewrite(
+          parseLyricsText(current),
+          [lineId],
+          [suggestion.rewrittenText],
+        ),
+      ),
     );
     setLyricRewriteSuggestions((current) =>
-      current.filter((item) => item.lineId !== lineId)
+      current.filter((item) => item.lineId !== lineId),
     );
   }
 
   function keepOriginalLyricLine(lineId: string) {
     setLyricRewriteSuggestions((current) =>
-      current.filter((item) => item.lineId !== lineId)
+      current.filter((item) => item.lineId !== lineId),
     );
   }
 
-  function setWizardStep(nextStep: WizardStep, mode: "push" | "replace" = "push") {
+  function setWizardStep(
+    nextStep: WizardStep,
+    mode: "push" | "replace" = "push",
+  ) {
     const url = new URL(window.location.href);
     url.searchParams.set("step", stepSlugs[nextStep]);
 
     if (mode === "replace") {
-      window.history.replaceState({ step: nextStep }, "", `${url.pathname}?${url.searchParams.toString()}`);
+      window.history.replaceState(
+        { step: nextStep },
+        "",
+        `${url.pathname}?${url.searchParams.toString()}`,
+      );
     } else {
-      window.history.pushState({ step: nextStep }, "", `${url.pathname}?${url.searchParams.toString()}`);
+      window.history.pushState(
+        { step: nextStep },
+        "",
+        `${url.pathname}?${url.searchParams.toString()}`,
+      );
     }
 
     setStep(nextStep);
@@ -1465,7 +1833,9 @@ export function CustomSongWizard() {
     }
 
     if (!occasion || !genre || story.trim().length < 10) {
-      setEmailError("Please complete your song details before capturing a lead.");
+      setEmailError(
+        "Please complete your song details before capturing a lead.",
+      );
       return;
     }
 
@@ -1573,9 +1943,90 @@ export function CustomSongWizard() {
       });
   }
 
-  function chooseSongVersion(version: string) {
+  async function chooseSongVersion(version: string) {
     setSelectedVersion(version);
-    setIsPaywallOpen(true);
+    const versionIndex = version === "B" ? 1 : 0;
+    const songVersion = songVersions[versionIndex] || songVersions[0];
+    const providerVersionId = songVersion?.id || version;
+    setSelectedProviderVersion(providerVersionId);
+
+    console.log("[CustomSongWizard] Choose song version", {
+      version,
+      providerVersionId,
+      songId: leadData?.songId,
+      hasLeadData: Boolean(leadData),
+      previewLimitSeconds: leadData?.previewLimitSeconds,
+      isLoggedIn,
+      sessionUserId: session?.user?.id,
+      versionIds: songVersions.map((item) => item.id),
+    });
+
+    if (!leadData?.songId || !songVersion?.audioUrl) {
+      console.warn("[CustomSongWizard] Missing song data for finalize", {
+        version,
+        providerVersionId,
+        songId: leadData?.songId,
+        hasAudioUrl: Boolean(songVersion?.audioUrl),
+      });
+      toast.error("This song version is not ready yet.");
+      return;
+    }
+
+    setFinalizingVersion(version);
+
+    try {
+      const response = await fetch("/api/songs/finalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          songId: leadData.songId,
+          versionId: providerVersionId,
+        }),
+      });
+      const result = await response.json();
+
+      console.log("[CustomSongWizard] Finalize response", {
+        version,
+        providerVersionId,
+        songId: leadData.songId,
+        ok: response.ok,
+        status: response.status,
+        success: result.success,
+        error: result.error,
+        songUrl: result.data?.songUrl,
+        alreadyFinalized: result.data?.alreadyFinalized,
+      });
+
+      if (response.status === 401) {
+        toast.info("Please sign in to save this song.");
+        return;
+      }
+
+      if (!response.ok || !result.success) {
+        if (result.error === "Insufficient song balance.") {
+          setIsPaywallOpen(true);
+          return;
+        }
+
+        toast.error(result.error || "Unable to save this song.");
+        return;
+      }
+
+      router.push(result.data?.songUrl || `/songs/${result.data?.songId}`);
+    } catch (error) {
+      console.error("[CustomSongWizard] Finalize request failed", {
+        version,
+        providerVersionId,
+        songId: leadData.songId,
+        error,
+      });
+      toast.error("Unable to save this song.", {
+        description:
+          error instanceof Error ? error.message : "Please try again shortly.",
+      });
+    } finally {
+      setFinalizingVersion(null);
+    }
   }
 
   return (
@@ -1601,7 +2052,9 @@ export function CustomSongWizard() {
                     <Music2 className="size-5 text-accent-foreground" />
                     Genre
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground">Pick one</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Pick one
+                  </p>
                 </div>
                 <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
                   {genres.map((item) => {
@@ -1617,7 +2070,7 @@ export function CustomSongWizard() {
                             ? "border-primary/20 bg-primary/10"
                             : isAutoPick
                               ? "border-dashed border-border bg-card"
-                              : "border-border"
+                              : "border-border",
                         )}
                         type="button"
                         onClick={() => setGenre(item.value)}
@@ -1657,7 +2110,7 @@ export function CustomSongWizard() {
                               ? "bg-primary/10 text-primary"
                               : auto
                                 ? "border-2 border-dashed border-border bg-transparent text-foreground"
-                                : "bg-card text-foreground"
+                                : "bg-card text-foreground",
                           )}
                           type="button"
                           onClick={() => setVocalGender(option)}
@@ -1692,7 +2145,7 @@ export function CustomSongWizard() {
                     <ChevronDown
                       className={cn(
                         "size-4 transition-transform",
-                        !showAllLanguages && "-rotate-90"
+                        !showAllLanguages && "-rotate-90",
                       )}
                     />
                     {moreLanguages.length} more languages
@@ -1733,20 +2186,43 @@ export function CustomSongWizard() {
                     </p>
                   </div>
                   <div className="space-y-3">
-                    {recipientNames.map((name, index) => (
+                    {recipients.map((recipient, index) => (
                       <div key={index} className="flex gap-3">
-                        <Input
-                          className="h-12 rounded-xl border-border bg-card px-4 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-primary/20"
-                          placeholder={index === 0 ? "Recipient name" : "Another name"}
-                          value={name}
-                          onChange={(event) =>
-                            updateRecipientName(index, event.target.value)
-                          }
-                        />
+                        <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
+                          <Input
+                            className="h-12 rounded-xl border-border bg-card px-4 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-primary/20"
+                            placeholder={
+                              index === 0 ? "Recipient name" : "Another name"
+                            }
+                            value={recipient.name}
+                            onChange={(event) =>
+                              updateRecipient(index, "name", event.target.value)
+                            }
+                          />
+                          <RelationshipCreatableSelect
+                            placeholder={
+                              index === 0
+                                ? "Relationship"
+                                : "Their relationship"
+                            }
+                            value={recipient.relationship}
+                            onChange={(value) =>
+                              updateRecipient(
+                                index,
+                                "relationship",
+                                value,
+                              )
+                            }
+                          />
+                        </div>
                         <Button
                           aria-label="Remove name"
                           className="h-12 w-12 shrink-0 rounded-xl bg-card text-muted-foreground shadow-sm hover:bg-muted hover:text-foreground"
-                          disabled={recipientNames.length === 1 && !name.trim()}
+                          disabled={
+                            recipients.length === 1 &&
+                            !recipient.name.trim() &&
+                            !recipient.relationship.trim()
+                          }
                           type="button"
                           variant="ghost"
                           onClick={() => removeRecipientName(index)}
@@ -1756,7 +2232,7 @@ export function CustomSongWizard() {
                       </div>
                     ))}
                   </div>
-                  {recipientNames.length < 3 && (
+                  {recipients.length < 3 && (
                     <button
                       className="mt-3 inline-flex items-center gap-2 rounded-xl border border-dashed border-border bg-card px-4 py-3 text-sm font-bold text-foreground transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
                       type="button"
@@ -1767,7 +2243,8 @@ export function CustomSongWizard() {
                     </button>
                   )}
                   <p className="mt-3 text-sm text-muted-foreground">
-                    Adding more than one name? The song will mention each of them.
+                    Adding more than one name? The song will mention each of
+                    them.
                   </p>
                 </div>
 
@@ -1777,11 +2254,16 @@ export function CustomSongWizard() {
                       <PartyPopper className="size-5 text-primary" />
                       Occasion
                     </div>
-                    <p className="text-sm font-medium text-muted-foreground">Pick one</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Pick one
+                    </p>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                     {occasions.map((item) => {
-                      const selected = occasion === item.value;
+                      const selected =
+                        item.value === customOccasionValue
+                          ? showCustomOccasionInput
+                          : occasion === item.value;
 
                       return (
                         <button
@@ -1790,10 +2272,10 @@ export function CustomSongWizard() {
                             "relative flex min-h-28 flex-col items-center justify-center rounded-2xl border bg-card p-3.5 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md",
                             selected
                               ? "border-primary/20 bg-primary/10"
-                              : "border-border"
+                              : "border-border",
                           )}
                           type="button"
-                          onClick={() => setOccasion(item.value)}
+                          onClick={() => selectOccasion(item.value)}
                         >
                           {selected && (
                             <span className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -1810,6 +2292,48 @@ export function CustomSongWizard() {
                       );
                     })}
                   </div>
+                  <AnimatePresence initial={false}>
+                    {showCustomOccasionInput && (
+                      <motion.div
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-3 shadow-sm"
+                        exit={{ opacity: 0, y: -8 }}
+                        initial={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {suggestedCustomOccasions.map((item) => {
+                            const selectedCustomOccasion = occasion === item;
+
+                            return (
+                              <button
+                                key={item}
+                                className={cn(
+                                  "rounded-full border px-3 py-2 text-xs font-bold transition",
+                                  selectedCustomOccasion
+                                    ? "border-primary bg-primary text-primary-foreground"
+                                    : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/10 hover:text-primary",
+                                )}
+                                type="button"
+                                onClick={() => selectCustomOccasion(item)}
+                              >
+                                {item}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <Input
+                          ref={customOccasionInputRef}
+                          className="h-14 rounded-xl border-primary bg-card px-5 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
+                          placeholder="e.g. Retirement, Housewarming..."
+                          value={customOccasionInput}
+                          onChange={(event) =>
+                            selectCustomOccasion(event.target.value)
+                          }
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </StepFrame>
@@ -1842,7 +2366,7 @@ export function CustomSongWizard() {
                       "rounded-full px-4 text-sm font-bold shadow-sm",
                       isRecording
                         ? "bg-primary/10 text-primary hover:bg-primary/15"
-                        : "bg-card text-foreground hover:bg-primary/10 hover:text-primary"
+                        : "bg-card text-foreground hover:bg-primary/10 hover:text-primary",
                     )}
                     type="button"
                     variant="ghost"
@@ -1895,13 +2419,15 @@ export function CustomSongWizard() {
               {lyricsStage === "loading" ? (
                 <LyricsGenerationView
                   activeStep={lyricLoadingStep}
-                  names={recipientNames}
+                  names={recipientNameList}
                 />
               ) : (
-                <div className="mx-auto mt-14 max-w-2xl space-y-4">
+                <div className="mx-auto mt-14 max-w-5xl space-y-4">
                   {lyricsError && (
                     <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-                      <p className="font-bold text-foreground">Lyrics generation failed</p>
+                      <p className="font-bold text-foreground">
+                        Lyrics generation failed
+                      </p>
                       <p className="mt-1 leading-6">{lyricsError}</p>
                       <Button
                         className="mt-3 h-9 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground hover:bg-primary/90"
@@ -1929,7 +2455,7 @@ export function CustomSongWizard() {
                     actionText="Write a new version"
                     icon={<Edit3 className="size-4 text-primary" />}
                     label="Lyrics"
-                    onAction={rewriteLyrics}
+                    onAction={openNewLyricsVersionDialog}
                   >
                     <LyricsLineEditor
                       error={lyricRewriteError}
@@ -1991,7 +2517,11 @@ export function CustomSongWizard() {
           {step === 5 && songStage === "player" && (
             <StepFrame key="player">
               <div className="mx-auto max-w-4xl pt-4">
-                <audio ref={audioRef} preload="metadata" src={currentVersion?.audioUrl} />
+                <audio
+                  ref={audioRef}
+                  preload="metadata"
+                  src={currentVersion?.audioUrl}
+                />
                 <div className="mb-5 flex flex-wrap gap-2">
                   <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-accent-foreground">
                     <ShieldCheck className="size-4" />
@@ -2005,8 +2535,7 @@ export function CustomSongWizard() {
                   </span>
                   {previewLimitSeconds && (
                     <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-muted-foreground">
-                      <LockKeyhole className="size-4" />
-                      1 minute preview
+                      <LockKeyhole className="size-4" />1 minute preview
                     </span>
                   )}
                 </div>
@@ -2032,11 +2561,29 @@ export function CustomSongWizard() {
                       {songTitle || "Your Custom Song"}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <InfoPill icon={<Heart className="size-4" />} label={selectedOccasion?.title || "For someone special"} />
-                      <InfoPill icon={<Cake className="size-4" />} label={selectedOccasion?.title.split("/")[0].trim() || "Birthday"} />
-                      <InfoPill icon={<Gift className="size-4" />} label={genre} />
-                      <InfoPill icon={<Mic2 className="size-4" />} label={vocalGender} />
-                      <InfoPill icon={<Languages className="size-4" />} label={language} />
+                      <InfoPill
+                        icon={<Heart className="size-4" />}
+                        label={selectedOccasion?.title || "For someone special"}
+                      />
+                      <InfoPill
+                        icon={<Cake className="size-4" />}
+                        label={
+                          selectedOccasion?.title.split("/")[0].trim() ||
+                          "Birthday"
+                        }
+                      />
+                      <InfoPill
+                        icon={<Gift className="size-4" />}
+                        label={genre}
+                      />
+                      <InfoPill
+                        icon={<Mic2 className="size-4" />}
+                        label={vocalGender}
+                      />
+                      <InfoPill
+                        icon={<Languages className="size-4" />}
+                        label={language}
+                      />
                     </div>
                   </div>
                 </div>
@@ -2044,7 +2591,9 @@ export function CustomSongWizard() {
                 <div className="mx-auto mt-6 max-w-2xl rounded-2xl border border-border bg-card p-4 shadow-sm">
                   <p className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.12em] text-primary">
                     <Heart className="size-4" />
-                    Message for {selectedOccasion?.title.split("/")[0].trim() || "recipient"}
+                    Message for{" "}
+                    {selectedOccasion?.title.split("/")[0].trim() ||
+                      "recipient"}
                   </p>
                   <p className="text-sm font-semibold leading-6 text-card-foreground">
                     {story.split(/[.!?\n]/)[0]?.trim() ||
@@ -2072,78 +2621,90 @@ export function CustomSongWizard() {
                     const isThisPlaying = isActiveVersion && isPlaying;
 
                     return (
-                    <div
-                      key={version}
-                      className="rounded-2xl border border-border bg-card p-4 shadow-sm"
-                    >
-                      <div className="mb-3 flex items-start gap-3">
-                        <span
-                          className={cn(
-                            "flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-primary-foreground",
-                            index === 0 ? "bg-foreground" : "bg-primary"
-                          )}
-                        >
-                          {version}
-                        </span>
-                        <div>
-                          <p className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                            Version {version}
-                          </p>
-                          <p className="text-sm font-bold text-foreground">
-                            {songVersion?.title || songTitle || "Your Custom Song"}
-                          </p>
+                      <div
+                        key={version}
+                        className="rounded-2xl border border-border bg-card p-4 shadow-sm"
+                      >
+                        <div className="mb-3 flex items-start gap-3">
+                          <span
+                            className={cn(
+                              "flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-primary-foreground",
+                              index === 0 ? "bg-foreground" : "bg-primary",
+                            )}
+                          >
+                            {version}
+                          </span>
+                          <div>
+                            <p className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                              Version {version}
+                            </p>
+                            <p className="text-sm font-bold text-foreground">
+                              {songVersion?.title ||
+                                songTitle ||
+                                "Your Custom Song"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 rounded-2xl bg-muted p-3">
+                          <button
+                            className={cn(
+                              "flex size-10 items-center justify-center rounded-full text-primary-foreground transition",
+                              index === 0
+                                ? "bg-foreground hover:bg-foreground/90"
+                                : "bg-primary hover:bg-primary/90",
+                            )}
+                            type="button"
+                            onClick={() =>
+                              toggleSongPlayback(
+                                version,
+                                songVersion?.audioUrl || "",
+                              )
+                            }
+                            aria-label={`Play version ${version}`}
+                          >
+                            {isThisPlaying ? (
+                              <Pause className="size-4 fill-current" />
+                            ) : (
+                              <Play className="ml-0.5 size-4 fill-current" />
+                            )}
+                          </button>
+                          <div className="flex flex-1 items-center gap-1 overflow-hidden">
+                            {Array.from({ length: 28 }).map((_, barIndex) => (
+                              <span
+                                key={barIndex}
+                                className="w-full rounded-full bg-border"
+                                style={{
+                                  height: `${8 + ((barIndex * 11 + index * 5) % 24)}px`,
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs font-bold text-muted-foreground">
+                            {isActiveVersion ? previewTime.toFixed(0) : "0"}s /{" "}
+                            {Math.ceil(displayDuration)}s
+                          </span>
+                        </div>
+
+                        <div className="mt-3 border-t border-border pt-3">
+                          <ChooseButton
+                            className={cn(
+                              "h-10 w-full rounded-full text-xs font-black text-primary-foreground",
+                              index === 0
+                                ? "bg-foreground hover:bg-foreground/90"
+                                : "bg-primary hover:bg-primary/90",
+                            )}
+                            onChoose={() => chooseSongVersion(version)}
+                          >
+                            {finalizingVersion === version ? (
+                              <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                              <Gift className="size-4" />
+                            )}
+                            {finalizingVersion === version ? "Saving..." : "Choose this one"}
+                          </ChooseButton>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-3 rounded-2xl bg-muted p-3">
-                        <button
-                          className={cn(
-                            "flex size-10 items-center justify-center rounded-full text-primary-foreground transition",
-                            index === 0
-                              ? "bg-foreground hover:bg-foreground/90"
-                              : "bg-primary hover:bg-primary/90"
-                          )}
-                          type="button"
-                          onClick={() => toggleSongPlayback(version, songVersion?.audioUrl || "")}
-                          aria-label={`Play version ${version}`}
-                        >
-                          {isThisPlaying ? (
-                            <Pause className="size-4 fill-current" />
-                          ) : (
-                            <Play className="ml-0.5 size-4 fill-current" />
-                          )}
-                        </button>
-                        <div className="flex flex-1 items-center gap-1 overflow-hidden">
-                          {Array.from({ length: 28 }).map((_, barIndex) => (
-                            <span
-                              key={barIndex}
-                              className="w-full rounded-full bg-border"
-                              style={{
-                                height: `${8 + ((barIndex * 11 + index * 5) % 24)}px`,
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs font-bold text-muted-foreground">
-                          {isActiveVersion ? previewTime.toFixed(0) : "0"}s / {Math.ceil(displayDuration)}s
-                        </span>
-                      </div>
-
-                      <div className="mt-3 border-t border-border pt-3">
-                        <ChooseButton
-                          className={cn(
-                            "h-10 w-full rounded-full text-xs font-black text-primary-foreground",
-                            index === 0
-                              ? "bg-foreground hover:bg-foreground/90"
-                              : "bg-primary hover:bg-primary/90"
-                          )}
-                          onChoose={() => chooseSongVersion(version)}
-                        >
-                          <Gift className="size-4" />
-                          Choose this one
-                        </ChooseButton>
-                      </div>
-                    </div>
                     );
                   })}
                 </div>
@@ -2156,7 +2717,9 @@ export function CustomSongWizard() {
                       </span>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                          Written for {selectedOccasion?.title.split("/")[0].trim() || "you"}
+                          Written for{" "}
+                          {selectedOccasion?.title.split("/")[0].trim() ||
+                            "you"}
                         </p>
                         <h3 className="text-lg font-black text-foreground">
                           The lyrics
@@ -2264,6 +2827,114 @@ export function CustomSongWizard() {
         )}
       </AnimatePresence>
 
+      <Dialog
+        open={isNewLyricsVersionDialogOpen}
+        onOpenChange={setIsNewLyricsVersionDialogOpen}
+      >
+        <DialogContent className="rounded-2xl border-border p-0 sm:max-w-xl">
+          <DialogHeader className="border-b border-border px-5 pb-4 pt-5 text-left sm:px-6">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black">
+              <Sparkles className="size-5 text-primary" />
+              Write a new version
+            </DialogTitle>
+            <DialogDescription className="leading-6">
+              Add optional direction for the next lyrics draft.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="px-5 py-4 sm:px-6">
+            <Textarea
+              autoFocus
+              className="min-h-32 resize-none rounded-2xl border-border bg-muted p-4 text-sm leading-6 text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
+              maxLength={500}
+              placeholder="e.g., Add the main character's name to the title, make the whole song more romantic..."
+              value={newLyricsVersionInstruction}
+              onChange={(event) =>
+                setNewLyricsVersionInstruction(event.target.value)
+              }
+            />
+            <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+              <span>{newLyricsVersionInstruction.length} / 500</span>
+              <span>Leave it blank for a fresh take.</span>
+            </div>
+          </div>
+
+          <DialogFooter className="border-t border-border px-5 py-4 sm:px-6">
+            <Button
+              className="h-10 rounded-full px-5 text-sm font-bold"
+              type="button"
+              variant="ghost"
+              onClick={() => setIsNewLyricsVersionDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="h-10 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
+              type="button"
+              onClick={generateNewLyricsVersion}
+            >
+              <RefreshCw className="size-4" />
+              Generate version
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(lyricsVersionComparison)}
+        onOpenChange={(open) => {
+          if (!open) keepOriginalLyricsVersion();
+        }}
+      >
+        <DialogContent className="flex max-h-[86vh] flex-col overflow-hidden rounded-2xl border-border p-0 sm:max-w-5xl">
+          <DialogHeader className="border-b border-border px-5 pb-4 pt-5 text-left sm:px-6">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black">
+              <Edit3 className="size-5 text-primary" />
+              Compare lyrics versions
+            </DialogTitle>
+            <DialogDescription className="leading-6">
+              Review both drafts before choosing which one to keep.
+            </DialogDescription>
+          </DialogHeader>
+
+          {lyricsVersionComparison && (
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <LyricsVersionPanel
+                  label="Original"
+                  lyrics={lyricsVersionComparison.originalLyrics}
+                  title={lyricsVersionComparison.originalTitle}
+                />
+                <LyricsVersionPanel
+                  label="New version"
+                  lyrics={lyricsVersionComparison.newLyrics}
+                  title={lyricsVersionComparison.newTitle}
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="border-t border-border px-5 py-4 sm:px-6">
+            <Button
+              className="h-10 rounded-full px-5 text-sm font-bold"
+              type="button"
+              variant="ghost"
+              onClick={keepOriginalLyricsVersion}
+            >
+              Use original
+            </Button>
+            <Button
+              className="h-10 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
+              type="button"
+              onClick={useNewLyricsVersion}
+            >
+              <Check className="size-4" />
+              Use new version
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AnimatePresence>
         {isLeadModalOpen && (
           <motion.div
@@ -2282,7 +2953,9 @@ export function CustomSongWizard() {
               <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-3xl">
                 🎉
               </div>
-              <h2 className="text-2xl font-bold">Where should we send your song?</h2>
+              <h2 className="text-2xl font-bold">
+                Where should we send your song?
+              </h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 This generated song will be linked to the email below. We will
                 send the finished music to this inbox when recording is done.
@@ -2326,8 +2999,28 @@ export function CustomSongWizard() {
       <AnimatePresence>
         {isPaywallOpen && (
           <PaywallModal
-            onClose={() => setIsPaywallOpen(false)}
-            onContinue={() => router.push("/pricing")}
+            isLoading={isCheckoutLoading}
+            onClose={() => {
+              if (isCheckoutLoading) return;
+              setIsPaywallOpen(false);
+            }}
+            onContinue={() => {
+              if (isCheckoutLoading) return;
+
+              if (!leadData?.songId) {
+                toast.error("This song preview is not ready yet.");
+                return;
+              }
+
+              setIsCheckoutLoading(true);
+              const params = new URLSearchParams({
+                type: "unlock_song",
+                songId: leadData.songId,
+                versionId: selectedProviderVersion || selectedVersion,
+              });
+              params.set("returnTo", `/samples/${leadData.songId}`);
+              router.push(`/pricing?${params.toString()}`);
+            }}
             recipientLabel={recipientLabel}
             songTitle={songTitle || "Your Custom Song"}
             version={selectedVersion}
@@ -2339,12 +3032,14 @@ export function CustomSongWizard() {
 }
 
 function PaywallModal({
+  isLoading,
   onClose,
   onContinue,
   recipientLabel,
   songTitle,
   version,
 }: {
+  isLoading: boolean;
   onClose: () => void;
   onContinue: () => void;
   recipientLabel: string;
@@ -2379,7 +3074,8 @@ function PaywallModal({
           </div>
           <button
             aria-label="Close paywall"
-            className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:text-foreground"
+            className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+            disabled={isLoading}
             type="button"
             onClick={onClose}
           >
@@ -2416,6 +3112,7 @@ function PaywallModal({
         <div className="flex items-center gap-3 border-t border-border bg-background/95 p-4">
           <Button
             className="h-10 rounded-full bg-muted px-6 text-sm font-bold text-muted-foreground hover:bg-muted hover:text-foreground"
+            disabled={isLoading}
             type="button"
             variant="ghost"
             onClick={onClose}
@@ -2424,11 +3121,17 @@ function PaywallModal({
           </Button>
           <Button
             className="h-10 flex-1 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
+            aria-busy={isLoading}
+            disabled={isLoading}
             type="button"
             onClick={onContinue}
           >
-            <LockKeyhole className="size-4" />
-            Continue to checkout
+            {isLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <LockKeyhole className="size-4" />
+            )}
+            {isLoading ? "Opening checkout..." : "Continue to checkout"}
           </Button>
         </div>
       </motion.div>
@@ -2570,8 +3273,10 @@ function LyricsGenerationView({
   names: string[];
 }) {
   const recipientLabel =
-    names.map((name) => name.trim()).filter(Boolean).join(" and ") ||
-    "your";
+    names
+      .map((name) => name.trim())
+      .filter(Boolean)
+      .join(" and ") || "your";
 
   return (
     <div className="mx-auto mt-14 flex max-w-2xl flex-col items-center text-center">
@@ -2599,7 +3304,9 @@ function LyricsGenerationView({
               key={item}
               className={cn(
                 "flex items-center gap-4 text-base font-semibold transition",
-                active || complete ? "text-foreground" : "text-muted-foreground/60"
+                active || complete
+                  ? "text-foreground"
+                  : "text-muted-foreground/60",
               )}
             >
               <span
@@ -2609,7 +3316,7 @@ function LyricsGenerationView({
                     ? "bg-primary text-primary-foreground"
                     : complete
                       ? "bg-primary/10 text-primary"
-                      : "bg-muted text-muted-foreground"
+                      : "bg-muted text-muted-foreground",
                 )}
               >
                 {complete ? (
@@ -2673,9 +3380,7 @@ function StoryHelperModal({
               <Wand2 className="size-5" />
             </span>
             <div>
-              <h2 className="text-xl font-black leading-tight">
-                Story Helper
-              </h2>
+              <h2 className="text-xl font-black leading-tight">Story Helper</h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 Question {questionNumber} of 3
               </p>
@@ -2734,7 +3439,7 @@ function StoryHelperModal({
                             "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-bold transition",
                             selected
                               ? "bg-primary/10 text-foreground"
-                              : "text-foreground hover:bg-muted"
+                              : "text-foreground hover:bg-muted",
                           )}
                           type="button"
                           onClick={() => onAnswerChange(option)}
@@ -2753,9 +3458,7 @@ function StoryHelperModal({
                         value={
                           helperStep.options?.includes(answer) ? "" : answer
                         }
-                        onChange={(event) =>
-                          onAnswerChange(event.target.value)
-                        }
+                        onChange={(event) => onAnswerChange(event.target.value)}
                       />
                     </div>
                   </div>
@@ -2822,7 +3525,7 @@ function StepProgress({ currentStep }: { currentStep: WizardStep }) {
                     ? "border-foreground bg-foreground text-primary-foreground shadow-foreground/20"
                     : complete
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-card text-muted-foreground"
+                      : "border-border bg-card text-muted-foreground",
                 )}
               >
                 {complete ? <Check className="size-4" /> : item.id}
@@ -2830,7 +3533,7 @@ function StepProgress({ currentStep }: { currentStep: WizardStep }) {
               <div
                 className={cn(
                   "text-xs font-bold tracking-[0.12em]",
-                  active ? "text-foreground" : "text-muted-foreground"
+                  active ? "text-foreground" : "text-muted-foreground",
                 )}
               >
                 {item.label}
@@ -2855,7 +3558,9 @@ function StepHeading({
       <h1 className="text-4xl font-black leading-tight tracking-normal text-foreground md:text-5xl">
         {title}
       </h1>
-      <p className="mt-5 text-base leading-8 text-muted-foreground">{description}</p>
+      <p className="mt-5 text-base leading-8 text-muted-foreground">
+        {description}
+      </p>
     </div>
   );
 }
@@ -2889,7 +3594,7 @@ function LyricsLineEditor({
 }) {
   const selectedCount = selectedLineIds.length;
   const suggestionsByLineId = new Map(
-    suggestions.map((suggestion) => [suggestion.lineId, suggestion])
+    suggestions.map((suggestion) => [suggestion.lineId, suggestion]),
   );
 
   return (
@@ -2926,7 +3631,9 @@ function LyricsLineEditor({
                   key={line.id}
                   className={cn(
                     "group rounded-lg px-1.5 py-1 transition",
-                    selected || suggestion ? "bg-rose-50/90 dark:bg-rose-950/20" : "bg-transparent"
+                    selected || suggestion
+                      ? "bg-rose-50/90 dark:bg-rose-950/20"
+                      : "bg-transparent",
                   )}
                 >
                   <div className="grid grid-cols-[1.35rem_1fr] items-center gap-1.5">
@@ -2935,7 +3642,9 @@ function LyricsLineEditor({
                       checked={selected}
                       className={cn(
                         "size-3.5 justify-self-center transition-opacity",
-                        selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        selected
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100",
                       )}
                       disabled={!isSelectable || isRewriting}
                       onCheckedChange={(checked) =>
@@ -2947,7 +3656,9 @@ function LyricsLineEditor({
                       className="h-7 rounded-md border-0 bg-transparent px-1.5 text-sm font-semibold leading-5 text-foreground shadow-none focus-visible:bg-background/80 focus-visible:ring-primary/15"
                       disabled={isRewriting || Boolean(suggestion)}
                       value={line.text}
-                      onChange={(event) => onLineChange(line.id, event.target.value)}
+                      onChange={(event) =>
+                        onLineChange(line.id, event.target.value)
+                      }
                     />
                   </div>
 
@@ -3031,6 +3742,129 @@ function LyricsLineEditor({
   );
 }
 
+function LyricsVersionPanel({
+  label,
+  lyrics,
+  title,
+}: {
+  label: string;
+  lyrics: string;
+  title: string;
+}) {
+  return (
+    <section className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="border-b border-border bg-muted/60 px-4 py-3">
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+          {label}
+        </p>
+        <h3 className="mt-1 line-clamp-2 text-base font-black leading-6 text-foreground">
+          {title || "Your Custom Song"}
+        </h3>
+      </div>
+      <ScrollArea className="min-h-0 flex-1">
+        <pre className="whitespace-pre-wrap break-words px-4 py-4 font-sans text-sm font-medium leading-7 text-foreground">
+          {lyrics || "No lyrics generated."}
+        </pre>
+      </ScrollArea>
+    </section>
+  );
+}
+
+function RelationshipCreatableSelect({
+  onChange,
+  placeholder,
+  value,
+}: {
+  onChange: (value: string) => void;
+  placeholder: string;
+  value: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const trimmedQuery = query.trim();
+  const selectedValue = value.trim();
+  const filteredOptions = relationshipOptions.filter((option) =>
+    option.toLowerCase().includes(trimmedQuery.toLowerCase()),
+  );
+  const canCreate =
+    trimmedQuery &&
+    !relationshipOptions.some(
+      (option) => option.toLowerCase() === trimmedQuery.toLowerCase(),
+    );
+
+  function selectRelationship(nextValue: string) {
+    onChange(nextValue);
+    setQuery("");
+    setOpen(false);
+  }
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        setQuery(nextOpen ? selectedValue : "");
+      }}
+    >
+      <PopoverTrigger asChild>
+        <button
+          className={cn(
+            "flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 text-left text-base text-foreground shadow-sm transition hover:border-primary/40 focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+            !selectedValue && "text-muted-foreground",
+          )}
+          type="button"
+        >
+          <span className="min-w-0 flex-1 truncate">
+            {selectedValue || placeholder}
+          </span>
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Search or type a relationship..."
+            value={query}
+            onValueChange={setQuery}
+          />
+          <CommandList>
+            {!filteredOptions.length && !canCreate && (
+              <CommandEmpty>No relationship found.</CommandEmpty>
+            )}
+            {canCreate && (
+              <CommandGroup>
+                <CommandItem onSelect={() => selectRelationship(trimmedQuery)}>
+                  <Plus className="size-4 text-primary" />
+                  Use &quot;{trimmedQuery}&quot;
+                </CommandItem>
+              </CommandGroup>
+            )}
+            <CommandGroup heading="Common relationships">
+              {filteredOptions.map((option) => (
+                <CommandItem
+                  key={option}
+                  value={option}
+                  onSelect={() => selectRelationship(option)}
+                >
+                  <Check
+                    className={cn(
+                      "size-4 text-primary",
+                      selectedValue.toLowerCase() === option.toLowerCase()
+                        ? "opacity-100"
+                        : "opacity-0",
+                    )}
+                  />
+                  {option}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function EditableBlock({
   actionText,
   children,
@@ -3089,7 +3923,7 @@ function LanguageChip({
     <button
       className={cn(
         "inline-flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5",
-        selected ? "bg-primary/10 text-primary" : "bg-card text-foreground"
+        selected ? "bg-primary/10 text-primary" : "bg-card text-foreground",
       )}
       type="button"
       onClick={onClick}

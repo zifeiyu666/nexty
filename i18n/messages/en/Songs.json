@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Your Final Songs",
+    "description": "Browse, play, and share your finalized custom songs."
+  },
+  "hero": {
+    "badge": "Final library",
+    "title": "Your finished songs, gathered in one place",
+    "description": "Every song you have finalized after choosing a sample lives here for playback, sharing, downloads, wall art, and music video creation."
+  },
+  "stats": {
+    "label": "Songs",
+    "create": "Create another song"
+  },
+  "filters": {
+    "all": "All songs",
+    "searchPlaceholder": "Search title, genre, occasion, recipient"
+  },
+  "duration": {
+    "ready": "Ready"
+  },
+  "card": {
+    "audio": "Audio",
+    "created": "Created {date}",
+    "fallback": "A finalized custom song ready to play and share.",
+    "open": "Open",
+    "writtenFor": "Written for {names}"
+  },
+  "empty": {
+    "create": "Create a song",
+    "samples": "View samples",
+    "noMatches": {
+      "title": "No songs match that search",
+      "description": "Try another occasion or a shorter search term."
+    },
+    "noSongs": {
+      "title": "No final songs yet",
+      "description": "Create a song sample, choose your favorite version, then your final song will appear here."
+    }
+  }
+}

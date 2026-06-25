@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { DEFAULT_LOCALE, useRouter } from "@/i18n/routing";
+import type { UnlockSongContext } from "@/lib/ai/song-unlock-after-payment";
 import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { Loader2, MousePointerClick } from "lucide-react";
@@ -17,12 +18,14 @@ type Params = {
   buttonClassName?: string;
   plan: PricingPlan;
   localizedPlan: any;
+  unlockSongContext?: UnlockSongContext | null;
 };
 
 export default function PricingCTA({
   buttonClassName,
   plan,
   localizedPlan,
+  unlockSongContext,
 }: Params) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -74,9 +77,14 @@ export default function PricingCTA({
 
         // PayPal
         planId?: string;
+        unlockSongContext?: UnlockSongContext;
       } = {
         provider: provider || "stripe",
       };
+
+      if (unlockSongContext) {
+        requestBody.unlockSongContext = unlockSongContext;
+      }
 
       if (isStripe) {
         requestBody.stripePriceId = stripePriceId!;
@@ -157,10 +165,17 @@ export default function PricingCTA({
       <div className="mb-6">
         <PayPalCheckoutButton
           plan={plan}
+          unlockSongContext={unlockSongContext}
           onSuccess={(data) => {
             const params = new URLSearchParams();
             params.set("provider", "paypal");
             params.set("order_id", data.orderId);
+            if (data.songUrl) {
+              params.set("song_url", data.songUrl);
+            }
+            if (unlockSongContext?.returnTo) {
+              params.set("returnTo", unlockSongContext.returnTo);
+            }
             if (data.pending) {
               params.set("pending", "true");
             }

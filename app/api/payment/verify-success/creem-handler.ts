@@ -4,6 +4,7 @@
 
 import { syncCreemSubscriptionData } from '@/actions/creem';
 import { apiResponse } from '@/lib/api-response';
+import { getUnlockSongResult } from '@/lib/ai/song-unlock-after-payment';
 import { retrieveCreemCheckoutSession } from '@/lib/creem/client';
 import { NextRequest, NextResponse } from 'next/server';
 import {
@@ -83,11 +84,15 @@ async function handleCreemPayment(
   // Special handling for Creem order statuses
   if (order.status === 'succeeded') {
     const metadata = order.metadata as any;
+    const unlockSong = getUnlockSongResult(metadata);
     return apiResponse.success({
       orderId: order.id,
       planName: metadata?.planName,
       planId: metadata?.planId,
-      message: 'Payment verified and order confirmed.',
+      unlockSong,
+      message: unlockSong?.status === 'completed'
+        ? 'Payment verified and your song is unlocked.'
+        : 'Payment verified and order confirmed.',
     });
   }
 
@@ -147,4 +152,3 @@ export async function verifyCreemPayment(
     `Unsupported Creem checkout session mode: ${session.mode}`
   );
 }
-

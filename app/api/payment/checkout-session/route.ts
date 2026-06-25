@@ -1,5 +1,12 @@
 import { createStripeCheckoutSession } from '@/actions/stripe';
 import { apiResponse } from '@/lib/api-response';
+import {
+  appendUnlockSongParams,
+  buildUnlockSongMetadata,
+  parseUnlockSongContext,
+  serializeUnlockSongForPayPal,
+  type UnlockSongContext,
+} from '@/lib/ai/song-unlock-after-payment';
 import { getSession } from '@/lib/auth/server';
 import {
   createCreemCheckoutSession
@@ -18,6 +25,7 @@ type RequestData = {
   planId?: string;
   couponCode?: string;
   referral?: string;
+  unlockSongContext?: UnlockSongContext;
 };
 
 export async function POST(req: Request) {
@@ -36,6 +44,10 @@ export async function POST(req: Request) {
   }
 
   const provider = requestData.provider;
+  const unlockSongContext = parseUnlockSongContext(
+    requestData.unlockSongContext
+  );
+  const unlockMetadata = buildUnlockSongMetadata(unlockSongContext);
 
   try {
     if (provider === 'stripe') {
@@ -48,6 +60,7 @@ export async function POST(req: Request) {
         priceId: stripePriceId,
         couponCode: requestData.couponCode,
         referral: requestData.referral,
+        unlockSongContext,
       });
       return apiResponse.success(result);
     }
@@ -85,7 +98,10 @@ export async function POST(req: Request) {
           email: user.email,
         },
         success_url: getURL(
-          'payment/success?provider=creem'
+          appendUnlockSongParams(
+            'payment/success?provider=creem',
+            unlockSongContext
+          )
         ),
         metadata: {
           userId: user.id,
@@ -93,6 +109,7 @@ export async function POST(req: Request) {
           planId: plan.id,
           planName: plan.cardTitle,
           productId: plan.creemProductId,
+          ...unlockMetadata,
         },
       }
 
@@ -154,6 +171,7 @@ export async function POST(req: Request) {
       }
 
       // Create the PayPal Subscription
+      const paypalUnlock = serializeUnlockSongForPayPal(unlockSongContext);
       const subscription = await createPayPalSubscription({
         planId: plan.paypalPlanId,
         subscriberEmail: user.email,
@@ -161,9 +179,20 @@ export async function POST(req: Request) {
           userId: user.id,
           planId: plan.id,
           submitProductId: null,
+          paypalUnlock,
         },
-        returnUrl: getURL('payment/success?provider=paypal'),
-        cancelUrl: getURL(process.env.NEXT_PUBLIC_PRICING_PATH || '/pricing'),
+        returnUrl: getURL(
+          appendUnlockSongParams(
+            'payment/success?provider=paypal',
+            unlockSongContext
+          )
+        ),
+        cancelUrl: getURL(
+          appendUnlockSongParams(
+            process.env.NEXT_PUBLIC_PRICING_PATH || '/pricing',
+            unlockSongContext
+          )
+        ),
       });
 
       // Get the approval URL
@@ -193,4 +222,3 @@ export async function POST(req: Request) {
     return apiResponse.serverError(errorMessage);
   }
 }
-

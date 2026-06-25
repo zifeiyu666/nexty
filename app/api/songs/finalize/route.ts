@@ -28,8 +28,27 @@ export async function POST(req: Request) {
 
   const sample = await songSampleStore.get(input.songId);
   if (!sample) {
+    console.warn("[songs/finalize] Sample not found", {
+      songId: input.songId,
+      versionId: input.versionId,
+      userId: session.user.id,
+      userEmail: session.user.email,
+    });
     return apiResponse.notFound("Song sample not found.");
   }
+
+  console.log("[songs/finalize] Finalize requested", {
+    songId: input.songId,
+    versionId: input.versionId,
+    userId: session.user.id,
+    userEmail: session.user.email,
+    sampleUserId: sample.userId,
+    sampleEmail: sample.email,
+    isExpired: sample.isExpired,
+    previewLimitSeconds: sample.previewLimitSeconds,
+    accessExpiresAt: sample.accessExpiresAt,
+    sampleVersionIds: sample.versions.map((version) => version.id),
+  });
 
   const result = await finalizeSongFromSample({
     sample,
@@ -38,8 +57,23 @@ export async function POST(req: Request) {
   });
 
   if (!result.success) {
+    console.warn("[songs/finalize] Finalize failed", {
+      songId: input.songId,
+      versionId: input.versionId,
+      userId: session.user.id,
+      status: result.status,
+      error: result.error,
+    });
     return apiResponse.error(result.error, result.status);
   }
+
+  console.log("[songs/finalize] Finalize succeeded", {
+    sourceSampleId: input.songId,
+    versionId: input.versionId,
+    userId: session.user.id,
+    songId: result.song.id,
+    alreadyFinalized: result.alreadyFinalized,
+  });
 
   return apiResponse.success({
     songId: result.song.id,

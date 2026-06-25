@@ -1,3 +1,4 @@
+import { GlobalMusicController } from "@/components/music/GlobalMusicController";
 import { siteConfig } from "@/config/site";
 import "@/styles/globals.css";
 import { Viewport } from "next";
@@ -9,7 +10,10 @@ export const viewport: Viewport = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <GlobalMusicController />
+      </body>
     </html>
   );
 }

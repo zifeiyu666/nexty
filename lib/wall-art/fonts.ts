@@ -19,6 +19,10 @@ export const userRequestedWallArtFontLabels = [
   "Bodoni Moda SC",
   "Oranienbaum",
   "Bodoni Moda",
+  "Story Script",
+  "Henny Penny",
+  "Abril Fatface",
+  "Playfair Display SC",
   "DM Serif Text",
   "Caveat",
 ] as const;
@@ -63,6 +67,26 @@ export const wallArtFonts: WallArtFont[] = [
     label: "Bodoni Moda",
     value: '"Bodoni Moda", serif',
     previewFamily: "Bodoni Moda",
+  },
+  {
+    label: "Story Script",
+    value: '"Story Script", cursive',
+    previewFamily: "Story Script",
+  },
+  {
+    label: "Henny Penny",
+    value: '"Henny Penny", fantasy',
+    previewFamily: "Henny Penny",
+  },
+  {
+    label: "Abril Fatface",
+    value: '"Abril Fatface", serif',
+    previewFamily: "Abril Fatface",
+  },
+  {
+    label: "Playfair Display SC",
+    value: '"Playfair Display SC", serif',
+    previewFamily: "Playfair Display SC",
   },
   {
     label: "DM Serif Text",
@@ -140,6 +164,10 @@ export const wallArtFontFiles = [
   ["Bodoni Moda SC", "/fonts/wallart/bodoni-moda-sc-variable.ttf", "400 900"],
   ["Oranienbaum", "/fonts/wallart/oranienbaum-400.ttf", "400"],
   ["Bodoni Moda", "/fonts/wallart/bodoni-moda-variable.ttf", "400 900"],
+  ["Story Script", "/fonts/wallart/story-script-400.ttf", "400"],
+  ["Henny Penny", "/fonts/wallart/henny-penny-400.ttf", "400"],
+  ["Abril Fatface", "/fonts/wallart/abril-fatface-400.ttf", "400"],
+  ["Playfair Display SC", "/fonts/wallart/playfair-display-sc-400.ttf", "400"],
   ["DM Serif Text", "/fonts/wallart/dm-serif-text-400.ttf", "400"],
   ["Caveat", "/fonts/wallart/caveat-variable.ttf", "400 700"],
   ["Parisienne", "/fonts/wallart/parisienne-400.ttf", "400"],
