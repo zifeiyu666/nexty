@@ -10,13 +10,17 @@ describe("customer reactions section", () => {
       "utf8",
     );
 
-    assert.match(source, /mx-auto grid max-w-5xl/);
+    assert.match(source, /mx-auto grid max-w-6xl/);
     assert.match(source, /gap-3/);
     assert.match(source, /lg:gap-4/);
     assert.match(source, /min-h-64/);
     assert.match(source, /sm:min-h-72/);
-    assert.match(source, /lg:scale-\[1\.035\]/);
+    assert.match(source, /\[--reaction-card-scale:1\.035\]/);
+    assert.match(source, /\[&_.reaction-card:not\(\.is-active\)\]:lg:\[--reaction-card-scale:0\.97\]/);
+    assert.match(source, /\[clip-path:inset\(0_round_1rem\)\]/);
+    assert.match(source, /overflow-hidden rounded-\[inherit\]/);
     assert.doesNotMatch(source, /min-h-80/);
-    assert.doesNotMatch(source, /lg:scale-\[1\.06\]/);
+    assert.doesNotMatch(source, /\[--reaction-card-scale:1\.08\]/);
+    assert.doesNotMatch(source, /\[--reaction-card-scale:0\.94\]/);
   });
 });

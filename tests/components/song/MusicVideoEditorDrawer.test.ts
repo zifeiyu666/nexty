@@ -57,6 +57,8 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(source, /wallArtFonts/);
     assert.match(source, /LyricsFontPicker/);
+    assert.match(source, /function LyricsStyleSettings/);
+    assert.match(source, /<LyricsStyleSettings/);
     assert.match(source, /label="Size"[\s\S]*max=\{120\}/);
     assert.match(source, /Text color/);
     assert.match(source, /Border color/);
@@ -66,7 +68,8 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /Motion Blur Slip/);
     assert.match(source, /Staggered Glow Reveal/);
     assert.match(source, /Rolling Flow/);
-    assert.match(source, /disabled=\{isRollingFlow\}/);
+    assert.match(source, /const lockCenterPosition = forceCenterPosition \|\| isRollingFlow/);
+    assert.match(source, /disabled=\{lockCenterPosition\}/);
     assert.match(source, /handleFontListWheel/);
     assert.match(source, /onWheel=\{handleFontListWheel\}/);
   });
@@ -105,6 +108,8 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /player\.seekTo\(Math\.round\(safeTime \* PHOTO_SLIDESHOW_FPS\)\)/);
     assert.match(source, /type="range"/);
     assert.match(source, /aria-label="Seek music video preview"/);
+    assert.doesNotMatch(source, /const \[currentTime, setCurrentTime\]/);
+    assert.match(source, /const \[previewTime, setPreviewTime\]/);
   });
 
   test("lets users switch the preview between 9:16 and 16:9", () => {
@@ -120,6 +125,7 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /16:9/);
     assert.match(source, /compositionHeight=\{previewDimensions\.height\}/);
     assert.match(source, /compositionWidth=\{previewDimensions\.width\}/);
+    assert.match(source, /key=\{`\$\{timeline\.templateId\}-\$\{previewDimensions\.label\}`\}/);
     assert.match(source, /onToggleAspectRatio/);
   });
 
@@ -153,7 +159,7 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /\/api\/musicvideos\/\$\{videoId\}\/refresh/);
   });
 
-  test("ships photo slideshow and minimal vinyl as editable templates", () => {
+  test("ships photo slideshow, minimal vinyl, and wave radio as editable templates", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
       "utf8",
@@ -162,10 +168,19 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /Photo Stream Memory Slideshow/);
     assert.match(source, /Minimal Vinyl Record/);
     assert.match(source, /Dynamic Wave Radio/);
-    assert.match(source, /Coming soon/);
+    assert.match(source, /WaveRadioComposition/);
+    assert.match(source, /buildWaveRadioTimeline/);
+    assert.match(source, /WaveRadioEditor/);
+    assert.match(source, /onChangeLyricsStyle/);
+    assert.match(source, /forceCenterPosition/);
+    assert.match(source, /WAVE_RADIO_BACKGROUND_OPTIONS/);
+    assert.match(source, /waveRadioBackgroundId/);
     assert.match(source, /MinimalVinylComposition/);
     assert.match(source, /buildMinimalVinylTimeline/);
     assert.match(source, /data-minimal-vinyl-editor/);
+    assert.doesNotMatch(source, /Vinyl Settings/);
+    assert.doesNotMatch(source, /Lyric Roll/);
+    assert.doesNotMatch(source, /Lyric Broadcast/);
   });
 
   test("uses the generated photo lyric MV image as the slideshow template demo", () => {
@@ -181,6 +196,19 @@ describe("MusicVideoEditorDrawer", () => {
       /\/images\/features\/photo-lyric-mv-template\.webp/,
     );
     assert.match(source, /Photo lyric MV template demo/);
+  });
+
+  test("uses the generated wave radio image as the dynamic template demo", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(
+      source,
+      /\/images\/features\/dynamic-wave-radio-template\.webp/,
+    );
+    assert.match(source, /Dynamic wave radio music visualizer template demo/);
   });
 
   test("keeps the right editor panel vertically scrollable", () => {
@@ -248,8 +276,10 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /data-music-video-editor-resizer/);
     assert.match(
       source,
-      /lg:grid-cols-\[230px_minmax\(360px,1fr\)_var\(--music-video-editor-width\)\]/,
+      /lg:grid-cols-\[220px_minmax\(420px,1fr\)_minmax\(360px,var\(--music-video-editor-width\)\)\]/,
     );
+    assert.match(source, /MAX_EDITOR_VIEWPORT_RATIO/);
+    assert.match(source, /getResponsiveEditorMaxWidth/);
     assert.match(source, /line-clamp-1/);
     assert.match(source, /truncate/);
   });
@@ -368,9 +398,9 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /function handleSelectTemplate\(template: TemplateCard\)/);
     assert.match(
       source,
-      /setPreviewTransitionLoop\(null\);[\s\S]*setIsPlaying\(false\);[\s\S]*setCurrentTime\(0\);[\s\S]*setActiveTemplate\(template\.id\);/,
+      /setPreviewTransitionLoop\(null\);[\s\S]*setIsPlaying\(false\);[\s\S]*setActiveTemplate\(template\.id\);/,
     );
-    assert.match(source, /key=\{timeline\.templateId\}/);
+    assert.match(source, /key=\{`\$\{timeline\.templateId\}-\$\{previewDimensions\.label\}`\}/);
   });
 
   test("logs concrete render failures to the browser console", () => {
@@ -381,7 +411,10 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(source, /function logMusicVideoRenderError/);
     assert.match(source, /console\.error\("\[MusicVideoEditorDrawer\] Render failed"/);
-    assert.match(source, /console\.error\("\[MusicVideoEditorDrawer\] Render status refresh failed"/);
+    assert.match(
+      source,
+      /console\.error\([\s\S]*"\[MusicVideoEditorDrawer\] Render status refresh failed"/,
+    );
     assert.match(source, /console\.error\("\[MusicVideoEditorDrawer\] Failed to start render"/);
   });
 });

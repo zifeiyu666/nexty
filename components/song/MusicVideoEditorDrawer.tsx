@@ -44,10 +44,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ATMOSPHERE_OVERLAY_OPTIONS,
   DEFAULT_ATMOSPHERE_OVERLAY,
+  DEFAULT_WAVE_RADIO_BACKGROUND,
+  WAVE_RADIO_BACKGROUND_OPTIONS,
   buildEvenPhotoAssignments,
   buildMinimalVinylTimeline,
   buildPhotoSlideshowTimeline,
   buildRandomTransitionAssignments,
+  buildWaveRadioTimeline,
   buildLyricCuesFromAlignedWords,
   createCoverPhoto,
   DEFAULT_LYRICS_STYLE,
@@ -67,6 +70,7 @@ import {
   type TransitionAssignment,
   type TransitionType,
   type UploadedPhoto,
+  type WaveRadioBackgroundOption,
 } from "@/lib/music-video/photo-slideshow";
 import {
   Popover,
@@ -82,6 +86,7 @@ import { cn } from "@/lib/utils";
 import { wallArtFontFiles, wallArtFonts } from "@/lib/wall-art/fonts";
 import { MinimalVinylComposition } from "@/remotion-src/MinimalVinylComposition";
 import { PhotoSlideshowComposition } from "@/remotion-src/PhotoSlideshowComposition";
+import { WaveRadioComposition } from "@/remotion-src/WaveRadioComposition";
 import { Player, type PlayerRef } from "@remotion/player";
 import {
   Check,
@@ -196,6 +201,8 @@ const templates: TemplateCard[] = [
     id: "minimal-vinyl",
     title: "Minimal Vinyl Record",
     description: "Spinning vinyl, synced lyric roll, and red-gold light leaks.",
+    demoImageAlt: "Minimal vinyl record music visualizer template demo",
+    demoImageSrc: "/images/features/minimal-vinyl-record-template.webp",
     icon: Music2,
     status: "available",
   },
@@ -203,15 +210,18 @@ const templates: TemplateCard[] = [
     id: "wave-radio",
     title: "Dynamic Wave Radio",
     description: "Audio-reactive waves and captions for a broadcast mood.",
+    demoImageAlt: "Dynamic wave radio music visualizer template demo",
+    demoImageSrc: "/images/features/dynamic-wave-radio-template.webp",
     icon: Radio,
-    status: "coming-soon",
+    status: "available",
   },
 ];
 
 const DEFAULT_DURATION = 30;
-const DEFAULT_EDITOR_WIDTH = 520;
-const MIN_EDITOR_WIDTH = 390;
-const MAX_EDITOR_WIDTH = 720;
+const DEFAULT_EDITOR_WIDTH = 480;
+const MIN_EDITOR_WIDTH = 360;
+const MAX_EDITOR_WIDTH = 600;
+const MAX_EDITOR_VIEWPORT_RATIO = 0.32;
 const MAX_MEDIA_BYTES = 80 * 1024 * 1024;
 const TRANSITION_PREVIEW_SECONDS = 1;
 const TRANSITION_PREVIEW_TAIL_SECONDS = 1;
@@ -389,8 +399,22 @@ function removePhotoAssignments(
   return assignments.filter((assignment) => assignment.photoId !== photoId);
 }
 
-function clampEditorWidth(width: number) {
-  return Math.min(Math.max(width, MIN_EDITOR_WIDTH), MAX_EDITOR_WIDTH);
+function getResponsiveEditorMaxWidth(viewportWidth?: number) {
+  const width =
+    viewportWidth ??
+    (typeof window === "undefined" ? MAX_EDITOR_WIDTH : window.innerWidth);
+
+  return Math.min(
+    MAX_EDITOR_WIDTH,
+    Math.max(MIN_EDITOR_WIDTH, Math.floor(width * MAX_EDITOR_VIEWPORT_RATIO)),
+  );
+}
+
+function clampEditorWidth(width: number, viewportWidth?: number) {
+  return Math.min(
+    Math.max(width, MIN_EDITOR_WIDTH),
+    getResponsiveEditorMaxWidth(viewportWidth),
+  );
 }
 
 function TemplateRail({
@@ -481,7 +505,6 @@ function TemplateRail({
 
 function MusicVideoPreview({
   aspectRatio,
-  currentTime,
   duration,
   isPlaying,
   latestVideo,
@@ -490,7 +513,6 @@ function MusicVideoPreview({
   onPlay,
   onPlayerDuration,
   onClearTransitionPreview,
-  onTimeChange,
   onToggleAspectRatio,
   previewTransitionLoop,
   renderProgress,
@@ -499,7 +521,6 @@ function MusicVideoPreview({
   timeline,
 }: {
   aspectRatio: PreviewAspectRatio;
-  currentTime: number;
   duration: number;
   isPlaying: boolean;
   latestVideo: MusicVideoRenderRecord | null;
@@ -508,7 +529,6 @@ function MusicVideoPreview({
   onPlay: () => void;
   onPlayerDuration: (duration: number) => void;
   onClearTransitionPreview: () => void;
-  onTimeChange: (time: number) => void;
   onToggleAspectRatio: () => void;
   previewTransitionLoop: TransitionPreviewLoop | null;
   renderProgress: number;
@@ -519,7 +539,9 @@ function MusicVideoPreview({
   const playerRef = useRef<PlayerRef | null>(null);
   const onPlayRef = useRef(onPlay);
   const previewTransitionLoopRef = useRef<TransitionPreviewLoop | null>(null);
-  const progress = duration ? Math.min(currentTime / duration, 1) * 100 : 0;
+  const [previewTime, setPreviewTime] = useState(0);
+  const lastPreviewTimeRef = useRef(0);
+  const progress = duration ? Math.min(previewTime / duration, 1) * 100 : 0;
   const previewDimensions = previewAspectRatioOptions[aspectRatio];
   const AspectIcon =
     aspectRatio === "portrait" ? RectangleHorizontal : RectangleVertical;
@@ -535,6 +557,8 @@ function MusicVideoPreview({
   const PreviewComposition =
     timeline.templateId === "minimal-vinyl"
       ? MinimalVinylComposition
+      : timeline.templateId === "wave-radio"
+        ? WaveRadioComposition
       : PhotoSlideshowComposition;
 
   useEffect(() => {
@@ -558,6 +582,20 @@ function MusicVideoPreview({
     const player = playerRef.current;
     if (!player) return;
 
+    const updatePreviewTime = (time: number, force = false) => {
+      const safeTime = Math.min(Math.max(time, 0), duration);
+      if (
+        !force &&
+        Math.abs(safeTime - lastPreviewTimeRef.current) <
+          1 / PHOTO_SLIDESHOW_FPS
+      ) {
+        return;
+      }
+
+      lastPreviewTimeRef.current = safeTime;
+      setPreviewTime(safeTime);
+    };
+
     const handleFrameUpdate = ({
       detail,
     }: {
@@ -566,11 +604,11 @@ function MusicVideoPreview({
       const loop = previewTransitionLoopRef.current;
       if (loop && detail.frame >= loop.endFrame) {
         player.seekTo(loop.startFrame);
-        onTimeChange(loop.startFrame / PHOTO_SLIDESHOW_FPS);
+        updatePreviewTime(loop.startFrame / PHOTO_SLIDESHOW_FPS, true);
         return;
       }
 
-      onTimeChange(detail.frame / PHOTO_SLIDESHOW_FPS);
+      updatePreviewTime(detail.frame / PHOTO_SLIDESHOW_FPS);
     };
     const handlePause = () => onPause();
     const handlePlay = () => onPlay();
@@ -587,7 +625,7 @@ function MusicVideoPreview({
       player.removeEventListener("play", handlePlay);
       player.removeEventListener("ended", handleEnded);
     };
-  }, [onPause, onPlay, onTimeChange]);
+  }, [duration, onPause, onPlay]);
 
   useEffect(() => {
     onPlayerDuration(duration);
@@ -619,14 +657,15 @@ function MusicVideoPreview({
     const safeTime = Math.min(Math.max(nextTime, 0), duration);
 
     clearTransitionPreview();
-    onTimeChange(safeTime);
+    lastPreviewTimeRef.current = safeTime;
+    setPreviewTime(safeTime);
     if (player) {
       player.seekTo(Math.round(safeTime * PHOTO_SLIDESHOW_FPS));
     }
   }
 
   return (
-    <section className="flex min-h-0 flex-col bg-[#f4efe8] px-4 py-4">
+    <section className="flex min-h-0 flex-col bg-[#f4efe8] px-4 py-4 xl:px-6">
       <div className="flex shrink-0 items-center justify-between gap-3">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">
@@ -674,19 +713,19 @@ function MusicVideoPreview({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 items-center justify-center py-4">
+      <div className="flex min-h-0 flex-1 items-center justify-center py-4 xl:py-6">
         <div
           className={cn(
             "relative overflow-hidden border-[10px] border-[#171412] bg-[#171412] shadow-2xl shadow-black/25",
             aspectRatio === "portrait"
               ? "aspect-[9/16] h-full max-h-[min(72vh,760px)] min-h-[420px] rounded-[34px]"
-              : "aspect-[16/9] w-full max-w-[min(70vw,860px)] rounded-[28px]",
+              : "aspect-[16/9] w-full max-w-[min(100%,1180px,calc(177.78vh-23.11rem))] rounded-[28px]",
           )}
         >
           <div className="absolute inset-0 rounded-[24px] bg-black">
             <Player
               ref={playerRef}
-              key={timeline.templateId}
+              key={`${timeline.templateId}-${previewDimensions.label}`}
               acknowledgeRemotionLicense
               component={PreviewComposition}
               compositionHeight={previewDimensions.height}
@@ -737,7 +776,7 @@ function MusicVideoPreview({
             min={0}
             step={1 / PHOTO_SLIDESHOW_FPS}
             type="range"
-            value={Math.min(currentTime, duration)}
+            value={Math.min(previewTime, duration)}
             onChange={(event) => handleSeek(event.currentTarget.valueAsNumber)}
           />
           <div
@@ -747,7 +786,7 @@ function MusicVideoPreview({
           />
         </div>
         <div className="mt-2 flex justify-between text-xs font-bold text-stone-500">
-          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(previewTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
@@ -977,6 +1016,109 @@ function LyricsColorField({
   );
 }
 
+function LyricsStyleSettings({
+  forceCenterPosition = false,
+  lyricsStyle,
+  onChangeLyricsStyle,
+}: {
+  forceCenterPosition?: boolean;
+  lyricsStyle: LyricsStyleConfig;
+  onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
+}) {
+  const isRollingFlow = lyricsStyle.entrance === "rolling-flow";
+  const lockCenterPosition = forceCenterPosition || isRollingFlow;
+
+  return (
+    <div className="space-y-4">
+      <LyricsFontPicker
+        value={lyricsStyle.fontFamily}
+        onChange={(fontFamily) => onChangeLyricsStyle({ fontFamily })}
+      />
+      <LyricsSliderField
+        label="Size"
+        max={120}
+        min={24}
+        step={1}
+        value={lyricsStyle.fontSize}
+        onChange={(fontSize) => onChangeLyricsStyle({ fontSize })}
+      />
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+        <LyricsColorField
+          label="Text color"
+          value={lyricsStyle.color}
+          onChange={(color) => onChangeLyricsStyle({ color })}
+        />
+        <LyricsColorField
+          label="Border color"
+          value={lyricsStyle.strokeColor}
+          onChange={(strokeColor) => onChangeLyricsStyle({ strokeColor })}
+        />
+      </div>
+      <LyricsSliderField
+        label="Border"
+        max={15}
+        min={0}
+        step={1}
+        value={lyricsStyle.strokeWidth}
+        onChange={(strokeWidth) => onChangeLyricsStyle({ strokeWidth })}
+      />
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+            Position
+          </Label>
+          <Select
+            value={lockCenterPosition ? "center" : lyricsStyle.position}
+            onValueChange={(position) =>
+              onChangeLyricsStyle({ position: position as LyricsPosition })
+            }
+          >
+            <SelectTrigger
+              className="h-9 rounded-lg bg-white px-2 text-xs font-bold"
+              disabled={lockCenterPosition}
+            >
+              <SelectValue
+                placeholder={lockCenterPosition ? "Center only" : undefined}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {lyricsPositionOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+            Entrance
+          </Label>
+          <Select
+            value={lyricsStyle.entrance}
+            onValueChange={(entrance) =>
+              onChangeLyricsStyle({
+                entrance: entrance as LyricsEntranceMode,
+              })
+            }
+          >
+            <SelectTrigger className="h-9 rounded-lg bg-white px-2 text-xs font-bold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {lyricsEntranceOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PhotoUploadLyricsTabs({
   atmosphereOverlay,
   lyricsStyle,
@@ -994,7 +1136,6 @@ function PhotoUploadLyricsTabs({
   onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
   onDropPhotos: (files: File[]) => void;
 }) {
-  const isRollingFlow = lyricsStyle.entrance === "rolling-flow";
   const selectedOverlay =
     ATMOSPHERE_OVERLAY_OPTIONS.find(
       (option) => option.id === atmosphereOverlay.overlayId,
@@ -1039,89 +1180,10 @@ function PhotoUploadLyricsTabs({
       </TabsContent>
 
       <TabsContent className="mt-3 space-y-4" value="lyrics">
-        <LyricsFontPicker
-          value={lyricsStyle.fontFamily}
-          onChange={(fontFamily) => onChangeLyricsStyle({ fontFamily })}
+        <LyricsStyleSettings
+          lyricsStyle={lyricsStyle}
+          onChangeLyricsStyle={onChangeLyricsStyle}
         />
-        <LyricsSliderField
-          label="Size"
-          max={120}
-          min={24}
-          step={1}
-          value={lyricsStyle.fontSize}
-          onChange={(fontSize) => onChangeLyricsStyle({ fontSize })}
-        />
-        <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-          <LyricsColorField
-            label="Text color"
-            value={lyricsStyle.color}
-            onChange={(color) => onChangeLyricsStyle({ color })}
-          />
-          <LyricsColorField
-            label="Border color"
-            value={lyricsStyle.strokeColor}
-            onChange={(strokeColor) => onChangeLyricsStyle({ strokeColor })}
-          />
-        </div>
-        <LyricsSliderField
-          label="Border"
-          max={15}
-          min={0}
-          step={1}
-          value={lyricsStyle.strokeWidth}
-          onChange={(strokeWidth) => onChangeLyricsStyle({ strokeWidth })}
-        />
-        <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
-              Position
-            </Label>
-            <Select
-              value={isRollingFlow ? "center" : lyricsStyle.position}
-              onValueChange={(position) =>
-                onChangeLyricsStyle({ position: position as LyricsPosition })
-              }
-            >
-              <SelectTrigger
-                className="h-9 rounded-lg bg-white px-2 text-xs font-bold"
-                disabled={isRollingFlow}
-              >
-                <SelectValue placeholder={isRollingFlow ? "Center only" : undefined} />
-              </SelectTrigger>
-              <SelectContent>
-                {lyricsPositionOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
-              Entrance
-            </Label>
-            <Select
-              value={lyricsStyle.entrance}
-              onValueChange={(entrance) =>
-                onChangeLyricsStyle({
-                  entrance: entrance as LyricsEntranceMode,
-                })
-              }
-            >
-              <SelectTrigger className="h-9 rounded-lg bg-white px-2 text-xs font-bold">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {lyricsEntranceOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
       </TabsContent>
 
       <TabsContent className="mt-3 space-y-4" value="overlay">
@@ -1556,13 +1618,11 @@ function LyricPhotoTimeline({
 }
 
 function MinimalVinylEditor({
-  coverPhoto,
-  cues,
-  songTitle,
+  lyricsStyle,
+  onChangeLyricsStyle,
 }: {
-  coverPhoto: UploadedPhoto | null;
-  cues: ReturnType<typeof parseTimestampedLyrics>;
-  songTitle: string;
+  lyricsStyle: LyricsStyleConfig;
+  onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
 }) {
   return (
     <ScrollArea
@@ -1572,83 +1632,108 @@ function MinimalVinylEditor({
       data-music-video-editor-main
     >
       <div className="min-h-full min-w-0 space-y-3 p-3">
-        <section className="overflow-hidden rounded-xl border border-amber-200 bg-[#24120d] text-white shadow-sm">
-          <div className="relative aspect-[4/3]">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_18%,rgba(255,244,194,.95)_0_12%,transparent_30%),radial-gradient(circle_at_78%_38%,rgba(248,113,22,.75)_0_16%,transparent_38%),linear-gradient(145deg,#3b0704_0%,#991b1b_48%,#f59e0b_100%)]" />
-            <div className="absolute left-1/2 top-1/2 size-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-amber-100/35 bg-black shadow-2xl">
-              <div className="absolute inset-5 rounded-full border border-white/10" />
-              <div className="absolute inset-10 overflow-hidden rounded-full bg-amber-400">
-                {coverPhoto ? (
-                  <img
-                    alt={coverPhoto.name}
-                    className="size-full object-cover"
-                    src={coverPhoto.objectUrl}
-                  />
-                ) : (
-                  <span className="flex size-full items-center justify-center px-1 text-center text-[9px] font-black uppercase leading-3 text-stone-900">
-                    {songTitle}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="absolute inset-x-3 bottom-3 rounded-lg bg-black/30 px-3 py-2 backdrop-blur-sm">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-100">
-                Minimal Vinyl Record
-              </p>
-              <p className="mt-1 line-clamp-1 text-sm font-black">
-                {songTitle}
-              </p>
-            </div>
-          </div>
-        </section>
-
         <section className="rounded-xl border border-amber-200 bg-white/90 p-3 shadow-sm">
           <div className="flex items-center gap-2 text-sm font-black text-foreground">
-            <Music2 className="size-4 text-amber-600" />
-            Vinyl Settings
+            <Type className="size-4 text-amber-600" />
+            Lyrics Config
           </div>
-          <div className="mt-3 space-y-2 text-xs font-bold text-stone-600">
-            <div className="flex items-center justify-between gap-3 rounded-lg bg-amber-50 px-3 py-2">
-              <span>Center label</span>
-              <span className="max-w-[180px] truncate text-stone-900">
-                {coverPhoto ? "Song cover" : "Title fallback"}
-              </span>
+          <div className="mt-3">
+            <LyricsStyleSettings
+              lyricsStyle={lyricsStyle}
+              onChangeLyricsStyle={onChangeLyricsStyle}
+            />
+          </div>
+        </section>
+      </div>
+    </ScrollArea>
+  );
+}
+
+function WaveRadioEditor({
+  backgroundId,
+  lyricsStyle,
+  onChangeLyricsStyle,
+  onSelectBackground,
+}: {
+  backgroundId: string;
+  lyricsStyle: LyricsStyleConfig;
+  onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
+  onSelectBackground: (backgroundId: string) => void;
+}) {
+  return (
+    <ScrollArea
+      className="min-h-0 min-w-0 overflow-y-auto rounded-xl border border-cyan-200 bg-[#eefcff]"
+      data-music-video-editor-main
+      data-music-video-editor-scroll
+      data-wave-radio-editor
+    >
+      <div className="min-h-full min-w-0 space-y-3 p-3">
+        <section className="rounded-xl border border-cyan-200 bg-white/90 p-3 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2 text-sm font-black text-foreground">
+              <Radio className="size-4 shrink-0 text-cyan-600" />
+              <span className="truncate">Background Video</span>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-lg bg-amber-50 px-3 py-2">
-              <span>Background</span>
-              <span className="text-stone-900">Red-gold light leak</span>
-            </div>
-            <div className="flex items-center justify-between gap-3 rounded-lg bg-amber-50 px-3 py-2">
-              <span>Motion</span>
-              <span className="text-stone-900">Audio-reactive</span>
-            </div>
+            <Badge className="shrink-0" variant="secondary">
+              {WAVE_RADIO_BACKGROUND_OPTIONS.length} clips
+            </Badge>
+          </div>
+
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {WAVE_RADIO_BACKGROUND_OPTIONS.map(
+              (background: WaveRadioBackgroundOption) => {
+                const isActive = background.id === backgroundId;
+
+                return (
+                  <button
+                    key={background.id}
+                    className={cn(
+                      "group overflow-hidden rounded-xl border bg-stone-950 text-left shadow-sm transition",
+                      isActive
+                        ? "border-cyan-400 ring-2 ring-cyan-200"
+                        : "border-stone-200 hover:border-cyan-300",
+                    )}
+                    data-wave-radio-background-option
+                    type="button"
+                    onClick={() => onSelectBackground(background.id)}
+                  >
+                    <div className="relative aspect-video overflow-hidden">
+                      <video
+                        muted
+                        loop
+                        playsInline
+                        className="size-full object-cover opacity-80 transition duration-300 group-hover:scale-105"
+                        preload="metadata"
+                        src={background.src}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-white/10" />
+                      {isActive ? (
+                        <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-cyan-400 text-stone-950 shadow-sm">
+                          <Check className="size-3.5" />
+                        </span>
+                      ) : null}
+                      <span className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] truncate text-xs font-black text-white">
+                        {background.label}
+                      </span>
+                    </div>
+                  </button>
+                );
+              },
+            )}
           </div>
         </section>
 
-        <section className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-sm font-black text-foreground">
-              <Film className="size-4" />
-              Lyric Roll
-            </div>
-            <Badge variant="secondary">{cues.length} cues</Badge>
+        <section className="rounded-xl border border-cyan-200 bg-white/90 p-3 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-black text-foreground">
+            <Type className="size-4 text-cyan-600" />
+            Lyrics Config
           </div>
-          <div className="space-y-2 pb-4">
-            {cues.map((cue) => (
-              <div
-                key={cue.id}
-                className="min-w-0 rounded-xl border border-amber-100 bg-white/90 px-3 py-2 shadow-sm"
-              >
-                <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-amber-600">
-                  <span>{formatTime(cue.start)}</span>
-                  <span className="text-stone-300">-</span>
-                  <span>{formatTime(cue.end)}</span>
-                </div>
-                <p className="mt-1 line-clamp-1 text-[13px] font-bold leading-5 text-foreground">
-                  {cue.text}
-                </p>
-              </div>
-            ))}
+          <div className="mt-3">
+            <LyricsStyleSettings
+              forceCenterPosition
+              lyricsStyle={lyricsStyle}
+              onChangeLyricsStyle={onChangeLyricsStyle}
+            />
           </div>
         </section>
       </div>
@@ -1677,15 +1762,19 @@ export function MusicVideoEditorDrawer({
   const [previewTransitionLoop, setPreviewTransitionLoop] =
     useState<TransitionPreviewLoop | null>(null);
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
-  const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [previewAspectRatio, setPreviewAspectRatio] =
     useState<PreviewAspectRatio>("portrait");
   const [lyricsStyle, setLyricsStyle] =
     useState<LyricsStyleConfig>(DEFAULT_LYRICS_STYLE);
+  const [waveRadioBackgroundId, setWaveRadioBackgroundId] = useState(
+    DEFAULT_WAVE_RADIO_BACKGROUND.id,
+  );
   const [atmosphereOverlay, setAtmosphereOverlay] =
     useState<AtmosphereOverlayConfig>(DEFAULT_ATMOSPHERE_OVERLAY);
-  const [editorWidth, setEditorWidth] = useState(DEFAULT_EDITOR_WIDTH);
+  const [editorWidth, setEditorWidth] = useState(() =>
+    clampEditorWidth(DEFAULT_EDITOR_WIDTH),
+  );
   const [latestVideo, setLatestVideo] =
     useState<MusicVideoRenderRecord | null>(null);
   const [renderProgress, setRenderProgress] = useState(0);
@@ -1759,8 +1848,25 @@ export function MusicVideoEditorDrawer({
             photos: [],
             songTitle,
             templateId: "minimal-vinyl",
+            lyricsStyle,
             transitions: [],
           }
+        : activeTemplate === "wave-radio"
+          ? {
+              assignments: [],
+              audioUrl,
+              duration: playerDuration,
+              lyrics: cues,
+              photos: [],
+              songTitle,
+              templateId: "wave-radio",
+              lyricsStyle: {
+                ...lyricsStyle,
+                position: "center",
+              },
+              transitions: [],
+              waveRadioBackgroundId,
+            }
         : {
             assignments,
             atmosphereOverlay,
@@ -1786,12 +1892,26 @@ export function MusicVideoEditorDrawer({
       playerDuration,
       songTitle,
       timelineTransitions,
+      waveRadioBackgroundId,
     ],
   );
 
   useEffect(() => {
     photosRef.current = photos;
   }, [photos]);
+
+  useEffect(() => {
+    function handleWindowResize() {
+      setEditorWidth((currentWidth) =>
+        clampEditorWidth(currentWidth, window.innerWidth),
+      );
+    }
+
+    handleWindowResize();
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => window.removeEventListener("resize", handleWindowResize);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -1953,7 +2073,6 @@ export function MusicVideoEditorDrawer({
     setTransitionAssignments(buildRandomTransitionAssignments({ cues }));
     setPreviewTransitionLoop(null);
     setIsPlaying(false);
-    setCurrentTime(0);
     toast.success("One-click movie layout applied.");
   }
 
@@ -1992,7 +2111,6 @@ export function MusicVideoEditorDrawer({
 
     setPreviewTransitionLoop(null);
     setIsPlaying(false);
-    setCurrentTime(0);
     setActiveTemplate(template.id);
   }
 
@@ -2001,7 +2119,9 @@ export function MusicVideoEditorDrawer({
     const startWidth = editorWidth;
 
     function resize(nextClientX: number) {
-      setEditorWidth(clampEditorWidth(startWidth + startX - nextClientX));
+      setEditorWidth(
+        clampEditorWidth(startWidth + startX - nextClientX, window.innerWidth),
+      );
     }
 
     function handleMouseMove(event: MouseEvent) {
@@ -2093,7 +2213,18 @@ export function MusicVideoEditorDrawer({
             lyrics,
             fallbackImageUrl: imageUrl,
             timestampedLyrics,
+            lyricsStyle,
           })
+        : activeTemplate === "wave-radio"
+          ? buildWaveRadioTimeline({
+              songTitle,
+              audioUrl,
+              duration: playerDuration,
+              lyrics,
+              timestampedLyrics,
+              lyricsStyle,
+              waveRadioBackgroundId,
+            })
         : buildPhotoSlideshowTimeline({
             songTitle,
             audioUrl,
@@ -2162,7 +2293,7 @@ export function MusicVideoEditorDrawer({
           <div className="min-h-0 flex-1 bg-[#f4efe8]">{emptyState}</div>
         ) : (
           <div
-            className="grid min-h-0 flex-1 overflow-hidden bg-[#f4efe8] lg:grid-cols-[230px_minmax(360px,1fr)_var(--music-video-editor-width)]"
+            className="grid min-h-0 flex-1 overflow-hidden bg-[#f4efe8] lg:grid-cols-[220px_minmax(420px,1fr)_minmax(360px,var(--music-video-editor-width))] 2xl:grid-cols-[210px_minmax(560px,1fr)_minmax(360px,var(--music-video-editor-width))]"
             style={
               {
                 "--music-video-editor-width": `${editorWidth}px`,
@@ -2176,7 +2307,6 @@ export function MusicVideoEditorDrawer({
 
             <MusicVideoPreview
               aspectRatio={previewAspectRatio}
-              currentTime={currentTime}
               duration={playerDuration}
               isPlaying={isPlaying}
               latestVideo={latestVideo}
@@ -2189,7 +2319,6 @@ export function MusicVideoEditorDrawer({
               onPause={handlePausePreview}
               onPlayerDuration={setPlayerDuration}
               onPlay={() => setIsPlaying(true)}
-              onTimeChange={setCurrentTime}
               onToggleAspectRatio={handleTogglePreviewAspectRatio}
               songTitle={songTitle}
             />
@@ -2220,7 +2349,9 @@ export function MusicVideoEditorDrawer({
                   <p className="text-sm font-black text-foreground">
                     {activeTemplate === "minimal-vinyl"
                       ? "Minimal Vinyl"
-                      : "Photo Slideshow"}
+                      : activeTemplate === "wave-radio"
+                        ? "Dynamic Wave Radio"
+                        : "Photo Slideshow"}
                   </p>
                 </div>
                 {canOneClickMovie ? (
@@ -2266,9 +2397,20 @@ export function MusicVideoEditorDrawer({
               {activeTemplate === "minimal-vinyl" ? (
                 <div className="min-h-0 flex-1 p-3">
                   <MinimalVinylEditor
-                    coverPhoto={coverPhoto}
-                    cues={cues}
-                    songTitle={songTitle}
+                    lyricsStyle={lyricsStyle}
+                    onChangeLyricsStyle={handleChangeLyricsStyle}
+                  />
+                </div>
+              ) : activeTemplate === "wave-radio" ? (
+                <div className="min-h-0 flex-1 p-3">
+                  <WaveRadioEditor
+                    backgroundId={waveRadioBackgroundId}
+                    lyricsStyle={{
+                      ...lyricsStyle,
+                      position: "center",
+                    }}
+                    onChangeLyricsStyle={handleChangeLyricsStyle}
+                    onSelectBackground={setWaveRadioBackgroundId}
                   />
                 </div>
               ) : (

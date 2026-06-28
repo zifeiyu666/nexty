@@ -608,7 +608,7 @@
   --primary-foreground: rgb(255, 255, 255);
   --secondary: rgb(255, 255, 255);
   --secondary-foreground: rgb(59, 55, 53);
-  --muted: rgb(250, 243, 240);
+  --muted: rgb(249, 243, 241);
   --muted-foreground: rgb(127, 112, 104);
   --accent: rgb(255, 219, 228);
   --accent-foreground: rgb(179, 62, 93);
@@ -791,5 +791,116 @@
   .cta-subtitle strong {
     font-weight: inherit;
     color: inherit;
+  }
+
+  .song-waveform-bar {
+    transform-origin: center;
+  }
+
+  .song-waveform-bar[style*="animation-duration"] {
+    animation-name: song-waveform-pulse;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  .song-cover-visualizer {
+    pointer-events: none;
+    opacity: 0.32;
+    transform: scale(0.94);
+  }
+
+  .song-cover-visualizer-line {
+    opacity: 0.16;
+    filter: drop-shadow(0 0 2px rgb(224 65 50 / 0.12));
+    stroke: var(--color-primary);
+    stroke-dasharray: 8 76;
+    stroke-dashoffset: 0;
+  }
+
+  .song-cover-visualizer-line:nth-child(3n + 2) {
+    stroke: var(--color-accent-foreground);
+  }
+
+  .song-cover-visualizer-line:nth-child(4n) {
+    stroke: var(--color-chart-3);
+  }
+
+  .song-cover-visualizer.is-playing {
+    opacity: 0.78;
+    transform: scale(1);
+  }
+
+  .song-cover-visualizer.is-playing .song-cover-visualizer-line {
+    animation: song-cover-wave 680ms ease-in-out infinite alternate;
+    animation-delay: var(--wave-delay);
+  }
+
+  .song-cover-playback-ring-base {
+    stroke: rgb(255 255 255 / 0.48);
+    filter: drop-shadow(0 0 4px rgb(255 255 255 / 0.24));
+  }
+
+  .song-cover-playback-ring-progress {
+    stroke: rgb(224 65 50 / 0.76);
+    filter: drop-shadow(0 0 4px rgb(224 65 50 / 0.22));
+    transition: stroke-dashoffset 180ms linear;
+  }
+
+  .handwritten-subtitle {
+    font-family:
+      "Bradley Hand",
+      "Comic Sans MS",
+      cursive;
+    font-size: 1rem;
+    line-height: 1.75rem;
+    color: var(--muted-foreground);
+  }
+
+  .handwritten-subtitle p {
+    margin: 0;
+  }
+
+  .handwritten-subtitle strong {
+    font-weight: 400;
+    color: inherit;
+  }
+
+  @media (min-width: 48rem) {
+    .handwritten-subtitle {
+      font-size: 1.125rem;
+    }
+  }
+}
+
+@keyframes song-waveform-pulse {
+  from {
+    transform: scaleY(0.45);
+    opacity: 0.45;
+  }
+
+  to {
+    transform: scaleY(1.15);
+    opacity: 0.95;
+  }
+}
+
+@keyframes song-cover-wave {
+  from {
+    opacity: 0.34;
+    stroke-dasharray: 12 76;
+    stroke-dashoffset: 9;
+  }
+
+  to {
+    opacity: 0.76;
+    stroke-dasharray: 28 76;
+    stroke-dashoffset: -9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .song-cover-visualizer.is-playing .song-cover-visualizer-line {
+    animation: none;
   }
 }

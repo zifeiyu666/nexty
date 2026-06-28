@@ -1,60 +1,10 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowLeft,
-  ArrowRight,
-  AudioLines,
-  Cake,
-  CalendarHeart,
-  Check,
-  ChevronDown,
-  Clock3,
-  Coffee,
-  Disc3,
-  Edit3,
-  Flame,
-  Flower2,
-  Gem,
-  Gift,
-  Globe2,
-  Guitar,
-  HandHeart,
-  Headphones,
-  Heart,
-  HeartPulse,
-  ImageIcon,
-  Keyboard,
-  Languages,
-  Leaf,
-  Lightbulb,
-  Loader2,
-  LockKeyhole,
-  Mail,
-  Mic2,
-  MicOff,
-  MoonStar,
-  Music2,
-  PartyPopper,
-  Pause,
-  Play,
-  Plus,
-  RefreshCw,
-  Ribbon,
-  ShieldCheck,
-  Sparkles,
-  Trash2,
-  Trophy,
-  Upload,
-  UserRound,
-  Wand2,
-  X,
-  Zap,
-} from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   FormEvent,
-  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -63,646 +13,84 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import ChooseButton from "@/components/song/ChooseButton";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
 import {
   applyLyricsLineRewrite,
   composeLyricsText,
   createLyricsLineRewriteSuggestions,
-  EditableLyricLine,
   LyricsLineRewriteSuggestion,
   parseLyricsText,
 } from "@/lib/ai/song-lyrics";
 import { authClient } from "@/lib/auth/auth-client";
+import {
+  GenreWarningDialog,
+  LeadEmailModal,
+  LyricsVersionComparisonDialog,
+  NewLyricsVersionDialog,
+} from "@/components/song/custom-song-wizard/components/dialogs";
+
+import {
+  createCheckoutSession,
+  finalizeSongVersion,
+  generateStoryFromHelper,
+  getLyricsGenerationStatus,
+  getSongGenerationStatus,
+  rewriteLyricsLines,
+  startLyricsGeneration,
+  startSongGeneration,
+} from "@/components/song/custom-song-wizard/api";
+import {
+  customOccasionValue,
+  defaultGenre,
+  defaultLanguage,
+  defaultVocalGender,
+  draftStorageKey,
+  fallbackLyrics,
+  genres,
+  isCustomOccasion,
+  lyricGenerationSteps,
+  occasions,
+  slugToStep,
+  stepSlugs,
+  storyHelperSteps,
+} from "@/components/song/custom-song-wizard/constants";
+import {
+  cleanRecipients,
+  createLyricsInputKey,
+  getRecommendedGenresForOccasion,
+  isLegacyEmptyStyleDraft,
+  normalizeRecipientsFromDraft,
+} from "@/components/song/custom-song-wizard/draft";
+import {
+  useAudioPreview,
+  useFocusCustomOccasionInput,
+  useStopSpeechRecognitionOnUnmount,
+} from "@/components/song/custom-song-wizard/hooks";
+import {
+  PaywallModal,
+  StepFrame,
+  StepHeading,
+  StepProgress,
+  StoryHelperModal,
+} from "@/components/song/custom-song-wizard/components/wizard-ui";
+import { LyricsStep } from "@/components/song/custom-song-wizard/steps/LyricsStep";
+import { RecipientStep } from "@/components/song/custom-song-wizard/steps/RecipientStep";
+import { SongStep } from "@/components/song/custom-song-wizard/steps/SongStep";
+import { StoryStep } from "@/components/song/custom-song-wizard/steps/StoryStep";
+import { StyleStep } from "@/components/song/custom-song-wizard/steps/StyleStep";
 import { cn } from "@/lib/utils";
-
-type Occasion = string;
-type WizardStep = 1 | 2 | 3 | 4 | 5;
-type SongStage = "loading" | "player";
-type LyricsStage = "loading" | "editor";
-
-type LyricLine = {
-  time: number;
-  line: string;
-};
-
-type SongVersion = {
-  id: string;
-  title: string;
-  audioUrl: string;
-  imageUrl?: string;
-  duration?: number;
-};
-
-type LyricsVersionComparison = {
-  originalTitle: string;
-  originalLyrics: string;
-  newTitle: string;
-  newLyrics: string;
-};
-
-type CaptureLeadResponse = {
-  userId: string;
-  email: string;
-  isNewGuest: boolean;
-  songId: string;
-  previewAudioUrl: string;
-  previewLimitSeconds?: number | null;
-  expiresAt?: string;
-  lyrics: LyricLine[];
-  versions?: SongVersion[];
-};
-
-type GenreOption = {
-  value: string;
-  label: string;
-  icon: ReactNode;
-  accent: string;
-};
-
-type LanguageOption = {
-  code: string;
-  label: string;
-};
-
-type RecipientInput = {
-  name: string;
-  relationship: string;
-};
-
-const draftStorageKey = "custom-song-wizard-draft-v1";
-const defaultGenre = "You Choose For Me";
-const defaultVocalGender = "Pick for me";
-const defaultLanguage = "English";
-const relationshipOptions = [
-  "Mother",
-  "Father",
-  "Partner",
-  "Wife",
-  "Husband",
-  "Girlfriend",
-  "Boyfriend",
-  "Daughter",
-  "Son",
-  "Sister",
-  "Brother",
-  "Grandmother",
-  "Grandfather",
-  "Best friend",
-  "Friend",
-  "Colleague",
-  "Teacher",
-  "Mentor",
-];
-
-const stepSlugs: Record<WizardStep, string> = {
-  1: "style",
-  2: "recipient",
-  3: "story",
-  4: "lyrics",
-  5: "song",
-};
-
-const slugToStep = Object.entries(stepSlugs).reduce(
-  (acc, [stepValue, slug]) => {
-    acc[slug] = Number(stepValue) as WizardStep;
-    return acc;
-  },
-  {} as Record<string, WizardStep>,
-);
-
-type StoredDraft = {
-  email?: string;
-  generatedLyrics?: string;
-  genre?: string;
-  language?: string;
-  lyricsGeneratedBy?: "ai";
-  lyricsInputKey?: string;
-  occasion?: Occasion | null;
-  recipients?: RecipientInput[];
-  recipientNames?: string[];
-  recipientRelationships?: string[];
-  songStage?: SongStage;
-  songTitle?: string;
-  story?: string;
-  vocalGender?: string;
-};
-
-const steps: Array<{ id: WizardStep; label: string }> = [
-  { id: 1, label: "STYLE" },
-  { id: 2, label: "RECIPIENT" },
-  { id: 3, label: "STORY" },
-  { id: 4, label: "LYRICS" },
-  { id: 5, label: "SONG" },
-];
-
-const genres: GenreOption[] = [
-  {
-    value: "You Choose For Me",
-    label: "You Choose For Me",
-    icon: <Sparkles className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Pop",
-    label: "Pop",
-    icon: <Mic2 className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Classic Rock",
-    label: "Classic Rock",
-    icon: <Guitar className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Hard Rock",
-    label: "Hard Rock",
-    icon: <Flame className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Pop Rock",
-    label: "Pop Rock",
-    icon: <Zap className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Indie Rock",
-    label: "Indie Rock",
-    icon: <Disc3 className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Folk Rock",
-    label: "Folk Rock",
-    icon: <Leaf className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Hip Hop",
-    label: "Hip Hop",
-    icon: <Mic2 className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "R&B",
-    label: "R&B",
-    icon: <Music2 className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Electronic dance music (EDM)",
-    label: "Electronic dance music (EDM)",
-    icon: <AudioLines className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Country",
-    label: "Country",
-    icon: <Disc3 className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Jazz",
-    label: "Jazz",
-    icon: <Keyboard className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Classical",
-    label: "Classical",
-    icon: <Music2 className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Reggae",
-    label: "Reggae",
-    icon: <Globe2 className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Romantic Ballad",
-    label: "Romantic Ballad",
-    icon: <Heart className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Folk Pop",
-    label: "Folk Pop",
-    icon: <Leaf className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Folk Country",
-    label: "Folk Country",
-    icon: <Leaf className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Acoustic",
-    label: "Acoustic",
-    icon: <Guitar className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Kids & Family",
-    label: "Kids & Family",
-    icon: <Disc3 className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Lullaby",
-    label: "Lullaby",
-    icon: <MoonStar className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Lo-Fi Chill",
-    label: "Lo-Fi Chill",
-    icon: <Coffee className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Birthday Pop",
-    label: "Birthday Pop",
-    icon: <Cake className="size-6" />,
-    accent: "text-primary",
-  },
-  {
-    value: "Latin Pop",
-    label: "Latin Pop",
-    icon: <Music2 className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-  {
-    value: "Synthwave",
-    label: "Synthwave",
-    icon: <Headphones className="size-6" />,
-    accent: "text-accent-foreground",
-  },
-];
-
-const vocalGenderOptions = [defaultVocalGender, "Male", "Female"];
-
-const featuredLanguages: LanguageOption[] = [
-  { code: "EN", label: "English" },
-  { code: "DE", label: "German" },
-  { code: "FR", label: "French" },
-  { code: "IT", label: "Italian" },
-  { code: "ES", label: "Spanish" },
-  { code: "PT", label: "Portuguese" },
-  { code: "NL", label: "Dutch" },
-];
-
-const moreLanguages: LanguageOption[] = [
-  { code: "PL", label: "Polish" },
-  { code: "SV", label: "Swedish" },
-  { code: "NO", label: "Norwegian" },
-  { code: "DA", label: "Danish" },
-  { code: "FI", label: "Finnish" },
-  { code: "IS", label: "Icelandic" },
-  { code: "CS", label: "Czech" },
-  { code: "SK", label: "Slovak" },
-  { code: "HU", label: "Hungarian" },
-  { code: "RO", label: "Romanian" },
-  { code: "BG", label: "Bulgarian" },
-  { code: "HR", label: "Croatian" },
-  { code: "SR", label: "Serbian" },
-  { code: "SL", label: "Slovenian" },
-  { code: "MK", label: "Macedonian" },
-  { code: "BS", label: "Bosnian" },
-  { code: "SQ", label: "Albanian" },
-  { code: "EL", label: "Greek" },
-  { code: "ET", label: "Estonian" },
-  { code: "LV", label: "Latvian" },
-  { code: "LT", label: "Lithuanian" },
-  { code: "MT", label: "Maltese" },
-  { code: "GA", label: "Irish" },
-  { code: "CY", label: "Welsh" },
-  { code: "EU", label: "Basque" },
-  { code: "CA", label: "Catalan" },
-  { code: "GL", label: "Galician" },
-  { code: "ZH", label: "Chinese" },
-  { code: "HI", label: "Hindi" },
-  { code: "KO", label: "Korean" },
-  { code: "RU", label: "Russian" },
-  { code: "AR", label: "Arabic" },
-  { code: "TR", label: "Turkish" },
-];
-
-const occasions: Array<{
-  value: Occasion;
-  icon: ReactNode;
-  title: string;
-  subtitle: string;
-}> = [
-  {
-    value: "mothers-day",
-    icon: <Flower2 className="size-6" />,
-    title: "Mother's Day",
-    subtitle: "A warm thank-you song for mom.",
-  },
-  {
-    value: "birthday",
-    icon: <Cake className="size-6" />,
-    title: "Birthday",
-    subtitle: "A celebratory song for their day.",
-  },
-  {
-    value: "just-because",
-    icon: <Sparkles className="size-6" />,
-    title: "Just Because",
-    subtitle: "A surprise song without needing a reason.",
-  },
-  {
-    value: "anniversary",
-    icon: <CalendarHeart className="size-6" />,
-    title: "Anniversary",
-    subtitle: "A romantic keepsake for your story.",
-  },
-  {
-    value: "wedding",
-    icon: <Gem className="size-6" />,
-    title: "Wedding",
-    subtitle: "A heartfelt song for the big day.",
-  },
-  {
-    value: "fathers-day",
-    icon: <ShieldCheck className="size-6" />,
-    title: "Father's Day",
-    subtitle: "A gratitude song for dad.",
-  },
-  {
-    value: "valentines-day",
-    icon: <Heart className="size-6" />,
-    title: "Valentine's Day",
-    subtitle: "A love song for your favorite person.",
-  },
-  {
-    value: "congratulations",
-    icon: <Trophy className="size-6" />,
-    title: "Congratulations",
-    subtitle: "Celebrate a milestone or big win.",
-  },
-  {
-    value: "get-well-soon",
-    icon: <HeartPulse className="size-6" />,
-    title: "Get Well Soon",
-    subtitle: "A gentle song for comfort and hope.",
-  },
-  {
-    value: "thank-you",
-    icon: <HandHeart className="size-6" />,
-    title: "Thank You",
-    subtitle: "Say what ordinary words cannot.",
-  },
-  {
-    value: "in-memoriam",
-    icon: <Ribbon className="size-6" />,
-    title: "In Memoriam",
-    subtitle: "A respectful song for remembrance.",
-  },
-  {
-    value: "something-else",
-    icon: <Plus className="size-6" />,
-    title: "Something else",
-    subtitle: "Use your own context and details.",
-  },
-];
-
-const customOccasionValue = "something-else";
-const suggestedCustomOccasions = [
-  "Retirement",
-  "Housewarming",
-  "Graduation",
-  "New Baby",
-  "Friendship",
-  "Apology",
-  "Long Distance",
-  "New Job",
-];
-
-function isCustomOccasion(value: Occasion | null | undefined) {
-  return Boolean(
-    value &&
-      value !== customOccasionValue &&
-      !occasions.some((item) => item.value === value),
-  );
-}
-
-const storyPlaceholders: Record<string, string> = {
-  anniversary:
-    "e.g., We met in 2018 at a cozy coffee shop in Seattle. He always calls me 'Little Piggy'. We traveled to Iceland together last year...",
-  "mothers-day":
-    "e.g., My mom sings while cooking Sunday dinner. She taught me to be brave, always texts me before big days, and still calls me her sunshine...",
-  wedding:
-    "e.g., Our first dance is for Maya and Theo. They met at a bookstore, got engaged in Lisbon, and love dancing in the kitchen after midnight...",
-  birthday:
-    "e.g., Jamie and I became friends in college. We survived terrible karaoke nights, a road trip with no AC, and still laugh about the pizza incident...",
-};
-
-const helperTags = [
-  {
-    label: "Our First Meeting",
-    text: "Our first meeting felt unforgettable because ",
-  },
-  {
-    label: "Inside Jokes",
-    text: "One inside joke that always makes us laugh is ",
-  },
-  {
-    label: "What I Want to Say",
-    text: "What I really want to say in this song is ",
-  },
-];
-
-type StoryHelperStep = {
-  group: 1 | 2 | 3;
-  mode: "choice" | "detail";
-  question: string;
-  options?: string[];
-};
-
-const storyHelperSteps: StoryHelperStep[] = [
-  {
-    group: 1,
-    mode: "choice",
-    question: "What do you admire most about them?",
-    options: [
-      "Kind and caring",
-      "Funny and joyful",
-      "Strong and inspiring",
-      "Always supportive",
-      "Truly unique",
-    ],
-  },
-  {
-    group: 1,
-    mode: "detail",
-    question: "Share one short example.",
-  },
-  {
-    group: 2,
-    mode: "choice",
-    question: "Which memory with them should we include?",
-    options: [
-      "A big milestone",
-      "A trip together",
-      "A quiet everyday moment",
-      "A funny moment",
-      "A tough day we got through",
-    ],
-  },
-  {
-    group: 2,
-    mode: "detail",
-    question: "What happened, and why did it matter?",
-  },
-  {
-    group: 3,
-    mode: "choice",
-    question: "What message should they hear today?",
-    options: [
-      "Thank you",
-      "I love you",
-      "I am proud of you",
-      "You inspire me",
-      "I am here for you",
-    ],
-  },
-  {
-    group: 3,
-    mode: "detail",
-    question: "Any final words to include?",
-  },
-];
-
-const loadingMessages = [
-  "Analyzing your beautiful story...",
-  "Weaving memories into poetic lyrics...",
-  "Tuning studio-quality instruments...",
-];
-
-const lyricGenerationSteps = [
-  "Understanding your story",
-  "Writing the verses & chorus",
-  "Shaping the title",
-];
-
-const fallbackLyrics: LyricLine[] = [
-  { time: 0, line: "I kept the small things you told me" },
-  { time: 6, line: "Turned every laugh into a melody" },
-  { time: 12, line: "If home is a voice, then yours is mine" },
-  { time: 18, line: "Thirty seconds, but a lifetime inside" },
-  { time: 24, line: "This is your story learning how to shine" },
-];
-
-const stepVariants = {
-  enter: { opacity: 0, y: 18 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -18 },
-};
-
-function createLyricsInputKey({
-  genre,
-  language,
-  occasion,
-  recipients,
-  story,
-  vocalGender,
-}: {
-  genre: string;
-  language: string;
-  occasion: Occasion | null;
-  recipients: RecipientInput[];
-  story: string;
-  vocalGender: string;
-}) {
-  return JSON.stringify({
-    genre,
-    language,
-    occasion,
-    recipients: cleanRecipients(recipients),
-    story: story.trim(),
-    vocalGender,
-  });
-}
-
-function isLegacyEmptyStyleDraft(draft: StoredDraft) {
-  const hasRecipients =
-    draft.recipients?.some(
-      (recipient) =>
-        recipient.name.trim() || recipient.relationship.trim(),
-    ) || draft.recipientNames?.some((name) => name.trim());
-  const hasProgress = Boolean(
-    draft.generatedLyrics?.trim() ||
-      draft.lyricsGeneratedBy ||
-      draft.lyricsInputKey ||
-      draft.occasion ||
-      hasRecipients ||
-      draft.songTitle?.trim() ||
-      draft.story?.trim(),
-  );
-
-  return (
-    !hasProgress &&
-    draft.genre === "Pop" &&
-    draft.vocalGender === "Female" &&
-    (!draft.language || draft.language === defaultLanguage)
-  );
-}
-
-function normalizeRecipientsFromDraft(draft: StoredDraft): RecipientInput[] {
-  const recipients =
-    draft.recipients?.map((recipient) => ({
-      name: recipient.name || "",
-      relationship: recipient.relationship || "",
-    })) ||
-    draft.recipientNames?.map((name, index) => ({
-      name,
-      relationship: draft.recipientRelationships?.[index] || "",
-    })) ||
-    [];
-
-  const normalized = recipients.slice(0, 3);
-  return normalized.length ? normalized : [{ name: "", relationship: "" }];
-}
-
-function cleanRecipients(recipients: RecipientInput[]) {
-  return recipients
-    .map((recipient) => ({
-      name: recipient.name.trim(),
-      relationship: recipient.relationship.trim(),
-    }))
-    .filter((recipient) => recipient.name);
-}
-
+import type {
+  CaptureLeadResponse,
+  GenreOption,
+  LyricsStage,
+  LyricsVersionComparison,
+  Occasion,
+  RecipientInput,
+  SongStage,
+  SongVersion,
+  StoredDraft,
+  WizardStep,
+} from "@/components/song/custom-song-wizard/types";
 export function CustomSongWizard() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
@@ -764,7 +152,9 @@ export function CustomSongWizard() {
   const [audioDuration, setAudioDuration] = useState(60);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-  const [finalizingVersion, setFinalizingVersion] = useState<string | null>(null);
+  const [finalizingVersion, setFinalizingVersion] = useState<string | null>(
+    null,
+  );
   const [selectedVersion, setSelectedVersion] = useState("A");
   const [selectedProviderVersion, setSelectedProviderVersion] = useState("A");
   const [activeVersion, setActiveVersion] = useState("A");
@@ -774,7 +164,9 @@ export function CustomSongWizard() {
     Array(storyHelperSteps.length).fill(""),
   );
   const [isCreatingStory, setIsCreatingStory] = useState(false);
+  const [isPolishingStory, setIsPolishingStory] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [pendingGenre, setPendingGenre] = useState<GenreOption | null>(null);
 
   const selectedOccasion = useMemo(() => {
     const matchedOccasion = occasions.find((item) => item.value === occasion);
@@ -790,9 +182,10 @@ export function CustomSongWizard() {
   }, [occasion]);
   const showCustomOccasionInput =
     occasion === customOccasionValue || isCustomOccasion(occasion);
-  const cleanRecipientList = useMemo(() => cleanRecipients(recipients), [
-    recipients,
-  ]);
+  const cleanRecipientList = useMemo(
+    () => cleanRecipients(recipients),
+    [recipients],
+  );
   const recipientNameList = useMemo(
     () => cleanRecipientList.map((recipient) => recipient.name).filter(Boolean),
     [cleanRecipientList],
@@ -831,6 +224,36 @@ export function CustomSongWizard() {
     selectedOccasion?.title || "For someone special";
   const selectedOccasionShortTitle =
     selectedOccasionTitle.split("/")[0].trim() || "recipient";
+  const recommendedGenreValues = useMemo(
+    () => getRecommendedGenresForOccasion(occasion),
+    [occasion],
+  );
+  const recommendedGenreSet = useMemo(
+    () => new Set(recommendedGenreValues),
+    [recommendedGenreValues],
+  );
+  const sortedGenres = useMemo(() => {
+    const order = new Map(
+      recommendedGenreValues.map((value, index) => [value, index]),
+    );
+
+    return [...genres].sort((a, b) => {
+      const aRecommended = recommendedGenreSet.has(a.value);
+      const bRecommended = recommendedGenreSet.has(b.value);
+
+      if (aRecommended && bRecommended) {
+        return (order.get(a.value) ?? 999) - (order.get(b.value) ?? 999);
+      }
+
+      if (aRecommended !== bRecommended) return aRecommended ? -1 : 1;
+      return (
+        genres.findIndex((item) => item.value === a.value) -
+        genres.findIndex((item) => item.value === b.value)
+      );
+    });
+  }, [recommendedGenreSet, recommendedGenreValues]);
+  const selectedGenreIsNotRecommended =
+    Boolean(genre) && !recommendedGenreSet.has(genre);
   const currentLyricsInputKey = createLyricsInputKey({
     genre,
     language,
@@ -1009,35 +432,33 @@ export function CustomSongWizard() {
     }
   }, [email, session?.user?.email]);
 
-  const requestLyricsGeneration = useCallback(async ({
-    comparisonSource,
-    revisionInstruction = "",
-  }: {
-    comparisonSource?: { lyrics: string; title: string } | null;
-    revisionInstruction?: string;
-  } = {}) => {
-    if (!occasion || story.trim().length < 10) return;
-    const trimmedRevisionInstruction = revisionInstruction.trim();
-    const isComparisonGeneration = Boolean(comparisonSource);
+  const requestLyricsGeneration = useCallback(
+    async ({
+      comparisonSource,
+      revisionInstruction = "",
+    }: {
+      comparisonSource?: { lyrics: string; title: string } | null;
+      revisionInstruction?: string;
+    } = {}) => {
+      if (!occasion || story.trim().length < 10) return;
+      const trimmedRevisionInstruction = revisionInstruction.trim();
+      const isComparisonGeneration = Boolean(comparisonSource);
 
-    setLyricsStage("loading");
-    setLyricsError("");
-    setLyricsTaskId("");
-    if (!isComparisonGeneration) {
-      setLyricsGeneratedBy(null);
-      setLyricsInputKey("");
-      setSongTitle("");
-      setGeneratedLyrics("");
-    }
-    setPendingLyricsComparisonSource(comparisonSource ?? null);
-    setLyricsRequestInputKey(currentLyricsInputKey);
-    setLyricLoadingStep(0);
+      setLyricsStage("loading");
+      setLyricsError("");
+      setLyricsTaskId("");
+      if (!isComparisonGeneration) {
+        setLyricsGeneratedBy(null);
+        setLyricsInputKey("");
+        setSongTitle("");
+        setGeneratedLyrics("");
+      }
+      setPendingLyricsComparisonSource(comparisonSource ?? null);
+      setLyricsRequestInputKey(currentLyricsInputKey);
+      setLyricLoadingStep(0);
 
-    try {
-      const response = await fetch("/api/songs/lyrics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      try {
+        const data = await startLyricsGeneration({
           occasion,
           genre,
           language,
@@ -1047,57 +468,54 @@ export function CustomSongWizard() {
           revisionInstruction: trimmedRevisionInstruction || undefined,
           story,
           vocalGender,
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Unable to start lyrics generation.");
-      }
-      if (result.data.status === "succeeded") {
-        if (comparisonSource) {
-          setLyricsVersionComparison({
-            originalTitle: comparisonSource.title,
-            originalLyrics: comparisonSource.lyrics,
-            newTitle: result.data.title || "Your Custom Song",
-            newLyrics: result.data.lyrics || "",
-          });
+        });
+        if (data.status === "succeeded") {
+          if (comparisonSource) {
+            setLyricsVersionComparison({
+              originalTitle: comparisonSource.title,
+              originalLyrics: comparisonSource.lyrics,
+              newTitle: data.title || "Your Custom Song",
+              newLyrics: data.lyrics || "",
+            });
+            setPendingLyricsComparisonSource(null);
+            setLyricsRequestInputKey("");
+            setLyricsStage("editor");
+            return;
+          }
+
+          setSongTitle(data.title || "Your Custom Song");
+          setGeneratedLyrics(data.lyrics || "");
+          setLyricsGeneratedBy("ai");
+          setLyricsInputKey(currentLyricsInputKey);
           setPendingLyricsComparisonSource(null);
           setLyricsRequestInputKey("");
           setLyricsStage("editor");
           return;
         }
-
-        setSongTitle(result.data.title || "Your Custom Song");
-        setGeneratedLyrics(result.data.lyrics || "");
-        setLyricsGeneratedBy("ai");
-        setLyricsInputKey(currentLyricsInputKey);
-        setPendingLyricsComparisonSource(null);
+        setLyricsTaskId(data.taskId);
+      } catch (error) {
+        setLyricsError(
+          error instanceof Error
+            ? error.message
+            : "Unable to start lyrics generation.",
+        );
         setLyricsRequestInputKey("");
+        setPendingLyricsComparisonSource(null);
         setLyricsStage("editor");
-        return;
       }
-      setLyricsTaskId(result.data.taskId);
-    } catch (error) {
-      setLyricsError(
-        error instanceof Error
-          ? error.message
-          : "Unable to start lyrics generation.",
-      );
-      setLyricsRequestInputKey("");
-      setPendingLyricsComparisonSource(null);
-      setLyricsStage("editor");
-    }
-  }, [
-    currentLyricsInputKey,
-    genre,
-    language,
-    occasion,
-    cleanRecipientList,
-    recipientNameList,
-    recipientRelationshipList,
-    story,
-    vocalGender,
-  ]);
+    },
+    [
+      currentLyricsInputKey,
+      genre,
+      language,
+      occasion,
+      cleanRecipientList,
+      recipientNameList,
+      recipientRelationshipList,
+      story,
+      vocalGender,
+    ],
+  );
 
   useEffect(() => {
     if (step !== 4) return;
@@ -1151,23 +569,16 @@ export function CustomSongWizard() {
     let cancelled = false;
     const poll = async () => {
       try {
-        const response = await fetch(
-          `/api/songs/lyrics/status?taskId=${encodeURIComponent(lyricsTaskId)}`,
-        );
-        const result = await response.json();
+        const data = await getLyricsGenerationStatus(lyricsTaskId);
         if (cancelled) return;
 
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || "Unable to check lyrics status.");
-        }
-
-        if (result.data.status === "succeeded") {
+        if (data.status === "succeeded") {
           if (pendingLyricsComparisonSource) {
             setLyricsVersionComparison({
               originalTitle: pendingLyricsComparisonSource.title,
               originalLyrics: pendingLyricsComparisonSource.lyrics,
-              newTitle: result.data.title || "Your Custom Song",
-              newLyrics: result.data.lyrics || "",
+              newTitle: data.title || "Your Custom Song",
+              newLyrics: data.lyrics || "",
             });
             setPendingLyricsComparisonSource(null);
             setLyricsRequestInputKey("");
@@ -1176,8 +587,8 @@ export function CustomSongWizard() {
             return;
           }
 
-          setSongTitle(result.data.title || "Your Custom Song");
-          setGeneratedLyrics(result.data.lyrics || "");
+          setSongTitle(data.title || "Your Custom Song");
+          setGeneratedLyrics(data.lyrics || "");
           setLyricsGeneratedBy("ai");
           setLyricsInputKey(currentLyricsInputKey);
           setPendingLyricsComparisonSource(null);
@@ -1187,8 +598,8 @@ export function CustomSongWizard() {
           return;
         }
 
-        if (result.data.status === "failed") {
-          throw new Error(result.data.error || "Lyrics generation failed.");
+        if (data.status === "failed") {
+          throw new Error(data.error || "Lyrics generation failed.");
         }
       } catch (error) {
         if (cancelled) return;
@@ -1245,28 +656,20 @@ export function CustomSongWizard() {
     setProgress(8);
 
     try {
-      const response = await fetch("/api/songs/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: session?.user ? undefined : email.trim(),
-          occasion,
-          genre,
-          language,
-          recipients: cleanRecipientList,
-          recipientNames: recipientNameList,
-          recipientRelationships: recipientRelationshipList,
-          story,
-          title: songTitle,
-          lyrics: generatedLyrics,
-          vocalGender,
-        }),
+      const data = await startSongGeneration({
+        email: session?.user ? undefined : email.trim(),
+        occasion,
+        genre,
+        language,
+        recipients: cleanRecipientList,
+        recipientNames: recipientNameList,
+        recipientRelationships: recipientRelationshipList,
+        story,
+        title: songTitle,
+        lyrics: generatedLyrics,
+        vocalGender,
       });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Unable to start song generation.");
-      }
-      setSongTaskId(result.data.songId);
+      setSongTaskId(data.songId);
       setProgress(18);
     } catch (error) {
       setSongError(
@@ -1302,29 +705,22 @@ export function CustomSongWizard() {
     let cancelled = false;
     const poll = async () => {
       try {
-        const response = await fetch(
-          `/api/songs/generate/status?songId=${encodeURIComponent(songTaskId)}`,
-        );
-        const result = await response.json();
+        const data = await getSongGenerationStatus(songTaskId);
         if (cancelled) return;
-
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || "Unable to check song status.");
-        }
 
         setProgress((current) => Math.min(92, current + 12));
 
-        if (result.data.status === "succeeded") {
-          const versions = result.data.versions || [];
+        if (data.status === "succeeded") {
+          const versions = data.versions || [];
 
           setLeadData({
             userId: session?.user?.id || "guest",
             email: session?.user?.email || email,
             isNewGuest: !session?.user,
-            songId: result.data.songId,
+            songId: data.songId,
             previewAudioUrl: versions[0]?.audioUrl || "",
-            previewLimitSeconds: result.data.previewLimitSeconds,
-            expiresAt: result.data.expiresAt,
+            previewLimitSeconds: data.previewLimitSeconds,
+            expiresAt: data.expiresAt,
             lyrics: fallbackLyrics,
             versions,
           });
@@ -1337,8 +733,8 @@ export function CustomSongWizard() {
           return;
         }
 
-        if (result.data.status === "failed") {
-          throw new Error(result.data.error || "Song generation failed.");
+        if (data.status === "failed") {
+          throw new Error(data.error || "Song generation failed.");
         }
       } catch (error) {
         if (cancelled) return;
@@ -1357,58 +753,32 @@ export function CustomSongWizard() {
     };
   }, [email, router, session?.user, songStage, songTaskId]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  useAudioPreview({
+    audioRef,
+    previewAudioUrl: leadData?.previewAudioUrl,
+    previewLimitSeconds: leadData?.previewLimitSeconds,
+    onDurationChange: setAudioDuration,
+    onEnded: () => setIsPlaying(false),
+    onPreviewLimitReached: () => setIsPlaying(false),
+    onTimeChange: setPreviewTime,
+  });
 
-    const handleTimeUpdate = () => {
-      const limit = leadData?.previewLimitSeconds;
-      if (limit && audio.currentTime >= limit) {
-        audio.pause();
-        audio.currentTime = limit;
-        setIsPlaying(false);
-        toast.info("This preview is limited to 1 minute.");
-      }
-      setPreviewTime(Number(audio.currentTime.toFixed(2)));
-    };
-    const handleLoadedMetadata = () => {
-      if (Number.isFinite(audio.duration) && audio.duration > 0) {
-        setAudioDuration(audio.duration);
-      }
-    };
-    const handleEnded = () => setIsPlaying(false);
+  useFocusCustomOccasionInput({
+    inputRef: customOccasionInputRef,
+    shouldFocus: showCustomOccasionInput,
+  });
 
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, [leadData?.previewLimitSeconds, leadData?.previewAudioUrl]);
-
-  useEffect(() => {
-    if (!showCustomOccasionInput) return;
-    window.requestAnimationFrame(() => customOccasionInputRef.current?.focus());
-  }, [showCustomOccasionInput]);
-
-  useEffect(() => {
-    return () => {
-      speechRecognitionRef.current?.stop?.();
-    };
-  }, []);
+  useStopSpeechRecognitionOnUnmount({ speechRecognitionRef });
 
   const activeLyricIndex = lyrics.reduce((activeIndex, lyric, index) => {
     return previewTime >= lyric.time ? index : activeIndex;
   }, 0);
 
   const canContinue =
-    (step === 1 && Boolean(genre)) ||
-    (step === 2 &&
+    (step === 1 &&
       hasSelectedOccasion &&
       cleanRecipientList.some((recipient) => recipient.name)) ||
+    (step === 2 && Boolean(genre)) ||
     (step === 3 && story.trim().length >= 10) ||
     (step === 4 &&
       songTitle.trim().length > 0 &&
@@ -1493,20 +863,79 @@ export function CustomSongWizard() {
       .join("\n\n");
   }
 
-  function goToNextStoryHelperStep() {
+  async function polishStoryWithAi() {
+    if (!occasion || story.trim().length < 10) return;
+
+    setIsPolishingStory(true);
+
+    try {
+      const generatedStory = await generateStoryFromHelper({
+        occasion,
+        genre,
+        language,
+        recipients: cleanRecipientList,
+        recipientNames: recipientNameList,
+        recipientRelationships: recipientRelationshipList,
+        answers: [],
+        sourceStory: story,
+        vocalGender,
+      });
+
+      if (generatedStory.story.trim()) {
+        setStory(generatedStory.story);
+        toast.success("AI polished your story.");
+      }
+    } catch (error) {
+      console.error("[Story Helper] Failed to polish story:", error);
+      toast.info("AI story polishing is unavailable right now.");
+    } finally {
+      setIsPolishingStory(false);
+      window.requestAnimationFrame(() => storyTextareaRef.current?.focus());
+    }
+  }
+
+  async function goToNextStoryHelperStep() {
     if (storyHelperStep < storyHelperSteps.length - 1) {
       setStoryHelperStep((current) => current + 1);
       return;
     }
 
     setIsCreatingStory(true);
-    window.setTimeout(() => {
-      const composedStory = composeStoryFromHelper(storyHelperAnswers);
+    const composedStory = composeStoryFromHelper(storyHelperAnswers);
+
+    try {
+      if (!occasion) {
+        throw new Error("Choose an occasion before creating a story.");
+      }
+
+      const generatedStory = await generateStoryFromHelper({
+        occasion,
+        genre,
+        language,
+        recipients: cleanRecipientList,
+        recipientNames: recipientNameList,
+        recipientRelationships: recipientRelationshipList,
+        answers: storyHelperAnswers.map((answer, index) => ({
+          question: storyHelperSteps[index]?.question || `Question ${index + 1}`,
+          answer,
+        })),
+        vocalGender,
+      });
+
+      if (generatedStory.story.trim()) {
+        setStory(generatedStory.story);
+      } else if (composedStory) {
+        setStory(composedStory);
+      }
+    } catch (error) {
+      console.error("[Story Helper] Failed to generate AI story:", error);
       if (composedStory) setStory(composedStory);
+      toast.info("We used your answers directly because AI story writing was unavailable.");
+    } finally {
       setIsCreatingStory(false);
       setIsStoryHelperOpen(false);
       window.requestAnimationFrame(() => storyTextareaRef.current?.focus());
-    }, 850);
+    }
   }
 
   function goToPreviousStoryHelperStep() {
@@ -1588,6 +1017,20 @@ export function CustomSongWizard() {
   function selectCustomOccasion(value: string) {
     setCustomOccasionInput(value);
     setOccasion(value.trim() || customOccasionValue);
+  }
+
+  function selectGenreOption(item: GenreOption) {
+    if (recommendedGenreSet.has(item.value)) {
+      setGenre(item.value);
+      return;
+    }
+
+    setPendingGenre(item);
+  }
+
+  function confirmPendingGenre() {
+    if (pendingGenre) setGenre(pendingGenre.value);
+    setPendingGenre(null);
   }
 
   function addRecipientName() {
@@ -1701,32 +1144,25 @@ export function CustomSongWizard() {
     setLyricRewriteError("");
 
     try {
-      const response = await fetch("/api/songs/lyrics/rewrite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          occasion,
-          genre,
-          language,
-          recipients: cleanRecipientList,
-          recipientNames: recipientNameList,
-          recipientRelationships: recipientRelationshipList,
-          fullLyrics: generatedLyrics,
-          selectedLines: selectedLines.map((line) => line.text),
-          instruction: lyricRewriteInstruction,
-        }),
+      const data = await rewriteLyricsLines({
+        occasion,
+        genre,
+        language,
+        recipients: cleanRecipientList,
+        recipientNames: recipientNameList,
+        recipientRelationships: recipientRelationshipList,
+        fullLyrics: generatedLyrics,
+        selectedLines: selectedLines.map((line) => line.text),
+        instruction: lyricRewriteInstruction,
+        story,
+        vocalGender,
       });
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Unable to rewrite selected lines.");
-      }
 
       setLyricRewriteSuggestions(
         createLyricsLineRewriteSuggestions(
           editableLyricLines,
           selectedLines.map((line) => line.id),
-          result.data.lines || [],
+          data.lines || [],
         ),
       );
       setSelectedLyricLineIds([]);
@@ -1823,6 +1259,18 @@ export function CustomSongWizard() {
     setWizardStep(Math.min(5, step + 1) as WizardStep);
   }
 
+  function respinSongPreview() {
+    audioRef.current?.pause();
+    setPreviewTime(0);
+    setIsPlaying(false);
+    setActiveVersion("A");
+    setLeadData(null);
+    setSongTaskId("");
+    setSongError("");
+    setProgress(8);
+    setSongStage("loading");
+  }
+
   async function submitLead(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setEmailError("");
@@ -1864,22 +1312,13 @@ export function CustomSongWizard() {
     setIsCheckoutLoading(true);
 
     try {
-      const response = await fetch("/api/payment/checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          provider: "stripe",
-          stripePriceId,
-          songId: leadData?.songId,
-          leadEmail: leadData?.email || email.trim(),
-        }),
+      const checkout = await createCheckoutSession({
+        stripePriceId,
+        songId: leadData?.songId,
+        leadEmail: leadData?.email || email.trim(),
       });
 
-      const result = await response.json();
-
-      if (response.status === 401) {
+      if (checkout.unauthorized) {
         toast.info("Guest checkout needs the next backend step.", {
           description:
             "The current checkout route requires a signed-in session; your preview and email are captured.",
@@ -1887,16 +1326,7 @@ export function CustomSongWizard() {
         return;
       }
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Unable to start checkout.");
-      }
-
-      if (result.data?.url) {
-        router.push(result.data.url);
-        return;
-      }
-
-      throw new Error("Checkout URL was not returned.");
+      router.push(checkout.url);
     } catch (error) {
       toast.error("Checkout could not be started.", {
         description:
@@ -1975,34 +1405,29 @@ export function CustomSongWizard() {
     setFinalizingVersion(version);
 
     try {
-      const response = await fetch("/api/songs/finalize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          songId: leadData.songId,
-          versionId: providerVersionId,
-        }),
+      const result = await finalizeSongVersion({
+        songId: leadData.songId,
+        versionId: providerVersionId,
       });
-      const result = await response.json();
 
       console.log("[CustomSongWizard] Finalize response", {
         version,
         providerVersionId,
         songId: leadData.songId,
-        ok: response.ok,
-        status: response.status,
+        ok: result.ok,
+        status: result.status,
         success: result.success,
         error: result.error,
         songUrl: result.data?.songUrl,
         alreadyFinalized: result.data?.alreadyFinalized,
       });
 
-      if (response.status === 401) {
+      if (result.status === 401) {
         toast.info("Please sign in to save this song.");
         return;
       }
 
-      if (!response.ok || !result.success) {
+      if (!result.ok || !result.success) {
         if (result.error === "Insufficient song balance.") {
           setIsPaywallOpen(true);
           return;
@@ -2029,747 +1454,151 @@ export function CustomSongWizard() {
     }
   }
 
-  return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-muted pb-20 text-foreground">
-      <div className="pointer-events-none absolute inset-0 bg-accent/20" />
+  const isSongResultStep = step === 5 && songStage === "player";
 
-      <div className="relative mx-auto w-full max-w-[1040px] px-4 py-5 sm:px-6">
+  return (
+    <section className="relative min-h-screen w-full bg-background pb-20 text-foreground">
+      <div className="pointer-events-none absolute inset-0 bg-accent/10" />
+
+      <div
+        className={cn(
+          "relative mx-auto w-full py-5",
+          isSongResultStep
+            ? "max-w-none px-0"
+            : "max-w-[1040px] px-4 sm:px-6",
+        )}
+      >
         {!(step === 5 && songStage === "player") && (
           <StepProgress currentStep={step} />
         )}
 
         <AnimatePresence mode="wait">
           {step === 1 && (
-            <StepFrame key="style">
-              <StepHeading
-                title="Let's pick your music style"
-                description="Choose the sound, the voice, and the language. You can let us pick for you any time."
-              />
-
-              <div className="mx-auto mt-8 max-w-4xl">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-base font-bold">
-                    <Music2 className="size-5 text-accent-foreground" />
-                    Genre
-                  </div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Pick one
-                  </p>
-                </div>
-                <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
-                  {genres.map((item) => {
-                    const selected = genre === item.value;
-                    const isAutoPick = item.value === "You Choose For Me";
-
-                    return (
-                      <button
-                        key={item.value}
-                        className={cn(
-                          "relative flex min-h-28 flex-col items-center justify-center rounded-2xl border bg-card p-3.5 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md",
-                          selected
-                            ? "border-primary/20 bg-primary/10"
-                            : isAutoPick
-                              ? "border-dashed border-border bg-card"
-                              : "border-border",
-                        )}
-                        type="button"
-                        onClick={() => setGenre(item.value)}
-                      >
-                        {selected && (
-                          <span className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                            <Check className="size-4" />
-                          </span>
-                        )}
-                        <span className="mb-3 flex size-11 items-center justify-center rounded-full bg-muted">
-                          <span className={item.accent}>{item.icon}</span>
-                        </span>
-                        <span className="text-sm font-bold leading-snug">
-                          {item.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-9">
-                  <div className="mb-4 flex items-center gap-2 text-base font-bold">
-                    <Mic2 className="size-5 text-accent-foreground" />
-                    Vocal gender
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {vocalGenderOptions.map((option) => {
-                      const selected = vocalGender === option;
-                      const auto = option === "Pick for me";
-
-                      return (
-                        <button
-                          key={option}
-                          className={cn(
-                            "rounded-full px-4 py-2 text-sm font-bold transition hover:-translate-y-0.5",
-                            selected
-                              ? "bg-primary/10 text-primary"
-                              : auto
-                                ? "border-2 border-dashed border-border bg-transparent text-foreground"
-                                : "bg-card text-foreground",
-                          )}
-                          type="button"
-                          onClick={() => setVocalGender(option)}
-                        >
-                          {option}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="mt-9">
-                  <div className="mb-4 flex items-center gap-2 text-base font-bold">
-                    <Globe2 className="size-5 text-accent-foreground" />
-                    Language
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {featuredLanguages.map((item) => (
-                      <LanguageChip
-                        key={item.code}
-                        language={item}
-                        selected={language === item.label}
-                        onClick={() => setLanguage(item.label)}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-primary"
-                    type="button"
-                    onClick={() => setShowAllLanguages((current) => !current)}
-                  >
-                    <ChevronDown
-                      className={cn(
-                        "size-4 transition-transform",
-                        !showAllLanguages && "-rotate-90",
-                      )}
-                    />
-                    {moreLanguages.length} more languages
-                  </button>
-                  {showAllLanguages && (
-                    <div className="mt-5 flex flex-wrap gap-3">
-                      {moreLanguages.map((item) => (
-                        <LanguageChip
-                          key={item.code}
-                          language={item}
-                          selected={language === item.label}
-                          showCode
-                          onClick={() => setLanguage(item.label)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </StepFrame>
-          )}
-
-          {step === 2 && (
             <StepFrame key="recipient">
               <StepHeading
                 title="Who's this song for?"
                 description="Tell us the names and the occasion so we can make it personal."
               />
-              <div className="mx-auto mt-8 max-w-5xl space-y-8">
-                <div>
-                  <div className="mb-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-                      <UserRound className="size-5 text-primary" />
-                      Who's this song for?
-                    </div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Up to 3 names
-                    </p>
-                  </div>
-                  <div className="space-y-3">
-                    {recipients.map((recipient, index) => (
-                      <div key={index} className="flex gap-3">
-                        <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-                          <Input
-                            className="h-12 rounded-xl border-border bg-card px-4 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-primary/20"
-                            placeholder={
-                              index === 0 ? "Recipient name" : "Another name"
-                            }
-                            value={recipient.name}
-                            onChange={(event) =>
-                              updateRecipient(index, "name", event.target.value)
-                            }
-                          />
-                          <RelationshipCreatableSelect
-                            placeholder={
-                              index === 0
-                                ? "Relationship"
-                                : "Their relationship"
-                            }
-                            value={recipient.relationship}
-                            onChange={(value) =>
-                              updateRecipient(
-                                index,
-                                "relationship",
-                                value,
-                              )
-                            }
-                          />
-                        </div>
-                        <Button
-                          aria-label="Remove name"
-                          className="h-12 w-12 shrink-0 rounded-xl bg-card text-muted-foreground shadow-sm hover:bg-muted hover:text-foreground"
-                          disabled={
-                            recipients.length === 1 &&
-                            !recipient.name.trim() &&
-                            !recipient.relationship.trim()
-                          }
-                          type="button"
-                          variant="ghost"
-                          onClick={() => removeRecipientName(index)}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                  {recipients.length < 3 && (
-                    <button
-                      className="mt-3 inline-flex items-center gap-2 rounded-xl border border-dashed border-border bg-card px-4 py-3 text-sm font-bold text-foreground transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
-                      type="button"
-                      onClick={addRecipientName}
-                    >
-                      <Plus className="size-4 text-primary" />
-                      Add another name
-                    </button>
-                  )}
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    Adding more than one name? The song will mention each of
-                    them.
-                  </p>
-                </div>
+              <RecipientStep
+                customOccasionInput={customOccasionInput}
+                customOccasionInputRef={customOccasionInputRef}
+                occasion={occasion}
+                recipients={recipients}
+                showCustomOccasionInput={showCustomOccasionInput}
+                onAddRecipient={addRecipientName}
+                onRecipientChange={updateRecipient}
+                onRemoveRecipient={removeRecipientName}
+                onSelectCustomOccasion={selectCustomOccasion}
+                onSelectOccasion={selectOccasion}
+              />
+            </StepFrame>
+          )}
 
-                <div>
-                  <div className="mb-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-                      <PartyPopper className="size-5 text-primary" />
-                      Occasion
-                    </div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Pick one
-                    </p>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                    {occasions.map((item) => {
-                      const selected =
-                        item.value === customOccasionValue
-                          ? showCustomOccasionInput
-                          : occasion === item.value;
-
-                      return (
-                        <button
-                          key={item.value}
-                          className={cn(
-                            "relative flex min-h-28 flex-col items-center justify-center rounded-2xl border bg-card p-3.5 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md",
-                            selected
-                              ? "border-primary/20 bg-primary/10"
-                              : "border-border",
-                          )}
-                          type="button"
-                          onClick={() => selectOccasion(item.value)}
-                        >
-                          {selected && (
-                            <span className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                              <Check className="size-4" />
-                            </span>
-                          )}
-                          <span className="mb-3 flex size-11 items-center justify-center rounded-full bg-muted text-primary">
-                            {item.icon}
-                          </span>
-                          <span className="text-sm font-bold leading-snug">
-                            {item.title}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <AnimatePresence initial={false}>
-                    {showCustomOccasionInput && (
-                      <motion.div
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-3 shadow-sm"
-                        exit={{ opacity: 0, y: -8 }}
-                        initial={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <div className="mb-3 flex flex-wrap gap-2">
-                          {suggestedCustomOccasions.map((item) => {
-                            const selectedCustomOccasion = occasion === item;
-
-                            return (
-                              <button
-                                key={item}
-                                className={cn(
-                                  "rounded-full border px-3 py-2 text-xs font-bold transition",
-                                  selectedCustomOccasion
-                                    ? "border-primary bg-primary text-primary-foreground"
-                                    : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/10 hover:text-primary",
-                                )}
-                                type="button"
-                                onClick={() => selectCustomOccasion(item)}
-                              >
-                                {item}
-                              </button>
-                            );
-                          })}
-                        </div>
-                        <Input
-                          ref={customOccasionInputRef}
-                          className="h-14 rounded-xl border-primary bg-card px-5 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
-                          placeholder="e.g. Retirement, Housewarming..."
-                          value={customOccasionInput}
-                          onChange={(event) =>
-                            selectCustomOccasion(event.target.value)
-                          }
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
+          {step === 2 && (
+            <StepFrame key="style">
+              <StepHeading
+                title="Choose the music style"
+                description="Pick the genre, voice, and language for this custom song."
+              />
+              <StyleStep
+                genre={genre}
+                language={language}
+                occasion={occasion}
+                recommendedGenreSet={recommendedGenreSet}
+                selectedGenreIsNotRecommended={selectedGenreIsNotRecommended}
+                selectedOccasionTitle={selectedOccasionTitle}
+                showAllLanguages={showAllLanguages}
+                sortedGenres={sortedGenres}
+                vocalGender={vocalGender}
+                onGenreSelect={selectGenreOption}
+                onLanguageChange={setLanguage}
+                onShowAllLanguagesChange={setShowAllLanguages}
+                onVocalGenderChange={setVocalGender}
+              />
             </StepFrame>
           )}
 
           {step === 3 && (
             <StepFrame key="story">
-              <div className="mx-auto mt-16 max-w-5xl">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 text-lg font-black text-foreground">
-                    <Edit3 className="size-5 text-primary" />
-                    Your story
-                  </div>
-                  <span className="text-sm font-semibold text-muted-foreground">
-                    80-600 words works best
-                  </span>
-                </div>
-                <div className="mb-4 flex flex-wrap items-center gap-3">
-                  <Button
-                    className="rounded-full bg-card px-4 py-2 text-sm font-bold text-foreground shadow-sm hover:bg-primary/10 hover:text-primary"
-                    type="button"
-                    variant="ghost"
-                    onClick={startStoryHelper}
-                  >
-                    <Wand2 className="size-5 text-primary" />
-                    Help me write
-                  </Button>
-                  <Button
-                    className={cn(
-                      "rounded-full px-4 text-sm font-bold shadow-sm",
-                      isRecording
-                        ? "bg-primary/10 text-primary hover:bg-primary/15"
-                        : "bg-card text-foreground hover:bg-primary/10 hover:text-primary",
-                    )}
-                    type="button"
-                    variant="ghost"
-                    onClick={toggleRecording}
-                  >
-                    {isRecording ? (
-                      <MicOff className="size-5 text-primary" />
-                    ) : (
-                      <Mic2 className="size-5 text-primary" />
-                    )}
-                    {isRecording ? "Stop recording" : "Speak"}
-                  </Button>
-                  {isRecording && (
-                    <span className="text-sm font-semibold text-primary/70">
-                      Listening...
-                    </span>
-                  )}
-                </div>
-                <Textarea
-                  ref={storyTextareaRef}
-                  className="min-h-[230px] resize-y rounded-2xl border-border bg-card p-5 text-base leading-8 text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
-                  placeholder={
-                    occasion
-                      ? storyPlaceholders[occasion]
-                      : "e.g., Tell us about the person, the moment, and the details that should become lyrics..."
-                  }
-                  value={story}
-                  onChange={(event) => setStory(event.target.value)}
-                />
-                <div className="-mt-9 mr-4 flex justify-end text-sm text-muted-foreground">
-                  {storyWordCount} words
-                </div>
-                <div className="mt-8 flex gap-4 rounded-2xl border border-primary/20 bg-primary/10 p-5 text-muted-foreground">
-                  <Lightbulb className="mt-1 size-5 shrink-0 text-primary" />
-                  <p className="text-base leading-7">
-                    <span className="font-black text-foreground">
-                      Little details matter.
-                    </span>{" "}
-                    Mention their nickname, a shared memory, their quirks, or
-                    something they're proud of. Our lyrics feel most personal
-                    when they include things only you two would know.
-                  </p>
-                </div>
-              </div>
+              <StoryStep
+                isRecording={isRecording}
+                isPolishingStory={isPolishingStory}
+                occasion={occasion}
+                story={story}
+                storyTextareaRef={storyTextareaRef}
+                storyWordCount={storyWordCount}
+                onOpenHelper={startStoryHelper}
+                onPolishStory={polishStoryWithAi}
+                onStoryChange={setStory}
+                onToggleRecording={toggleRecording}
+              />
             </StepFrame>
           )}
 
           {step === 4 && (
             <StepFrame key={`lyrics-${lyricsStage}`}>
-              {lyricsStage === "loading" ? (
-                <LyricsGenerationView
-                  activeStep={lyricLoadingStep}
-                  names={recipientNameList}
-                />
-              ) : (
-                <div className="mx-auto mt-14 max-w-5xl space-y-4">
-                  {lyricsError && (
-                    <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-                      <p className="font-bold text-foreground">
-                        Lyrics generation failed
-                      </p>
-                      <p className="mt-1 leading-6">{lyricsError}</p>
-                      <Button
-                        className="mt-3 h-9 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground hover:bg-primary/90"
-                        type="button"
-                        onClick={rewriteLyrics}
-                      >
-                        <RefreshCw className="size-4" />
-                        Try again
-                      </Button>
-                    </div>
-                  )}
-                  <EditableBlock
-                    actionText="You can edit"
-                    icon={<span className="text-primary">Aa</span>}
-                    label="Song Title"
-                  >
-                    <Input
-                      className="h-auto rounded-xl border-0 bg-muted px-3.5 py-3 text-base font-bold text-foreground shadow-none focus-visible:ring-primary/25 md:text-xl"
-                      value={songTitle}
-                      onChange={(event) => setSongTitle(event.target.value)}
-                    />
-                  </EditableBlock>
-
-                  <EditableBlock
-                    actionText="Write a new version"
-                    icon={<Edit3 className="size-4 text-primary" />}
-                    label="Lyrics"
-                    onAction={openNewLyricsVersionDialog}
-                  >
-                    <LyricsLineEditor
-                      error={lyricRewriteError}
-                      instruction={lyricRewriteInstruction}
-                      isRewriting={isRewritingLyricLines}
-                      lines={editableLyricLines}
-                      selectedLineIds={selectedLyricLineIds}
-                      suggestions={lyricRewriteSuggestions}
-                      onAcceptSuggestion={acceptLyricRewriteSuggestion}
-                      onInstructionChange={setLyricRewriteInstruction}
-                      onKeepOriginal={keepOriginalLyricLine}
-                      onLineChange={updateLyricLine}
-                      onRewriteSelected={rewriteSelectedLyricLines}
-                      onSelectionChange={toggleLyricLineSelection}
-                    />
-                  </EditableBlock>
-                </div>
-              )}
+              <LyricsStep
+                editableLyricLines={editableLyricLines}
+                lyricLoadingStep={lyricLoadingStep}
+                lyricRewriteError={lyricRewriteError}
+                lyricRewriteInstruction={lyricRewriteInstruction}
+                lyricRewriteSuggestions={lyricRewriteSuggestions}
+                lyricsError={lyricsError}
+                lyricsStage={lyricsStage}
+                recipientNameList={recipientNameList}
+                selectedLyricLineIds={selectedLyricLineIds}
+                songTitle={songTitle}
+                isRewritingLyricLines={isRewritingLyricLines}
+                onAcceptLyricRewriteSuggestion={acceptLyricRewriteSuggestion}
+                onKeepOriginalLyricLine={keepOriginalLyricLine}
+                onLyricLineChange={updateLyricLine}
+                onLyricLineSelectionChange={toggleLyricLineSelection}
+                onLyricRewriteInstructionChange={setLyricRewriteInstruction}
+                onOpenNewLyricsVersionDialog={openNewLyricsVersionDialog}
+                onRewriteLyrics={rewriteLyrics}
+                onRewriteSelectedLyricLines={rewriteSelectedLyricLines}
+                onSongTitleChange={setSongTitle}
+              />
             </StepFrame>
           )}
 
-          {step === 5 && songStage === "loading" && (
-            <StepFrame key="song-generating">
-              {songError ? (
-                <div className="mx-auto mt-16 max-w-xl rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
-                  <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <RefreshCw className="size-5" />
-                  </div>
-                  <h2 className="text-xl font-black text-foreground">
-                    Song generation needs another try
-                  </h2>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                    {songError}
-                  </p>
-                  <Button
-                    className="mt-5 h-11 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground hover:bg-primary/90"
-                    type="button"
-                    onClick={() => {
-                      setSongError("");
-                      setSongTaskId("");
-                      requestSongGeneration();
-                    }}
-                  >
-                    <RefreshCw className="size-4" />
-                    Try again
-                  </Button>
-                </div>
-              ) : (
-                <SongGenerationPage
-                  note={personalNote}
-                  onNoteChange={setPersonalNote}
-                  progress={progress}
-                  recipientLabel={recipientLabel}
-                />
-              )}
-            </StepFrame>
-          )}
-
-          {step === 5 && songStage === "player" && (
-            <StepFrame key="player">
-              <div className="mx-auto max-w-4xl pt-4">
-                <audio
-                  ref={audioRef}
-                  preload="metadata"
-                  src={currentVersion?.audioUrl}
-                />
-                <div className="mb-5 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-accent-foreground">
-                    <ShieldCheck className="size-4" />
-                    Ready · Only you can see this preview
-                  </span>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-border bg-accent px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-accent-foreground">
-                    <Clock3 className="size-4" />
-                    {leadData?.expiresAt
-                      ? `Preview expires ${new Date(leadData.expiresAt).toLocaleDateString()}`
-                      : "Preview expires in 3 days"}
-                  </span>
-                  {previewLimitSeconds && (
-                    <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-muted-foreground">
-                      <LockKeyhole className="size-4" />1 minute preview
-                    </span>
-                  )}
-                </div>
-
-                <div className="grid gap-6 lg:grid-cols-[210px_1fr] lg:items-center">
-                  <div className="mx-auto size-48 overflow-hidden rounded-full bg-gradient-to-br from-accent via-primary/20 to-foreground shadow-2xl shadow-primary/20">
-                    <div className="relative h-full w-full">
-                      <div className="absolute left-10 top-14 h-20 w-8 rounded-full bg-foreground/55" />
-                      <div className="absolute left-8 top-9 size-10 rounded-full bg-foreground/60" />
-                      <div className="absolute right-14 top-16 h-24 w-9 rounded-full bg-foreground/45" />
-                      <div className="absolute right-14 top-10 size-11 rounded-full bg-foreground/50" />
-                      <div className="absolute bottom-8 left-1/2 h-24 w-12 -translate-x-1/2 rounded-full bg-foreground/70" />
-                      <div className="absolute bottom-28 left-1/2 size-11 -translate-x-1/2 rounded-full bg-foreground/75" />
-                      <div className="absolute bottom-6 left-4 right-4 h-10 rounded-[50%] border border-border" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="mb-1 font-[cursive] text-xl text-accent-foreground">
-                      ta-da!
-                    </p>
-                    <h1 className="max-w-2xl text-xl font-black leading-tight text-foreground md:text-4xl">
-                      {songTitle || "Your Custom Song"}
-                    </h1>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <InfoPill
-                        icon={<Heart className="size-4" />}
-                        label={selectedOccasion?.title || "For someone special"}
-                      />
-                      <InfoPill
-                        icon={<Cake className="size-4" />}
-                        label={
-                          selectedOccasion?.title.split("/")[0].trim() ||
-                          "Birthday"
-                        }
-                      />
-                      <InfoPill
-                        icon={<Gift className="size-4" />}
-                        label={genre}
-                      />
-                      <InfoPill
-                        icon={<Mic2 className="size-4" />}
-                        label={vocalGender}
-                      />
-                      <InfoPill
-                        icon={<Languages className="size-4" />}
-                        label={language}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mx-auto mt-6 max-w-2xl rounded-2xl border border-border bg-card p-4 shadow-sm">
-                  <p className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.12em] text-primary">
-                    <Heart className="size-4" />
-                    Message for{" "}
-                    {selectedOccasion?.title.split("/")[0].trim() ||
-                      "recipient"}
-                  </p>
-                  <p className="text-sm font-semibold leading-6 text-card-foreground">
-                    {story.split(/[.!?\n]/)[0]?.trim() ||
-                      "A personal song made from your story and memories."}
-                  </p>
-                </div>
-
-                <div className="mt-9 text-center">
-                  <p className="font-[cursive] text-xl text-accent-foreground">
-                    here they are...
-                  </p>
-                  <h2 className="text-xl font-black text-foreground md:text-2xl">
-                    Two takes. Pick the one that feels right.
-                  </h2>
-                  <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                    Same lyrics, two different recordings. Play both previews
-                    below and choose the one that fits the moment.
-                  </p>
-                </div>
-
-                <div className="mx-auto mt-6 grid max-w-3xl gap-4 md:grid-cols-2">
-                  {["A", "B"].map((version, index) => {
-                    const songVersion = songVersions[index];
-                    const isActiveVersion = activeVersion === version;
-                    const isThisPlaying = isActiveVersion && isPlaying;
-
-                    return (
-                      <div
-                        key={version}
-                        className="rounded-2xl border border-border bg-card p-4 shadow-sm"
-                      >
-                        <div className="mb-3 flex items-start gap-3">
-                          <span
-                            className={cn(
-                              "flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-primary-foreground",
-                              index === 0 ? "bg-foreground" : "bg-primary",
-                            )}
-                          >
-                            {version}
-                          </span>
-                          <div>
-                            <p className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                              Version {version}
-                            </p>
-                            <p className="text-sm font-bold text-foreground">
-                              {songVersion?.title ||
-                                songTitle ||
-                                "Your Custom Song"}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 rounded-2xl bg-muted p-3">
-                          <button
-                            className={cn(
-                              "flex size-10 items-center justify-center rounded-full text-primary-foreground transition",
-                              index === 0
-                                ? "bg-foreground hover:bg-foreground/90"
-                                : "bg-primary hover:bg-primary/90",
-                            )}
-                            type="button"
-                            onClick={() =>
-                              toggleSongPlayback(
-                                version,
-                                songVersion?.audioUrl || "",
-                              )
-                            }
-                            aria-label={`Play version ${version}`}
-                          >
-                            {isThisPlaying ? (
-                              <Pause className="size-4 fill-current" />
-                            ) : (
-                              <Play className="ml-0.5 size-4 fill-current" />
-                            )}
-                          </button>
-                          <div className="flex flex-1 items-center gap-1 overflow-hidden">
-                            {Array.from({ length: 28 }).map((_, barIndex) => (
-                              <span
-                                key={barIndex}
-                                className="w-full rounded-full bg-border"
-                                style={{
-                                  height: `${8 + ((barIndex * 11 + index * 5) % 24)}px`,
-                                }}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs font-bold text-muted-foreground">
-                            {isActiveVersion ? previewTime.toFixed(0) : "0"}s /{" "}
-                            {Math.ceil(displayDuration)}s
-                          </span>
-                        </div>
-
-                        <div className="mt-3 border-t border-border pt-3">
-                          <ChooseButton
-                            className={cn(
-                              "h-10 w-full rounded-full text-xs font-black text-primary-foreground",
-                              index === 0
-                                ? "bg-foreground hover:bg-foreground/90"
-                                : "bg-primary hover:bg-primary/90",
-                            )}
-                            onChoose={() => chooseSongVersion(version)}
-                          >
-                            {finalizingVersion === version ? (
-                              <Loader2 className="size-4 animate-spin" />
-                            ) : (
-                              <Gift className="size-4" />
-                            )}
-                            {finalizingVersion === version ? "Saving..." : "Choose this one"}
-                          </ChooseButton>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="mx-auto mt-6 max-w-3xl overflow-hidden rounded-2xl border-2 border-ring bg-card shadow-sm">
-                  <div className="flex items-center justify-between border-b border-border p-4">
-                    <div className="flex items-center gap-3">
-                      <span className="flex size-9 items-center justify-center rounded-xl bg-accent text-primary-foreground">
-                        <Edit3 className="size-4" />
-                      </span>
-                      <div>
-                        <p className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                          Written for{" "}
-                          {selectedOccasion?.title.split("/")[0].trim() ||
-                            "you"}
-                        </p>
-                        <h3 className="text-lg font-black text-foreground">
-                          The lyrics
-                        </h3>
-                      </div>
-                    </div>
-                    <button
-                      className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground"
-                      type="button"
-                      aria-label="Collapse lyrics"
-                    >
-                      <ChevronDown className="size-4 rotate-180" />
-                    </button>
-                  </div>
-                  <div className="max-h-[330px] overflow-y-auto p-5 text-sm leading-7 text-foreground">
-                    <pre className="whitespace-pre-wrap font-sans">
-                      {generatedLyrics}
-                    </pre>
-                  </div>
-                </div>
-
-                <button
-                  className="mx-auto mt-6 flex w-full max-w-3xl items-center justify-between rounded-2xl border border-dashed border-border bg-card p-4 text-left transition hover:border-primary/40 hover:bg-primary/5"
-                  type="button"
-                  onClick={() => {
-                    setSongStage("loading");
-                    setLeadData(null);
-                    setWizardStep(1);
-                  }}
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                      <RefreshCw className="size-4" />
-                    </span>
-                    <div>
-                      <p className="font-[cursive] text-base text-accent-foreground">
-                        not quite right?
-                      </p>
-                      <p className="text-base font-black text-foreground">
-                        Change your inputs & recreate
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Tweak the genre, occasion, story or anything else and
-                        get a fresh pair of versions.
-                      </p>
-                    </div>
-                  </span>
-                  <ChevronDown className="size-5 text-muted-foreground" />
-                </button>
-              </div>
+          {step === 5 && (
+            <StepFrame
+              key={songStage === "loading" ? "song-generating" : "player"}
+            >
+              <SongStep
+                activeVersion={activeVersion}
+                audioRef={audioRef}
+                currentVersion={currentVersion}
+                displayDuration={displayDuration}
+                finalizingVersion={finalizingVersion}
+                generatedLyrics={generatedLyrics}
+                genre={genre}
+                language={language}
+                leadData={leadData}
+                personalNote={personalNote}
+                previewLimitSeconds={previewLimitSeconds}
+                previewTime={previewTime}
+                progress={progress}
+                recipientLabel={recipientLabel}
+                selectedOccasion={selectedOccasion}
+                songError={songError}
+                songStage={songStage}
+                songTitle={songTitle}
+                songVersions={songVersions}
+                story={story}
+                vocalGender={vocalGender}
+                isPlaying={isPlaying}
+                onChooseVersion={chooseSongVersion}
+                onNoteChange={setPersonalNote}
+                onPlaybackToggle={toggleSongPlayback}
+                onRespin={respinSongPreview}
+                onRetryGeneration={() => {
+                  setSongError("");
+                  setSongTaskId("");
+                  requestSongGeneration();
+                }}
+              />
             </StepFrame>
           )}
         </AnimatePresence>
@@ -2827,173 +1656,37 @@ export function CustomSongWizard() {
         )}
       </AnimatePresence>
 
-      <Dialog
-        open={isNewLyricsVersionDialogOpen}
-        onOpenChange={setIsNewLyricsVersionDialogOpen}
-      >
-        <DialogContent className="rounded-2xl border-border p-0 sm:max-w-xl">
-          <DialogHeader className="border-b border-border px-5 pb-4 pt-5 text-left sm:px-6">
-            <DialogTitle className="flex items-center gap-2 text-xl font-black">
-              <Sparkles className="size-5 text-primary" />
-              Write a new version
-            </DialogTitle>
-            <DialogDescription className="leading-6">
-              Add optional direction for the next lyrics draft.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="px-5 py-4 sm:px-6">
-            <Textarea
-              autoFocus
-              className="min-h-32 resize-none rounded-2xl border-border bg-muted p-4 text-sm leading-6 text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
-              maxLength={500}
-              placeholder="e.g., Add the main character's name to the title, make the whole song more romantic..."
-              value={newLyricsVersionInstruction}
-              onChange={(event) =>
-                setNewLyricsVersionInstruction(event.target.value)
-              }
-            />
-            <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-              <span>{newLyricsVersionInstruction.length} / 500</span>
-              <span>Leave it blank for a fresh take.</span>
-            </div>
-          </div>
-
-          <DialogFooter className="border-t border-border px-5 py-4 sm:px-6">
-            <Button
-              className="h-10 rounded-full px-5 text-sm font-bold"
-              type="button"
-              variant="ghost"
-              onClick={() => setIsNewLyricsVersionDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="h-10 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
-              type="button"
-              onClick={generateNewLyricsVersion}
-            >
-              <RefreshCw className="size-4" />
-              Generate version
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={Boolean(lyricsVersionComparison)}
+      <GenreWarningDialog
+        pendingGenre={pendingGenre}
+        onConfirm={confirmPendingGenre}
         onOpenChange={(open) => {
-          if (!open) keepOriginalLyricsVersion();
+          if (!open) setPendingGenre(null);
         }}
-      >
-        <DialogContent className="flex max-h-[86vh] flex-col overflow-hidden rounded-2xl border-border p-0 sm:max-w-5xl">
-          <DialogHeader className="border-b border-border px-5 pb-4 pt-5 text-left sm:px-6">
-            <DialogTitle className="flex items-center gap-2 text-xl font-black">
-              <Edit3 className="size-5 text-primary" />
-              Compare lyrics versions
-            </DialogTitle>
-            <DialogDescription className="leading-6">
-              Review both drafts before choosing which one to keep.
-            </DialogDescription>
-          </DialogHeader>
+      />
 
-          {lyricsVersionComparison && (
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <LyricsVersionPanel
-                  label="Original"
-                  lyrics={lyricsVersionComparison.originalLyrics}
-                  title={lyricsVersionComparison.originalTitle}
-                />
-                <LyricsVersionPanel
-                  label="New version"
-                  lyrics={lyricsVersionComparison.newLyrics}
-                  title={lyricsVersionComparison.newTitle}
-                />
-              </div>
-            </div>
-          )}
+      <NewLyricsVersionDialog
+        instruction={newLyricsVersionInstruction}
+        open={isNewLyricsVersionDialogOpen}
+        onGenerate={generateNewLyricsVersion}
+        onInstructionChange={setNewLyricsVersionInstruction}
+        onOpenChange={setIsNewLyricsVersionDialogOpen}
+      />
 
-          <DialogFooter className="border-t border-border px-5 py-4 sm:px-6">
-            <Button
-              className="h-10 rounded-full px-5 text-sm font-bold"
-              type="button"
-              variant="ghost"
-              onClick={keepOriginalLyricsVersion}
-            >
-              Use original
-            </Button>
-            <Button
-              className="h-10 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
-              type="button"
-              onClick={useNewLyricsVersion}
-            >
-              <Check className="size-4" />
-              Use new version
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LyricsVersionComparisonDialog
+        comparison={lyricsVersionComparison}
+        onKeepOriginal={keepOriginalLyricsVersion}
+        onUseNew={useNewLyricsVersion}
+      />
 
       <AnimatePresence>
-        {isLeadModalOpen && (
-          <motion.div
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 px-4 py-8 backdrop-blur-xl"
-            exit={{ opacity: 0 }}
-            initial={{ opacity: 0 }}
-          >
-            <motion.div
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="w-full max-w-md rounded-[2rem] border border-border bg-background/90 p-6 text-foreground shadow-2xl shadow-foreground/20 backdrop-blur-2xl sm:p-8"
-              exit={{ opacity: 0, scale: 0.96, y: 12 }}
-              initial={{ opacity: 0, scale: 0.96, y: 12 }}
-              transition={{ duration: 0.25 }}
-            >
-              <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-3xl">
-                🎉
-              </div>
-              <h2 className="text-2xl font-bold">
-                Where should we send your song?
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                This generated song will be linked to the email below. We will
-                send the finished music to this inbox when recording is done.
-              </p>
-
-              <form className="mt-6 space-y-3" onSubmit={submitLead}>
-                <div className="relative">
-                  <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    className="h-12 rounded-full border-border bg-card pl-11 text-foreground placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
-                    placeholder="you@example.com"
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                  />
-                </div>
-                {emailError && (
-                  <p className="text-sm text-primary">{emailError}</p>
-                )}
-                <Button
-                  className="h-12 w-full rounded-full bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90"
-                  disabled={isSubmittingLead}
-                  type="submit"
-                >
-                  {isSubmittingLead ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Music2 className="size-4" />
-                  )}
-                  Continue
-                </Button>
-                <p className="text-center text-xs text-muted-foreground">
-                  No credit card required · Takes 2 mins
-                </p>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
+        <LeadEmailModal
+          email={email}
+          emailError={emailError}
+          isSubmitting={isSubmittingLead}
+          open={isLeadModalOpen}
+          onEmailChange={setEmail}
+          onSubmit={submitLead}
+        />
       </AnimatePresence>
 
       <AnimatePresence>
@@ -3028,927 +1721,6 @@ export function CustomSongWizard() {
         )}
       </AnimatePresence>
     </section>
-  );
-}
-
-function PaywallModal({
-  isLoading,
-  onClose,
-  onContinue,
-  recipientLabel,
-  songTitle,
-  version,
-}: {
-  isLoading: boolean;
-  onClose: () => void;
-  onContinue: () => void;
-  recipientLabel: string;
-  songTitle: string;
-  version: string;
-}) {
-  return (
-    <motion.div
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 px-4 py-8 backdrop-blur-xl"
-      exit={{ opacity: 0 }}
-      initial={{ opacity: 0 }}
-    >
-      <motion.div
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-background text-foreground shadow-2xl shadow-foreground/20"
-        exit={{ opacity: 0, scale: 0.96, y: 12 }}
-        initial={{ opacity: 0, scale: 0.96, y: 12 }}
-        transition={{ duration: 0.25 }}
-      >
-        <div className="flex items-center justify-between gap-4 border-b border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-accent to-primary text-xs font-black text-primary-foreground">
-              {version}
-            </div>
-            <div>
-              <h2 className="text-lg font-black leading-tight">{songTitle}</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Version · {version} · for {recipientLabel}
-              </p>
-            </div>
-          </div>
-          <button
-            aria-label="Close paywall"
-            className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
-            disabled={isLoading}
-            type="button"
-            onClick={onClose}
-          >
-            <X className="size-5" />
-          </button>
-        </div>
-
-        <div className="p-5 text-center sm:p-6">
-          <p className="font-[cursive] text-base text-primary">
-            one more step...
-          </p>
-          <h3 className="mt-1.5 text-xl font-black text-foreground">
-            Choose how to unlock
-          </h3>
-          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-            Pick a one-off unlock, a bundle, or a subscription plan on the next
-            screen.
-          </p>
-
-          <div className="mx-auto mt-5 flex max-w-lg gap-3 rounded-xl border border-border bg-muted p-3.5 text-left text-sm leading-6 text-muted-foreground">
-            <Gift className="mt-1 size-4 shrink-0 text-primary" />
-            <p>
-              You don&apos;t have a subscription or song credits yet. We&apos;ll
-              take you to secure checkout to pick the right option for you.
-            </p>
-          </div>
-
-          <p className="mt-5 inline-flex items-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="size-4 text-primary" />
-            Secure checkout
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 border-t border-border bg-background/95 p-4">
-          <Button
-            className="h-10 rounded-full bg-muted px-6 text-sm font-bold text-muted-foreground hover:bg-muted hover:text-foreground"
-            disabled={isLoading}
-            type="button"
-            variant="ghost"
-            onClick={onClose}
-          >
-            Not yet
-          </Button>
-          <Button
-            className="h-10 flex-1 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
-            aria-busy={isLoading}
-            disabled={isLoading}
-            type="button"
-            onClick={onContinue}
-          >
-            {isLoading ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <LockKeyhole className="size-4" />
-            )}
-            {isLoading ? "Opening checkout..." : "Continue to checkout"}
-          </Button>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function SongGenerationPage({
-  note,
-  onNoteChange,
-  progress,
-  recipientLabel,
-}: {
-  note: string;
-  onNoteChange: (value: string) => void;
-  progress: number;
-  recipientLabel: string;
-}) {
-  return (
-    <div className="mx-auto mt-10 max-w-5xl pb-10">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-foreground via-primary to-accent p-7 text-primary-foreground shadow-2xl shadow-primary/20 md:p-9">
-        <div className="pointer-events-none absolute -right-16 -top-20 size-64 rounded-full bg-accent/35" />
-        <div className="relative flex flex-col gap-5 md:flex-row md:items-center">
-          <div className="flex size-24 shrink-0 items-center justify-center rounded-full bg-primary-foreground/10">
-            <div className="flex size-20 items-center justify-center rounded-full bg-gradient-to-tr from-primary via-accent to-primary motion-safe:animate-spin">
-              <div className="flex size-16 items-center justify-center rounded-full bg-foreground">
-                <Music2 className="size-8 text-primary" />
-              </div>
-            </div>
-          </div>
-          <div>
-            <p className="mb-2 font-[cursive] text-lg text-primary-foreground/80">
-              almost there...
-            </p>
-            <h1 className="text-2xl font-black leading-tight md:text-3xl">
-              We&apos;re recording {recipientLabel}&apos;s song
-            </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-primary-foreground/75 md:text-base">
-              Our studio is stitching the lyrics, vocals and music together.
-              You&apos;ll get an email the moment it&apos;s ready.
-            </p>
-            <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-bold">
-              <Clock3 className="size-4" />
-              {Math.max(5, Math.min(99, Math.round(progress)))}% complete
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-10 text-center">
-        <p className="font-[cursive] text-base text-primary">
-          while you wait...
-        </p>
-        <h2 className="mt-2 text-2xl font-black text-foreground md:text-3xl">
-          Make it even more personal
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground md:text-base">
-          Add an album cover and a note. These will be saved with the song and
-          shown whenever it&apos;s played or shared.
-        </p>
-      </section>
-
-      <div className="mt-8 grid gap-5 md:grid-cols-2">
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <div className="mb-4">
-            <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">
-              <ImageIcon className="size-4 text-primary" />
-              Album Cover
-            </p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Upload your own photo or let us dream one up.
-            </p>
-          </div>
-          <div className="mx-auto flex aspect-square w-full max-w-56 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted text-muted-foreground">
-            <ImageIcon className="size-9" />
-            <p className="mt-4 text-sm font-medium">Pick a cover below</p>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Button
-              className="h-11 flex-1 rounded-full bg-foreground text-sm font-bold text-primary-foreground hover:bg-foreground/90"
-              type="button"
-            >
-              <Wand2 className="size-4" />
-              Generate with AI
-            </Button>
-            <Button
-              className="h-11 rounded-full text-sm font-bold text-muted-foreground hover:text-foreground"
-              type="button"
-              variant="ghost"
-            >
-              <Upload className="size-4" />
-              Upload
-            </Button>
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <div className="mb-4">
-            <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">
-              <Mail className="size-4 text-primary" />
-              Personal Note
-            </p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              A little card that sits alongside the song.
-            </p>
-          </div>
-          <Textarea
-            className="min-h-44 resize-none rounded-2xl border-0 bg-muted p-4 text-sm leading-6 text-foreground shadow-none placeholder:text-muted-foreground focus-visible:ring-primary/20"
-            maxLength={500}
-            placeholder={`Write something special for ${recipientLabel}...`}
-            value={note}
-            onChange={(event) => onNoteChange(event.target.value)}
-          />
-          <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-            <span>{note.length} / 500</span>
-            <span className="inline-flex items-center gap-1.5">
-              <LockKeyhole className="size-3.5" />
-              Only {recipientLabel} will see this
-            </span>
-          </div>
-          <Button
-            className="mt-5 h-11 w-full rounded-full bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90"
-            type="button"
-          >
-            <Mail className="size-4" />
-            Save note
-          </Button>
-        </section>
-      </div>
-    </div>
-  );
-}
-
-function LyricsGenerationView({
-  activeStep,
-  names,
-}: {
-  activeStep: number;
-  names: string[];
-}) {
-  const recipientLabel =
-    names
-      .map((name) => name.trim())
-      .filter(Boolean)
-      .join(" and ") || "your";
-
-  return (
-    <div className="mx-auto mt-14 flex max-w-2xl flex-col items-center text-center">
-      <div className="relative mb-8 flex size-36 items-center justify-center rounded-full bg-background shadow-2xl shadow-primary/10">
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary via-accent to-primary motion-safe:animate-spin" />
-        <div className="absolute inset-3 rounded-full bg-background" />
-        <Music2 className="relative size-12 text-primary/50" />
-      </div>
-
-      <h1 className="text-3xl font-black leading-tight text-foreground md:text-4xl">
-        Writing {recipientLabel}&apos;s song...
-      </h1>
-      <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
-        Our songwriters are turning your story into lyrics. This usually takes
-        about 20 seconds.
-      </p>
-
-      <div className="mt-10 w-full max-w-md space-y-5 text-left">
-        {lyricGenerationSteps.map((item, index) => {
-          const complete = index < activeStep;
-          const active = index === activeStep;
-
-          return (
-            <div
-              key={item}
-              className={cn(
-                "flex items-center gap-4 text-base font-semibold transition",
-                active || complete
-                  ? "text-foreground"
-                  : "text-muted-foreground/60",
-              )}
-            >
-              <span
-                className={cn(
-                  "flex size-9 items-center justify-center rounded-full",
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : complete
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted text-muted-foreground",
-                )}
-              >
-                {complete ? (
-                  <Check className="size-4" />
-                ) : active ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : null}
-              </span>
-              {item}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function StoryHelperModal({
-  answer,
-  isCreating,
-  onAnswerChange,
-  onBack,
-  onClose,
-  onNext,
-  step,
-}: {
-  answer: string;
-  isCreating: boolean;
-  onAnswerChange: (value: string) => void;
-  onBack: () => void;
-  onClose: () => void;
-  onNext: () => void;
-  step: number;
-}) {
-  const helperStep = storyHelperSteps[step];
-  const isFirstStep = step === 0;
-  const isLastStep = step === storyHelperSteps.length - 1;
-  const questionNumber =
-    helperStep.mode === "detail"
-      ? `${helperStep.group}.1`
-      : String(helperStep.group);
-  const progress = ((step + 1) / storyHelperSteps.length) * 100;
-
-  return (
-    <motion.div
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 px-3 py-6 backdrop-blur-xl"
-      exit={{ opacity: 0 }}
-      initial={{ opacity: 0 }}
-    >
-      <motion.div
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative flex max-h-[86vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-border bg-background text-foreground shadow-2xl shadow-foreground/20"
-        exit={{ opacity: 0, scale: 0.96, y: 12 }}
-        initial={{ opacity: 0, scale: 0.96, y: 12 }}
-        transition={{ duration: 0.25 }}
-      >
-        <div className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-7 sm:pt-6">
-          <div className="flex items-center gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Wand2 className="size-5" />
-            </span>
-            <div>
-              <h2 className="text-xl font-black leading-tight">Story Helper</h2>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                Question {questionNumber} of 3
-              </p>
-            </div>
-          </div>
-          <button
-            aria-label="Close story helper"
-            className="rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-            type="button"
-            onClick={onClose}
-          >
-            <X className="size-5" />
-          </button>
-        </div>
-
-        <div className="px-5 pt-5 sm:px-7">
-          <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="min-h-[300px] flex-1 overflow-y-auto px-5 py-6 sm:px-7">
-          {isCreating ? (
-            <div className="flex min-h-[240px] flex-col items-center justify-center text-center">
-              <Loader2 className="mb-6 size-10 animate-spin text-primary" />
-              <h3 className="text-xl font-black">Creating your story...</h3>
-              <p className="mt-3 text-sm text-muted-foreground">
-                This will just take a moment
-              </p>
-            </div>
-          ) : (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                initial={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <h3 className="text-xl font-black leading-tight md:text-2xl">
-                  {helperStep.question}
-                </h3>
-
-                {helperStep.mode === "choice" && (
-                  <div className="mt-6 space-y-2">
-                    {helperStep.options?.map((option) => {
-                      const selected = answer === option;
-
-                      return (
-                        <button
-                          key={option}
-                          className={cn(
-                            "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-bold transition",
-                            selected
-                              ? "bg-primary/10 text-foreground"
-                              : "text-foreground hover:bg-muted",
-                          )}
-                          type="button"
-                          onClick={() => onAnswerChange(option)}
-                        >
-                          {option}
-                        </button>
-                      );
-                    })}
-                    <div className="pt-2">
-                      <p className="mb-2 text-sm text-muted-foreground">
-                        Or write your own:
-                      </p>
-                      <Textarea
-                        className="min-h-24 resize-none rounded-2xl border-border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
-                        placeholder="Type your answer here..."
-                        value={
-                          helperStep.options?.includes(answer) ? "" : answer
-                        }
-                        onChange={(event) => onAnswerChange(event.target.value)}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {helperStep.mode === "detail" && (
-                  <Textarea
-                    autoFocus
-                    className="mt-6 min-h-36 resize-none rounded-2xl border-primary bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
-                    placeholder="Type your answer here..."
-                    value={answer}
-                    onChange={(event) => onAnswerChange(event.target.value)}
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          )}
-        </div>
-
-        {!isCreating && (
-          <div className="flex items-center justify-between gap-4 border-t border-border bg-background/95 px-5 py-4 sm:px-7">
-            <Button
-              className="h-10 rounded-full bg-muted px-6 text-sm font-bold text-muted-foreground hover:bg-muted disabled:text-muted-foreground"
-              disabled={isFirstStep}
-              type="button"
-              variant="ghost"
-              onClick={onBack}
-            >
-              <ArrowLeft className="size-5" />
-              Back
-            </Button>
-            <Button
-              className="h-10 rounded-full bg-primary px-7 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
-              type="button"
-              onClick={onNext}
-            >
-              {isLastStep ? "Create Story" : "Next"}
-              {!isLastStep && <ArrowRight className="size-5" />}
-            </Button>
-          </div>
-        )}
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function StepProgress({ currentStep }: { currentStep: WizardStep }) {
-  return (
-    <div className="mx-auto grid w-full max-w-2xl grid-cols-5 items-start justify-center">
-      {steps.map((item, index) => {
-        const active = item.id === currentStep;
-        const complete = item.id < currentStep;
-
-        return (
-          <div key={item.id} className="relative flex justify-center">
-            {index < steps.length - 1 && (
-              <div className="absolute left-1/2 top-5 h-0.5 w-full translate-x-6 rounded-full bg-border" />
-            )}
-            <div className="relative z-10 flex min-w-16 flex-col items-center gap-2">
-              <div
-                className={cn(
-                  "flex size-10 items-center justify-center rounded-full border-4 text-base font-bold shadow-sm",
-                  active
-                    ? "border-foreground bg-foreground text-primary-foreground shadow-foreground/20"
-                    : complete
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-card text-muted-foreground",
-                )}
-              >
-                {complete ? <Check className="size-4" /> : item.id}
-              </div>
-              <div
-                className={cn(
-                  "text-xs font-bold tracking-[0.12em]",
-                  active ? "text-foreground" : "text-muted-foreground",
-                )}
-              >
-                {item.label}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function StepHeading({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="mx-auto mt-16 max-w-3xl text-center">
-      <h1 className="text-4xl font-black leading-tight tracking-normal text-foreground md:text-5xl">
-        {title}
-      </h1>
-      <p className="mt-5 text-base leading-8 text-muted-foreground">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-function LyricsLineEditor({
-  error,
-  instruction,
-  isRewriting,
-  lines,
-  selectedLineIds,
-  suggestions,
-  onAcceptSuggestion,
-  onInstructionChange,
-  onKeepOriginal,
-  onLineChange,
-  onRewriteSelected,
-  onSelectionChange,
-}: {
-  error: string;
-  instruction: string;
-  isRewriting: boolean;
-  lines: EditableLyricLine[];
-  selectedLineIds: string[];
-  suggestions: LyricsLineRewriteSuggestion[];
-  onAcceptSuggestion: (lineId: string) => void;
-  onInstructionChange: (value: string) => void;
-  onKeepOriginal: (lineId: string) => void;
-  onLineChange: (lineId: string, text: string) => void;
-  onRewriteSelected: () => void;
-  onSelectionChange: (lineId: string, selected: boolean) => void;
-}) {
-  const selectedCount = selectedLineIds.length;
-  const suggestionsByLineId = new Map(
-    suggestions.map((suggestion) => [suggestion.lineId, suggestion]),
-  );
-
-  return (
-    <div className="space-y-3">
-      <div className="-mx-4 border-y border-border/70 px-4 py-2 sm:-mx-5 sm:px-5">
-        <ScrollArea className="h-[360px]">
-          <div className="space-y-1 py-1">
-            {lines.map((line) => {
-              const isSelectable = line.kind === "lyric";
-              const selected = selectedLineIds.includes(line.id);
-              const suggestion = suggestionsByLineId.get(line.id);
-
-              if (line.kind === "blank") {
-                return <div key={line.id} className="h-1.5" />;
-              }
-
-              if (line.kind === "title") {
-                return null;
-              }
-
-              if (line.kind === "section") {
-                return (
-                  <div
-                    key={line.id}
-                    className="flex min-h-6 items-center px-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground"
-                  >
-                    {line.text}
-                  </div>
-                );
-              }
-
-              return (
-                <div
-                  key={line.id}
-                  className={cn(
-                    "group rounded-lg px-1.5 py-1 transition",
-                    selected || suggestion
-                      ? "bg-rose-50/90 dark:bg-rose-950/20"
-                      : "bg-transparent",
-                  )}
-                >
-                  <div className="grid grid-cols-[1.35rem_1fr] items-center gap-1.5">
-                    <Checkbox
-                      aria-label="Select lyric line"
-                      checked={selected}
-                      className={cn(
-                        "size-3.5 justify-self-center transition-opacity",
-                        selected
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100",
-                      )}
-                      disabled={!isSelectable || isRewriting}
-                      onCheckedChange={(checked) =>
-                        onSelectionChange(line.id, checked === true)
-                      }
-                    />
-                    <Input
-                      aria-label="Lyric line"
-                      className="h-7 rounded-md border-0 bg-transparent px-1.5 text-sm font-semibold leading-5 text-foreground shadow-none focus-visible:bg-background/80 focus-visible:ring-primary/15"
-                      disabled={isRewriting || Boolean(suggestion)}
-                      value={line.text}
-                      onChange={(event) =>
-                        onLineChange(line.id, event.target.value)
-                      }
-                    />
-                  </div>
-
-                  {suggestion && (
-                    <div className="ml-7 mt-1.5 space-y-2 rounded-lg bg-background/70 p-2.5 shadow-sm">
-                      <div className="grid gap-2 text-sm sm:grid-cols-2">
-                        <div>
-                          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-muted-foreground">
-                            Original
-                          </p>
-                          <p className="mt-1 leading-6 text-muted-foreground">
-                            {suggestion.originalText}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">
-                            New
-                          </p>
-                          <p className="mt-1 leading-6 font-semibold text-foreground">
-                            {suggestion.rewrittenText}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap justify-end gap-2">
-                        <Button
-                          className="h-8 rounded-lg px-3 text-xs font-bold"
-                          size="sm"
-                          type="button"
-                          variant="ghost"
-                          onClick={() => onKeepOriginal(line.id)}
-                        >
-                          Use original
-                        </Button>
-                        <Button
-                          className="h-8 rounded-lg bg-primary px-3 text-xs font-bold text-primary-foreground hover:bg-primary/90"
-                          size="sm"
-                          type="button"
-                          onClick={() => onAcceptSuggestion(line.id)}
-                        >
-                          Use new
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
-      </div>
-
-      <div className="grid gap-2 rounded-xl bg-muted/60 p-2 sm:grid-cols-[1fr_auto]">
-        <Input
-          className="h-9 rounded-lg border-0 bg-background text-sm shadow-none focus-visible:ring-primary/20"
-          disabled={isRewriting}
-          placeholder="Optional direction, e.g. make selected lines more tender"
-          value={instruction}
-          onChange={(event) => onInstructionChange(event.target.value)}
-        />
-        <Button
-          className="h-9 rounded-lg bg-primary px-4 text-xs font-bold text-primary-foreground hover:bg-primary/90"
-          disabled={!selectedCount || isRewriting}
-          type="button"
-          onClick={onRewriteSelected}
-        >
-          {isRewriting ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Wand2 className="size-4" />
-          )}
-          Rewrite {selectedCount ? selectedCount : ""}
-        </Button>
-      </div>
-
-      {error && (
-        <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function LyricsVersionPanel({
-  label,
-  lyrics,
-  title,
-}: {
-  label: string;
-  lyrics: string;
-  title: string;
-}) {
-  return (
-    <section className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <div className="border-b border-border bg-muted/60 px-4 py-3">
-        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-muted-foreground">
-          {label}
-        </p>
-        <h3 className="mt-1 line-clamp-2 text-base font-black leading-6 text-foreground">
-          {title || "Your Custom Song"}
-        </h3>
-      </div>
-      <ScrollArea className="min-h-0 flex-1">
-        <pre className="whitespace-pre-wrap break-words px-4 py-4 font-sans text-sm font-medium leading-7 text-foreground">
-          {lyrics || "No lyrics generated."}
-        </pre>
-      </ScrollArea>
-    </section>
-  );
-}
-
-function RelationshipCreatableSelect({
-  onChange,
-  placeholder,
-  value,
-}: {
-  onChange: (value: string) => void;
-  placeholder: string;
-  value: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const trimmedQuery = query.trim();
-  const selectedValue = value.trim();
-  const filteredOptions = relationshipOptions.filter((option) =>
-    option.toLowerCase().includes(trimmedQuery.toLowerCase()),
-  );
-  const canCreate =
-    trimmedQuery &&
-    !relationshipOptions.some(
-      (option) => option.toLowerCase() === trimmedQuery.toLowerCase(),
-    );
-
-  function selectRelationship(nextValue: string) {
-    onChange(nextValue);
-    setQuery("");
-    setOpen(false);
-  }
-
-  return (
-    <Popover
-      open={open}
-      onOpenChange={(nextOpen) => {
-        setOpen(nextOpen);
-        setQuery(nextOpen ? selectedValue : "");
-      }}
-    >
-      <PopoverTrigger asChild>
-        <button
-          className={cn(
-            "flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 text-left text-base text-foreground shadow-sm transition hover:border-primary/40 focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
-            !selectedValue && "text-muted-foreground",
-          )}
-          type="button"
-        >
-          <span className="min-w-0 flex-1 truncate">
-            {selectedValue || placeholder}
-          </span>
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Search or type a relationship..."
-            value={query}
-            onValueChange={setQuery}
-          />
-          <CommandList>
-            {!filteredOptions.length && !canCreate && (
-              <CommandEmpty>No relationship found.</CommandEmpty>
-            )}
-            {canCreate && (
-              <CommandGroup>
-                <CommandItem onSelect={() => selectRelationship(trimmedQuery)}>
-                  <Plus className="size-4 text-primary" />
-                  Use &quot;{trimmedQuery}&quot;
-                </CommandItem>
-              </CommandGroup>
-            )}
-            <CommandGroup heading="Common relationships">
-              {filteredOptions.map((option) => (
-                <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={() => selectRelationship(option)}
-                >
-                  <Check
-                    className={cn(
-                      "size-4 text-primary",
-                      selectedValue.toLowerCase() === option.toLowerCase()
-                        ? "opacity-100"
-                        : "opacity-0",
-                    )}
-                  />
-                  {option}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-function EditableBlock({
-  actionText,
-  children,
-  icon,
-  label,
-  onAction,
-}: {
-  actionText: string;
-  children: ReactNode;
-  icon: ReactNode;
-  label: string;
-  onAction?: () => void;
-}) {
-  return (
-    <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
-          {icon}
-          {label}
-        </div>
-        <button
-          className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground transition hover:text-primary"
-          type="button"
-          onClick={onAction}
-        >
-          {onAction && <RefreshCw className="size-4" />}
-          {actionText}
-        </button>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function InfoPill({ icon, label }: { icon: ReactNode; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-2 text-xs font-bold text-muted-foreground shadow-sm">
-      <span className="text-primary">{icon}</span>
-      {label}
-    </span>
-  );
-}
-
-function LanguageChip({
-  language,
-  onClick,
-  selected,
-  showCode = false,
-}: {
-  language: LanguageOption;
-  onClick: () => void;
-  selected: boolean;
-  showCode?: boolean;
-}) {
-  return (
-    <button
-      className={cn(
-        "inline-flex items-center gap-3 rounded-full px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5",
-        selected ? "bg-primary/10 text-primary" : "bg-card text-foreground",
-      )}
-      type="button"
-      onClick={onClick}
-    >
-      {showCode && (
-        <span className="font-black uppercase tracking-[0.08em] text-muted-foreground">
-          {language.code}
-        </span>
-      )}
-      {language.label}
-    </button>
-  );
-}
-
-function StepFrame({ children }: { children: ReactNode }) {
-  return (
-    <motion.div
-      animate="center"
-      exit="exit"
-      initial="enter"
-      transition={{ duration: 0.28, ease: "easeOut" }}
-      variants={stepVariants}
-    >
-      {children}
-    </motion.div>
   );
 }
 

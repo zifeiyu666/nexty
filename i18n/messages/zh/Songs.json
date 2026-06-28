@@ -22,6 +22,7 @@
   "card": {
     "audio": "音频",
     "created": "创建于 {date}",
+    "createdFor": "为 {names} 创建",
     "fallback": "一首已最终生成、可播放和分享的定制歌曲。",
     "open": "打开",
     "writtenFor": "写给 {names}"

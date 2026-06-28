@@ -22,6 +22,7 @@
   "card": {
     "audio": "音声",
     "created": "{date} に作成",
+    "createdFor": "{names} のために作成",
     "fallback": "再生や共有ができる完成済みのカスタムソングです。",
     "open": "開く",
     "writtenFor": "{names} へ"

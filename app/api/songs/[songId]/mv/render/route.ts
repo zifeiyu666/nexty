@@ -85,9 +85,19 @@ const minimalVinylTimelineSchema = z.object({
   transitions: z.array(transitionSchema).default([]),
 });
 
+const waveRadioTimelineSchema = z.object({
+  ...baseTimelineSchema,
+  assignments: z.array(assignmentSchema).default([]),
+  photos: z.array(photoSchema).default([]),
+  templateId: z.literal("wave-radio"),
+  transitions: z.array(transitionSchema).default([]),
+  waveRadioBackgroundId: z.string(),
+});
+
 const timelineSchema = z.discriminatedUnion("templateId", [
   photoSlideshowTimelineSchema,
   minimalVinylTimelineSchema,
+  waveRadioTimelineSchema,
 ]);
 
 export async function POST(

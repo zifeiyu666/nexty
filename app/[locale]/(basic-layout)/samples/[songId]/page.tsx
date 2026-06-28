@@ -91,8 +91,9 @@ export default async function SampleDetailPage({
   });
 
   return (
-    <main className="min-h-screen w-full bg-[#fbf8f5] px-4 py-6 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-5xl">
+    <main className="relative min-h-screen w-full bg-background py-6 text-foreground">
+      <div className="pointer-events-none absolute inset-0 bg-accent/10" />
+      <div className="relative mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
         <Button
           asChild
           className="mb-4 h-10 rounded-full bg-background/80 text-sm font-bold text-muted-foreground shadow-sm hover:text-foreground"
@@ -103,12 +104,12 @@ export default async function SampleDetailPage({
             Back to samples
           </Link>
         </Button>
-
-        <SampleSongPlayer
-          data={playerData}
-          regenerateHref={`/create-song?${regenerateParams.toString()}`}
-        />
       </div>
+
+      <SampleSongPlayer
+        data={playerData}
+        regenerateHref={`/create-song?${regenerateParams.toString()}`}
+      />
     </main>
   );
 }

@@ -6,11 +6,15 @@ import {
   buildEvenPhotoAssignments,
   buildMinimalVinylTimeline,
   buildPhotoSlideshowTimeline,
+  buildWaveRadioTimeline,
   buildRandomTransitionAssignments,
   buildLyricCuesFromAlignedWords,
   DEFAULT_TRANSITION_TYPE,
   DEFAULT_LYRICS_STYLE,
+  DEFAULT_WAVE_RADIO_BACKGROUND,
   normalizeLyricsStyleConfig,
+  normalizeWaveRadioBackgroundId,
+  WAVE_RADIO_BACKGROUND_OPTIONS,
   getUploadedMediaType,
   findActiveCue,
   parseTimestampedLyrics,
@@ -426,6 +430,15 @@ describe("photo slideshow music video helpers", () => {
       duration: 16,
       lyrics: "[00:00] Verse line\n[00:08] Chorus line",
       fallbackImageUrl: "https://cdn.example.com/cover.jpg",
+      lyricsStyle: {
+        ...DEFAULT_LYRICS_STYLE,
+        color: "#fef3c7",
+        fontFamily: "Georgia, serif",
+        fontSize: 54,
+        position: "bottom",
+        strokeColor: "#111111",
+        strokeWidth: 0,
+      },
     });
 
     assert.equal(timeline.templateId, "minimal-vinyl");
@@ -435,6 +448,47 @@ describe("photo slideshow music video helpers", () => {
     assert.deepEqual(timeline.assignments, []);
     assert.deepEqual(timeline.transitions, []);
     assert.equal(timeline.coverPhoto?.url, "https://cdn.example.com/cover.jpg");
+    assert.equal(timeline.lyricsStyle?.fontFamily, "Georgia, serif");
+    assert.equal(timeline.lyricsStyle?.fontSize, 54);
+    assert.equal(timeline.lyricsStyle?.position, "bottom");
+    assert.deepEqual(
+      timeline.lyrics.map((cue) => cue.text),
+      ["Verse line", "Chorus line"],
+    );
+  });
+
+  test("normalizes wave radio background choices to a bundled video", () => {
+    assert.equal(
+      normalizeWaveRadioBackgroundId(WAVE_RADIO_BACKGROUND_OPTIONS[1].id),
+      WAVE_RADIO_BACKGROUND_OPTIONS[1].id,
+    );
+    assert.equal(
+      normalizeWaveRadioBackgroundId("missing-background"),
+      DEFAULT_WAVE_RADIO_BACKGROUND.id,
+    );
+  });
+
+  test("builds a wave radio timeline with centered single-line lyrics", () => {
+    const timeline = buildWaveRadioTimeline({
+      songTitle: "Our Song",
+      audioUrl: "https://cdn.example.com/song.mp3",
+      duration: 16,
+      lyrics: "[00:00] Verse line\n[00:08] Chorus line",
+      waveRadioBackgroundId: WAVE_RADIO_BACKGROUND_OPTIONS[2].id,
+      lyricsStyle: {
+        ...DEFAULT_LYRICS_STYLE,
+        color: "#f8fafc",
+        fontSize: 64,
+        position: "bottom",
+      },
+    });
+
+    assert.equal(timeline.templateId, "wave-radio");
+    assert.equal(timeline.waveRadioBackgroundId, WAVE_RADIO_BACKGROUND_OPTIONS[2].id);
+    assert.deepEqual(timeline.photos, []);
+    assert.deepEqual(timeline.assignments, []);
+    assert.deepEqual(timeline.transitions, []);
+    assert.equal(timeline.lyricsStyle?.position, "center");
     assert.deepEqual(
       timeline.lyrics.map((cue) => cue.text),
       ["Verse line", "Chorus line"],

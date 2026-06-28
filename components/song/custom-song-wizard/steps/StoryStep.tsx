@@ -1,0 +1,182 @@
+"use client";
+
+import {
+  Edit3,
+  Lightbulb,
+  Loader2,
+  Mic2,
+  MicOff,
+  Sparkles,
+  Wand2,
+} from "lucide-react";
+import type { RefObject } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+
+import { storyPlaceholders } from "../constants";
+import type { Occasion } from "../types";
+
+const detailTemplates = [
+  { label: "Nickname", text: "[Nickname: ]" },
+  { label: "Shared Memory", text: "[Remember when we: ]" },
+  { label: "Quirks", text: "[Their funny habit/quirk: ]" },
+  { label: "Proud Moment", text: "[Something they are proud of: ]" },
+];
+
+type StoryStepProps = {
+  isRecording: boolean;
+  isPolishingStory: boolean;
+  occasion: Occasion | null;
+  story: string;
+  storyTextareaRef: RefObject<HTMLTextAreaElement | null>;
+  storyWordCount: number;
+  onOpenHelper: () => void;
+  onPolishStory: () => void;
+  onStoryChange: (value: string) => void;
+  onToggleRecording: () => void;
+};
+
+export function StoryStep({
+  isRecording,
+  isPolishingStory,
+  occasion,
+  story,
+  storyTextareaRef,
+  storyWordCount,
+  onOpenHelper,
+  onPolishStory,
+  onStoryChange,
+  onToggleRecording,
+}: StoryStepProps) {
+  function insertTemplate(template: string) {
+    const textarea = storyTextareaRef.current;
+
+    if (!textarea) {
+      const separator = story.trim().length ? "\n\n" : "";
+      onStoryChange(`${story}${separator}${template}`);
+      return;
+    }
+
+    const start = textarea.selectionStart ?? story.length;
+    const end = textarea.selectionEnd ?? story.length;
+    const before = story.slice(0, start);
+    const after = story.slice(end);
+    const separator =
+      before && !before.endsWith(" ") && !before.endsWith("\n") ? " " : "";
+    const nextStory = `${before}${separator}${template}${after}`;
+    const nextCursor = start + separator.length + template.length - 1;
+
+    onStoryChange(nextStory);
+    window.requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(nextCursor, nextCursor);
+    });
+  }
+
+  return (
+    <div className="mx-auto mt-16 max-w-5xl">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3 text-lg font-black text-foreground">
+          <Edit3 className="size-5 text-primary" />
+          Your story
+        </div>
+        <span className="text-sm font-semibold text-muted-foreground">
+          100-200 words works best
+        </span>
+      </div>
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <Button
+          className="rounded-full bg-card px-4 py-2 text-sm font-bold text-foreground shadow-sm hover:bg-primary/10 hover:text-primary"
+          type="button"
+          variant="ghost"
+          onClick={onOpenHelper}
+        >
+          <Wand2 className="size-5 text-primary" />
+          Help me write
+        </Button>
+        <Button
+          className={cn(
+            "rounded-full px-4 text-sm font-bold shadow-sm",
+            isRecording
+              ? "bg-primary/10 text-primary hover:bg-primary/15"
+              : "bg-card text-foreground hover:bg-primary/10 hover:text-primary",
+          )}
+          type="button"
+          variant="ghost"
+          onClick={onToggleRecording}
+        >
+          {isRecording ? (
+            <MicOff className="size-5 text-primary" />
+          ) : (
+            <Mic2 className="size-5 text-primary" />
+          )}
+          {isRecording ? "Stop recording" : "Speak"}
+        </Button>
+        {isRecording && (
+          <span className="text-sm font-semibold text-primary/70">
+            Listening...
+          </span>
+        )}
+        <Button
+          className="ml-auto rounded-full bg-primary/10 px-4 py-2 text-sm font-bold text-primary shadow-sm hover:bg-primary/15"
+          disabled={isPolishingStory || story.trim().length < 10}
+          type="button"
+          variant="ghost"
+          onClick={onPolishStory}
+        >
+          {isPolishingStory ? (
+            <Loader2 className="size-5 animate-spin text-primary" />
+          ) : (
+            <Sparkles className="size-5 text-primary" />
+          )}
+          {isPolishingStory ? "AI polishing..." : "AI polish story"}
+        </Button>
+      </div>
+      <Textarea
+        ref={storyTextareaRef}
+        className="min-h-[230px] resize-y rounded-2xl border-border bg-card p-5 text-base leading-8 text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
+        placeholder={
+          occasion
+            ? storyPlaceholders[occasion]
+            : "e.g., Tell us about the person, the moment, and the details that should become lyrics..."
+        }
+        value={story}
+        onChange={(event) => onStoryChange(event.target.value)}
+      />
+      <div className="-mt-9 mr-4 flex justify-end text-sm text-muted-foreground">
+        {storyWordCount} words
+      </div>
+      <div className="mt-8 flex gap-4 rounded-2xl border border-primary/20 bg-primary/10 p-5 text-muted-foreground">
+        <Lightbulb className="mt-1 size-5 shrink-0 text-primary" />
+        <div className="text-base leading-7">
+          <p>
+            <span className="font-black text-foreground">Tip:</span>{" "}
+            Add a{" "}
+            {detailTemplates.map((template, index) => (
+              <span key={template.label}>
+                <button
+                  className="font-black text-foreground underline decoration-primary decoration-2 underline-offset-4 transition hover:text-primary"
+                  type="button"
+                  onClick={() => insertTemplate(template.text)}
+                >
+                  {template.label}
+                </button>
+                {index === detailTemplates.length - 2
+                  ? ", or a "
+                  : index < detailTemplates.length - 1
+                    ? ", a "
+                    : ""}
+              </span>
+            ))}{" "}
+            to make the lyrics truly one-of-a-kind.
+          </p>
+          <p className="mt-1 text-sm font-semibold text-muted-foreground/85">
+            Click words to use templates.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

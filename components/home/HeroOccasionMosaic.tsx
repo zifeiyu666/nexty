@@ -75,7 +75,7 @@ export default function HeroOccasionMosaic() {
       className="absolute inset-0 -z-30 overflow-hidden bg-[#080605]"
       aria-hidden="true"
     >
-      <div className="absolute left-1/2 top-1/2 flex h-[190vh] w-[150vw] -translate-x-1/2 -translate-y-1/2 rotate-[-12deg] items-center justify-center gap-4 sm:gap-5 lg:gap-6">
+      <div className="absolute left-1/2 top-1/2 flex h-[190vh] w-[150vw] -translate-x-1/2 -translate-y-1/2 rotate-[-12deg] items-center justify-center gap-2 sm:gap-3 lg:gap-4">
         {heroOccasionColumns.map((column) => (
           <HeroOccasionColumnView key={column.id} column={column} />
         ))}
@@ -89,16 +89,16 @@ function HeroOccasionColumnView({ column }: { column: HeroOccasionColumn }) {
     <div
       data-hero-occasion-column
       data-direction={column.direction}
-      className="flex w-28 shrink-0 flex-col gap-4 will-change-transform sm:w-36 sm:gap-5 lg:w-48 lg:gap-6 2xl:w-56"
+      className="flex w-28 shrink-0 flex-col gap-2 will-change-transform sm:w-36 sm:gap-3 lg:w-48 lg:gap-4 2xl:w-56"
     >
       <div
         data-hero-occasion-column-idle
-        className="flex flex-col gap-4 will-change-transform sm:gap-5 lg:gap-6"
+        className="flex flex-col gap-2 will-change-transform sm:gap-3 lg:gap-4"
       >
         {column.tiles.map((tile, index) => (
           <div
             key={`${column.id}-${tile.src}-${index}`}
-            className={`relative w-full shrink-0 overflow-hidden rounded-2xl bg-black shadow-[0_12px_30px_rgba(71,46,34,0.14)] ${tile.heightClass}`}
+            className={`relative w-full shrink-0 overflow-hidden rounded-lg bg-black shadow-[0_12px_30px_rgba(71,46,34,0.14)] ${tile.heightClass}`}
           >
             <Image
               src={tile.src}

@@ -61,6 +61,13 @@ export type AtmosphereOverlayConfig = {
   overlayId: string | null;
 };
 
+export type WaveRadioBackgroundOption = {
+  durationInFrames: number;
+  id: string;
+  label: string;
+  src: string;
+};
+
 export function getUploadedMediaType(
   media: Pick<UploadedPhoto, "mediaType"> | null | undefined,
 ) {
@@ -73,7 +80,10 @@ export type LyricsStyleInput = Omit<Partial<LyricsStyleConfig>, "entrance"> & {
 
 export type AtmosphereOverlayInput = Partial<AtmosphereOverlayConfig> | null;
 
-export type MusicVideoTemplateId = "photo-slideshow" | "minimal-vinyl";
+export type MusicVideoTemplateId =
+  | "photo-slideshow"
+  | "minimal-vinyl"
+  | "wave-radio";
 
 type BaseMusicVideoTimeline = {
   templateId: MusicVideoTemplateId;
@@ -97,7 +107,15 @@ export type MinimalVinylTimeline = BaseMusicVideoTimeline & {
   templateId: "minimal-vinyl";
 };
 
-export type MusicVideoTimeline = PhotoSlideshowTimeline | MinimalVinylTimeline;
+export type WaveRadioTimeline = BaseMusicVideoTimeline & {
+  templateId: "wave-radio";
+  waveRadioBackgroundId: string;
+};
+
+export type MusicVideoTimeline =
+  | PhotoSlideshowTimeline
+  | MinimalVinylTimeline
+  | WaveRadioTimeline;
 
 export type ResolvedCuePhoto = {
   cue: LyricCue;
@@ -144,6 +162,172 @@ export const ATMOSPHERE_OVERLAY_OPTIONS: AtmosphereOverlayOption[] = [
     src: "/overlay/video/48569-454825064.mp4",
   },
 ];
+export const WAVE_RADIO_BACKGROUND_OPTIONS: WaveRadioBackgroundOption[] = [
+  {
+    durationInFrames: 299,
+    id: "crimson-pulse-107256",
+    label: "Crimson Pulse",
+    src: "/overlay/bg-video/107256-678130118.mp4",
+  },
+  {
+    durationInFrames: 993,
+    id: "midnight-glow-11722",
+    label: "Midnight Glow",
+    src: "/overlay/bg-video/11722-231759069.mp4",
+  },
+  {
+    durationInFrames: 1066,
+    id: "aurora-119885",
+    label: "Aurora Signal",
+    src: "/overlay/bg-video/119885-719283332.mp4",
+  },
+  {
+    durationInFrames: 299,
+    id: "ember-veil-127216",
+    label: "Ember Veil",
+    src: "/overlay/bg-video/127216-738093640.mp4",
+  },
+  {
+    durationInFrames: 203,
+    id: "glass-shimmer-132427",
+    label: "Glass Shimmer",
+    src: "/overlay/bg-video/132427-753435588.mp4",
+  },
+  {
+    durationInFrames: 543,
+    id: "sunset-drift-147206",
+    label: "Sunset Drift",
+    src: "/overlay/bg-video/147206-791344441.mp4",
+  },
+  {
+    durationInFrames: 376,
+    id: "violet-field-148029",
+    label: "Violet Field",
+    src: "/overlay/bg-video/148029-793140704.mp4",
+  },
+  {
+    durationInFrames: 828,
+    id: "starlight-rain-151469",
+    label: "Starlight Rain",
+    src: "/overlay/bg-video/151469-800921014.mp4",
+  },
+  {
+    durationInFrames: 677,
+    id: "lilac-mist-152798",
+    label: "Lilac Mist",
+    src: "/overlay/bg-video/152798-803733100.mp4",
+  },
+  {
+    durationInFrames: 1441,
+    id: "solar-spark-154006",
+    label: "Solar Spark",
+    src: "/overlay/bg-video/154006-806572051.mp4",
+  },
+  {
+    durationInFrames: 301,
+    id: "velvet-night-155630",
+    label: "Velvet Night",
+    src: "/overlay/bg-video/155630-810650602.mp4",
+  },
+  {
+    durationInFrames: 505,
+    id: "rose-orbit-175741",
+    label: "Rose Orbit",
+    src: "/overlay/bg-video/175741-854057998.mp4",
+  },
+  {
+    durationInFrames: 240,
+    id: "warm-bokeh-199558",
+    label: "Warm Bokeh",
+    src: "/overlay/bg-video/199558-910609536.mp4",
+  },
+  {
+    durationInFrames: 476,
+    id: "horizon-bloom-230851",
+    label: "Horizon Bloom",
+    src: "/overlay/bg-video/230851.mp4",
+  },
+  {
+    durationInFrames: 762,
+    id: "electric-haze-248842",
+    label: "Electric Haze",
+    src: "/overlay/bg-video/248842.mp4",
+  },
+  {
+    durationInFrames: 255,
+    id: "magma-fall-265607",
+    label: "Magma Fall",
+    src: "/overlay/bg-video/265607.mp4",
+  },
+  {
+    durationInFrames: 252,
+    id: "aqua-ray-265648",
+    label: "Aqua Ray",
+    src: "/overlay/bg-video/265648.mp4",
+  },
+  {
+    durationInFrames: 912,
+    id: "vertical-lights-266987",
+    label: "Vertical Lights",
+    src: "/overlay/bg-video/266987.mp4",
+  },
+  {
+    durationInFrames: 1024,
+    id: "blue-current-277316",
+    label: "Blue Current",
+    src: "/overlay/bg-video/277316.mp4",
+  },
+  {
+    durationInFrames: 481,
+    id: "flare-canopy-284542",
+    label: "Flare Canopy",
+    src: "/overlay/bg-video/284542.mp4",
+  },
+  {
+    durationInFrames: 207,
+    id: "neon-tunnel-302596",
+    label: "Neon Tunnel",
+    src: "/overlay/bg-video/302596.mp4",
+  },
+  {
+    durationInFrames: 313,
+    id: "vertical-aura-315351",
+    label: "Vertical Aura",
+    src: "/overlay/bg-video/315351.mp4",
+  },
+  {
+    durationInFrames: 1782,
+    id: "comet-stream-45316",
+    label: "Comet Stream",
+    src: "/overlay/bg-video/45316-442643130.mp4",
+  },
+  {
+    durationInFrames: 324,
+    id: "sunset-grain-58142",
+    label: "Sunset Grain",
+    src: "/overlay/bg-video/58142-487508532.mp4",
+  },
+  {
+    durationInFrames: 450,
+    id: "light-leak-62666",
+    label: "Light Leak",
+    src: "/overlay/bg-video/62666-504665647.mp4",
+  },
+  {
+    durationInFrames: 141,
+    id: "prism-bloom-6962",
+    label: "Prism Bloom",
+    src: "/overlay/bg-video/6962-197634410.mp4",
+  },
+  {
+    durationInFrames: 444,
+    id: "ember-cloud-84916",
+    label: "Ember Cloud",
+    src: "/overlay/bg-video/84916-587646675.mp4",
+  },
+];
+export const DEFAULT_WAVE_RADIO_BACKGROUND =
+  WAVE_RADIO_BACKGROUND_OPTIONS[0];
 export const DEFAULT_ATMOSPHERE_OVERLAY: AtmosphereOverlayConfig = {
   opacity: 0.36,
   overlayId: null,
@@ -225,6 +409,16 @@ export function normalizeAtmosphereOverlayConfig(
     opacity: normalizeOverlayOpacity(overlay?.opacity),
     overlayId: isKnownOverlay ? overlayId : null,
   };
+}
+
+export function normalizeWaveRadioBackgroundId(backgroundId?: string | null) {
+  const isKnownBackground = WAVE_RADIO_BACKGROUND_OPTIONS.some(
+    (option) => option.id === backgroundId,
+  );
+
+  return isKnownBackground
+    ? (backgroundId as string)
+    : DEFAULT_WAVE_RADIO_BACKGROUND.id;
 }
 
 function parseTimestamp(match: RegExpMatchArray) {
@@ -566,6 +760,7 @@ export function buildMinimalVinylTimeline({
   lyrics,
   fallbackImageUrl,
   timestampedLyrics,
+  lyricsStyle,
 }: {
   songTitle: string;
   audioUrl: string;
@@ -573,6 +768,7 @@ export function buildMinimalVinylTimeline({
   lyrics: string;
   fallbackImageUrl?: string | null;
   timestampedLyrics?: { alignedWords: AlignedLyricWord[] } | null;
+  lyricsStyle?: LyricsStyleConfig;
 }): MusicVideoTimeline {
   const effectiveDuration = normalizeDuration(duration);
   const lyricCues = timestampedLyrics?.alignedWords?.length
@@ -592,6 +788,53 @@ export function buildMinimalVinylTimeline({
     photos: [],
     assignments: [],
     coverPhoto: createCoverPhoto(fallbackImageUrl) ?? undefined,
+    lyricsStyle: normalizeLyricsStyleConfig(lyricsStyle),
     transitions: [],
+  };
+}
+
+export function buildWaveRadioTimeline({
+  songTitle,
+  audioUrl,
+  duration,
+  lyrics,
+  timestampedLyrics,
+  lyricsStyle,
+  waveRadioBackgroundId,
+}: {
+  songTitle: string;
+  audioUrl: string;
+  duration?: number | null;
+  lyrics: string;
+  timestampedLyrics?: { alignedWords: AlignedLyricWord[] } | null;
+  lyricsStyle?: LyricsStyleConfig;
+  waveRadioBackgroundId?: string | null;
+}): MusicVideoTimeline {
+  const effectiveDuration = normalizeDuration(duration);
+  const lyricCues = timestampedLyrics?.alignedWords?.length
+    ? buildLyricCuesFromAlignedWords({
+        lyrics,
+        alignedWords: timestampedLyrics.alignedWords,
+        duration: effectiveDuration,
+      })
+    : parseTimestampedLyrics(lyrics, effectiveDuration);
+  const normalizedLyricsStyle = normalizeLyricsStyleConfig(lyricsStyle);
+
+  return {
+    templateId: "wave-radio",
+    songTitle,
+    audioUrl,
+    duration: effectiveDuration,
+    lyrics: lyricCues,
+    photos: [],
+    assignments: [],
+    lyricsStyle: {
+      ...normalizedLyricsStyle,
+      position: "center",
+    },
+    transitions: [],
+    waveRadioBackgroundId: normalizeWaveRadioBackgroundId(
+      waveRadioBackgroundId,
+    ),
   };
 }

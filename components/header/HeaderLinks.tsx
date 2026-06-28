@@ -18,6 +18,28 @@ type HeaderLinksProps = {
   variant?: "default" | "adaptive";
 };
 
+type RollingNavTextProps = {
+  children: string;
+};
+
+const RollingNavText = ({ children }: RollingNavTextProps) => (
+  <span className="relative inline-block overflow-hidden align-middle leading-[1.15]">
+    <span className="sr-only">{children}</span>
+    <span
+      aria-hidden="true"
+      className="block transition-transform duration-500 ease-[cubic-bezier(0.22,1.38,0.36,1)] motion-reduce:transition-none group-hover/nav-link:translate-y-[120%] group-focus-visible/nav-link:translate-y-[120%]"
+    >
+      {children}
+    </span>
+    <span
+      aria-hidden="true"
+      className="absolute inset-x-0 top-0 block -translate-y-[120%] transition-transform duration-500 ease-[cubic-bezier(0.22,1.38,0.36,1)] motion-reduce:transition-none group-hover/nav-link:translate-y-0 group-focus-visible/nav-link:translate-y-0"
+    >
+      {children}
+    </span>
+  </span>
+);
+
 const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
   const tHeader = useTranslations("Header");
   const pathname = usePathname();
@@ -30,13 +52,13 @@ const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
 
   const triggerClassName =
     variant === "adaptive"
-      ? "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-normal text-white/82 transition-colors hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950 group-data-[scrolled=true]/header:data-[state=open]:bg-zinc-950/5 group-data-[scrolled=true]/header:data-[state=open]:text-zinc-950"
-      : "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 hover:bg-accent-foreground/10 hover:text-accent-foreground text-sm font-normal text-muted-foreground";
+      ? "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-white/82 transition-colors hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950 group-data-[scrolled=true]/header:data-[state=open]:bg-zinc-950/5 group-data-[scrolled=true]/header:data-[state=open]:text-zinc-950"
+      : "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 hover:bg-accent-foreground/10 hover:text-accent-foreground text-sm font-medium text-muted-foreground";
 
   const linkClassName =
     variant === "adaptive"
-      ? "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-normal text-white/82 transition-colors hover:bg-white/10 hover:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950"
-      : "bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-normal text-muted-foreground hover:bg-accent-foreground/10 hover:text-accent-foreground";
+      ? "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-white/82 transition-colors hover:bg-white/10 hover:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950"
+      : "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-muted-foreground hover:bg-accent-foreground/10 hover:text-accent-foreground";
 
   const activeClassName =
     variant === "adaptive"
@@ -51,7 +73,7 @@ const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
             {link.items ? (
               <>
                 <NavigationMenuTrigger className={triggerClassName}>
-                  {link.name}
+                  <RollingNavText>{link.name}</RollingNavText>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="w-[250px] gap-1">
@@ -110,7 +132,7 @@ const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
                   pathname === link.href && activeClassName
                 )}
               >
-                {link.name}
+                <RollingNavText>{link.name}</RollingNavText>
                 {link.target === "_blank" && (
                   <span className="text-xs">
                     <ExternalLink className="w-4 h-4" />

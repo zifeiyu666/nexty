@@ -14,7 +14,7 @@ import {
   SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
   parseLyricsText,
 } from "../../../lib/ai/song-lyrics";
-import { buildLyricsPrompt } from "../../../lib/ai/song";
+import { buildLyricsPrompt, buildStoryPrompt } from "../../../lib/ai/song";
 import {
   createSongSampleFromTask,
   getSampleAccessExpiresAt,
@@ -62,6 +62,73 @@ describe("song lyrics prompt", () => {
     assert.match(prompt, /Additional New Version Direction/i);
     assert.match(prompt, /Add Maya's name to the title/);
     assert.match(prompt, /more romantic/);
+  });
+});
+
+describe("song story prompt", () => {
+  test("builds a lyric-ready story prompt from helper answers", () => {
+    const prompt = buildStoryPrompt({
+      occasion: "mothers-day",
+      genre: "Acoustic Folk",
+      language: "English",
+      recipients: [{ name: "Maya", relationship: "Mom" }],
+      recipientNames: ["Maya"],
+      recipientRelationships: ["Mom"],
+      vocalGender: "Female",
+      answers: [
+        {
+          question: "What do you admire most about them?",
+          answer: "Kind and caring",
+        },
+        {
+          question: "Share one short example.",
+          answer: "She sang while cooking Sunday dinner.",
+        },
+      ],
+    });
+
+    assert.match(prompt, /careful story editor/i);
+    assert.match(prompt, /Recipient\(s\): Maya \(Mom\)/);
+    assert.match(prompt, /Occasion: Mothers Day/);
+    assert.match(prompt, /Target lyrics language: English/);
+    assert.match(prompt, /entirely in English/);
+    assert.match(prompt, /Music style \/ genre: Acoustic Folk/);
+    assert.match(prompt, /Vocal direction: Female/);
+    assert.match(prompt, /What do you admire most about them\?/);
+    assert.match(prompt, /Kind and caring/);
+    assert.match(prompt, /She sang while cooking Sunday dinner/);
+    assert.match(prompt, /Do not invent new facts/i);
+    assert.match(prompt, /Do not write lyrics/i);
+    assert.match(prompt, /Do not pad the story to reach a target word count/i);
+    assert.match(prompt, /shorter faithful story/i);
+  });
+
+  test("builds a story polish prompt from existing story text", () => {
+    const prompt = buildStoryPrompt({
+      occasion: "anniversary",
+      genre: "Romantic Ballad",
+      language: "Chinese",
+      recipientNames: ["Lina"],
+      recipientRelationships: ["Wife"],
+      vocalGender: "Female",
+      sourceStory:
+        "Lina and I met at a bookstore. We still dance in the kitchen after midnight.",
+      answers: [],
+    });
+
+    assert.match(prompt, /Source Story To Polish/i);
+    assert.match(prompt, /Lina and I met at a bookstore/);
+    assert.match(prompt, /Template Marker Meanings/i);
+    assert.match(prompt, /\[Nickname: \]/);
+    assert.match(prompt, /\[Remember when we: \]/);
+    assert.match(prompt, /\[Their funny habit\/quirk: \]/);
+    assert.match(prompt, /\[Something they are proud of: \]/);
+    assert.match(prompt, /Do not output the bracketed template labels/i);
+    assert.match(prompt, /entirely in Chinese/);
+    assert.match(prompt, /Do not invent new facts/i);
+    assert.match(prompt, /If the user provides only simple details/i);
+    assert.match(prompt, /do not add imagined scenes/i);
+    assert.match(prompt, /preserve the user's facts/i);
   });
 });
 

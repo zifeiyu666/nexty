@@ -38,6 +38,8 @@ export const REDIS_KEYS_CONFIGS = {
     songExternalId: (externalId: string) => `${LOWER_CASE_SITE_NAME}:song:ext:${externalId}`,
     /** @example wenext:ssample:{songId} */
     sample: (songId: string) => `${LOWER_CASE_SITE_NAME}:ssample:${songId}`,
+    /** @example wenext:ssample:email-sent:{songId} */
+    sampleReadyEmailSent: (songId: string) => `${LOWER_CASE_SITE_NAME}:ssample:email-sent:${songId}`,
     /** @example wenext:ssamples:user:{userId} */
     samplesByUser: (userId: string) => `${LOWER_CASE_SITE_NAME}:ssamples:user:${userId}`,
     /** @example wenext:ssamples:email:{email} */

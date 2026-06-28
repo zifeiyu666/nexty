@@ -23,7 +23,7 @@ export async function generateMetadata({
 
 export default function CreateSongPage() {
   return (
-    <div className="w-full min-h-screen bg-muted">
+    <div className="w-full min-h-screen bg-background">
       <CustomSongWizard />
     </div>
   );

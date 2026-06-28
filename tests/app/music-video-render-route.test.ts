@@ -27,4 +27,16 @@ describe("music video render route", () => {
     assert.match(source, /opacity: z\.number\(\)\.min\(0\)\.max\(1\)/);
     assert.match(source, /atmosphereOverlay: atmosphereOverlaySchema\.optional\(\)/);
   });
+
+  test("accepts wave radio timelines with a bundled background id", () => {
+    const source = readFileSync(
+      join(process.cwd(), "app/api/songs/[songId]/mv/render/route.ts"),
+      "utf8",
+    );
+
+    assert.match(source, /const waveRadioTimelineSchema = z\.object/);
+    assert.match(source, /templateId: z\.literal\("wave-radio"\)/);
+    assert.match(source, /waveRadioBackgroundId: z\.string\(\)/);
+    assert.match(source, /waveRadioTimelineSchema/);
+  });
 });

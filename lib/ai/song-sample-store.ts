@@ -86,6 +86,10 @@ function unique(values: string[]): string[] {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
+function removeValue(values: string[] | null, value: string): string[] {
+  return unique((values || []).filter((item) => item !== value));
+}
+
 export function createSongSampleFromTask(
   task: SongGenerationTask,
   now = Date.now()
@@ -160,5 +164,37 @@ export const songSampleStore = {
       .filter((sample): sample is SongSampleView => Boolean(sample))
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(0, input.limit || 60);
+  },
+
+  async delete(songId: string): Promise<SongSample | null> {
+    if (!redis) {
+      throw new Error("Redis is not configured for song samples.");
+    }
+
+    const sample = await getJson<SongSample>(keys.sample(songId));
+    if (!sample) return null;
+
+    const operations: Promise<unknown>[] = [redis.del(keys.sample(songId))];
+
+    if (sample.userId) {
+      const indexKey = keys.samplesByUser(sample.userId);
+      operations.push(
+        getJson<string[]>(indexKey).then((ids) =>
+          setJson(indexKey, removeValue(ids, songId))
+        )
+      );
+    }
+
+    if (sample.email) {
+      const indexKey = keys.samplesByEmail(sample.email);
+      operations.push(
+        getJson<string[]>(indexKey).then((ids) =>
+          setJson(indexKey, removeValue(ids, songId))
+        )
+      );
+    }
+
+    await Promise.all(operations);
+    return sample;
   },
 };

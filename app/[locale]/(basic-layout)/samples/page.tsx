@@ -1,22 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Locale } from "@/i18n/routing";
+import { SamplesGrid } from "@/components/song/SamplesGrid";
+import { Link, Locale } from "@/i18n/routing";
 import { getUserBenefits } from "@/actions/usage/benefits";
 import { songSampleStore } from "@/lib/ai/song-sample-store";
 import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
 import { cn } from "@/lib/utils";
-import {
-    ArrowRight,
-    Calendar,
-    Clock3,
-    Gift,
-    LockKeyhole,
-    Search,
-    Trash2,
-} from "lucide-react";
+import { Library, Search } from "lucide-react";
 import { Metadata } from "next";
-import Link from "next/link";
 
 type Params = Promise<{ locale: string }>;
 type SearchParams = Promise<{ email?: string; q?: string; occasion?: string }>;
@@ -44,10 +36,6 @@ function labelize(value: string): string {
     .join(" ");
 }
 
-function artworkName(names: string[]): string {
-  return names.length ? `for ${names.join(" and ")}` : "for you";
-}
-
 export default async function SamplesPage({
   searchParams,
 }: {
@@ -55,14 +43,20 @@ export default async function SamplesPage({
 }) {
   const session = await getSession();
   const { email = "", q = "", occasion = "all" } = await searchParams;
-  const benefits = session?.user?.id ? await getUserBenefits(session.user.id) : null;
+  const benefits = session?.user?.id
+    ? await getUserBenefits(session.user.id)
+    : null;
   const hasActiveSubscription =
-    benefits?.subscriptionStatus === "active" || benefits?.subscriptionStatus === "trialing";
+    benefits?.subscriptionStatus === "active" ||
+    benefits?.subscriptionStatus === "trialing";
   const samples = await songSampleStore.list({
     userId: session?.user?.id,
     email: session?.user?.email || email,
     hasActiveSubscription,
   });
+  const sampleOccasions = Array.from(
+    new Set(samples.map((sample) => sample.occasion.toLowerCase())),
+  );
   const filteredSamples = samples.filter((sample) => {
     const matchesOccasion =
       occasion === "all" || sample.occasion.toLowerCase() === occasion;
@@ -75,69 +69,69 @@ export default async function SamplesPage({
     return matchesOccasion && matchesQuery;
   });
   const occasions = [
-    ["all", "All"],
-    ["birthday", "Birthday"],
-    ["anniversary", "Anniversary"],
-    ["mothers-day", "Mother's Day"],
-    ["just-because", "Just because"],
-    ["thank-you", "Thank you"],
+    "all",
+    ...(sampleOccasions.length
+      ? sampleOccasions
+      : [
+          "birthday",
+          "anniversary",
+          "mothers-day",
+          "just-because",
+          "thank-you",
+        ]),
   ];
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <section className="mx-auto max-w-7xl px-4 pb-12 pt-8 sm:px-6">
-        <div className="max-w-4xl">
-          <h1 className="font-serif text-5xl font-black leading-[0.94] tracking-normal text-primary md:text-7xl">
-            Your samples, ready to choose
-          </h1>
-          <p className="mt-5 max-w-3xl text-xl leading-8 text-muted-foreground md:text-2xl md:leading-10">
-            Every generated song lands here first. Subscribers keep samples
-            permanently; guests and non-subscribers can unlock within{" "}
-            <strong className="text-foreground">72 hours</strong>.
-          </p>
-        </div>
-
-        <div className="mt-10 rounded-2xl border border-border bg-primary/5 p-5">
-          <div className="flex gap-3">
-            <Clock3 className="mt-0.5 size-5 shrink-0 text-primary" />
-            <div>
-              <h2 className="text-base font-black text-foreground">
-                Sample Library
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                Subscribers get permanent access to generated samples. Other
-                samples keep a 3-day preview window before they expire.
-              </p>
-            </div>
+    <main className="min-h-screen w-full bg-[#fbfaf7] text-foreground">
+      <section className="w-full bg-[#f3eadf]">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
+          <div className="max-w-4xl">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase text-primary shadow-sm">
+              <Library className="size-4" />
+              Sample library
+            </p>
+            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.96] tracking-normal text-stone-950 md:text-7xl">
+              Your samples, ready to choose
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-700">
+              Every generated song lands here first. Subscribers keep samples
+              permanently; guests and non-subscribers can unlock within{" "}
+              <strong className="text-stone-950">72 hours</strong>.
+            </p>
           </div>
         </div>
+      </section>
 
-        <div className="mt-9 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {occasions.map(([value, label]) => (
+      <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-8">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
+            {occasions.map((value) => (
               <Link
                 key={value}
                 className={cn(
-                  "rounded-full px-5 py-3 text-sm font-black transition",
+                  "inline-flex h-8 items-center whitespace-nowrap rounded-full px-3.5 text-sm font-normal transition",
                   occasion === value
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
+                    ? "bg-stone-950 text-white"
+                    : "bg-white text-muted-foreground shadow-sm hover:text-foreground",
                 )}
                 href={`/samples?occasion=${value}${email ? `&email=${encodeURIComponent(email)}` : ""}`}
               >
-                {label}
+                {value === "all" ? "All samples" : labelize(value)}
               </Link>
             ))}
           </div>
 
-          <form className="relative w-full max-w-md" action="/samples">
+          <form action="/samples" className="relative w-full max-w-xs sm:w-80">
             {email && <input name="email" type="hidden" value={email} />}
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            {occasion !== "all" && (
+              <input name="occasion" type="hidden" value={occasion} />
+            )}
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="h-12 rounded-full border-border bg-background pl-11 text-base shadow-sm"
+              className="h-10 rounded-full border-0 bg-white pl-9 pr-4 text-sm font-medium outline-none shadow-[0_10px_30px_rgba(28,25,23,0.10)] transition placeholder:text-muted-foreground focus-visible:ring-4 focus-visible:ring-primary/10"
               defaultValue={q}
               name="q"
-              placeholder="Search by name or occasion"
+              placeholder="Search title, occasion, recipient"
             />
           </form>
         </div>
@@ -161,78 +155,7 @@ export default async function SamplesPage({
           </form>
         )}
 
-        <div className="mt-9 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filteredSamples.map((sample) => (
-            <article
-              key={sample.songId}
-              className={cn(
-                "overflow-hidden rounded-2xl border border-border bg-card shadow-sm",
-                sample.isExpired && "opacity-55"
-              )}
-            >
-              <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-primary/80 to-accent">
-                <div className="absolute -right-20 -top-16 size-56 rounded-full bg-primary-foreground/20" />
-                <div className="absolute -bottom-16 -left-16 size-44 rounded-full bg-foreground/15" />
-                <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-primary/75 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-primary-foreground">
-                  <LockKeyhole className="size-3.5" />
-                  Sample
-                </span>
-                <p className="relative max-w-[70%] rotate-[-4deg] text-center font-[cursive] text-3xl text-primary-foreground">
-                  {artworkName(sample.recipientNames)}
-                </p>
-                <span className="absolute bottom-4 right-4 rounded-full bg-primary/75 px-3 py-1.5 text-xs font-black text-primary-foreground">
-                  {sample.previewLimitSeconds ? "1:00 preview" : "Full song"}
-                </span>
-              </div>
-
-              <div className="p-5">
-                <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-primary">
-                  <Gift className="size-4" />
-                  {labelize(sample.occasion)}
-                </p>
-                <h2 className="mt-3 line-clamp-2 text-2xl font-black leading-tight text-foreground">
-                  {sample.title}
-                </h2>
-                <p className="mt-3 text-base text-muted-foreground">
-                  Written for{" "}
-                  <strong className="text-foreground">
-                    {sample.recipientNames.join(" and ") || "someone special"}
-                  </strong>
-                </p>
-                <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="size-4" />
-                  Created {new Date(sample.createdAt).toLocaleDateString()}
-                </p>
-                {sample.isExpired && (
-                  <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-sm font-semibold text-muted-foreground">
-                    Expired. Recreate from form data to generate again.
-                  </p>
-                )}
-              </div>
-
-              {/* version choose buttons removed from list view; keep selection on detail page */}
-
-              <div className="flex items-center gap-3 border-t border-border p-4">
-                <Button
-                  asChild
-                  className="h-11 flex-1 rounded-full bg-primary text-sm font-black text-primary-foreground hover:bg-primary/90"
-                >
-                  <Link href={`/samples/${sample.songId}`}>
-                    View details
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
-                <Button
-                  className="size-11 rounded-full text-muted-foreground"
-                  type="button"
-                  variant="ghost"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
-            </article>
-          ))}
-        </div>
+        <SamplesGrid email={email} samples={filteredSamples} />
 
         {!filteredSamples.length && (
           <div className="mt-10 rounded-2xl border border-dashed border-border bg-card p-8 text-center">

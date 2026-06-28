@@ -127,4 +127,17 @@ export const songTaskStore = {
     await this.setSong(updated);
     return updated;
   },
+
+  async claimSongSampleReadyEmail(songId: string): Promise<boolean> {
+    if (!redis) {
+      throw new Error("Redis is not configured for temporary song generation storage.");
+    }
+
+    const result = await redis.set(keys.sampleReadyEmailSent(songId), "1", {
+      ex: TTL,
+      nx: true,
+    });
+
+    return result === "OK";
+  },
 };

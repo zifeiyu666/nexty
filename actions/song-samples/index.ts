@@ -1,0 +1,51 @@
+"use server";
+
+import { actionResponse } from "@/lib/action-response";
+import { songSampleStore } from "@/lib/ai/song-sample-store";
+import { getSession } from "@/lib/auth/server";
+import { getErrorMessage } from "@/lib/error-utils";
+import "server-only";
+
+export async function deleteSongSampleAction(input: {
+  songId: string;
+  email?: string;
+}) {
+  const songId = input.songId.trim();
+  const guestEmail = input.email?.trim().toLowerCase();
+
+  if (!songId) {
+    return actionResponse.badRequest("Sample ID is required.");
+  }
+
+  try {
+    const session = await getSession();
+    const sample = await songSampleStore.get(songId);
+
+    if (!sample) {
+      return actionResponse.notFound("Sample not found.");
+    }
+
+    const userCanDelete =
+      Boolean(session?.user?.id && sample.userId === session.user.id) ||
+      Boolean(
+        session?.user?.email &&
+          sample.email?.toLowerCase() === session.user.email.toLowerCase()
+      ) ||
+      Boolean(
+        !session?.user?.id &&
+          guestEmail &&
+          sample.email?.toLowerCase() === guestEmail
+      );
+
+    if (!userCanDelete) {
+      return actionResponse.forbidden("You do not have permission to delete this sample.");
+    }
+
+    await songSampleStore.delete(songId);
+
+    return actionResponse.success({ songId });
+  } catch (error) {
+    console.error("[deleteSongSampleAction] Failed to delete sample", error);
+    return actionResponse.error(getErrorMessage(error));
+  }
+}

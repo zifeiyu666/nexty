@@ -38,6 +38,15 @@ const minimalVinylTimeline = {
   transitions: [],
 };
 
+const waveRadioTimeline = {
+  ...timeline,
+  templateId: "wave-radio" as const,
+  photos: [],
+  assignments: [],
+  transitions: [],
+  waveRadioBackgroundId: "aurora-119885",
+};
+
 describe("music video renders", () => {
   test("rejects timelines that only contain browser object URLs", () => {
     assert.throws(
@@ -95,6 +104,21 @@ describe("music video renders", () => {
       () =>
         assertTimelineIsRenderable({
           ...minimalVinylTimeline,
+          audioUrl: "",
+        }),
+      /audio URL/,
+    );
+  });
+
+  test("allows wave radio rendering without uploaded photos or a cover image", () => {
+    assert.doesNotThrow(() => assertTimelineIsRenderable(waveRadioTimeline));
+  });
+
+  test("rejects wave radio timelines without renderable audio", () => {
+    assert.throws(
+      () =>
+        assertTimelineIsRenderable({
+          ...waveRadioTimeline,
           audioUrl: "",
         }),
       /audio URL/,

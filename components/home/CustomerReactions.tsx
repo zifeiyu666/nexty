@@ -102,7 +102,7 @@ export default function CustomerReactions({
           <h2 className="preset-title">
             <span className="title-gradient">{t("title")}</span>
           </h2>
-          <div className="relative mx-auto mt-4 max-w-2xl font-['Bradley_Hand','Comic_Sans_MS',cursive] text-base leading-7 text-muted-foreground md:text-lg [&_p]:m-0 [&_strong]:font-normal [&_strong]:text-inherit">
+          <div className="handwritten-subtitle relative mx-auto mt-4 max-w-2xl">
             {t.rich("description", {
               p: (chunks) => <p>{chunks}</p>,
               strong: (chunks) => <strong>{chunks}</strong>,
@@ -150,7 +150,7 @@ export default function CustomerReactions({
           className={cn(
             "mx-auto grid max-w-6xl grid-cols-1 gap-3 [perspective:1200px] sm:grid-cols-2 sm:gap-4 lg:grid-cols-5 lg:gap-4",
             activeIndex !== null &&
-              "[&_.reaction-card:not(.is-active)]:lg:[--reaction-card-scale:0.94]",
+              "[&_.reaction-card:not(.is-active)]:lg:[--reaction-card-scale:0.97]",
           )}
           onMouseLeave={() => setActiveIndex(null)}
         >
@@ -180,9 +180,9 @@ export default function CustomerReactions({
                   setActiveIndex(null);
                 }}
                 className={cn(
-                  "reaction-card group relative aspect-[9/14] min-h-64 cursor-pointer overflow-hidden rounded-2xl border border-white/70 bg-muted text-left shadow-sm outline-none [--reaction-card-scale:1] [--reaction-magnet-x:0px] [--reaction-magnet-y:0px] [--reaction-tilt-x:0deg] [--reaction-tilt-y:0deg] [transform:perspective(900px)_translate3d(var(--reaction-magnet-x),var(--reaction-magnet-y),0)_rotateX(var(--reaction-tilt-x))_rotateY(var(--reaction-tilt-y))_scale(var(--reaction-card-scale))] [transform-style:preserve-3d] transition-[transform,box-shadow,border-color] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:[transform:none] sm:min-h-72 lg:min-h-0",
+                  "reaction-card group relative aspect-[9/14] min-h-64 cursor-pointer overflow-hidden rounded-2xl border border-white/70 bg-muted text-left shadow-sm outline-none [--reaction-card-scale:1] [--reaction-magnet-x:0px] [--reaction-magnet-y:0px] [--reaction-tilt-x:0deg] [--reaction-tilt-y:0deg] [clip-path:inset(0_round_1rem)] [transform:perspective(900px)_translate3d(var(--reaction-magnet-x),var(--reaction-magnet-y),0)_rotateX(var(--reaction-tilt-x))_rotateY(var(--reaction-tilt-y))_scale(var(--reaction-card-scale))] [transform-style:preserve-3d] transition-[transform,box-shadow,border-color] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:[transform:none] sm:min-h-72 lg:min-h-0",
                   "hover:z-20 hover:shadow-[0_26px_70px_rgba(15,23,42,0.28)] hover:shadow-primary/25",
-                  isActive && "is-active z-20 lg:[--reaction-card-scale:1.08]",
+                  isActive && "is-active z-20 lg:[--reaction-card-scale:1.035]",
                 )}
                 aria-pressed={isAudible}
                 aria-label={
@@ -191,27 +191,29 @@ export default function CustomerReactions({
                     : t("playLabel", { title: video.title })
                 }
               >
-                <video
-                  ref={setVideoRef(index)}
-                  src={video.src}
-                  poster={posterSrc}
-                  className="absolute inset-0 h-full w-full bg-transparent object-cover object-center"
-                  preload="metadata"
-                  autoPlay
-                  muted
-                  playsInline
-                  loop
-                  onLoadedData={() => playWhenReady(index)}
-                  onCanPlay={() => playWhenReady(index)}
-                />
-                <div
-                  className={cn(
-                    "absolute inset-0 bg-background/35 backdrop-blur-[1px] transition-opacity duration-500",
-                    isActive
-                      ? "opacity-0"
-                      : "opacity-0 md:group-hover:opacity-0",
-                  )}
-                />
+                <div className="absolute inset-0 overflow-hidden rounded-[inherit] [transform:translateZ(0)]">
+                  <video
+                    ref={setVideoRef(index)}
+                    src={video.src}
+                    poster={posterSrc}
+                    className="h-full w-full bg-transparent object-cover object-center"
+                    preload="metadata"
+                    autoPlay
+                    muted
+                    playsInline
+                    loop
+                    onLoadedData={() => playWhenReady(index)}
+                    onCanPlay={() => playWhenReady(index)}
+                  />
+                  <div
+                    className={cn(
+                      "absolute inset-0 bg-background/35 backdrop-blur-[1px] transition-opacity duration-500",
+                      isActive
+                        ? "opacity-0"
+                        : "opacity-0 md:group-hover:opacity-0",
+                    )}
+                  />
+                </div>
                 {/* <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground shadow-lg">
                   <Gift className="h-3.5 w-3.5" />
                   {video.label}

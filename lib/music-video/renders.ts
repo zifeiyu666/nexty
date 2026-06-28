@@ -69,7 +69,10 @@ function assertBaseTimelineIsRenderable(timeline: MusicVideoTimeline) {
 export function assertTimelineIsRenderable(timeline: MusicVideoTimeline) {
   assertBaseTimelineIsRenderable(timeline);
 
-  if (timeline.templateId === "minimal-vinyl") {
+  if (
+    timeline.templateId === "minimal-vinyl" ||
+    timeline.templateId === "wave-radio"
+  ) {
     return;
   }
 

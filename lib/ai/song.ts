@@ -63,6 +63,25 @@ export type SongLyricsRewriteInput = Pick<
   instruction?: string;
 };
 
+export type SongStoryAnswer = {
+  question: string;
+  answer: string;
+};
+
+export type SongStoryInput = Pick<
+  SongInputContext,
+  | "occasion"
+  | "genre"
+  | "language"
+  | "recipients"
+  | "recipientNames"
+  | "recipientRelationships"
+  | "vocalGender"
+> & {
+  answers: SongStoryAnswer[];
+  sourceStory?: string;
+};
+
 function occasionLabel(value: string): string {
   return value
     .split("-")
@@ -94,6 +113,74 @@ function formatRecipientsForPrompt(input: {
     .filter(Boolean);
 
   return labels.length ? labels.join(", ") : "someone special";
+}
+
+export function buildStoryPrompt(input: SongStoryInput): string {
+  const recipients = formatRecipientsForPrompt(input);
+  const occasion = occasionLabel(input.occasion);
+  const sourceStory = input.sourceStory?.trim();
+  const answers = input.answers
+    .map((item, index) => {
+      const question = item.question.trim();
+      const answer = item.answer.trim();
+      return answer ? `${index + 1}. ${question}\nAnswer: ${answer}` : "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
+
+  const sourceMaterial = sourceStory
+    ? `[Source Story To Polish]
+${sourceStory}`
+    : `[User Helper Answers]
+${answers || "The user did not provide detailed helper answers."}`;
+
+  return `You are a careful story editor for personalized AI songs.
+
+Your task is to turn the user's material into a polished, lyric-ready personal story brief.
+
+This story brief will be used as source material for a later lyric-writing model, so it must be clear, specific, emotionally useful, and faithful to the user's facts.
+
+[Song Context]
+- Recipient(s): ${recipients}
+- Occasion: ${occasion}
+- Target lyrics language: ${input.language}
+- Music style / genre: ${input.genre}
+- Vocal direction: ${input.vocalGender}
+
+${sourceMaterial}
+
+[Template Marker Meanings]
+If the source material contains these bracketed markers, treat them as structured user intent:
+- [Nickname: ] means the user wants to provide a nickname or affectionate name for the recipient.
+- [Remember when we: ] means the user wants to provide a shared memory or meaningful scene.
+- [Their funny habit/quirk: ] means the user wants to provide a distinctive personality detail, habit, or quirk.
+- [Something they are proud of: ] means the user wants to provide an achievement, milestone, or source of pride.
+- Use any filled-in text after these markers as factual source material.
+- Do not output the bracketed template labels themselves. Convert them into natural story language.
+
+[Writing Requirements]
+- Write the story brief entirely in ${input.language}, even when the source material is written in another language.
+- Preserve all concrete names, nicknames, places, memories, inside jokes, and meaningful phrases from the user's answers.
+- Do not invent new facts, events, names, dates, locations, or promises.
+- When polishing an existing story, preserve the user's facts, emotional intent, and relationship context.
+- If the user provides only simple details, keep the output simple and do not add imagined scenes, emotions, backstory, settings, or relationship history.
+- Do not pad the story to reach a target word count. A shorter faithful story is better than a longer story with unsupported details.
+- If an answer is vague, gently make it more natural without adding unsupported details.
+- Shape the brief around three things: what makes the recipient special, one memorable scene or emotional moment, and the heartfelt message the song should express.
+- Make it useful for lyric generation: include vivid but concise emotional details, images, and relationship context.
+- Do not write lyrics.
+- Do not include song section tags like [Verse] or [Chorus].
+- Do not include a title.
+- Do not explain what you are doing.
+- Output only the final story brief.
+
+[Length And Style]
+- Write 1-2 short paragraphs.
+- Use 120-220 words only when the user supplied enough concrete detail.
+- If the source material is sparse, write a shorter concise brief.
+- Keep the tone sincere, warm, personal, and gift-ready.
+- Avoid generic greeting-card language.
+- Avoid exaggerated drama unless the user's answers clearly support it.`;
 }
 
 export function buildLyricsPrompt(input: SongInputContext): string {
@@ -248,6 +335,31 @@ export async function createLyricsGeneration(input: SongInputContext): Promise<S
 
 export async function refreshLyricsGeneration(taskId: string): Promise<SongLyricsTask | null> {
   return songTaskStore.getLyrics(taskId);
+}
+
+export async function generateSongStory(
+  input: SongStoryInput
+): Promise<{ story: string }> {
+  const model = getReplicateGpt5LyricsModel();
+  const prompt = buildStoryPrompt(input);
+
+  console.log("[Replicate GPT-5 Story] Request", {
+    model,
+    promptLength: prompt.length,
+    answerCount: input.answers.length,
+  });
+
+  const story = await generateTextWithReplicateGpt5({
+    model,
+    prompt,
+    maxCompletionTokens: 700,
+    reasoningEffort: "minimal",
+    verbosity: "medium",
+    systemPrompt:
+      "You are a careful, faithful personal-story editor. Preserve user facts exactly and return only the finished story brief.",
+  });
+
+  return { story };
 }
 
 export async function generateSongLyrics(input: SongInputContext): Promise<{

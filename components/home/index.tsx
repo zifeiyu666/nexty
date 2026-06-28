@@ -4,6 +4,7 @@ import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
 import OccasionShowcase from "@/components/home/OccasionShowcase";
 import OurProducts from "@/components/home/OurProducts";
+import SceneUniverseGrid from "@/components/home/SceneUniverseGrid";
 import SongfinchComparison from "@/components/home/SongfinchComparison";
 import Testimonials from "@/components/home/Testimonials";
 import { BG1 } from "@/components/shared/BGs";
@@ -106,6 +107,8 @@ export default async function HomeComponent() {
           wallArtSongOptions={wallArtSongOptions}
         />
       )}
+
+      <SceneUniverseGrid />
 
       <OccasionShowcase />
 

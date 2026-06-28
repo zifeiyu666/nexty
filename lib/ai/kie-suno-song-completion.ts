@@ -96,7 +96,17 @@ export async function completeSongTaskFromKieResult({
   if (updated) {
     const sample = createSongSampleFromTask(updated);
     await songSampleStore.save(sample);
-    await songSampleEmail.sendSongSampleReadyEmail(sample);
+
+    const shouldSendReadyEmail = await songTaskStore.claimSongSampleReadyEmail(
+      updated.songId
+    );
+    if (shouldSendReadyEmail) {
+      await songSampleEmail.sendSongSampleReadyEmail(sample);
+    } else {
+      console.log("[KIE Suno Completion] Song sample ready email already sent", {
+        songId: updated.songId,
+      });
+    }
   }
 
   return updated;
