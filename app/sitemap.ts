@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticPages = [
     '',
+    '/occasions/birthday',
   ]
 
   const pages = LOCALES.flatMap(locale => {

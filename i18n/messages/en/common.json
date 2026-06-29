@@ -394,7 +394,12 @@
               "id": "pricing",
               "href": "/#pricing",
               "name": "Pricing"
-            },
+            }
+          ]
+        },
+        {
+          "title": "Articles",
+          "links": [
             {
               "href": "/blog",
               "name": "Blog"

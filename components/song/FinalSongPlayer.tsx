@@ -563,7 +563,15 @@ function SongFacts({ data }: { data: FinalSongPlayerData }) {
   );
 }
 
-function SharePanel({ shareUrl, title }: { shareUrl: string; title: string }) {
+function SharePanel({
+  audioUrl,
+  shareUrl,
+  title,
+}: {
+  audioUrl: string;
+  shareUrl: string;
+  title: string;
+}) {
   const [copied, setCopied] = useState(false);
   const tweetUrl = `https://twitter.com/intent/tweet?${new URLSearchParams({
     text: `Listen to "${title}"`,
@@ -601,6 +609,15 @@ function SharePanel({ shareUrl, title }: { shareUrl: string; title: string }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:justify-end">
+          <Button
+            asChild
+            className={glassButtonClassName}
+          >
+            <a href={audioUrl} rel="noreferrer" target="_blank">
+              <Download className="size-4" />
+              Download
+            </a>
+          </Button>
           <Button
             asChild
             className={glassButtonClassName}
@@ -799,16 +816,6 @@ function OwnerLyricsPanel({ data }: { data: FinalSongPlayerData }) {
             <FileText className="size-4" />
             Export LRC
           </Button>
-          <Button
-            asChild
-            className={lyricActionButtonClassName}
-            size="sm"
-          >
-            <a href={data.audioUrl} rel="noreferrer" target="_blank">
-              <Download className="size-4" />
-              Open audio
-            </a>
-          </Button>
         </div>
       </div>
 
@@ -823,11 +830,11 @@ function OwnerLyricsPanel({ data }: { data: FinalSongPlayerData }) {
                 <p
                   key={`${line}-${index}`}
                   className={cn(
-                    "font-sans text-[15px] font-semibold leading-8 text-foreground",
+                    "font-sans text-[15px] font-semibold leading-6 text-foreground",
                     isTitle &&
-                      "mx-auto max-w-xl rounded-2xl bg-muted px-4 py-3 text-xl font-black normal-case tracking-normal text-foreground md:text-2xl",
+                      "mx-auto max-w-xl px-3 py-2 text-xl font-bold normal-case tracking-normal text-foreground md:text-xl",
                     isSection &&
-                      "pt-3 text-xs font-black uppercase tracking-[0.12em] text-muted-foreground/55",
+                      "pt-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground/55",
                   )}
                 >
                   {line}
@@ -1042,7 +1049,11 @@ export function FinalSongOwnerPlayer({
 
       <section className="relative z-10 mx-auto mt-10 w-full max-w-5xl space-y-5 px-4 sm:px-6 lg:px-8">
         {data.shareUrl && (
-          <SharePanel shareUrl={data.shareUrl} title={data.title} />
+          <SharePanel
+            audioUrl={data.audioUrl}
+            shareUrl={data.shareUrl}
+            title={data.title}
+          />
         )}
 
         <div>

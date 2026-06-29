@@ -418,7 +418,12 @@
               "id": "pricing",
               "href": "/#pricing",
               "name": "定价"
-            },
+            }
+          ]
+        },
+        {
+          "title": "文章",
+          "links": [
             {
               "href": "/blog",
               "name": "博客"

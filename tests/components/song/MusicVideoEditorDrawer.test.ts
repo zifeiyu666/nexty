@@ -13,7 +13,7 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /Music Video Studio/);
     assert.match(source, /Templates/);
     assert.match(source, /Remotion Preview/);
-    assert.match(source, /Upload Media/);
+    assert.match(source, /Media Assets/);
     assert.match(source, /Lyrics Storyline/);
     assert.match(source, /Generate Video/);
   });
@@ -28,9 +28,9 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /TabsTrigger[\s\S]*value="photos"/);
     assert.match(source, /TabsTrigger[\s\S]*value="lyrics"/);
     assert.match(source, /TabsTrigger[\s\S]*value="overlay"/);
-    assert.match(source, /Upload Media/);
-    assert.match(source, /Lyrics Config/);
-    assert.match(source, /Overlay Config/);
+    assert.match(source, /Media/);
+    assert.match(source, /Lyrics/);
+    assert.match(source, /FX/);
     assert.match(source, /PhotoUploadPool/);
   });
 
@@ -42,7 +42,7 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(source, /ATMOSPHERE_OVERLAY_OPTIONS/);
     assert.match(source, /atmosphereOverlay/);
-    assert.match(source, /Overlay Config/);
+    assert.match(source, /Atmosphere overlay/);
     assert.match(source, /No Overlay/);
     assert.match(source, /Overlay opacity/);
     assert.match(source, /overlayId/);
@@ -120,6 +120,7 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(source, /type PreviewAspectRatio = "portrait" \| "landscape"/);
     assert.match(source, /const \[previewAspectRatio, setPreviewAspectRatio\]/);
+    assert.match(source, /useState<PreviewAspectRatio>\("landscape"\)/);
     assert.match(source, /aria-label="Switch preview aspect ratio"/);
     assert.match(source, /9:16/);
     assert.match(source, /16:9/);
@@ -137,7 +138,7 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(
       source,
-      /<div className="flex shrink-0 items-center gap-2">[\s\S]*Generate Video[\s\S]*aria-label="Switch preview aspect ratio"/,
+      /<div className="flex shrink-0 flex-wrap items-center gap-2">[\s\S]*Generate Video[\s\S]*aria-label="Switch preview aspect ratio"[\s\S]*onClick=\{togglePlayback\}/,
     );
   });
 
@@ -251,7 +252,8 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /data-music-video-editor-main/);
     assert.match(source, /data-lyric-photo-card/);
     assert.match(source, /grid-cols-\[56px_minmax\(0,1fr\)\]/);
-    assert.match(source, /max-w-full truncate/);
+    assert.match(source, /text-balance/);
+    assert.match(source, /text-pretty/);
   });
 
   test("softens inherited non-cover lyric media", () => {
@@ -276,7 +278,15 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /data-music-video-editor-resizer/);
     assert.match(
       source,
-      /lg:grid-cols-\[220px_minmax\(420px,1fr\)_minmax\(360px,var\(--music-video-editor-width\)\)\]/,
+      /lg:grid-cols-\[184px_minmax\(280px,1fr\)_minmax\(380px,var\(--music-video-editor-width\)\)\]/,
+    );
+    assert.match(
+      source,
+      /xl:grid-cols-\[200px_minmax\(320px,1fr\)_minmax\(420px,var\(--music-video-editor-width\)\)\]/,
+    );
+    assert.match(
+      source,
+      /2xl:grid-cols-\[220px_minmax\(360px,1fr\)_minmax\(460px,var\(--music-video-editor-width\)\)\]/,
     );
     assert.match(source, /MAX_EDITOR_VIEWPORT_RATIO/);
     assert.match(source, /getResponsiveEditorMaxWidth/);

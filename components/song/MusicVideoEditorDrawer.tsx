@@ -1,16 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,8 +11,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -43,23 +48,22 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ATMOSPHERE_OVERLAY_OPTIONS,
-  DEFAULT_ATMOSPHERE_OVERLAY,
-  DEFAULT_WAVE_RADIO_BACKGROUND,
-  WAVE_RADIO_BACKGROUND_OPTIONS,
   buildEvenPhotoAssignments,
+  buildLyricCuesFromAlignedWords,
   buildMinimalVinylTimeline,
   buildPhotoSlideshowTimeline,
   buildRandomTransitionAssignments,
   buildWaveRadioTimeline,
-  buildLyricCuesFromAlignedWords,
   createCoverPhoto,
+  DEFAULT_ATMOSPHERE_OVERLAY,
   DEFAULT_LYRICS_STYLE,
-  DEFAULT_TRANSITION_TYPE,
+  DEFAULT_WAVE_RADIO_BACKGROUND,
   getUploadedMediaType,
   normalizeTransitions,
   parseTimestampedLyrics,
   resolveCuePhotos,
   shouldShowPhotoTransition,
+  WAVE_RADIO_BACKGROUND_OPTIONS,
   type AlignedLyricWord,
   type AtmosphereOverlayConfig,
   type LyricsEntranceMode,
@@ -72,11 +76,6 @@ import {
   type UploadedPhoto,
   type WaveRadioBackgroundOption,
 } from "@/lib/music-video/photo-slideshow";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   PHOTO_SLIDESHOW_FPS,
   PHOTO_SLIDESHOW_HEIGHT,
@@ -91,20 +90,19 @@ import { Player, type PlayerRef } from "@remotion/player";
 import {
   Check,
   ChevronsUpDown,
-  Clapperboard,
   Circle,
+  Clapperboard,
   Download,
   Film,
   ImagePlus,
   Images,
-  type LucideIcon,
   Loader2,
   Music2,
   Pause,
   Play,
+  Radio,
   RectangleHorizontal,
   RectangleVertical,
-  Radio,
   Sparkles,
   Sun,
   Trash2,
@@ -115,16 +113,17 @@ import {
   Waves,
   Wind,
   ZoomIn,
+  type LucideIcon,
 } from "lucide-react";
 import Image from "next/image";
 import {
   Fragment,
-  type CSSProperties,
-  type ReactNode,
   useEffect,
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
+  type ReactNode,
 } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -218,10 +217,10 @@ const templates: TemplateCard[] = [
 ];
 
 const DEFAULT_DURATION = 30;
-const DEFAULT_EDITOR_WIDTH = 480;
-const MIN_EDITOR_WIDTH = 360;
-const MAX_EDITOR_WIDTH = 600;
-const MAX_EDITOR_VIEWPORT_RATIO = 0.32;
+const DEFAULT_EDITOR_WIDTH = 560;
+const MIN_EDITOR_WIDTH = 380;
+const MAX_EDITOR_WIDTH = 760;
+const MAX_EDITOR_VIEWPORT_RATIO = 0.44;
 const MAX_MEDIA_BYTES = 80 * 1024 * 1024;
 const TRANSITION_PREVIEW_SECONDS = 1;
 const TRANSITION_PREVIEW_TAIL_SECONDS = 1;
@@ -425,12 +424,12 @@ function TemplateRail({
   onSelectTemplate: (template: TemplateCard) => void;
 }) {
   return (
-    <aside className="flex min-h-0 flex-col border-b bg-[#fffaf5]/90 p-3 lg:border-b-0 lg:border-r">
-      <div className="flex shrink-0 items-center gap-2 px-1 text-sm font-black text-foreground">
-        <Clapperboard className="size-4" />
+    <aside className="flex min-h-0 flex-col border-b border-stone-200/70 bg-[#fffaf5]/80 p-2 lg:border-b-0 lg:border-r">
+      <div className="flex shrink-0 items-center gap-2 px-1.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-stone-500">
+        <Clapperboard className="size-3.5 text-rose-500" />
         Templates
       </div>
-      <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+      <div className="mt-2 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
         {templates.map((template) => {
           const Icon = template.icon;
           const isActive = activeTemplate === template.id;
@@ -440,28 +439,31 @@ function TemplateRail({
             <button
               key={template.id}
               className={cn(
-                "w-full rounded-xl border p-2 text-left transition",
+                "group relative w-full cursor-pointer overflow-hidden rounded-lg p-1.5 text-left shadow-sm shadow-stone-950/[0.04] transition duration-300 ease-out will-change-transform",
                 isActive
-                  ? "border-rose-400 bg-rose-50 shadow-sm"
-                  : "border-stone-200 bg-white hover:border-rose-300 hover:bg-rose-50/50",
+                  ? "bg-white shadow-[0_0_0_1px_rgba(251,113,133,0.36),0_18px_38px_rgba(120,53,15,0.13)]"
+                  : "bg-white/45 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_16px_32px_rgba(120,53,15,0.10)]",
                 isDisabled && "cursor-not-allowed opacity-60 hover:bg-white",
               )}
               disabled={isDisabled}
               type="button"
               onClick={() => onSelectTemplate(template)}
             >
-              <div className="overflow-hidden rounded-lg border border-stone-200 bg-[#241d1b]">
+              {isActive ? (
+                <span className="absolute inset-y-2 left-0 w-0.5 rounded-r-full bg-rose-500" />
+              ) : null}
+              <div className="overflow-hidden rounded-md bg-[#241d1b] shadow-inner shadow-black/20">
                 <div className="relative aspect-[4/3]">
                   {template.demoImageSrc ? (
                     <>
                       <Image
                         fill
                         alt={template.demoImageAlt ?? template.title}
-                        className="object-cover"
+                        className="object-cover transition duration-500 ease-out group-hover:scale-[1.035]"
                         sizes="(min-width: 1024px) 204px, calc(100vw - 48px)"
                         src={template.demoImageSrc}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10 transition duration-300 group-hover:from-black/20 group-hover:to-rose-100/20" />
                     </>
                   ) : (
                     <>
@@ -473,13 +475,15 @@ function TemplateRail({
                       </div>
                     </>
                   )}
-                  <span className="absolute left-3 top-3 flex size-9 items-center justify-center rounded-lg bg-white/90 text-rose-500">
+                  <span className="absolute left-2 top-2 flex size-7 items-center justify-center rounded-md bg-white/90 text-rose-500 shadow-sm transition duration-300 group-hover:scale-105 group-hover:bg-rose-50">
                     <Icon className="size-4" />
                   </span>
                 </div>
               </div>
-              <div className="mt-2 flex items-start justify-between gap-2">
-                <p className="text-xs font-black leading-4">{template.title}</p>
+              <div className="mt-2 flex items-start justify-between gap-2 pl-1">
+                <p className="line-clamp-2 text-[11px] font-black leading-4 text-stone-900">
+                  {template.title}
+                </p>
                 {isActive ? (
                   <Badge className="px-1.5 py-0 text-[10px]">Active</Badge>
                 ) : null}
@@ -492,7 +496,7 @@ function TemplateRail({
                   </Badge>
                 ) : null}
               </div>
-              <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+              <p className="mt-1 line-clamp-2 pl-1 text-[10px] leading-4 text-muted-foreground">
                 {template.description}
               </p>
             </button>
@@ -560,6 +564,13 @@ function MusicVideoPreview({
       : timeline.templateId === "wave-radio"
         ? WaveRadioComposition
       : PhotoSlideshowComposition;
+  const previewBackdropUrl =
+    timeline.coverPhoto?.url ??
+    timeline.coverPhoto?.objectUrl ??
+    timeline.photos.find((photo) => getUploadedMediaType(photo) === "image")
+      ?.url ??
+    timeline.photos.find((photo) => getUploadedMediaType(photo) === "image")
+      ?.objectUrl;
 
   useEffect(() => {
     onPlayRef.current = onPlay;
@@ -665,17 +676,36 @@ function MusicVideoPreview({
   }
 
   return (
-    <section className="flex min-h-0 flex-col bg-[#f4efe8] px-4 py-4 xl:px-6">
-      <div className="flex shrink-0 items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">
-            Remotion Preview
-          </p>
-          <h3 className="text-lg font-black text-foreground">{songTitle}</h3>
+    <section className="relative flex min-h-0 flex-col overflow-hidden bg-[#f7f3ee] px-4 py-3 xl:px-6">
+      {previewBackdropUrl ? (
+        <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+          <div
+            className="absolute inset-[-9%] bg-cover bg-center opacity-35 blur-3xl"
+            style={{ backgroundImage: `url(${previewBackdropUrl})` }}
+          />
+          <div className="absolute inset-0 bg-[#f7f3ee]/78 backdrop-blur-[2px]" />
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+      ) : (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.78),transparent_34%),linear-gradient(180deg,#faf7f2_0%,#f4eee7_100%)]"
+        />
+      )}
+      <div className="relative z-10 flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="h-px w-6 bg-rose-400/80" />
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-stone-500">
+              Remotion Preview
+            </p>
+          </div>
+          <h3 className="mt-1 truncate text-lg font-black text-stone-950">
+            {songTitle}
+          </h3>
+        </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           <Button
-            className="rounded-full bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:bg-rose-600"
+            className="rounded-full bg-[#191411]/88 text-white shadow-[0_16px_34px_rgba(28,25,23,0.22)] backdrop-blur-xl hover:bg-[#241d1b]/92"
             disabled={isRendering || renderStatus === "uploading"}
             type="button"
             onClick={onGenerateVideo}
@@ -689,7 +719,7 @@ function MusicVideoPreview({
           </Button>
           <Button
             aria-label="Switch preview aspect ratio"
-            className="rounded-full border-stone-300 bg-white/85 px-3 font-black text-stone-700 shadow-sm hover:bg-white hover:text-rose-600"
+            className="rounded-full border-0 bg-white/58 px-3 font-black text-stone-800 shadow-[0_12px_28px_rgba(28,25,23,0.10)] backdrop-blur-xl hover:bg-white/76 hover:text-rose-600"
             title={`Switch to ${nextAspectRatioLabel}`}
             type="button"
             variant="outline"
@@ -699,7 +729,7 @@ function MusicVideoPreview({
             {previewDimensions.label}
           </Button>
           <Button
-            className="rounded-full bg-[#1f1a17] text-white hover:bg-[#332b26]"
+            className="rounded-full bg-white/58 text-stone-900 shadow-[0_12px_28px_rgba(28,25,23,0.10)] backdrop-blur-xl hover:bg-white/76 hover:text-rose-600"
             type="button"
             onClick={togglePlayback}
           >
@@ -713,16 +743,16 @@ function MusicVideoPreview({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 items-center justify-center py-4 xl:py-6">
+      <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center py-4 xl:py-5">
         <div
           className={cn(
-            "relative overflow-hidden border-[10px] border-[#171412] bg-[#171412] shadow-2xl shadow-black/25",
+            "relative overflow-hidden border-[8px] border-[#171412] bg-[#171412] shadow-xl shadow-stone-950/20",
             aspectRatio === "portrait"
-              ? "aspect-[9/16] h-full max-h-[min(72vh,760px)] min-h-[420px] rounded-[34px]"
-              : "aspect-[16/9] w-full max-w-[min(100%,1180px,calc(177.78vh-23.11rem))] rounded-[28px]",
+              ? "aspect-[9/16] h-full max-h-[min(72vh,760px)] min-h-[420px] rounded-[30px]"
+              : "aspect-[16/9] w-full max-w-[min(100%,1180px,calc(177.78vh-23.11rem))] rounded-[24px]",
           )}
         >
-          <div className="absolute inset-0 rounded-[24px] bg-black">
+          <div className="absolute inset-0 rounded-[20px] bg-black">
             <Player
               ref={playerRef}
               key={`${timeline.templateId}-${previewDimensions.label}`}
@@ -737,16 +767,16 @@ function MusicVideoPreview({
               style={{ height: "100%", width: "100%" }}
             />
           </div>
-          <div className="absolute left-1/2 top-2 h-1.5 w-16 -translate-x-1/2 rounded-full bg-white/20" />
+          <div className="absolute left-1/2 top-2 h-1 w-14 -translate-x-1/2 rounded-full bg-white/20" />
         </div>
       </div>
 
-      <div className="shrink-0">
+      <div className="relative z-10 shrink-0">
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
           {latestVideo?.videoUrl ? (
             <Button
               asChild
-              className="rounded-full"
+              className="rounded-full border-0 bg-white/58 shadow-[0_12px_28px_rgba(28,25,23,0.10)] backdrop-blur-xl hover:bg-white/76"
               type="button"
               variant="outline"
             >
@@ -758,14 +788,14 @@ function MusicVideoPreview({
           ) : null}
         </div>
         {isRendering ? (
-          <div className="mb-3 rounded-xl border border-rose-100 bg-white/75 px-3 py-2 text-xs font-bold text-stone-600">
+          <div className="mb-3 rounded-lg bg-white/70 px-3 py-2 text-xs font-bold text-stone-600 shadow-sm shadow-stone-950/[0.04]">
             Rendering video... {Math.round(renderProgress * 100)}%
           </div>
         ) : null}
-        <div className="relative h-5">
-          <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 overflow-hidden rounded-full bg-white shadow-inner">
+        <div className="relative h-4">
+          <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 overflow-hidden rounded-full bg-white/80 shadow-inner shadow-stone-200/70">
             <div
-              className="h-full rounded-full bg-rose-500 transition-[width]"
+              className="h-full rounded-full bg-rose-500/90 transition-[width]"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -781,11 +811,11 @@ function MusicVideoPreview({
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-rose-500 shadow-md"
+            className="pointer-events-none absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-rose-500 shadow-sm"
             style={{ left: `${progress}%` }}
           />
         </div>
-        <div className="mt-2 flex justify-between text-xs font-bold text-stone-500">
+        <div className="mt-1.5 flex justify-between text-[11px] font-bold text-stone-500">
           <span>{formatTime(previewTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
@@ -825,7 +855,7 @@ function PhotoUploadPool({
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2 text-sm font-black text-foreground">
           <Images className="size-4 shrink-0" />
-          <span className="truncate">Media Assets</span>
+          <span className="leading-tight break-words">Media Assets</span>
         </div>
         <Badge className="shrink-0" variant="secondary">
           {photos.length} assets
@@ -834,18 +864,18 @@ function PhotoUploadPool({
       <div
         {...getRootProps()}
         className={cn(
-          "mt-3 flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed bg-white/70 px-3 py-5 text-center transition",
+          "mt-3 flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-[#ebe7e1] px-3 py-5 text-center transition",
           isDragActive
-            ? "border-rose-400 bg-rose-50"
-            : "border-stone-300 hover:border-rose-300 hover:bg-white",
+            ? "bg-[#e8dfd8]"
+            : "hover:bg-[#e6e1da]",
         )}
       >
         <input {...getInputProps()} />
-        <UploadCloud className="size-8 shrink-0 text-rose-500" />
-        <p className="mt-2 max-w-full truncate text-sm font-bold text-foreground">
+        <UploadCloud className="size-7 shrink-0 text-stone-500" />
+        <p className="mt-2 max-w-[26rem] text-balance text-sm font-bold leading-6 text-foreground sm:text-[15px]">
           Drag media here or click to upload
         </p>
-        <p className="mt-1 max-w-full truncate text-xs leading-5 text-muted-foreground">
+        <p className="mt-1 max-w-[30rem] text-pretty text-xs leading-5 text-muted-foreground">
           JPG, PNG, WebP, GIF, MP4, MOV, or WebM. Up to 80MB each.
         </p>
       </div>
@@ -1142,29 +1172,32 @@ function PhotoUploadLyricsTabs({
     ) ?? null;
 
   return (
-    <Tabs defaultValue="photos" className="min-w-0 rounded-xl border border-stone-200 bg-white/85 p-3 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <TabsList className="grid h-9 w-full grid-cols-3 bg-stone-100">
+    <Tabs
+      defaultValue="photos"
+      className="min-w-0 rounded-lg bg-white/60 p-3 shadow-sm shadow-stone-950/[0.04]"
+    >
+      <div className="flex items-center justify-center">
+        <TabsList className="h-8 w-fit rounded-full bg-stone-100/75 p-1 shadow-inner shadow-stone-300/60">
           <TabsTrigger
-            className="rounded-md text-xs font-black data-[state=active]:bg-white data-[state=active]:text-rose-600"
+            className="h-6 flex-none gap-1.5 rounded-full px-3 text-[11px] font-black tracking-[0.01em] data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
             value="photos"
           >
             <ImagePlus className="size-3.5" />
-            Upload Media
+            Media
           </TabsTrigger>
           <TabsTrigger
-            className="rounded-md text-xs font-black data-[state=active]:bg-white data-[state=active]:text-rose-600"
+            className="h-6 flex-none gap-1.5 rounded-full px-3 text-[11px] font-black tracking-[0.01em] data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
             value="lyrics"
           >
             <Type className="size-3.5" />
-            Lyrics Config
+            Lyrics
           </TabsTrigger>
           <TabsTrigger
-            className="rounded-md text-xs font-black data-[state=active]:bg-white data-[state=active]:text-rose-600"
+            className="h-6 flex-none gap-1.5 rounded-full px-3 text-[11px] font-black tracking-[0.01em] data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
             value="overlay"
           >
             <Sparkles className="size-3.5" />
-            Overlay Config
+            FX
           </TabsTrigger>
         </TabsList>
       </div>
@@ -1172,7 +1205,7 @@ function PhotoUploadLyricsTabs({
       <TabsContent className="mt-3 space-y-3" value="photos">
         <PhotoUploadPool photos={photos} onDropPhotos={onDropPhotos} />
         {selectedUploadedPhoto ? (
-          <div className="flex min-w-0 items-center gap-2 rounded-lg border border-rose-100 bg-white px-3 py-2 text-xs font-bold text-stone-600 shadow-sm">
+          <div className="flex min-w-0 items-center gap-2 rounded-lg bg-white/75 px-3 py-2 text-xs font-bold text-stone-600 shadow-sm shadow-stone-950/[0.04]">
             <Waves className="size-4 shrink-0 text-rose-500" />
             <span className="truncate">Selected: {selectedUploadedPhoto.name}</span>
           </div>
@@ -1214,7 +1247,7 @@ function PhotoUploadLyricsTabs({
         </div>
 
         {selectedOverlay ? (
-          <div className="overflow-hidden rounded-lg border border-rose-100 bg-stone-950 shadow-sm">
+          <div className="overflow-hidden rounded-lg bg-stone-950 shadow-sm shadow-stone-950/15">
             <video
               muted
               loop
@@ -1259,7 +1292,7 @@ function PhotoMediaRail({
 
   return (
     <section
-      className="flex min-h-0 flex-col rounded-xl border border-stone-200 bg-white/90 p-2 shadow-sm"
+      className="flex min-h-0 flex-col rounded-lg bg-white/60 p-2 shadow-sm shadow-stone-950/[0.04]"
       data-photo-media-rail
     >
       <div className="flex shrink-0 items-center justify-between gap-2 px-1">
@@ -1279,7 +1312,7 @@ function PhotoMediaRail({
       >
         <div className="space-y-2 pb-2 pr-3">
           {media.length === 0 ? (
-            <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50/80 px-2 text-center">
+            <div className="flex min-h-[180px] flex-col items-center justify-center rounded-lg bg-stone-50/80 px-2 text-center shadow-inner shadow-stone-950/[0.04]">
               <ImagePlus className="size-6 text-stone-300" />
               <p className="mt-2 text-[11px] font-black leading-4 text-stone-500">
                 No media
@@ -1292,10 +1325,10 @@ function PhotoMediaRail({
                 <div
                   key={photo.id}
                   className={cn(
-                    "group relative overflow-hidden rounded-xl border bg-stone-100 text-left shadow-sm transition",
+                    "group relative overflow-hidden rounded-lg bg-stone-100 text-left shadow-sm shadow-stone-950/[0.06] transition",
                     selectedPhotoId === photo.id
-                      ? "border-rose-500 ring-2 ring-rose-200"
-                      : "border-stone-200 hover:border-rose-300",
+                      ? "shadow-[0_0_0_2px_rgba(244,63,94,0.45),0_12px_28px_rgba(28,25,23,0.12)]"
+                      : "hover:shadow-md hover:shadow-stone-950/[0.10]",
                   )}
                   data-cover-photo={photo.isCover ? true : undefined}
                   draggable
@@ -1382,11 +1415,11 @@ function TransitionNode({
       aria-label="Transition Node"
       className="relative flex items-center justify-center py-1"
     >
-      <div className="absolute left-7 top-0 h-full w-px bg-stone-200" />
+      <div className="absolute left-7 top-0 h-full w-px bg-stone-200/70" />
       <Popover>
         <PopoverTrigger asChild>
           <button
-            className="relative z-10 inline-flex max-w-full items-center gap-1.5 rounded-full border border-stone-200 bg-white px-2.5 py-1 text-[10px] font-black text-stone-600 shadow-sm transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600"
+            className="relative z-10 inline-flex max-w-full cursor-pointer items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-black text-stone-600 shadow-sm shadow-stone-950/[0.04] transition hover:bg-white hover:text-rose-600 hover:shadow-md hover:shadow-stone-950/[0.06]"
             type="button"
             onClick={() => onPreviewTransition(toCueId)}
           >
@@ -1396,7 +1429,7 @@ function TransitionNode({
         </PopoverTrigger>
         <PopoverContent
           align="center"
-          className="w-auto max-w-[min(420px,calc(100vw-32px))] rounded-xl border-rose-100 bg-white/95 p-2 shadow-xl"
+          className="w-auto max-w-[min(420px,calc(100vw-32px))] rounded-lg border-0 bg-white/95 p-2 shadow-xl shadow-stone-950/15"
           side="top"
         >
           <div className="flex gap-2">
@@ -1408,10 +1441,10 @@ function TransitionNode({
                 <button
                   key={option.type}
                   className={cn(
-                    "group flex w-[92px] flex-col items-center gap-1 rounded-lg border px-2 py-2 text-center transition",
+                    "group flex w-[92px] cursor-pointer flex-col items-center gap-1 rounded-lg px-2 py-2 text-center shadow-sm shadow-stone-950/[0.04] transition",
                     isActive
-                      ? "border-rose-400 bg-rose-50 text-rose-600"
-                      : "border-stone-200 bg-white text-stone-600 hover:border-rose-300 hover:bg-rose-50/80",
+                      ? "bg-rose-50/80 text-rose-600 shadow-[0_10px_24px_rgba(244,63,94,0.12)]"
+                      : "bg-white text-stone-600 hover:bg-rose-50/50 hover:shadow-md hover:shadow-stone-950/[0.07]",
                   )}
                   title={option.description}
                   type="button"
@@ -1476,8 +1509,8 @@ function LyricPhotoTimeline({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm font-black text-foreground">
-          <Film className="size-4" />
+        <div className="flex items-center gap-2 text-sm font-black text-stone-900">
+          <Film className="size-4 text-rose-500" />
           Lyrics Storyline
         </div>
         <Badge variant="secondary">{cues.length} cues</Badge>
@@ -1505,7 +1538,7 @@ function LyricPhotoTimeline({
           return (
             <Fragment key={cue.id}>
               <div
-                className="grid min-w-0 grid-cols-[56px_minmax(0,1fr)] gap-2.5 rounded-xl border border-stone-200 bg-white/85 p-2.5 shadow-sm transition hover:border-rose-200"
+                className="grid min-w-0 grid-cols-[56px_minmax(0,1fr)] gap-2.5 rounded-lg bg-white/82 p-2 shadow-[0_10px_24px_rgba(28,25,23,0.10)] transition hover:bg-white hover:shadow-[0_14px_30px_rgba(28,25,23,0.13)]"
                 data-lyric-photo-card
                 onDragOver={(event) => {
                   event.preventDefault();
@@ -1519,11 +1552,11 @@ function LyricPhotoTimeline({
               >
                 <button
                   className={cn(
-                    "relative aspect-square w-full overflow-hidden rounded-lg border bg-stone-100 transition",
+                    "relative aspect-square w-full cursor-pointer overflow-hidden rounded-md bg-stone-100 shadow-inner shadow-stone-950/[0.08] transition",
                     assignedPhotoId
-                      ? "border-rose-400"
-                      : "border-dashed border-stone-300",
-                    selectedPhotoId && "hover:border-rose-500",
+                      ? "shadow-[inset_0_0_0_2px_rgba(251,113,133,0.7)]"
+                      : "shadow-inner shadow-stone-950/[0.08]",
+                    selectedPhotoId && "hover:shadow-[inset_0_0_0_2px_rgba(244,63,94,0.7)]",
                   )}
                   type="button"
                   onClick={() => {
@@ -1561,7 +1594,7 @@ function LyricPhotoTimeline({
                 </button>
 
                 <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-rose-500">
+                  <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-stone-500">
                     <span>{formatTime(cue.start)}</span>
                     <span className="text-stone-300">-</span>
                     <span>{formatTime(cue.end)}</span>
@@ -1585,7 +1618,7 @@ function LyricPhotoTimeline({
                   >
                     <SelectTrigger
                       aria-label={`Select media for lyric ${cue.text}`}
-                      className="h-8 w-full min-w-0 rounded-lg bg-white px-2 text-xs [&>span]:min-w-0 [&>span]:truncate"
+                      className="h-7 w-36 min-w-0 rounded-md bg-white/65 px-2 text-xs text-stone-500 shadow-inner shadow-stone-200/70 [&>span]:min-w-0 [&>span]:truncate"
                       disabled={photos.length === 0}
                     >
                       <SelectValue placeholder="Media" />
@@ -1626,15 +1659,15 @@ function MinimalVinylEditor({
 }) {
   return (
     <ScrollArea
-      className="min-h-0 min-w-0 overflow-y-auto rounded-xl border border-amber-200 bg-[#fff7ed]"
+      className="min-h-0 min-w-0 overflow-y-auto rounded-lg bg-white/60 shadow-sm shadow-stone-950/[0.04]"
       data-minimal-vinyl-editor
       data-music-video-editor-scroll
       data-music-video-editor-main
     >
-      <div className="min-h-full min-w-0 space-y-3 p-3">
-        <section className="rounded-xl border border-amber-200 bg-white/90 p-3 shadow-sm">
-          <div className="flex items-center gap-2 text-sm font-black text-foreground">
-            <Type className="size-4 text-amber-600" />
+      <div className="min-h-full min-w-0 space-y-3">
+        <section className="rounded-lg bg-white/70 p-3 shadow-sm shadow-stone-950/[0.04]">
+          <div className="flex items-center gap-2 text-sm font-black text-stone-900">
+            <Type className="size-4 text-rose-500" />
             Lyrics Config
           </div>
           <div className="mt-3">
@@ -1662,16 +1695,16 @@ function WaveRadioEditor({
 }) {
   return (
     <ScrollArea
-      className="min-h-0 min-w-0 overflow-y-auto rounded-xl border border-cyan-200 bg-[#eefcff]"
+      className="min-h-0 min-w-0 overflow-y-auto rounded-lg bg-white/60 shadow-sm shadow-stone-950/[0.04]"
       data-music-video-editor-main
       data-music-video-editor-scroll
       data-wave-radio-editor
     >
-      <div className="min-h-full min-w-0 space-y-3 p-3">
-        <section className="rounded-xl border border-cyan-200 bg-white/90 p-3 shadow-sm">
+      <div className="min-h-full min-w-0 space-y-3">
+        <section className="rounded-lg bg-white/70 p-3 shadow-sm shadow-stone-950/[0.04]">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2 text-sm font-black text-foreground">
-              <Radio className="size-4 shrink-0 text-cyan-600" />
+            <div className="flex min-w-0 items-center gap-2 text-sm font-black text-stone-900">
+              <Radio className="size-4 shrink-0 text-rose-500" />
               <span className="truncate">Background Video</span>
             </div>
             <Badge className="shrink-0" variant="secondary">
@@ -1688,10 +1721,10 @@ function WaveRadioEditor({
                   <button
                     key={background.id}
                     className={cn(
-                      "group overflow-hidden rounded-xl border bg-stone-950 text-left shadow-sm transition",
+                      "group cursor-pointer overflow-hidden rounded-lg bg-stone-950 text-left shadow-sm shadow-stone-950/15 transition",
                       isActive
-                        ? "border-cyan-400 ring-2 ring-cyan-200"
-                        : "border-stone-200 hover:border-cyan-300",
+                        ? "shadow-[0_0_0_2px_rgba(251,113,133,0.55),0_14px_32px_rgba(28,25,23,0.18)]"
+                        : "hover:shadow-md hover:shadow-stone-950/20",
                     )}
                     data-wave-radio-background-option
                     type="button"
@@ -1708,7 +1741,7 @@ function WaveRadioEditor({
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-white/10" />
                       {isActive ? (
-                        <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-cyan-400 text-stone-950 shadow-sm">
+                        <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm">
                           <Check className="size-3.5" />
                         </span>
                       ) : null}
@@ -1723,9 +1756,9 @@ function WaveRadioEditor({
           </div>
         </section>
 
-        <section className="rounded-xl border border-cyan-200 bg-white/90 p-3 shadow-sm">
-          <div className="flex items-center gap-2 text-sm font-black text-foreground">
-            <Type className="size-4 text-cyan-600" />
+        <section className="rounded-lg bg-white/70 p-3 shadow-sm shadow-stone-950/[0.04]">
+          <div className="flex items-center gap-2 text-sm font-black text-stone-900">
+            <Type className="size-4 text-rose-500" />
             Lyrics Config
           </div>
           <div className="mt-3">
@@ -1764,7 +1797,7 @@ export function MusicVideoEditorDrawer({
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [previewAspectRatio, setPreviewAspectRatio] =
-    useState<PreviewAspectRatio>("portrait");
+    useState<PreviewAspectRatio>("landscape");
   const [lyricsStyle, setLyricsStyle] =
     useState<LyricsStyleConfig>(DEFAULT_LYRICS_STYLE);
   const [waveRadioBackgroundId, setWaveRadioBackgroundId] = useState(
@@ -1855,6 +1888,7 @@ export function MusicVideoEditorDrawer({
           ? {
               assignments: [],
               audioUrl,
+              coverPhoto: coverPhoto ?? undefined,
               duration: playerDuration,
               lyrics: cues,
               photos: [],
@@ -2273,27 +2307,25 @@ export function MusicVideoEditorDrawer({
             100% { transform: scale(1.03); }
           }
         `}</style>
-        <SheetHeader className="border-b bg-background/95 px-5 py-2 backdrop-blur">
+        <SheetHeader className=" bg-white px-5 py-2 backdrop-blur">
           <div className="flex min-w-0 items-center gap-3 pr-10">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-600">
-              <Video className="size-4" />
-            </div>
+            <Video className="size-4 shrink-0 text-rose-600" />
             <div className="flex min-w-0 items-baseline gap-3">
-              <SheetTitle className="shrink-0 text-xl font-black">
+              <SheetTitle className="shrink-0 text-lg font-black text-stone-950">
                 Music Video Studio
               </SheetTitle>
-              <SheetDescription className="truncate text-sm">
-                Bind media to lyrics and preview a music video.
+              <SheetDescription className="truncate text-sm text-stone-500">
+                Create, preview, and render your music video.
               </SheetDescription>
             </div>
           </div>
         </SheetHeader>
 
         {emptyState ? (
-          <div className="min-h-0 flex-1 bg-[#f4efe8]">{emptyState}</div>
+          <div className="min-h-0 flex-1 bg-[#f7f3ee]">{emptyState}</div>
         ) : (
           <div
-            className="grid min-h-0 flex-1 overflow-hidden bg-[#f4efe8] lg:grid-cols-[220px_minmax(420px,1fr)_minmax(360px,var(--music-video-editor-width))] 2xl:grid-cols-[210px_minmax(560px,1fr)_minmax(360px,var(--music-video-editor-width))]"
+            className="grid min-h-0 flex-1 overflow-hidden bg-[#f7f3ee] lg:grid-cols-[184px_minmax(280px,1fr)_minmax(380px,var(--music-video-editor-width))] xl:grid-cols-[200px_minmax(320px,1fr)_minmax(420px,var(--music-video-editor-width))] 2xl:grid-cols-[220px_minmax(360px,1fr)_minmax(460px,var(--music-video-editor-width))]"
             style={
               {
                 "--music-video-editor-width": `${editorWidth}px`,
@@ -2323,10 +2355,10 @@ export function MusicVideoEditorDrawer({
               songTitle={songTitle}
             />
 
-            <aside className="relative flex min-h-0 min-w-0 flex-col border-t bg-[#fffaf5]/95 lg:border-l lg:border-t-0">
+            <aside className="relative flex min-h-0 min-w-0 flex-col border-t border-stone-200/70 bg-[#fffaf5]/80 lg:border-l lg:border-t-0">
               <button
                 aria-label="Resize editor panel"
-                className="absolute inset-y-0 left-0 z-20 hidden w-3 -translate-x-1/2 cursor-col-resize items-center justify-center rounded-full text-rose-500 transition hover:bg-rose-100/70 lg:flex"
+                className="absolute inset-y-0 left-0 z-20 hidden w-3 -translate-x-1/2 cursor-col-resize items-center justify-center rounded-full text-rose-500 transition hover:bg-rose-100/60 lg:flex"
                 data-music-video-editor-resizer
                 type="button"
                 onMouseDown={(event) => {
@@ -2338,15 +2370,15 @@ export function MusicVideoEditorDrawer({
                   if (touch) handleEditorResizeStart(touch.clientX);
                 }}
               >
-                <span className="h-12 w-1 rounded-full bg-rose-300/80 shadow-sm" />
+                <span className="h-12 w-1 rounded-full bg-rose-300/70 shadow-sm" />
               </button>
 
-              <div className="m-3 mb-0 flex shrink-0 items-center justify-between gap-3 rounded-xl border border-rose-100 bg-white/80 px-3 py-2">
+              <div className="mx-3 mt-3 flex shrink-0 items-center justify-between gap-3 border-b border-stone-200/70 px-0 pb-3">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-500">
+                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-stone-500">
                     Smart Editor
                   </p>
-                  <p className="text-sm font-black text-foreground">
+                  <p className="text-sm font-black text-stone-950">
                     {activeTemplate === "minimal-vinyl"
                       ? "Minimal Vinyl"
                       : activeTemplate === "wave-radio"
@@ -2358,7 +2390,7 @@ export function MusicVideoEditorDrawer({
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
-                        className="shrink-0 rounded-full bg-rose-500 px-4 text-sm font-black text-white shadow-sm shadow-rose-500/20 hover:bg-rose-600"
+                        className="shrink-0 rounded-full bg-white px-4 text-sm font-black text-rose-700 shadow-sm shadow-rose-950/[0.08] hover:bg-rose-50"
                         size="sm"
                         type="button"
                       >
@@ -2366,7 +2398,7 @@ export function MusicVideoEditorDrawer({
                         Auto Movie
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="border-rose-100">
+                    <AlertDialogContent className="border-stone-200">
                       <AlertDialogHeader>
                         <AlertDialogTitle>Auto Movie</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -2379,7 +2411,7 @@ export function MusicVideoEditorDrawer({
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          className="bg-rose-500 text-white hover:bg-rose-600"
+                          className="bg-rose-600 text-white hover:bg-rose-700"
                           onClick={handleOneClickMovie}
                         >
                           Apply
@@ -2414,7 +2446,7 @@ export function MusicVideoEditorDrawer({
                   />
                 </div>
               ) : (
-                <div className="grid min-h-0 flex-1 grid-cols-[104px_minmax(0,1fr)] gap-3 p-3">
+                <div className="grid min-h-0 flex-1 grid-cols-[92px_minmax(0,1fr)] gap-3 p-3 xl:grid-cols-[104px_minmax(0,1fr)]">
                   <PhotoMediaRail
                     media={visibleMedia}
                     selectedPhotoId={selectedPhotoId}
@@ -2423,11 +2455,11 @@ export function MusicVideoEditorDrawer({
                   />
 
                   <ScrollArea
-                    className="min-h-0 min-w-0 overflow-y-auto rounded-xl border border-stone-200 bg-[#f8f3ec]"
+                    className="min-h-0 min-w-0 overflow-y-auto rounded-lg bg-[#faf7f2]/80 shadow-sm shadow-stone-950/[0.04]"
                     data-music-video-editor-scroll
                     data-music-video-editor-main
                   >
-                    <div className="min-h-full min-w-0 space-y-3 p-3">
+                    <div className="min-h-full min-w-0 space-y-3">
                       <PhotoUploadLyricsTabs
                         atmosphereOverlay={atmosphereOverlay}
                         lyricsStyle={lyricsStyle}

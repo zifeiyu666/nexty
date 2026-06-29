@@ -28,7 +28,7 @@ export default async function Footer() {
     <div className="bg-gray-900 text-gray-300 border-t border-gray-700">
       <footer className="py-2 container max-w-8xl mx-auto">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-12 lg:grid-cols-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-12 lg:grid-cols-7">
             <div className="w-full flex flex-col sm:flex-row lg:flex-col gap-4 col-span-full md:col-span-2">
               <div className="space-y-4 flex-1">
                 <div className="items-center space-x-2 flex">

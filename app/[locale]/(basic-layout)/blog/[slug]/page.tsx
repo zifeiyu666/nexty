@@ -1,6 +1,7 @@
 import { listPublishedPostsAction } from "@/actions/posts/posts";
 import { getViewCountAction } from "@/actions/posts/views";
 import { ContentRestrictionMessage } from "@/components/cms/ContentRestrictionMessage";
+import { BlogPostCTA } from "@/components/cms/BlogPostCTA";
 import { POST_CONFIGS } from "@/components/cms/post-config";
 import { PostCard } from "@/components/cms/PostCard";
 import { RelatedPosts } from "@/components/cms/RelatedPosts";
@@ -164,18 +165,23 @@ export default async function BlogPage({ params }: { params: Params }) {
       : "";
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="w-full">
       <ViewCounter
         slug={slug}
         postType="blog"
         trackView={viewCountConfig.enabled}
         trackMode={viewCountConfig.mode}
       />
-      <div className="flex gap-8">
-        {/* Main Content */}
-        <div className="flex-1 min-w-0">
-          <div className="mb-8">
-            <Button asChild variant="ghost" size="sm" className="group">
+
+      <header className="w-full border-b border-[#eadfd4] bg-[#f8f4f0]">
+        <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:px-8 lg:py-14">
+          <div className="max-w-3xl">
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="group mb-5 -ml-3 rounded-full text-[#4b3456] hover:bg-white/70 hover:text-[#2b1038]"
+            >
               <I18nLink
                 href="/blog"
                 title={t("BlogDetail.backToBlogs")}
@@ -185,135 +191,114 @@ export default async function BlogPage({ params }: { params: Params }) {
                 {t("BlogDetail.backToBlogs")}
               </I18nLink>
             </Button>
-          </div>
 
-          <header className="mb-12">
-            {post.visibility !== "public" && (
-              <div
-                className={`${visibilityInfo.bgColor} text-white text-xs px-3 py-1 rounded-full inline-flex mb-6`}
-              >
-                {visibilityInfo.label}
-              </div>
-            )}
-
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-              {post.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-8">
-              <div className="flex items-center">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dayjs(post.publishedAt).format("MMMM D, YYYY")}
-              </div>
-
+            <div className="mb-4 flex flex-wrap items-center gap-2 text-xs font-medium text-[#604769] sm:text-sm">
+              {post.visibility !== "public" && (
+                <span
+                  className={`${visibilityInfo.bgColor} inline-flex rounded-full px-3 py-1 text-xs text-white`}
+                >
+                  {visibilityInfo.label}
+                </span>
+              )}
               {viewCountConfig.enabled &&
                 viewCountConfig.showInUI &&
                 viewCount > 0 && (
-                  <div className="flex items-center">
+                  <span className="inline-flex items-center rounded-full bg-white/70 px-3 py-1 shadow-sm shadow-stone-900/5">
                     <EyeIcon className="mr-2 h-4 w-4" />
                     {t("BlogDetail.viewCount", { count: viewCount })}
-                  </div>
+                  </span>
                 )}
-
               {post.isPinned && (
-                <div className="flex items-center bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 px-2 py-0.5 rounded-md text-xs">
+                <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800 shadow-sm shadow-stone-900/5">
                   {t("BlogDetail.featured")}
-                </div>
+                </span>
               )}
             </div>
 
+            <h1 className="max-w-4xl text-balance text-3xl font-bold leading-tight tracking-normal text-[#32103f] sm:text-4xl lg:text-5xl">
+              {post.title}
+            </h1>
+
             {post.description && (
-              <div className="bg-muted rounded-lg p-6 text-lg mb-8">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#63536b] sm:text-lg">
                 {post.description}
-              </div>
+              </p>
             )}
-          </header>
+          </div>
 
-          {post.featuredImageUrl && (
-            <div className="my-10 rounded-xl overflow-hidden shadow-md aspect-video relative">
-              <Image
-                src={post.featuredImageUrl}
-                alt={post.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 1200px"
-                priority
-                className="object-cover"
-              />
+          <div className="flex lg:justify-end">
+            <div className="inline-flex items-center rounded-full border border-white/80 bg-white px-4 py-2 text-sm font-semibold text-[#2b1038] shadow-[0_12px_30px_rgba(58,37,24,0.08)]">
+              <CalendarIcon className="mr-2 h-4 w-4 text-[#7a647f]" />
+              {dayjs(post.publishedAt).format("MMMM D, YYYY")}
             </div>
-          )}
-
-          {tagsArray.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-10">
-              {tagsArray.map((tag) => (
-                <div
-                  key={tag}
-                  className="rounded-full bg-secondary/80 hover:bg-secondary px-3 py-1 text-sm font-medium transition-colors"
-                >
-                  {tag}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Mobile TOC */}
-          {post.content && (
-            <div className="xl:hidden mb-8">
-              <TableOfContents content={post.content} mobile />
-            </div>
-          )}
-
-          {showRestrictionMessageInsteadOfContent ? (
-            <ContentRestrictionMessage
-              title={messageTitle}
-              message={messageContent}
-              actionText={actionText}
-              actionLink={actionLink}
-              backText={t("BlogDetail.backToBlogs")}
-              backLink={`/blog`}
-            />
-          ) : contentHtml ? (
-            <article
-              className="prose dark:prose-invert max-w-none prose-p:leading-normal prose-p:my-2 prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-li:my-0.5 prose-blockquote:not-italic prose-blockquote:font-normal prose-blockquote:text-muted-foreground prose-blockquote:border-l-4 prose-blockquote:border-primary/50 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_td_p]:my-0 [&_th_p]:my-0 lg:prose-lg"
-              dangerouslySetInnerHTML={{ __html: contentHtml }}
-            />
-          ) : null}
-
-          {/* Related Posts */}
-          {post.id && (
-            <RelatedPosts
-              postId={post.id}
-              postType="blog"
-              limit={10}
-              title="Related Posts"
-              locale={locale}
-              CardComponent={BlogPostCard}
-            />
-          )}
-
-          <div className="mt-16 pt-8 border-t">
-            <Button asChild variant="outline" size="sm">
-              <I18nLink
-                href="/blog"
-                title={t("BlogDetail.backToBlogs")}
-                prefetch={false}
-                className="inline-flex items-center"
-              >
-                <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                {t("BlogDetail.backToBlogs")}
-              </I18nLink>
-            </Button>
           </div>
         </div>
+      </header>
 
-        {/* PC TOC - Sidebar */}
-        {post.content && (
-          <aside className="hidden xl:block w-64 shrink-0">
-            <div className="sticky top-48">
-              <TableOfContents content={post.content} />
-            </div>
-          </aside>
+      <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 lg:py-16">
+        {post.featuredImageUrl && (
+          <div className="relative mb-12 aspect-video overflow-hidden rounded-2xl shadow-[0_24px_70px_rgba(50,16,63,0.14)] ring-1 ring-black/5">
+            <Image
+              src={post.featuredImageUrl}
+              alt={post.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              priority
+              className="object-cover"
+            />
+          </div>
         )}
-      </div>
+
+        {tagsArray.length > 0 && (
+          <div className="mb-10 flex flex-wrap gap-2">
+            {tagsArray.map((tag) => (
+              <div
+                key={tag}
+                className="rounded-full bg-secondary/80 px-3 py-1 text-sm font-medium transition-colors hover:bg-secondary"
+              >
+                {tag}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {post.content && (
+          <div className="mb-10">
+            <TableOfContents content={post.content} mobile />
+          </div>
+        )}
+
+        {showRestrictionMessageInsteadOfContent ? (
+          <ContentRestrictionMessage
+            title={messageTitle}
+            message={messageContent}
+            actionText={actionText}
+            actionLink={actionLink}
+            backText={t("BlogDetail.backToBlogs")}
+            backLink={`/blog`}
+          />
+        ) : contentHtml ? (
+          <>
+            <article
+              className="prose dark:prose-invert mx-auto max-w-[68ch] prose-p:my-5 prose-p:leading-8 prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-3xl prose-h2:mt-12 prose-h2:text-3xl prose-h3:text-2xl prose-li:my-1 prose-blockquote:not-italic prose-blockquote:font-normal prose-blockquote:text-muted-foreground prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-table:my-10 prose-table:block prose-table:w-full prose-table:min-w-full prose-table:overflow-x-auto prose-table:border-separate prose-table:border-spacing-0 prose-table:text-sm prose-thead:bg-[#f8f4f0] prose-th:min-w-44 prose-th:border-b prose-th:border-[#d8d2cc] prose-th:px-5 prose-th:py-4 prose-th:text-left prose-th:text-sm prose-th:font-semibold prose-th:leading-6 prose-th:text-[#1f2937] prose-td:min-w-44 prose-td:border-b prose-td:border-[#e6e1dc] prose-td:px-5 prose-td:py-4 prose-td:align-top prose-td:leading-7 prose-td:text-[#374151] [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_table]:rounded-xl [&_table]:border [&_table]:border-[#e6e1dc] [&_tbody_tr:nth-child(even)]:bg-[#fbfaf8] [&_tbody_tr:last-child_td]:border-b-0 [&_td_p]:my-0 [&_th:first-child]:rounded-tl-xl [&_th:last-child]:rounded-tr-xl [&_th_p]:my-0 [&_thead+tbody_tr:first-child_td]:border-t-0 lg:prose-lg lg:prose-p:leading-9"
+              dangerouslySetInnerHTML={{ __html: contentHtml }}
+            />
+            <BlogPostCTA />
+          </>
+        ) : null}
+
+        {/* Related Posts */}
+        {post.id && (
+          <RelatedPosts
+            postId={post.id}
+            postType="blog"
+            limit={10}
+            title="Related Posts"
+            locale={locale}
+            CardComponent={BlogPostCard}
+          />
+        )}
+      </section>
     </div>
   );
 }
