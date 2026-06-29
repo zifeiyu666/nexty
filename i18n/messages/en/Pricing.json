@@ -1,13 +1,12 @@
 {
   "badge": {
     "label": "PRICING",
-    "text": "One-Time Payment, Lifetime Updates"
+    "text": "Simple custom song packages"
   },
-  "title": "Ship your SaaS in days, not months",
-  "description": "Using our battle-tested SaaS starter template, so you can skip boilerplate coding and focus on the features your users actually need.",
+  "title": "Choose the custom song gift that fits your moment",
+  "description": "Preview your personalized song for free, then unlock the full track and optional gift extras when you are ready.",
   "annual": "Annual",
   "monthly": "Monthly",
   "onetime": "One-Time",
   "saveTip": "Save 20%"
 }
-

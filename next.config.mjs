@@ -1,8 +1,10 @@
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
+import { fileURLToPath } from "node:url";
 
 const withNextIntl = createNextIntlPlugin();
+const root = fileURLToPath(new URL(".", import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -27,6 +29,9 @@ const nextConfig = {
         : []),
     ],
   },
+  turbopack: {
+    root,
+  },
   compiler: {
     removeConsole:
       process.env.NODE_ENV === "production"
@@ -43,14 +48,10 @@ const withBundleAnalyzerWrapper = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
-if (
-  process.env.NODE_ENV === "development" &&
-  !process.env.NEXTY_WELCOME_SHOWN
-) {
-  console.log("\n🎉 Welcome to NEXTY.DEV Boilerplate!");
-  console.log("💬 Join our Discord community: https://discord.gg/VRDxBgXUZ8");
-  console.log("📚 Documentation: https://nexty.dev/docs\n\n");
-  process.env.NEXTY_WELCOME_SHOWN = "true";
+if (process.env.NODE_ENV === "development" && !process.env.CUSTOMSONG_WELCOME_SHOWN) {
+  console.log("\nWelcome to CustomSong.");
+  console.log("Local app: http://localhost:3000\n");
+  process.env.CUSTOMSONG_WELCOME_SHOWN = "true";
 }
 
 const sentryConfig = {
@@ -60,8 +61,11 @@ const sentryConfig = {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
-  // Automatically tree-shake Sentry logger statements in production
-  disableLogger: true,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
 };
 
 export default withSentryConfig(

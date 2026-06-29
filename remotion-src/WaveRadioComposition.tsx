@@ -4,7 +4,6 @@ import {
   Easing,
   Video,
   interpolate,
-  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
@@ -18,6 +17,7 @@ import {
   type LyricCue,
   type MusicVideoTimeline,
 } from "../lib/music-video/photo-slideshow";
+import { resolveRemotionMediaSrc } from "./media-src";
 
 export type WaveRadioCompositionProps = {
   timeline: MusicVideoTimeline;
@@ -162,7 +162,7 @@ export function WaveRadioComposition({ timeline }: WaveRadioCompositionProps) {
         loop
         muted
         name={`Wave Radio Background: ${background.label}`}
-        src={staticFile(background.src.replace(/^\/+/, ""))}
+        src={resolveRemotionMediaSrc(background.src)}
         style={{
           filter: "saturate(1.2) contrast(1.08)",
           height: "100%",

@@ -2,13 +2,13 @@ import {
   AbsoluteFill,
   Loop,
   OffthreadVideo,
-  staticFile,
 } from "remotion";
 import {
   ATMOSPHERE_OVERLAY_OPTIONS,
   normalizeAtmosphereOverlayConfig,
   type AtmosphereOverlayConfig,
 } from "../lib/music-video/photo-slideshow";
+import { resolveRemotionMediaSrc } from "./media-src";
 
 export function AtmosphereOverlay({
   overlay,
@@ -35,7 +35,7 @@ export function AtmosphereOverlay({
           muted
           name={`Atmosphere: ${option.label}`}
           pauseWhenBuffering
-          src={staticFile(option.src.replace(/^\/+/, ""))}
+          src={resolveRemotionMediaSrc(option.src)}
           style={{
             height: "100%",
             objectFit: "cover",

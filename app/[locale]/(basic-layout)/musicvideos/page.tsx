@@ -22,6 +22,7 @@ export async function generateMetadata({
     description: "Browse every generated music video version for your songs.",
     locale: locale as Locale,
     path: "/musicvideos",
+    noIndex: true,
   });
 }
 

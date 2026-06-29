@@ -1,6 +1,18 @@
 import { SiteConfig } from "@/types/siteConfig";
 
-export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://nexty.dev";
+const DEFAULT_SITE_URL = "https://customsong.top";
+
+function resolveBaseUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (process.env.NODE_ENV === "production" && !configuredUrl) {
+    throw new Error("NEXT_PUBLIC_SITE_URL must be set in production.");
+  }
+
+  return configuredUrl || DEFAULT_SITE_URL;
+}
+
+export const BASE_URL = resolveBaseUrl();
 
 const GITHUB_URL = ''
 const TWITTER_URL = ''

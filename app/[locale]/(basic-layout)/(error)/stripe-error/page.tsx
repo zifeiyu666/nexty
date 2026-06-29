@@ -27,6 +27,7 @@ export async function generateMetadata({
     locale: locale as Locale,
     path: `/stripe-error`,
     canonicalUrl: "/stripe-error",
+    noIndex: true,
   });
 }
 

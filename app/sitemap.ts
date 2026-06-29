@@ -4,8 +4,8 @@ import { DEFAULT_LOCALE, LOCALES } from '@/i18n/routing'
 import { blogCms } from '@/lib/cms'
 import { db } from '@/lib/db'
 import { posts as postsSchema } from '@/lib/db/schema'
-import { MetadataRoute } from 'next'
 import { eq, max } from 'drizzle-orm'
+import { MetadataRoute } from 'next'
 
 const siteUrl = siteConfig.url
 
@@ -14,10 +14,14 @@ const STATIC_PAGE_MTIME = new Date(new Date().getFullYear(), 0, 1)
 type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never' | undefined
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Static pages
   const staticPages = [
     '',
+    '/pricing',
+    '/create-song',
     '/occasions/birthday',
+    '/privacy-policy',
+    '/terms-of-service',
+    '/refund-policy',
   ]
 
   const pages = LOCALES.flatMap(locale => {
@@ -100,10 +104,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     new Map(allBlogSitemapEntries.map((entry) => [entry.url, entry])).values()
   );
 
-  // Glossary entries (server-side only, no local file system access)
   const allGlossarySitemapEntries: MetadataRoute.Sitemap = [];
 
-  // Add glossary list page
   for (const locale of LOCALES) {
     allGlossarySitemapEntries.push({
       url: `${siteUrl}${locale === DEFAULT_LOCALE ? '' : `/${locale}`}/glossary`,
@@ -113,7 +115,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // Add glossary entries
   for (const locale of LOCALES) {
     const serverResult = await listPublishedPostsAction({
       locale: locale,
@@ -143,6 +144,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...pages,
     ...uniqueBlogPostEntries,
-    ...uniqueGlossaryEntries
+    ...uniqueGlossaryEntries,
   ]
 }

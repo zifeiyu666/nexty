@@ -27,6 +27,7 @@ export async function generateMetadata({
     locale: locale as Locale,
     path: `/redirect-error`,
     canonicalUrl: "/redirect-error",
+    noIndex: true,
   });
 }
 

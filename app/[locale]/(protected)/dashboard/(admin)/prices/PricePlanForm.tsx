@@ -672,7 +672,7 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
     const template = await getLangTemplate();
     form.setValue("langJsonb", "", { shouldValidate: true });
 
-    const prompt = `This is the multilingual configuration for a SaaS product's pricing card. The copy for the default language (${DEFAULT_LOCALE}) is provided below. Acting as a translation expert, please complete the copy for the other languages within the JSON structure, prices and currency units must remain untouched. Ensure all translations are natural and idiomatic, suitable for native speakers. Here is the template: ${JSON.stringify(
+    const prompt = `This is the localized configuration for a CustomSong pricing card. The copy for the default language (${DEFAULT_LOCALE}) is provided below. Acting as a localization editor, please complete any other language entries already present in the JSON structure. Prices and currency units must remain untouched. Ensure all copy is natural and idiomatic. Here is the template: ${JSON.stringify(
       template,
       null,
       2
@@ -1759,7 +1759,7 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
                           placeholder={
                             isTranslating
                               ? "Translating..."
-                              : `{ "zh": { "cardTitle": "NEXTY.DEV 高级启动模板", ... }, "jp": { "cardTitle": "NEXTY.DEV 高級起動テンプレート", ... } }`
+                              : `{ "en": { "cardTitle": "Custom Song Gift", "cardDescription": "Personalized song package", ... } }`
                           }
                           {...field}
                           value={field.value ?? ""}

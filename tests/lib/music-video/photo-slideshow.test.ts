@@ -457,7 +457,7 @@ describe("photo slideshow music video helpers", () => {
     );
   });
 
-  test("normalizes wave radio background choices to a bundled video", () => {
+  test("normalizes wave radio background choices to a CDN video", () => {
     assert.equal(
       normalizeWaveRadioBackgroundId(WAVE_RADIO_BACKGROUND_OPTIONS[1].id),
       WAVE_RADIO_BACKGROUND_OPTIONS[1].id,
@@ -465,6 +465,27 @@ describe("photo slideshow music video helpers", () => {
     assert.equal(
       normalizeWaveRadioBackgroundId("missing-background"),
       DEFAULT_WAVE_RADIO_BACKGROUND.id,
+    );
+  });
+
+  test("serves overlay presets from the CDN instead of local public assets", () => {
+    const overlayOptions = [
+      ...ATMOSPHERE_OVERLAY_OPTIONS,
+      ...WAVE_RADIO_BACKGROUND_OPTIONS,
+    ];
+
+    assert.equal(overlayOptions.length > 0, true);
+
+    for (const option of overlayOptions) {
+      assert.match(option.src, /^https:\/\/cdn\.customsong\.top\/overlay\//);
+      assert.doesNotMatch(option.src, /^\/overlay\//);
+    }
+
+    assert.match(
+      WAVE_RADIO_BACKGROUND_OPTIONS.find(
+        (option) => option.id === "blue-current-277316",
+      )?.src ?? "",
+      /\/overlay\/bg-video\/720p\/277316\.mp4$/,
     );
   });
 

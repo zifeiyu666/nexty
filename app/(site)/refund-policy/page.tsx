@@ -24,7 +24,7 @@ export default function RefundPolicyPage() {
       <div className="container mx-auto max-w-4xl px-4">
         <div className="bg-background rounded-xl border p-6 shadow-xs sm:p-8 dark:border-zinc-800">
           <h1 className="mb-6 text-2xl font-bold sm:text-3xl">
-            Refund Policy(Template)
+            Refund Policy
           </h1>
 
           <div className="space-y-6">

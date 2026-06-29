@@ -67,13 +67,13 @@
     "buttonLink": "Button Link/Action",
     "buttonLinkPlaceholder": "e.g., /dashboard, https://example.com or mailto:email@example.com",
     "buttonLinkDescription": "If filled, this will override the Stripe Checkout behavior. Use URLs or `mailto:email@example.com` format.",
-    "multiLanguageTranslations": "Multi-language Translations",
-    "multiLanguageTranslationsDescription": "Provide translations for text fields in JSON format.",
+    "multiLanguageTranslations": "Localized Display Copy",
+    "multiLanguageTranslationsDescription": "Provide display copy for supported languages in JSON format.",
     "generateTemplate": "Generate Template",
     "translateByAI": "Translate by AI",
     "translateByAIDescription": "Configure environment variables NEXT_PUBLIC_AI_MODEL_ID and NEXT_PUBLIC_AI_PROVIDER to use AI translation.",
     "languageJSON": "Language JSON",
-    "languageJSONDescription": "JSON object keyed by language code (e.g., \"en\", \"zh\", \"jp\"). Ensure valid JSON.",
+    "languageJSONDescription": "JSON object keyed by supported language code (currently \"en\"). Ensure valid JSON.",
     "planBenefits": "Benefits",
     "planBenefitsDescription": "Define the benefits users receive after purchasing this plan.",
     "benefitsJSON": "Benefits JSON",
@@ -88,7 +88,7 @@
     "createPlan": "Create Plan",
     "saveChanges": "Save Changes",
     "cancel": "Cancel",
-    "pleaseEnterLanguageData": "Before submitting, please ensure the \"Language JSON\" field is up-to-date. This is the primary information displayed to users across all supported languages."
+    "pleaseEnterLanguageData": "Before submitting, please ensure the \"Language JSON\" field is up-to-date. This is the primary information displayed to users."
   },
   "API": {
     "missingRequiredFields": "Missing required fields: environment, card_title",

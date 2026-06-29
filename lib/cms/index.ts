@@ -9,6 +9,9 @@ import matter from 'gray-matter';
 import path from 'path';
 
 const POSTS_BATCH_SIZE = 10;
+const LOCAL_DIRECTORY_READERS: Partial<Record<PostType, (locale: string) => string>> = {
+  blog: (locale: string) => path.join(process.cwd(), 'blogs', locale),
+};
 
 /**
  * Maps a server post to the unified PostBase format
@@ -50,6 +53,26 @@ function mapLocalFileToPostBase(data: Record<string, any>, content: string, loca
     content,
     metadata: data,
   };
+}
+
+async function readLocalMarkdownFiles(postType: PostType, localDirectory: string | undefined, locale: string) {
+  const getDirectory = LOCAL_DIRECTORY_READERS[postType];
+
+  if (!localDirectory || !getDirectory) {
+    return null;
+  }
+
+  const postsDirectory = getDirectory(locale);
+
+  if (!fs.existsSync(postsDirectory)) {
+    return null;
+  }
+
+  const filenames = (await fs.promises.readdir(postsDirectory))
+    .filter((filename) => filename.endsWith('.mdx'))
+    .reverse();
+
+  return { filenames, postsDirectory };
 }
 
 export interface GetBySlugResult {
@@ -96,9 +119,9 @@ export function createCmsModule(postType: PostType) {
   ): Promise<GetBySlugResult> {
     // Try local filesystem first if localDirectory is configured
     if (localDirectory) {
-      const postsDirectory = path.join(process.cwd(), localDirectory, locale);
-      if (fs.existsSync(postsDirectory)) {
-        const filenames = await fs.promises.readdir(postsDirectory);
+      const localFiles = await readLocalMarkdownFiles(postType, localDirectory, locale);
+      if (localFiles) {
+        const { filenames, postsDirectory } = localFiles;
         for (const filename of filenames) {
           const fullPath = path.join(postsDirectory, filename);
           try {
@@ -147,14 +170,13 @@ export function createCmsModule(postType: PostType) {
       return { posts: [] };
     }
 
-    const postsDirectory = path.join(process.cwd(), localDirectory, locale);
+    const localFiles = await readLocalMarkdownFiles(postType, localDirectory, locale);
 
-    if (!fs.existsSync(postsDirectory)) {
+    if (!localFiles) {
       return { posts: [] };
     }
 
-    let filenames = await fs.promises.readdir(postsDirectory);
-    filenames = filenames.reverse();
+    const { filenames, postsDirectory } = localFiles;
 
     let allPosts: PostBase[] = [];
 
@@ -229,9 +251,9 @@ export function createCmsModule(postType: PostType) {
   ): Promise<GetMetadataResult> {
     // Try local filesystem first if localDirectory is configured
     if (localDirectory) {
-      const postsDirectory = path.join(process.cwd(), localDirectory, locale);
-      if (fs.existsSync(postsDirectory)) {
-        const filenames = await fs.promises.readdir(postsDirectory);
+      const localFiles = await readLocalMarkdownFiles(postType, localDirectory, locale);
+      if (localFiles) {
+        const { filenames, postsDirectory } = localFiles;
         for (const filename of filenames) {
           const fullPath = path.join(postsDirectory, filename);
           try {

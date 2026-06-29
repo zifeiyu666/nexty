@@ -1,27 +1,29 @@
-# Nexty - Modern Full-Stack SaaS Boilerplate
+# CustomSong
 
-Nexty is a feature-rich, full-stack SaaS application boilerplate built with Next.js 16, React 19, and Supabase. It provides developers with a complete solution to quickly build and deploy SaaS applications.
+CustomSong is a Next.js 16 application for creating personalized AI song gifts. Users can turn memories into custom songs, generate shareable music videos, and manage downloads from their account dashboard.
 
-- 🚀 Get the boilerplate 👉: https://nexty.dev
-- 🚀 Roadmap 👉: https://nexty.dev/roadmap
-- 🚀 Documentation 👉: https://nexty.dev/docs
+## Stack
 
-> If you encounter any issues, please contact me for support:
-> - Email: hi@nexty.dev
-> - Twitter (Chinese): https://x.com/weijunext
-> - Twitter (English): https://x.com/judewei_dev
+- Next.js 16 and React 19
+- Better Auth for authentication
+- Drizzle ORM with PostgreSQL
+- Stripe, Creem, and PayPal payment integrations
+- Resend email
+- Cloudflare R2/S3-compatible storage
+- AI providers for lyrics, music, image, and video workflows
 
-## ✨ Key Features
+## Development
 
-- 🚀 **Next.js 16 & React 19** - Built on the latest tech stack
-- 💳 **Stripe Integration** - Complete subscription payment system
-- 🔒 **Supabase Authentication** - Secure and reliable user management
-- 🌍 **Internationalization (i18n) Ready** - Built-in support for English, Chinese, and Japanese
-- 🧠 **AI Integration** - Supports multiple AI providers (OpenAI, Anthropic, DeepSeek, Google, etc.)
-- 📊 **Admin Dashboard** - User management, pricing plans, content management, etc.
-- 📱 **Responsive Design** - Perfect adaptation across various devices
-- 🎨 **Tailwind CSS** - Modern UI design
-- 📧 **Email System** - Notifications and marketing emails powered by Resend
-- 🖼️ **R2/S3 Storage** - Cloud storage support for media files
+```bash
+pnpm install
+pnpm dev
+```
 
-Please refer to the [Documentation](https://nexty.dev/docs) for instructions on using the boilerplate.
+Copy `.env.example` to `.env.local` for local development and fill in the required provider keys. Production secrets should live only in the deployment platform.
+
+## Checks
+
+```bash
+pnpm lint
+pnpm build
+```

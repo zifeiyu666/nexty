@@ -87,6 +87,7 @@ export async function generateMetadata({
     description: "Listen to and share your finalized custom song.",
     locale: locale as Locale,
     path: `/songs/${songId}`,
+    noIndex: true,
   });
 }
 

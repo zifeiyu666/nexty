@@ -1,15 +1,15 @@
 {
-  "name": "nexty",
+  "name": "customsong",
   "version": "3.4.0",
   "author": {
-    "name": "WeNext",
-    "repository": "https://github.com/wenextdev/nexty.dev"
+    "name": "CustomSong",
+    "repository": "https://customsong.top"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "analyze": "ANALYZE=true next build",
     "fix": "pnpm i fix-react2shell-next@latest && npx fix-react2shell-next",
     "update:next": "pnpm i next@latest react@latest react-dom@latest @next/env@latest @next/bundle-analyzer@latest @types/react@latest @types/react-dom@latest",

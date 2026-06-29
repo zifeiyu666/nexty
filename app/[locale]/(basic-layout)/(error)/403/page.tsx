@@ -24,6 +24,7 @@ export async function generateMetadata({
     locale: locale as Locale,
     path: `/403`,
     canonicalUrl: "/403",
+    noIndex: true,
   });
 }
 

@@ -30,6 +30,7 @@ export async function generateMetadata({
       "Preview your generated custom song sample and recreate it when access expires.",
     locale: locale as Locale,
     path: `/samples/${songId}`,
+    noIndex: true,
   });
 }
 

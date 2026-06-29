@@ -148,7 +148,6 @@ export default async function Footer() {
                   )}
                 </div>
 
-                {/* <BuiltWithButton /> */}
               </div>
             </div>
 

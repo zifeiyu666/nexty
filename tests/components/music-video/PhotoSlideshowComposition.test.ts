@@ -49,7 +49,7 @@ describe("PhotoSlideshowComposition", () => {
     );
 
     assert.match(source, /OffthreadVideo/);
-    assert.match(source, /staticFile/);
+    assert.match(source, /resolveRemotionMediaSrc/);
     assert.match(source, /ATMOSPHERE_OVERLAY_OPTIONS/);
     assert.match(source, /mixBlendMode: "screen"/);
     assert.match(source, /pointerEvents: "none"/);
@@ -83,7 +83,7 @@ describe("PhotoSlideshowComposition", () => {
     assert.match(source, /<WaveRadioComposition timeline=\{timeline\} \/>/);
   });
 
-  test("renders wave radio with a looped bundled video and one active lyric line", () => {
+  test("renders wave radio with a looped remote-capable video and one active lyric line", () => {
     const source = readFileSync(
       join(process.cwd(), "remotion-src/WaveRadioComposition.tsx"),
       "utf8",
@@ -91,6 +91,7 @@ describe("PhotoSlideshowComposition", () => {
 
     assert.match(source, /WAVE_RADIO_BACKGROUND_OPTIONS/);
     assert.match(source, /Video/);
+    assert.match(source, /resolveRemotionMediaSrc/);
     assert.match(source, /findActiveCue/);
     assert.match(source, /SingleLineLyric/);
     assert.match(source, /interpolate/);

@@ -77,6 +77,7 @@ export async function generateMetadata({
     description: "Listen to a shared personalized song.",
     locale: locale as Locale,
     path: `/shared/songs/${shareToken}`,
+    noIndex: true,
   });
 }
 

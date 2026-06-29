@@ -10,10 +10,10 @@
     "titleAccent": "Cherish Forever",
     "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI instantly transforms your memories into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.</p>",
     "getStarted": "Start Crafting Free",
-    "getStartedLink": "https://nexty.dev/#pricing",
+    "getStartedLink": "/create-song",
     "howItWorksCta": "How It Works",
-    "viewDocs": "View Documentation",
-    "viewDocsLink": "https://nexty.dev/docs"
+    "viewDocs": "Read the Blog",
+    "viewDocsLink": "/blog"
   },
   "CustomerReactions": {
     "badge": {
@@ -31,52 +31,52 @@
     ],
     "videos": [
       {
-        "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-2.mp4",
         "label": "CustomSong",
         "title": "Mother's first listen"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-13.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
         "label": "CustomSong",
         "title": "The happy tears"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-14.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
         "label": "CustomSong",
         "title": "Best surprise ever"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-15.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
         "label": "CustomSong",
         "title": "wedding replay"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-12.mp4",
         "label": "CustomSong",
         "title": "Anniversary Surprise"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-5.mp4",
         "label": "CustomSong",
         "title": "Couple's song"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-18.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
         "label": "CustomSong",
         "title": "From shock to joy"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-20.mp4",
         "label": "CustomSong",
         "title": "One more listen"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-17.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
         "label": "CustomSong",
         "title": "Father's first listen"
       },
       {
-        "src": "/cass_demo/optimized/giftsong-slide-16.mp4",
+        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
         "label": "CustomSong",
         "title": "Cry tears of joy"
       }

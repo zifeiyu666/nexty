@@ -1,8 +1,20 @@
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import SidebarInsetHeader from "@/components/header/SidebarInsetHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Metadata } from "next";
 import React from "react";
 import { DashboardSidebar } from "./DashboardSidebar";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default async function DashboardLayout({
   children,

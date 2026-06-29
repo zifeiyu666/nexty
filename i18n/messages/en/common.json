@@ -113,7 +113,7 @@
   },
   "Blogs": {
     "title": "Blog Posts",
-    "description": "Insights on Next.js ecosystem and NEXTY.DEV template updates.",
+    "description": "Gift ideas, custom song guides, and tips for creating personalized music memories.",
     "emptyState": {
       "title": "No blog posts",
       "description": "We are creating exciting content, please stay tuned!"
@@ -361,9 +361,9 @@
       },
       "unsubscribe": {
         "title": "Newsletter Unsubscription",
-        "success": "You have successfully unsubscribed from Nexty newsletters.",
+        "success": "You have successfully unsubscribed from CustomSong newsletters.",
         "emailPrefix": "Email:",
-        "regretMessage": "You can resubscribe anytime to receive the latest Nexty updates and tutorials.",
+        "regretMessage": "You can resubscribe anytime to receive the latest CustomSong updates and gift ideas.",
         "errorGeneric": "An error occurred while processing your unsubscribe request",
         "errorNoToken": "No unsubscribe token provided",
         "errorMessage": "Please make sure you're using the correct unsubscribe link. If the problem persists, contact our support team for assistance.",
@@ -414,13 +414,12 @@
           "title": "Support",
           "links": [
             {
-              "name": "Docs",
-              "href": "https://docs.nexty.dev/docs",
-              "target": "_blank"
+              "name": "Privacy Policy",
+              "href": "/privacy-policy"
             },
             {
-              "name": "Roadmap",
-              "href": "https://nexty.dev/roadmap"
+              "name": "Terms of Service",
+              "href": "/terms-of-service"
             }
           ]
         }

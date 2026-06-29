@@ -1,27 +1,12 @@
-# Nexty - モダンなフルスタック SaaS ボイラープレート
+# CustomSong
 
-Nexty は、Next.js 16、React 19、Supabase を使用して構築された、機能豊富なフルスタック SaaS アプリケーションボイラープレートです。開発者が SaaS アプリケーションを迅速に構築・デプロイするための完全なソリューションを提供します。
+CustomSong is a Next.js 16 app for personalized AI song gifts. The public site currently ships in English only, so Japanese and Chinese message JSON files have been removed to avoid stale translations.
 
-- 🚀 ボイラープレートを入手 👉: https://nexty.dev  
-- 🚀 ロードマップ 👉: https://nexty.dev/roadmap  
-- 🚀 ドキュメント 👉: https://nexty.dev/docs
+## Development
 
-> 何か問題が発生した場合は、サポートまでご連絡ください：  
-> - メール：hi@nexty.dev  
-> - Twitter (中国語)：https://x.com/weijunext  
-> - Twitter (英語)：https://x.com/judewei_dev  
+```bash
+pnpm install
+pnpm dev
+```
 
-## ✨ 主な特徴
-
-- 🚀 **Next.js 16 & React 19** - 最新の技術スタックで構築
-- 💳 **Stripe 連携** - 完全なサブスクリプション決済システム
-- 🔒 **Supabase 認証** - 安全で信頼性の高いユーザー管理
-- 🌍 **国際化 (i18n) 対応** - 英語、中国語、日本語を標準サポート
-- 🧠 **AI 連携** - 複数の AI プロバイダー (OpenAI, Anthropic, DeepSeek, Google など) をサポート
-- 📊 **管理ダッシュボード** - ユーザー管理、料金プラン、コンテンツ管理など
-- 📱 **レスポンシブデザイン** - 様々なデバイスに最適化
-- 🎨 **Tailwind CSS** - モダンな UI デザイン
-- 📧 **メールシステム** - Resend を利用した通知・マーケティングメール
-- 🖼️ **R2/S3 ストレージ** - メディアファイル用クラウドストレージ対応
-
-ボイラープレートの使用方法については、[ドキュメント](https://nexty.dev/docs) を参照してください。
+Copy `.env.example` to `.env.local` for local development. Keep production secrets in the deployment platform.

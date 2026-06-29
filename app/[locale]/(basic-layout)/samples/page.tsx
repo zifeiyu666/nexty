@@ -26,6 +26,7 @@ export async function generateMetadata({
       "Browse your generated song samples and choose your favorite version.",
     locale: locale as Locale,
     path: "/samples",
+    noIndex: true,
   });
 }
 

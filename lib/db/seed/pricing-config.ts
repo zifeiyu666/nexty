@@ -153,7 +153,7 @@ export const pricingPlans: PricingPlanConfig[] = [
     ],
     isHighlighted: false,
     buttonText: 'Get Common Version',
-    buttonLink: 'https://nexty.dev/#pricing',
+    buttonLink: '/pricing',
     displayOrder: 3,
     isActive: true,
     langJsonb: {
@@ -276,7 +276,7 @@ export const pricingPlans: PricingPlanConfig[] = [
     isHighlighted: true,
     highlightText: 'Best Value',
     buttonText: 'Get Credits Version',
-    buttonLink: 'https://nexty.dev/#pricing',
+    buttonLink: '/pricing',
     displayOrder: 4,
     isActive: true,
     langJsonb: {
@@ -641,7 +641,7 @@ export const pricingPlans: PricingPlanConfig[] = [
     environment: 'test',
     groupSlug: 'no-payment',
     cardTitle: 'Internal Link',
-    cardDescription: 'Next.js SaaS starter template for developers and product managers.',
+    cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
     provider: 'none',
     paymentType: null,
     recurringInterval: null,
@@ -825,7 +825,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         displayPrice: '$128.00',
         highlightText: 'Best Value',
         originalPrice: '$256.00',
-        cardDescription: 'Next.js SaaS starter template for developers and product managers.',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
       ja: {
         currency: 'usd',
@@ -915,7 +915,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         displayPrice: '$128.00',
         highlightText: '最高の価値',
         originalPrice: '$256.00',
-        cardDescription: '開発者とプロダクトマネージャーのための Next.js SaaS スターターテンプレート。',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
       zh: {
         currency: 'usd',
@@ -1005,7 +1005,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         displayPrice: '$128.00',
         highlightText: '最佳价值',
         originalPrice: '$256.00',
-        cardDescription: '适用于开发人员和产品经理的 Next.js SaaS 启动模板。',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
     },
     benefitsJsonb: {
@@ -1017,7 +1017,7 @@ export const pricingPlans: PricingPlanConfig[] = [
     environment: 'test',
     groupSlug: 'onetime',
     cardTitle: 'Pro - No Credits',
-    cardDescription: 'Next.js SaaS starter template for developers and product managers.',
+    cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
     provider: 'stripe',
     stripePriceId: 'price_1RmRDIInsTsiNJR5RBtb7egL',
     stripeProductId: 'prod_ShqvpEkgBN1Sbb',
@@ -1176,7 +1176,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         priceSuffix: '/lifetime',
         displayPrice: '$256.00',
         highlightText: 'Best Value',
-        cardDescription: 'Next.js SaaS starter template for developers and product managers.',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
       ja: {
         features: [
@@ -1238,7 +1238,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         priceSuffix: '/永久',
         displayPrice: '$256.00',
         highlightText: '最高の価値',
-        cardDescription: '開発者やプロダクトマネージャー向けのNext.js SaaSスターターテンプレート。',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
       zh: {
         features: [
@@ -1300,7 +1300,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         priceSuffix: '/终身',
         displayPrice: '$256.00',
         highlightText: '最佳价值',
-        cardDescription: '为开发者和产品经理打造的Next.js SaaS起步模板。',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
     },
     benefitsJsonb: {},
@@ -1310,7 +1310,7 @@ export const pricingPlans: PricingPlanConfig[] = [
     environment: 'test',
     groupSlug: 'onetime',
     cardTitle: 'Pro - creem',
-    cardDescription: 'Next.js SaaS starter template for developers and product managers.',
+    cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
     provider: 'creem',
     creemProductId: 'prod_6JLiUBr0GKYQxqtHQ8TF8A',
     creemDiscountCode: 'NEW',
@@ -1494,7 +1494,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         displayPrice: '$256.00',
         highlightText: 'Best Value',
         originalPrice: '',
-        cardDescription: 'Next.js SaaS starter template for developers and product managers.',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
       ja: {
         currency: 'USD',
@@ -1584,7 +1584,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         displayPrice: '$256.00',
         highlightText: '最高の価値',
         originalPrice: '',
-        cardDescription: '開発者とプロダクトマネージャーのための Next.js SaaS スターターテンプレート。',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
       zh: {
         currency: 'USD',
@@ -1674,7 +1674,7 @@ export const pricingPlans: PricingPlanConfig[] = [
         displayPrice: '$256.00',
         highlightText: '最佳价值',
         originalPrice: '',
-        cardDescription: '适用于开发者和产品经理的 Next.js SaaS 启动模板。',
+        cardDescription: 'Personalized song gift package for custom tracks, videos, and keepsakes.',
       },
     },
     benefitsJsonb: {

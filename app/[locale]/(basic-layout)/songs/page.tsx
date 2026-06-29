@@ -34,6 +34,7 @@ export async function generateMetadata({
     description: t("meta.description"),
     locale: locale as Locale,
     path: "/songs",
+    noIndex: true,
   });
 }
 
