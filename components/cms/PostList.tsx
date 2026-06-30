@@ -40,6 +40,11 @@ interface PostListProps {
   showTagSelector?: boolean;
   showCover?: boolean;
   gridClassName?: string;
+  cardClassName?: string;
+  coverClassName?: string;
+  contentClassName?: string;
+  titleClassName?: string;
+  showPublicVisibilityBadge?: boolean;
   emptyMessage?: string;
 }
 
@@ -55,6 +60,11 @@ export function PostList({
   showTagSelector = false,
   showCover = true,
   gridClassName,
+  cardClassName,
+  coverClassName,
+  contentClassName,
+  titleClassName,
+  showPublicVisibilityBadge = true,
   emptyMessage = "No posts found.",
 }: PostListProps) {
   const [posts, setPosts] = useState<PublicPost[]>(initialPosts);
@@ -71,9 +81,11 @@ export function PostList({
 
   // Default grid class based on showCover if not provided
   // When showCover is false, always use single column layout regardless of gridClassName
-  const gridClass = showCover
-    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-    : "flex flex-col gap-1"; // List view for no cover
+  const gridClass = gridClassName
+    ? gridClassName
+    : showCover
+      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      : "flex flex-col gap-1";
 
   const loadMorePosts = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -177,6 +189,11 @@ export function PostList({
                   post={post}
                   baseUrl={baseUrl}
                   showCover={showCover}
+                  cardClassName={cardClassName}
+                  coverClassName={coverClassName}
+                  contentClassName={contentClassName}
+                  titleClassName={titleClassName}
+                  showPublicVisibilityBadge={showPublicVisibilityBadge}
                 />
               ))}
 
@@ -186,6 +203,11 @@ export function PostList({
                 post={mapServerPostToCard(post, locale)}
                 baseUrl={baseUrl}
                 showCover={showCover}
+                cardClassName={cardClassName}
+                coverClassName={coverClassName}
+                contentClassName={contentClassName}
+                titleClassName={titleClassName}
+                showPublicVisibilityBadge={showPublicVisibilityBadge}
               />
             ))}
           </div>

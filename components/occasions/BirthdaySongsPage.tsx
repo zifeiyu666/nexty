@@ -1,24 +1,27 @@
+import FAQ from "@/components/home/FAQ";
+import OurProducts from "@/components/home/OurProducts";
+import Testimonials, {
+  type TestimonialItem,
+} from "@/components/home/Testimonials";
+import BirthdayHeroVisual from "@/components/occasions/BirthdayHeroVisual";
+import HowItWorksSection from "@/components/shared/HowItWorksSection";
+import { type FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
+import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
 import { Button } from "@/components/ui/button";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { Link as I18nLink } from "@/i18n/routing";
 import {
   ArrowRight,
   Cake,
-  CheckCircle2,
   Clock3,
   Gift,
   Heart,
   MessageCircleHeart,
-  Mic2,
   Music2,
-  Palette,
   PartyPopper,
   PlayCircle,
   Sparkles,
-  Star,
-  Video,
 } from "lucide-react";
-import Image from "next/image";
 import type { ReactNode } from "react";
 
 const createBirthdaySongHref = "/create-song?occasion=birthday";
@@ -140,45 +143,27 @@ const exampleBriefs = [
   },
 ];
 
-const bundleItems: IconBlock[] = [
-  {
-    title: "Personalized song",
-    description:
-      "A studio-quality custom song shaped by names, memories, tone, language, and genre.",
-    icon: <Mic2 className="size-6" />,
-  },
-  {
-    title: "Music video gift",
-    description:
-      "Pair the birthday song with photos, lyric scenes, and a shareable video for texts or social posts.",
-    icon: <Video className="size-6" />,
-  },
-  {
-    title: "Printable wall art",
-    description:
-      "Turn favorite lyrics into a birthday keepsake poster they can frame after the candles are out.",
-    icon: <Palette className="size-6" />,
-  },
-];
-
-const testimonials = [
+const testimonials: TestimonialItem[] = [
   {
     quote:
       "I put my mom's nickname and our Sunday dinner memories into the prompt. She cried before the first chorus ended.",
     author: "David K.",
-    context: "Mom's 50th",
+    badge: "Mom's 50th",
+    cardClassName: "bg-[#fff0f4] dark:bg-[#3d252a]",
   },
   {
     quote:
       "The song sounded like it was written for my boyfriend, not a template. The 90s indie style was perfect.",
     author: "Sofia R.",
-    context: "Boyfriend's birthday",
+    badge: "Boyfriend's birthday",
+    cardClassName: "bg-[#f7f3f1] dark:bg-[#2d2421]",
   },
   {
     quote:
       "I needed something personal the night before the party. The preview came fast, and the final song became the slideshow soundtrack.",
     author: "Chloe B.",
-    context: "Last-minute party",
+    badge: "Last-minute party",
+    cardClassName: "bg-[#f6f2ef] dark:bg-[#2d2421]",
   },
 ];
 
@@ -246,13 +231,25 @@ function Stars() {
       aria-hidden="true"
     >
       {Array.from({ length: 5 }).map((_, index) => (
-        <Star key={index} className="size-4 fill-current stroke-current" />
+        <span key={index} className="text-sm leading-none">
+          ★
+        </span>
       ))}
     </span>
   );
 }
 
-export default function BirthdaySongsPage() {
+type BirthdaySongsPageProps = {
+  isAuthenticated: boolean;
+  musicVideoSongOptions: FinalSongPlayerData[];
+  wallArtSongOptions: WallArtSongOption[];
+};
+
+export default function BirthdaySongsPage({
+  isAuthenticated,
+  musicVideoSongOptions,
+  wallArtSongOptions,
+}: BirthdaySongsPageProps) {
   return (
     <div className="w-full overflow-hidden bg-[#fffaf7] text-[#2b1914]">
       <section className="relative isolate bg-[#fffaf7] px-6 pb-12 pt-10 sm:px-8 md:pb-14 md:pt-14 lg:px-12 xl:px-16">
@@ -261,10 +258,10 @@ export default function BirthdaySongsPage() {
 
         <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[0.9fr_1fr] lg:gap-10">
           <div className="max-w-2xl">
-            <div className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full border border-[#eadad2] bg-white/85 px-3.5 py-1.5 text-sm text-[#695851] shadow-[0_10px_34px_rgba(92,48,28,0.08)] backdrop-blur">
+            <div className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full bg-white/58 px-4 py-2 text-sm text-[#695851] shadow-[0_18px_40px_rgba(92,48,28,0.08),0_2px_10px_rgba(255,255,255,0.35),inset_0_1px_0_rgba(255,255,255,0.78),inset_0_-1px_0_rgba(214,189,176,0.18)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/42">
               <Stars />
               <span className="font-bold text-[#261712]">Excellent</span>
-              <span className="text-[#d5c5bd]">/</span>
+              <span className="text-[#d8c6bd]">/</span>
               <span>Birthday song gifts</span>
             </div>
 
@@ -300,7 +297,7 @@ export default function BirthdaySongsPage() {
               </MagneticButton>
             </div>
 
-            <div className="mt-7 grid max-w-lg grid-cols-3 gap-3 text-center">
+            {/* <div className="mt-7 grid max-w-lg grid-cols-3 gap-3 text-center">
               {[
                 ["2 min", "Preview"],
                 ["No skills", "Needed"],
@@ -318,43 +315,15 @@ export default function BirthdaySongsPage() {
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
 
-          <div className="relative">
-            <div className="relative aspect-[1.6] overflow-hidden rounded-2xl bg-[#edd6c9] shadow-[0_24px_64px_rgba(69,34,20,0.16)] ring-1 ring-white/80 lg:aspect-[1.42]">
-              <Image
-                src="/images/occasions/birthday-custom-song-hero.png"
-                alt="Smiling birthday recipient listening to a personalized birthday song beside candles"
-                fill
-                priority
-                sizes="(min-width: 1024px) 48vw, 100vw"
-                className="object-cover object-[58%_48%]"
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.16),transparent_42%,rgba(72,29,14,0.16))]" />
-            </div>
-            <div className="absolute -bottom-5 left-5 right-5 rounded-lg border border-white/70 bg-white/90 p-3.5 shadow-[0_18px_44px_rgba(65,34,20,0.16)] backdrop-blur md:left-auto md:w-[300px]">
-              <div className="flex items-start gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#1d958d]/15 text-[#16766f]">
-                  <Music2 className="size-4" />
-                </span>
-                <div>
-                  <p className="text-sm font-black text-[#261712]">
-                    Built for birthday reveals
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-[#6f625c]">
-                    Play it at cake time, send it by text, or turn it into a
-                    keepsake video.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BirthdayHeroVisual />
         </div>
       </section>
 
       <section className="bg-white px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-6xl">
           <SectionHeader
             eyebrow="Why it works"
             title="More personal than another birthday card"
@@ -382,40 +351,15 @@ export default function BirthdaySongsPage() {
         </div>
       </section>
 
-      <section
-        id="how-it-works"
-        className="bg-[#f8f2ee] px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16"
-      >
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            eyebrow="How it works"
-            title="From birthday memory to singable surprise"
-            description="You bring the real details. The song maker turns them into lyrics, music, vocals, and a gift that feels impossible to buy off a shelf."
-          />
-
-          <div className="mt-12 grid gap-4 lg:grid-cols-4">
-            {steps.map((step) => (
-              <article
-                key={step.kicker}
-                className="rounded-lg bg-white p-6 shadow-sm ring-1 ring-[#eadbd3]"
-              >
-                <div className="mb-6 inline-flex rounded-full bg-[#25130e] px-3 py-1 text-xs font-black text-white">
-                  {step.kicker}
-                </div>
-                <h3 className="text-xl font-black leading-tight text-[#261712]">
-                  {step.title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-[#74665f]">
-                  {step.description}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HowItWorksSection
+        eyebrow="How it works"
+        title="From birthday memory to singable surprise"
+        description="You bring the real details. The song maker turns them into lyrics, music, vocals, and a gift that feels impossible to buy off a shelf."
+        steps={steps}
+      />
 
       <section className="bg-white px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-6xl">
           <SectionHeader
             eyebrow="Birthday moments"
             title="A song for every kind of birthday person"
@@ -428,7 +372,7 @@ export default function BirthdaySongsPage() {
                 key={useCase.title}
                 className="group rounded-lg border border-[#f0e3dc] bg-white p-6 transition hover:-translate-y-1 hover:shadow-[0_18px_48px_rgba(59,31,18,0.08)]"
               >
-                <div className="mb-5 flex size-11 items-center justify-center rounded-lg bg-[#eaf8f6] text-[#16766f] transition group-hover:bg-[#16766f] group-hover:text-white">
+                <div className="bg-accent text-accent-foreground group-hover:bg-primary group-hover:text-primary-foreground mb-5 flex size-11 items-center justify-center rounded-lg transition">
                   {useCase.icon}
                 </div>
                 <h3 className="text-xl font-black leading-tight text-[#261712]">
@@ -447,7 +391,7 @@ export default function BirthdaySongsPage() {
         id="birthday-examples"
         className="bg-[#25130e] px-6 py-16 text-white sm:px-8 md:py-20 lg:px-12 xl:px-16"
       >
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#f6be32]">
@@ -496,130 +440,28 @@ export default function BirthdaySongsPage() {
         </div>
       </section>
 
-      <section className="bg-[#fffaf7] px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            eyebrow="Gift bundle"
-            title="More than an MP3"
-            description="A birthday song can become the centerpiece of a complete personalized music gift across audio, video, and printable keepsakes."
-          />
+      <OurProducts
+        isAuthenticated={isAuthenticated}
+        musicVideoSongOptions={musicVideoSongOptions}
+        wallArtSongOptions={wallArtSongOptions}
+      />
 
-          <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            {bundleItems.map((item) => (
-              <article
-                key={item.title}
-                className="rounded-lg bg-white p-7 shadow-[0_18px_52px_rgba(59,31,18,0.07)] ring-1 ring-[#eadbd3]"
-              >
-                <div className="mb-6 flex size-12 items-center justify-center rounded-lg bg-[#fff0cf] text-[#b56a00]">
-                  {item.icon}
-                </div>
-                <h3 className="text-2xl font-black leading-tight text-[#261712]">
-                  {item.title}
-                </h3>
-                <p className="mt-4 text-sm leading-7 text-[#74665f]">
-                  {item.description}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Testimonials
+        title="Birthday songs that land"
+        description="When the song includes their actual life, the reaction feels different from any ordinary gift."
+        items={testimonials}
+        contentWidthClassName="max-w-6xl"
+      />
 
-      <section className="bg-white px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            eyebrow="Customer reactions"
-            title="Birthday songs that land"
-            description="When the song includes their actual life, the reaction feels different from any ordinary gift."
-          />
-
-          <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <figure
-                key={testimonial.author}
-                className="rounded-lg border border-[#f0e3dc] bg-[#fffaf7] p-6"
-              >
-                <Stars />
-                <blockquote className="mt-5 text-base font-semibold leading-7 text-[#3a251f]">
-                  "{testimonial.quote}"
-                </blockquote>
-                <figcaption className="mt-6 flex items-center gap-3">
-                  <span className="flex size-10 items-center justify-center rounded-full bg-[#e04132] text-sm font-black text-white">
-                    {testimonial.author.charAt(0)}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-black text-[#261712]">
-                      {testimonial.author}
-                    </span>
-                    <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[#947b70]">
-                      {testimonial.context}
-                    </span>
-                  </span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#f8f2ee] px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.75fr_1.25fr]">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#c33f32]">
-              FAQ
-            </p>
-            <h2 className="mt-3 text-balance text-3xl font-black leading-tight text-[#261712] sm:text-4xl md:text-5xl">
-              Common birthday song questions
-            </h2>
-            <p className="mt-4 text-base leading-7 text-[#6f625c] md:text-lg">
-              A few details are enough to start, and you can refine before the
-              final birthday surprise.
-            </p>
-          </div>
-
-          <div className="divide-y divide-[#e5d4cc] rounded-lg border border-[#e5d4cc] bg-white">
-            {faqs.map((faq, index) => (
-              <details
-                key={faq.question}
-                className="group px-5 py-4 open:bg-[#fffaf7]"
-                open={index === 0}
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-black text-[#261712]">
-                  {faq.question}
-                  <CheckCircle2 className="size-5 shrink-0 text-[#16766f] transition group-open:rotate-12" />
-                </summary>
-                <p className="mt-3 max-w-3xl text-sm leading-7 text-[#74665f]">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#25130e] px-6 py-16 text-white sm:px-8 md:py-20 lg:px-12 xl:px-16">
-        <div className="mx-auto flex max-w-6xl flex-col items-center text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#f6be32]">
-            Ready for their birthday?
-          </p>
-          <h2 className="mt-3 max-w-4xl text-balance text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
-            Create a birthday song that sounds like it could only be for them.
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-white/70 md:text-lg">
-            Add the name, the memories, and the feeling. Get a free preview and
-            turn it into a personalized music gift today.
-          </p>
-          <Button
-            asChild
-            className="mt-8 h-12 rounded-full bg-white px-8 text-base font-black text-[#25130e] hover:bg-[#fff2eb]"
-          >
-            <I18nLink href={createBirthdaySongHref}>
-              Create Your Song
-              <ArrowRight className="size-4" />
-            </I18nLink>
-          </Button>
-        </div>
-      </section>
+      <FAQ
+        title="Common birthday song questions"
+        description="A few details are enough to start, and you can refine before the final birthday surprise."
+        items={faqs}
+        ctaTitle="Ready for their birthday?"
+        ctaDescription="Add the name, the memories, and the feeling. Get a free preview and turn it into a personalized music gift today."
+        ctaButtonLabel="Create Your Song"
+        ctaHref={createBirthdaySongHref}
+      />
     </div>
   );
 }

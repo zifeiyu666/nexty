@@ -15,7 +15,7 @@ export default function Hero() {
       <div className="absolute inset-0 -z-20 bg-black/62" />
 
       <div className="container mx-auto">
-        <div className="flex h-dvh min-h-[640px] -translate-y-5 flex-col items-center justify-center gap-8 pb-16 pt-28 text-center sm:-translate-y-6 lg:-translate-y-8 lg:pb-24 lg:pt-36 2xl:-translate-y-10 2xl:pb-32 2xl:pt-44">
+        <div className="flex h-dvh min-h-[640px] -translate-y-2 flex-col items-center justify-center gap-8 pb-16 pt-28 text-center sm:-translate-y-3 lg:-translate-y-4 lg:pb-24 lg:pt-36 2xl:-translate-y-6 2xl:pb-32 2xl:pt-44">
           {/* <FeatureBadge
             label={t("badge.label")}
             text={t("badge.text")}
@@ -72,8 +72,8 @@ export default function Hero() {
             <MagneticButton
               href="/create-song"
               variant="primary"
-              size="sm"
-              className="min-w-[170px] sm:min-w-[220px]"
+              size="default"
+              className="min-w-[210px] text-[1.05rem] font-semibold sm:min-w-[250px] sm:text-[1.16rem]"
               trailingArrow
             >
               <span>{t("getStarted")}</span>
@@ -83,10 +83,10 @@ export default function Hero() {
               title={t("howItWorksCta")}
               prefetch={false}
               variant="light"
-              size="sm"
-              className="min-w-[165px] text-black hover:text-black sm:min-w-[195px]"
+              size="default"
+              className="min-w-[200px] text-[1.05rem] font-semibold text-black hover:text-black sm:min-w-[230px] sm:text-[1.16rem]"
             >
-              <MousePointerClick className="size-4 text-black" />
+              <MousePointerClick className="size-[1.1rem] text-black sm:size-5" />
               <span>{t("howItWorksCta")}</span>
             </MagneticButton>
           </div>

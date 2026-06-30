@@ -118,6 +118,7 @@ import {
 import Image from "next/image";
 import {
   Fragment,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -129,17 +130,23 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 
 type MusicVideoEditorDrawerProps = {
+  emptyState?: ReactNode;
+  initialSong?: MusicVideoSongOption;
+  songOptions?: MusicVideoSongOption[];
+  trigger: ReactNode;
+};
+
+export type MusicVideoSongOption = {
   audioUrl: string;
   duration?: number | null;
-  emptyState?: ReactNode;
+  id: string;
   imageUrl?: string | null;
   lyrics: string;
-  songId: string;
-  songTitle: string;
+  shareUrl?: string;
+  title: string;
   timestampedLyrics?: {
     alignedWords: AlignedLyricWord[];
   } | null;
-  trigger: ReactNode;
 };
 
 type ApiEnvelope<T> = {
@@ -1775,16 +1782,38 @@ function WaveRadioEditor({
 }
 
 export function MusicVideoEditorDrawer({
-  audioUrl,
-  duration,
   emptyState,
-  imageUrl,
-  lyrics,
-  songId,
-  songTitle,
-  timestampedLyrics,
+  initialSong,
+  songOptions,
   trigger,
 }: MusicVideoEditorDrawerProps) {
+  const selectableSongs = useMemo(() => {
+    const seen = new Set<string>();
+    const options = [initialSong, ...(songOptions ?? [])].filter(
+      (song): song is MusicVideoSongOption => Boolean(song),
+    );
+
+    return options.filter((song) => {
+      if (seen.has(song.id)) return false;
+      seen.add(song.id);
+      return true;
+    });
+  }, [initialSong, songOptions]);
+  const fallbackSong = selectableSongs[0] ?? null;
+  const fallbackSongId = fallbackSong?.id ?? "";
+  const [selectedSongId, setSelectedSongId] = useState(fallbackSongId);
+  const selectedSong =
+    selectableSongs.find((song) => song.id === selectedSongId) ??
+    fallbackSong;
+  const hasSongs = selectableSongs.length > 0;
+  const activeSongId = selectedSong?.id ?? "";
+  const audioUrl = selectedSong?.audioUrl ?? "";
+  const imageUrl = selectedSong?.imageUrl ?? null;
+  const lyrics = selectedSong?.lyrics ?? "";
+  const songDuration = selectedSong?.duration ?? null;
+  const songId = selectedSong?.id ?? "";
+  const songTitle = selectedSong?.title ?? "";
+  const timestampedLyrics = selectedSong?.timestampedLyrics ?? null;
   const [activeTemplate, setActiveTemplate] =
     useState<TemplateId>("photo-slideshow");
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
@@ -1815,7 +1844,7 @@ export function MusicVideoEditorDrawer({
     "idle" | "uploading" | "rendering" | "completed" | "failed"
   >("idle");
   const [playerDuration, setPlayerDuration] = useState(
-    duration && duration > 0 ? duration : DEFAULT_DURATION,
+    songDuration && songDuration > 0 ? songDuration : DEFAULT_DURATION,
   );
   const photosRef = useRef<UploadedPhoto[]>([]);
   const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1957,6 +1986,42 @@ export function MusicVideoEditorDrawer({
       }
     };
   }, []);
+
+  const resetSongScopedState = useCallback(
+    (nextSong: MusicVideoSongOption | null) => {
+      if (pollingTimeoutRef.current) {
+        clearTimeout(pollingTimeoutRef.current);
+        pollingTimeoutRef.current = null;
+      }
+      for (const photo of photosRef.current) {
+        URL.revokeObjectURL(photo.objectUrl);
+      }
+      photosRef.current = [];
+      setPhotos([]);
+      setAssignments([]);
+      setTransitionAssignments([]);
+      setPreviewTransitionLoop(null);
+      setSelectedPhotoId(null);
+      setIsPlaying(false);
+      setLatestVideo(null);
+      setRenderProgress(0);
+      setRenderStatus("idle");
+      setPlayerDuration(
+        nextSong?.duration && nextSong.duration > 0
+          ? nextSong.duration
+          : DEFAULT_DURATION,
+      );
+    },
+    [],
+  );
+
+  function handleSongSelection(nextSongId: string) {
+    const nextSong = selectableSongs.find((song) => song.id === nextSongId);
+    if (!nextSong || nextSong.id === activeSongId) return;
+
+    setSelectedSongId(nextSong.id);
+    resetSongScopedState(nextSong);
+  }
 
   async function uploadPhotoToR2(file: File, localPhoto: UploadedPhoto) {
     const presignResponse = await fetch(
@@ -2307,17 +2372,40 @@ export function MusicVideoEditorDrawer({
             100% { transform: scale(1.03); }
           }
         `}</style>
-        <SheetHeader className=" bg-white px-5 py-2 backdrop-blur">
-          <div className="flex min-w-0 items-center gap-3 pr-10">
-            <Video className="size-4 shrink-0 text-rose-600" />
-            <div className="flex min-w-0 items-baseline gap-3">
-              <SheetTitle className="shrink-0 text-lg font-black text-stone-950">
-                Music Video Studio
-              </SheetTitle>
-              <SheetDescription className="truncate text-sm text-stone-500">
-                Create, preview, and render your music video.
-              </SheetDescription>
+        <SheetHeader className="border-b bg-white px-5 py-2 backdrop-blur">
+          <div className="flex min-w-0 items-center justify-between gap-4 pr-10">
+            <div className="flex min-w-0 items-center gap-3">
+              <Video className="size-4 shrink-0 text-rose-600" />
+              <div className="flex min-w-0 items-baseline gap-3">
+                <SheetTitle className="shrink-0 text-lg font-black text-stone-950">
+                  Music Video Studio
+                </SheetTitle>
+                <SheetDescription className="truncate text-sm text-stone-500">
+                  Create, preview, and render your music video.
+                </SheetDescription>
+              </div>
             </div>
+
+            <Select value={activeSongId} onValueChange={handleSongSelection}>
+              <SelectTrigger
+                aria-label="Choose song"
+                className="h-10 w-[280px] shrink-0 rounded-lg border-rose-300 bg-white text-left font-bold text-stone-950 shadow-sm"
+                disabled={!hasSongs}
+              >
+                <SelectValue
+                  placeholder={hasSongs ? "Choose song" : "No songs yet"}
+                />
+              </SelectTrigger>
+              <SelectContent align="end" className="w-[280px]">
+                {selectableSongs.map((song) => (
+                  <SelectItem key={song.id} value={song.id}>
+                    <span className="block max-w-[220px] truncate">
+                      {song.title || "Untitled song"}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </SheetHeader>
 

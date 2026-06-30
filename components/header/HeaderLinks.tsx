@@ -12,9 +12,9 @@ import { Link as I18nLink, usePathname } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { HeaderLink } from "@/types/common";
 import { ExternalLink } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 type HeaderLinksProps = {
+  links: HeaderLink[];
   variant?: "default" | "adaptive";
 };
 
@@ -40,15 +40,8 @@ const RollingNavText = ({ children }: RollingNavTextProps) => (
   </span>
 );
 
-const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
-  const tHeader = useTranslations("Header");
+const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
   const pathname = usePathname();
-
-  const headerLinks: HeaderLink[] = tHeader.raw("links");
-  const pricingLink = headerLinks.find((link) => link.id === "pricing");
-  if (pricingLink) {
-    pricingLink.href = process.env.NEXT_PUBLIC_PRICING_PATH!;
-  }
 
   const triggerClassName =
     variant === "adaptive"
@@ -68,7 +61,7 @@ const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
   return (
     <NavigationMenu viewport={false} className="hidden lg:block">
       <NavigationMenuList className="flex-wrap">
-        {headerLinks.map((link) => (
+        {links.map((link) => (
           <NavigationMenuItem key={link.name}>
             {link.items ? (
               <>
@@ -76,10 +69,10 @@ const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
                   <RollingNavText>{link.name}</RollingNavText>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="w-[250px] gap-1">
+                  <ul className="w-[320px] max-w-[calc(100vw-2rem)] gap-1">
                     {link.items.map((child) => (
                       <li
-                        key={child.name}
+                        key={child.href}
                         className="hover:bg-accent-foreground/10"
                       >
                         <NavigationMenuLink asChild>
@@ -93,14 +86,14 @@ const HeaderLinks = ({ variant = "default" }: HeaderLinksProps) => {
                             }
                             target={child.target || "_self"}
                             rel={child.rel || undefined}
-                            className={cn(
-                              "flex flex-col gap-y-1 text-sm text-muted-foreground hover:text-accent-foreground"
-                            )}
+                            className="flex flex-col gap-y-1 text-sm text-muted-foreground hover:text-accent-foreground"
                           >
-                            <div className="flex items-center gap-x-1">
-                              {child.name}
+                            <div className="flex min-w-0 items-start gap-x-1 leading-snug">
+                              <span className="min-w-0 whitespace-normal break-words">
+                                {child.name}
+                              </span>
                               {child.target === "_blank" && (
-                                <span className="text-xs">
+                                <span className="shrink-0 text-xs">
                                   <ExternalLink className="w-4 h-4" />
                                 </span>
                               )}

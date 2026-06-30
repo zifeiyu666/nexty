@@ -452,7 +452,7 @@ export default function OccasionShowcase() {
           </p> */}
           <h2
             id="occasion-showcase-heading"
-            className="mx-auto max-w-3xl text-balance text-xl font-semibold leading-tight sm:text-2xl md:text-4xl"
+            className="mx-auto max-w-3xl text-balance text-5xl font-black leading-tight "
           >
             <span className="title-gradient">{copy.title}</span>
           </h2>

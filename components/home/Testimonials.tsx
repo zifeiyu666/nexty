@@ -5,15 +5,15 @@ import { Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 
-type Testimonial = {
+export type TestimonialItem = {
   badge: string;
   quote: string;
   author: string;
-  avatar: string;
-  cardClassName: string;
+  avatar?: string;
+  cardClassName?: string;
 };
 
-const testimonials: Testimonial[] = [
+const testimonials: TestimonialItem[] = [
   {
     badge: "💍 5th Anniversary",
     quote:
@@ -94,11 +94,11 @@ const RatingStars = () => {
   );
 };
 
-const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
+const TestimonialCard = ({ testimonial }: { testimonial: TestimonialItem }) => {
   return (
     <li className="w-[260px] shrink-0 list-none sm:w-[300px] lg:w-[340px]">
       <figure
-        className={`flex h-full transform-gpu flex-col rounded-2xl p-5 shadow-sm transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.015] hover:shadow-xl sm:p-6 ${testimonial.cardClassName}`}
+        className={`flex h-full transform-gpu flex-col rounded-2xl p-5 shadow-sm transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.015] hover:shadow-xl sm:p-6 ${testimonial.cardClassName ?? "bg-[#f7f3f1] dark:bg-[#2d2421]"}`}
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2">
@@ -112,13 +112,19 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
           </blockquote>
         </div>
         <figcaption className="flex items-center gap-2.5 pt-6">
-          <img
-            src={testimonial.avatar}
-            alt={testimonial.author}
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-full object-cover"
-          />
+          {testimonial.avatar ? (
+            <img
+              src={testimonial.avatar}
+              alt={testimonial.author}
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-black text-primary-foreground">
+              {testimonial.author.charAt(0)}
+            </div>
+          )}
           <div>
             <p className="text-sm font-semibold text-foreground">
               {testimonial.author}
@@ -131,9 +137,22 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   );
 };
 
-export default function Testimonials() {
+type TestimonialsProps = {
+  title?: string;
+  description?: string;
+  items?: TestimonialItem[];
+  contentWidthClassName?: string;
+};
+
+export default function Testimonials({
+  title,
+  description,
+  items,
+  contentWidthClassName = "max-w-7xl",
+}: TestimonialsProps) {
   const t = useTranslations("Landing.Testimonials");
-  const marqueeTestimonials = [...testimonials, ...testimonials];
+  const sectionTestimonials = items ?? testimonials;
+  const marqueeTestimonials = [...sectionTestimonials, ...sectionTestimonials];
   const marqueeRef = useRef<HTMLUListElement | null>(null);
   const lastScrollYRef = useRef(0);
   const positionRef = useRef(0);
@@ -242,14 +261,16 @@ export default function Testimonials() {
 
   return (
     <section id="testimonials" className="overflow-hidden py-12 md:py-18">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div
+        className={`mx-auto ${contentWidthClassName} px-4 sm:px-6 lg:px-8`}
+      >
         <div className="mb-10 text-center md:mb-12">
           {/* <FeatureBadge label={t("badge.label")} className="mb-6" /> */}
           <h2 className="preset-title">
-            <span className="title-gradient">{t("title")}</span>
+            <span className="title-gradient">{title ?? t("title")}</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl font-['Bradley_Hand','Comic_Sans_MS',cursive] text-base leading-7 text-muted-foreground md:text-lg">
-            {t("description")}
+            {description ?? t("description")}
           </p>
         </div>
       </div>

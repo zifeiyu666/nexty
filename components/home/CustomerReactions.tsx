@@ -108,7 +108,7 @@ export default function CustomerReactions({
               strong: (chunks) => <strong>{chunks}</strong>,
             })}
             <svg
-              className="pointer-events-none absolute -right-12 top-1/2 h-10 w-10 -translate-y-[36%] rotate-[-8deg] text-muted-foreground sm:-right-16 sm:h-12 sm:w-12 md:-right-20 md:h-14 md:w-14"
+              className="pointer-events-none absolute -right-12 top-1/2 h-10 w-10 -translate-y-[36%] rotate-[-8deg] text-[color:color-mix(in_srgb,var(--color-primary)_78%,white_22%)] sm:-right-16 sm:h-12 sm:w-12 md:-right-20 md:h-14 md:w-14"
               viewBox="0 0 72 72"
               fill="none"
               aria-hidden="true"

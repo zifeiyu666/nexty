@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import type { SongSampleView } from "@/lib/ai/song-sample-store";
-import { ArrowRight, LockKeyhole, Trash2 } from "lucide-react";
+import { ArrowRight, LockKeyhole, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -73,6 +73,10 @@ function SampleCard({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const imageUrl = coverImageUrl(sample);
+  const isExpired = sample.isExpired;
+  const ctaHref = isExpired ? "/pricing#pricing" : `/samples/${sample.songId}`;
+  const ctaLabel = isExpired ? "Subscribe to unlock" : "View details";
+  const CtaIcon = isExpired ? Sparkles : ArrowRight;
 
   function handleDelete() {
     startTransition(async () => {
@@ -113,16 +117,16 @@ function SampleCard({
       coverFallbackClassName="bg-gradient-to-br from-primary via-primary/80 to-accent"
       createdFor={`Created for ${sample.recipientNames.join(" and ") || "someone special"}`}
       createdText={`Created ${new Date(sample.createdAt).toLocaleDateString()}`}
-      dimmed={sample.isExpired}
+      dimmed={isExpired}
       footer={
         <>
           <Button
             asChild
-            className="h-10 flex-1 rounded-full bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+            className="h-10 flex-1 rounded-full bg-primary text-xs font-semibold text-primary-foreground opacity-100 hover:bg-primary/90"
           >
-            <Link href={`/samples/${sample.songId}`}>
-              View details
-              <ArrowRight className="size-3.5" />
+            <Link href={ctaHref}>
+              {ctaLabel}
+              <CtaIcon className="size-3.5" />
             </Link>
           </Button>
 
@@ -164,13 +168,6 @@ function SampleCard({
       }
       imageAlt={`${sample.title} cover`}
       imageUrl={imageUrl}
-      notice={
-        sample.isExpired ? (
-          <p className="rounded-xl bg-muted px-3 py-2 text-xs font-semibold text-muted-foreground">
-            Expired. Recreate from form data to generate again.
-          </p>
-        ) : null
-      }
       title={sample.title}
     />
   );

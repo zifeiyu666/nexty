@@ -13,7 +13,9 @@ describe("FinalSongPlayer music video entry", () => {
     const musicVideoIndex = source.indexOf("Music Video");
     assert.notEqual(musicVideoIndex, -1, "Music Video card should exist");
     assert.match(source, /MusicVideoEditorDrawer/);
-    assert.match(source, /songId=\{data\.id\}/);
+    assert.match(source, /initialSong=\{data\}/);
+    assert.match(source, /songOptions=\{songOptions\}/);
+    assert.doesNotMatch(source, /songId=\{data\.id\}/);
     assert.equal(
       source.includes("Coming soon"),
       false,

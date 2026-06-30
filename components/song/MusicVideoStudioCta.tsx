@@ -15,21 +15,6 @@ type MusicVideoStudioCtaProps = {
   className?: string;
 };
 
-const emptySong: FinalSongPlayerData = {
-  id: "new-song-required",
-  title: "Create a song first",
-  lyrics: "",
-  genre: "",
-  occasion: "",
-  language: "",
-  vocalGender: "",
-  recipientNames: [],
-  story: "",
-  audioUrl: "",
-  imageUrl: null,
-  duration: null,
-};
-
 function MusicVideoEmptyState() {
   return (
     <div className="flex min-h-full items-center justify-center px-5 py-10 text-center">
@@ -91,14 +76,9 @@ export function MusicVideoStudioCta({
 
   return (
     <MusicVideoEditorDrawer
-      audioUrl={firstSong?.audioUrl ?? emptySong.audioUrl}
-      duration={firstSong?.duration ?? emptySong.duration}
       emptyState={firstSong ? undefined : <MusicVideoEmptyState />}
-      imageUrl={firstSong?.imageUrl ?? emptySong.imageUrl}
-      lyrics={firstSong?.lyrics ?? emptySong.lyrics}
-      songId={firstSong?.id ?? emptySong.id}
-      songTitle={firstSong?.title ?? emptySong.title}
-      timestampedLyrics={firstSong?.timestampedLyrics ?? null}
+      initialSong={firstSong}
+      songOptions={songOptions}
       trigger={
         <button className={className} type="button">
           {label}

@@ -903,13 +903,8 @@ function SongCreationTools({
       />
 
       <MusicVideoEditorDrawer
-        audioUrl={data.audioUrl}
-        duration={data.duration}
-        imageUrl={data.imageUrl}
-        lyrics={data.lyrics}
-        songId={data.id}
-        songTitle={data.title}
-        timestampedLyrics={data.timestampedLyrics}
+        initialSong={data}
+        songOptions={songOptions}
         trigger={
           <button className={toolCardClassName} type="button">
             <div className="flex items-start justify-between gap-4">

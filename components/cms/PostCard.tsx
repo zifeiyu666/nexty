@@ -15,6 +15,11 @@ interface PostCardProps {
   baseUrl: string;
   showDescription?: boolean;
   showCover?: boolean;
+  cardClassName?: string;
+  coverClassName?: string;
+  contentClassName?: string;
+  titleClassName?: string;
+  showPublicVisibilityBadge?: boolean;
 }
 
 function getVisibilityInfo(visibility: string) {
@@ -47,8 +52,15 @@ function PostCardCover({
   post,
   baseUrl,
   showDescription,
+  cardClassName,
+  coverClassName,
+  contentClassName,
+  titleClassName,
+  showPublicVisibilityBadge = true,
 }: Omit<PostCardProps, "showCover">) {
   const visibilityInfo = getVisibilityInfo(post.visibility || "public");
+  const shouldShowVisibilityBadge =
+    post.visibility !== "public" || showPublicVisibilityBadge;
 
   return (
     <I18nLink
@@ -57,8 +69,12 @@ function PostCardCover({
       prefetch={false}
       className="group block h-full focus:outline-none"
     >
-      <div className="bg-card border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 h-full flex flex-col">
-        <div className="relative w-full overflow-hidden aspect-video shrink-0">
+      <div
+        className={`bg-card border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 h-full flex flex-col ${cardClassName ?? ""}`}
+      >
+        <div
+          className={`relative w-full overflow-hidden aspect-video shrink-0 ${coverClassName ?? ""}`}
+        >
           <Image
             src={post.featuredImageUrl || "/placeholder.svg"}
             alt={post.title}
@@ -75,13 +91,15 @@ function PostCardCover({
                 <PinIcon className="h-3.5 w-3.5" />
               </div>
             )}
-            <div
-              className={`${visibilityInfo.bgColor} text-white text-xs px-2 py-1 rounded-full flex items-center gap-1`}
-              title={visibilityInfo.label}
-            >
-              {visibilityInfo.icon}
-              <span className="text-xs">{visibilityInfo.label}</span>
-            </div>
+            {shouldShowVisibilityBadge && (
+              <div
+                className={`${visibilityInfo.bgColor} text-white text-xs px-2 py-1 rounded-full flex items-center gap-1`}
+                title={visibilityInfo.label}
+              >
+                {visibilityInfo.icon}
+                <span className="text-xs">{visibilityInfo.label}</span>
+              </div>
+            )}
           </div>
 
           <div className="absolute bottom-3 left-3 bg-slate-900/80 text-white text-xs px-2.5 py-1 rounded-full">
@@ -89,8 +107,10 @@ function PostCardCover({
           </div>
         </div>
 
-        <div className="p-4 flex flex-col flex-1">
-          <h2 className="text-lg font-medium line-clamp-2 group-hover:text-primary transition-colors mb-2">
+        <div className={`p-4 flex flex-col flex-1 ${contentClassName ?? ""}`}>
+          <h2
+            className={`text-lg font-medium line-clamp-2 group-hover:text-primary transition-colors mb-2 ${titleClassName ?? ""}`}
+          >
             {post.title}
           </h2>
 
@@ -165,6 +185,11 @@ export function PostCard({
   baseUrl,
   showDescription = true,
   showCover = true,
+  cardClassName,
+  coverClassName,
+  contentClassName,
+  titleClassName,
+  showPublicVisibilityBadge = true,
 }: PostCardProps) {
   if (showCover) {
     return (
@@ -172,6 +197,11 @@ export function PostCard({
         post={post}
         baseUrl={baseUrl}
         showDescription={showDescription}
+        cardClassName={cardClassName}
+        coverClassName={coverClassName}
+        contentClassName={contentClassName}
+        titleClassName={titleClassName}
+        showPublicVisibilityBadge={showPublicVisibilityBadge}
       />
     );
   }

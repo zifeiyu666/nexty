@@ -1,10 +1,14 @@
 import { listPublishedPostsAction } from "@/actions/posts/posts";
 import { getViewCountAction } from "@/actions/posts/views";
+import { BlogWallArtStudioCTA } from "@/components/cms/BlogWallArtStudioCTA";
 import { ContentRestrictionMessage } from "@/components/cms/ContentRestrictionMessage";
 import { BlogPostCTA } from "@/components/cms/BlogPostCTA";
 import { POST_CONFIGS } from "@/components/cms/post-config";
 import { PostCard } from "@/components/cms/PostCard";
 import { RelatedPosts } from "@/components/cms/RelatedPosts";
+import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
+import { buildSongShareUrl, getFinalSongsForOwner } from "@/lib/ai/final-song";
+import { getSession } from "@/lib/auth/server";
 import { ViewCounter } from "@/components/cms/ViewCounter";
 import { TableOfContents } from "@/components/tiptap/TableOfContents";
 import { Button } from "@/components/ui/button";
@@ -83,12 +87,26 @@ export async function generateMetadata({
 export default async function BlogPage({ params }: { params: Params }) {
   const { slug, locale } = await params;
   const t = await getTranslations("Blogs");
+  const session = await getSession();
 
   const { post, errorCode } = await blogCms.getBySlug(slug, locale);
 
   if (!post) {
     notFound();
   }
+
+  const isWallArtStudioPost = slug === "custom-song-lyric-gifts";
+  const finalSongs =
+    isWallArtStudioPost && session?.user
+      ? await getFinalSongsForOwner(session.user.id)
+      : [];
+  const wallArtSongOptions: WallArtSongOption[] = finalSongs.map((song) => ({
+    id: song.id,
+    title: song.title,
+    lyrics: song.lyrics,
+    imageUrl: song.imageUrl,
+    shareUrl: buildSongShareUrl(song),
+  }));
 
   // View count tracking
   const viewCountConfig = POST_CONFIGS.blog.viewCount;
@@ -283,6 +301,12 @@ export default async function BlogPage({ params }: { params: Params }) {
               className="prose dark:prose-invert mx-auto max-w-[68ch] prose-p:my-5 prose-p:leading-8 prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-3xl prose-h2:mt-12 prose-h2:text-3xl prose-h3:text-2xl prose-li:my-1 prose-blockquote:not-italic prose-blockquote:font-normal prose-blockquote:text-muted-foreground prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-table:my-10 prose-table:block prose-table:w-full prose-table:min-w-full prose-table:overflow-x-auto prose-table:border-separate prose-table:border-spacing-0 prose-table:text-sm prose-thead:bg-[#f8f4f0] prose-th:min-w-44 prose-th:border-b prose-th:border-[#d8d2cc] prose-th:px-5 prose-th:py-4 prose-th:text-left prose-th:text-sm prose-th:font-semibold prose-th:leading-6 prose-th:text-[#1f2937] prose-td:min-w-44 prose-td:border-b prose-td:border-[#e6e1dc] prose-td:px-5 prose-td:py-4 prose-td:align-top prose-td:leading-7 prose-td:text-[#374151] [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_table]:rounded-xl [&_table]:border [&_table]:border-[#e6e1dc] [&_tbody_tr:nth-child(even)]:bg-[#fbfaf8] [&_tbody_tr:last-child_td]:border-b-0 [&_td_p]:my-0 [&_th:first-child]:rounded-tl-xl [&_th:last-child]:rounded-tr-xl [&_th_p]:my-0 [&_thead+tbody_tr:first-child_td]:border-t-0 lg:prose-lg lg:prose-p:leading-9"
               dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
+            {isWallArtStudioPost ? (
+              <BlogWallArtStudioCTA
+                isAuthenticated={Boolean(session?.user)}
+                songOptions={wallArtSongOptions}
+              />
+            ) : null}
             <BlogPostCTA />
           </>
         ) : null}

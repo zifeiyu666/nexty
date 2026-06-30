@@ -1,14 +1,48 @@
 import { PricingAll } from "@/components/pricing";
+import { PageHero } from "@/components/shared/PageHero";
+import { type FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
+import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
 import { Locale } from "@/i18n/routing";
+import { buildSongShareUrl, getFinalSongsForOwner } from "@/lib/ai/final-song";
+import { getSession } from "@/lib/auth/server";
 import { parseUnlockSongContext } from "@/lib/ai/song-unlock-after-payment";
 import { constructMetadata } from "@/lib/metadata";
 import { shouldHidePricingHero } from "@/lib/pricing/page-hero";
-import { ChevronRight } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Metadata } from "next";
-import Link from "next/link";
 
 type Params = Promise<{ locale: string }>;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function getTimestampedLyrics(
+  metadata: unknown,
+): FinalSongPlayerData["timestampedLyrics"] {
+  if (!metadata || typeof metadata !== "object") return null;
+  const timestampedLyrics = (metadata as Record<string, unknown>)
+    .timestampedLyrics;
+  if (!timestampedLyrics || typeof timestampedLyrics !== "object") return null;
+  const alignedWords = (timestampedLyrics as Record<string, unknown>)
+    .alignedWords;
+  if (!Array.isArray(alignedWords)) return null;
+
+  return {
+    alignedWords: alignedWords
+      .map((word) => {
+        if (!word || typeof word !== "object") return null;
+        const record = word as Record<string, unknown>;
+        const text = String(record.word ?? "").trim();
+        const startS = Number(record.startS);
+        const endS = Number(record.endS);
+        if (!text || !Number.isFinite(startS) || !Number.isFinite(endS)) {
+          return null;
+        }
+        return { word: text, startS, endS };
+      })
+      .filter((word): word is { word: string; startS: number; endS: number } =>
+        Boolean(word),
+      ),
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -20,7 +54,7 @@ export async function generateMetadata({
   return constructMetadata({
     title: "Simple pricing for everyone",
     description:
-      "Pay once for a single song, or choose a subscription for monthly songs, MP3 downloads, video gifts, and wall art.",
+      "Create and tweak until it's perfect. Pay once for a single masterpiece, or upgrade to Pro for monthly downloads and premium video styles.",
     locale: locale as Locale,
     path: "/pricing",
   });
@@ -31,40 +65,70 @@ export default async function PricingPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const session = await getSession();
+  const isAuthenticated = Boolean(session?.user);
+  const finalSongs = session?.user
+    ? await getFinalSongsForOwner(session.user.id)
+    : [];
   const resolvedSearchParams = await searchParams;
   const hideHero = shouldHidePricingHero(resolvedSearchParams);
   const unlockSongContext = parseUnlockSongContext(resolvedSearchParams);
+  const musicVideoSongOptions: FinalSongPlayerData[] = finalSongs.map((song) => ({
+    id: song.id,
+    title: song.title,
+    lyrics: song.lyrics,
+    timestampedLyrics: getTimestampedLyrics(song.metadataJsonb),
+    genre: song.genre,
+    occasion: song.occasion,
+    language: song.language,
+    vocalGender: song.vocalGender,
+    recipientNames: Array.isArray(song.recipientNamesJsonb)
+      ? song.recipientNamesJsonb.filter(
+          (value): value is string => typeof value === "string",
+        )
+      : [],
+    story: song.story,
+    audioUrl: song.audioUrl,
+    imageUrl: song.imageUrl,
+    duration: song.duration,
+    shareUrl: buildSongShareUrl(song),
+  }));
+  const wallArtSongOptions: WallArtSongOption[] = musicVideoSongOptions.map(
+    (song) => ({
+      id: song.id,
+      title: song.title,
+      lyrics: song.lyrics,
+      imageUrl: song.imageUrl,
+      shareUrl: song.shareUrl,
+    }),
+  );
 
   return (
     <main className="min-h-screen bg-background text-foreground w-full">
       {!hideHero && (
-        <section className="w-full bg-muted">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  pb-16 pt-16 ">
-            <nav
-              aria-label="Breadcrumb"
-              className="mb-8 flex items-center gap-2 text-sm font-medium text-muted-foreground"
-            >
-              <Link className="transition hover:text-foreground" href="/">
-                Home
-              </Link>
-              <ChevronRight className="size-4" />
-              <span>Pricing</span>
-            </nav>
-
-            <div className="max-w-3xl">
-              <h1 className="text-5xl font-black leading-tight tracking-normal text-foreground md:text-6xl">
-                Simple pricing for everyone
-              </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-                Pay once for a single song, or go Pro or Platinum for monthly
-                songs, MP3 downloads, and video styles at a better rate.
-              </p>
-            </div>
-          </div>
-        </section>
+        <PageHero
+          badge={{
+            icon: <Sparkles className="size-4" />,
+            label: "Flexible plans for every kind of gift",
+          }}
+          backgroundClassName="bg-[#f3eadf]"
+          description="Start with a one-time song for a single unforgettable moment, or unlock Pro for recurring downloads, premium video styles, and more room to create keepsakes people actually replay."
+          descriptionClassName="text-stone-700"
+          titleClassName="text-stone-950"
+          titleLines={[
+            "Create heartfelt songs",
+            "Pay only for what you love",
+          ]}
+          underline={{ phrase: "what you love" }}
+        />
       )}
 
-      <PricingAll unlockSongContext={unlockSongContext} />
+      <PricingAll
+        isAuthenticated={isAuthenticated}
+        musicVideoSongOptions={musicVideoSongOptions}
+        unlockSongContext={unlockSongContext}
+        wallArtSongOptions={wallArtSongOptions}
+      />
     </main>
   );
 }

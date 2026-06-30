@@ -854,7 +854,7 @@
       cursive;
     font-size: 1rem;
     line-height: 1.75rem;
-    color: var(--muted-foreground);
+    color: color-mix(in srgb, var(--color-primary) 78%, white 22%);
   }
 
   .handwritten-subtitle p {

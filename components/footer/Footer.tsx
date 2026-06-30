@@ -2,27 +2,32 @@ import { Newsletter } from "@/components/footer/Newsletter";
 import { TwitterX } from "@/components/social-icons/icons";
 import { siteConfig } from "@/config/site";
 import { Link as I18nLink } from "@/i18n/routing";
+import {
+  getArticleNavigationLinks,
+  withArticleFooterLinks,
+} from "@/lib/cms/article-navigation";
+import { cn } from "@/lib/utils";
 import { FooterLink } from "@/types/common";
 import { GithubIcon, InstagramIcon, MailIcon, Youtube } from "lucide-react";
-import { getMessages, getTranslations } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiDiscord, SiTiktok } from "react-icons/si";
 
 export default async function Footer() {
-  const messages = await getMessages();
+  const locale = await getLocale();
+  const [messages, t, tFooter, articleLinks] = await Promise.all([
+    getMessages(),
+    getTranslations("Home"),
+    getTranslations("Footer"),
+    getArticleNavigationLinks(locale),
+  ]);
 
-  const t = await getTranslations("Home");
-  const tFooter = await getTranslations("Footer");
-
-  const footerLinks: FooterLink[] = tFooter.raw("Links.groups");
-  footerLinks.forEach((group) => {
-    const pricingLink = group.links.find((link) => link.id === "pricing");
-    if (pricingLink) {
-      pricingLink.href = process.env.NEXT_PUBLIC_PRICING_PATH!;
-    }
-  });
+  const footerLinks = withArticleFooterLinks(
+    tFooter.raw("Links.groups") as FooterLink[],
+    articleLinks
+  );
 
   return (
     <div className="bg-gray-900 text-gray-300 border-t border-gray-700">
@@ -151,42 +156,53 @@ export default async function Footer() {
               </div>
             </div>
 
-            {footerLinks.map((section) => (
-              <div key={section.title} className="flex-1">
-                <div className="text-white text-lg font-semibold mb-4">
-                  {section.title}
+            {footerLinks.map((section) => {
+              const isArticlesSection = section.title === "Articles";
+              const linkClassName = cn(
+                "hover:text-white transition-colors",
+                isArticlesSection && "block max-w-sm line-clamp-2 leading-5"
+              );
+
+              return (
+                <div
+                  key={section.title}
+                  className={cn("flex-1", isArticlesSection && "lg:col-span-2")}
+                >
+                  <div className="text-white text-lg font-semibold mb-4">
+                    {section.title}
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    {section.links.map((link) => (
+                      <li key={link.href}>
+                        {link.href.startsWith("/") && !link.useA ? (
+                          <I18nLink
+                            href={link.href}
+                            title={link.name}
+                            prefetch={false}
+                            className={linkClassName}
+                            target={link.target || ""}
+                            rel={link.rel || ""}
+                          >
+                            {link.name}
+                          </I18nLink>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            title={link.name}
+                            prefetch={false}
+                            className={linkClassName}
+                            target={link.target || ""}
+                            rel={link.rel || ""}
+                          >
+                            {link.name}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-2 text-sm">
-                  {section.links.map((link) => (
-                    <li key={link.href}>
-                      {link.href.startsWith("/") && !link.useA ? (
-                        <I18nLink
-                          href={link.href}
-                          title={link.name}
-                          prefetch={false}
-                          className="hover:text-white transition-colors"
-                          target={link.target || ""}
-                          rel={link.rel || ""}
-                        >
-                          {link.name}
-                        </I18nLink>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          title={link.name}
-                          prefetch={false}
-                          className="hover:text-white transition-colors"
-                          target={link.target || ""}
-                          rel={link.rel || ""}
-                        >
-                          {link.name}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
 
             {messages.Footer.Newsletter && (
               <div className="w-full flex-1">

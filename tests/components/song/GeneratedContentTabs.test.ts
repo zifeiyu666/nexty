@@ -27,9 +27,9 @@ describe("GeneratedContentTabs", () => {
 
     assert.match(source, /No music videos yet/);
     assert.match(source, /Generate Music Video/);
-    assert.match(source, /songId=\{song\.id\}/);
-    assert.match(source, /audioUrl=\{song\.audioUrl\}/);
-    assert.match(source, /timestampedLyrics=\{song\.timestampedLyrics\}/);
+    assert.match(source, /initialSong=\{song\}/);
+    assert.doesNotMatch(source, /songId=\{song\.id\}/);
+    assert.doesNotMatch(source, /audioUrl=\{song\.audioUrl\}/);
   });
 
   test("song detail page renders generated content tabs with song and videos", () => {

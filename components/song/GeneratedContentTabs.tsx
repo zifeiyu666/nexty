@@ -142,13 +142,7 @@ function GenerateMusicVideoButton({
 
   return (
     <MusicVideoEditorDrawer
-      audioUrl={song.audioUrl}
-      duration={song.duration}
-      imageUrl={song.imageUrl}
-      lyrics={song.lyrics}
-      songId={song.id}
-      songTitle={song.title}
-      timestampedLyrics={song.timestampedLyrics}
+      initialSong={song}
       trigger={
         <button className={buttonClassName} type="button">
           Generate Music Video

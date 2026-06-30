@@ -6,15 +6,20 @@ import { UserAvatar } from "@/components/header/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Link as I18nLink } from "@/i18n/routing";
 import { getSession } from "@/lib/auth/server";
+import { getHeaderNavigationLinks } from "@/lib/cms/article-navigation";
 import { user as userSchema } from "@/lib/db/schema";
 import { Music2 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 type User = typeof userSchema.$inferSelect;
 
 const Header = async () => {
-  const t = await getTranslations("Home");
-  const session = await getSession();
+  const locale = await getLocale();
+  const [t, session, headerLinks] = await Promise.all([
+    getTranslations("Home"),
+    getSession(),
+    getHeaderNavigationLinks(locale),
+  ]);
   const user = session?.user;
 
   return (
@@ -34,7 +39,7 @@ const Header = async () => {
             />
           </I18nLink>
 
-          <HeaderLinks variant="adaptive" />
+          <HeaderLinks links={headerLinks} variant="adaptive" />
         </div>
 
         <div className="flex items-center gap-x-2 flex-1 justify-end">
@@ -65,7 +70,7 @@ const Header = async () => {
               </I18nLink>
             </Button>
             <UserAvatar user={user as User} />
-            <MobileMenu variant="adaptive" />
+            <MobileMenu links={headerLinks} variant="adaptive" />
           </div>
         </div>
       </nav>

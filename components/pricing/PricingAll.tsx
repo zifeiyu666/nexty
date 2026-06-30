@@ -1,5 +1,9 @@
 import { getPublicPricingPlans } from "@/actions/prices/public";
 import PricingCTA from "@/components/pricing/PricingCTA";
+import { type FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
+import { MusicVideoStudioCta } from "@/components/song/MusicVideoStudioCta";
+import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
+import { WallArtStudioCta } from "@/components/song/WallArtStudioCta";
 import { DEFAULT_LOCALE } from "@/i18n/routing";
 import type { UnlockSongContext } from "@/lib/ai/song-unlock-after-payment";
 import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
@@ -34,6 +38,32 @@ type DisplayPlan = {
   staticCta?: string;
   tone: "single" | "pro" | "platinum";
 };
+
+type InteractiveAddOn = {
+  ctaLabel: string;
+  description: string;
+  icon: typeof Video;
+  originalPrice: string;
+  promoLabel: string;
+  suffix: string;
+  title: string;
+  trigger: "music-video" | "wall-art";
+};
+
+type StaticAddOn = {
+  description: string;
+  icon: typeof Video;
+  originalPrice: string;
+  promoLabel: string;
+  suffix: string;
+  title: string;
+};
+
+function isInteractiveAddOn(
+  item: InteractiveAddOn | StaticAddOn,
+): item is InteractiveAddOn {
+  return "trigger" in item;
+}
 
 const fallbackPlans: DisplayPlan[] = [
   {
@@ -112,28 +142,35 @@ const fallbackPlans: DisplayPlan[] = [
   },
 ];
 
-const addOns = [
+const addOns: Array<InteractiveAddOn | StaticAddOn> = [
   {
     description:
       "Transform your custom song into a breathtaking visual story with your own memories. ",
+    ctaLabel: "Open video studio",
     icon: Video,
-    price: "From $23.99",
+    originalPrice: "$23.99",
+    promoLabel: "FREE ADD-ON",
     suffix: "per video",
     title: "Cinematic Music Video",
+    trigger: "music-video",
   },
   {
     description:
       "A high-resolution digital design of your custom song lyrics. Ready to download, print, and frame",
+    ctaLabel: "Open wall art studio",
     icon: ImageIcon,
-    price: "From $7.99",
+    originalPrice: "$7.99",
+    promoLabel: "FREE ADD-ON",
     suffix: "per print",
     title: "Digital Lyrics Wall Art",
+    trigger: "wall-art",
   },
   {
     description:
       "Get a high-quality MP3 download of your custom song . Keep it offline and play it on any device forever.",
     icon: Download,
-    price: "From $7",
+    originalPrice: "$7",
+    promoLabel: "FREE ADD-ON",
     suffix: "per song",
     title: "Studio-Quality MP3",
   },
@@ -158,9 +195,15 @@ const trustItems = [
 ];
 
 export default async function PricingAll({
+  isAuthenticated = false,
+  musicVideoSongOptions = [],
   unlockSongContext,
+  wallArtSongOptions = [],
 }: {
+  isAuthenticated?: boolean;
+  musicVideoSongOptions?: FinalSongPlayerData[];
   unlockSongContext?: UnlockSongContext | null;
+  wallArtSongOptions?: WallArtSongOption[];
 } = {}) {
   const locale = await getLocale();
   const result = await getPublicPricingPlans();
@@ -189,43 +232,97 @@ export default async function PricingAll({
           ))}
         </div>
 
-        <section className="mt-10 py-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-black tracking-normal text-foreground md:text-3xl">
-              限时免费
+        <section className="mt-10 overflow-hidden rounded-2xl border border-primary/15 bg-[radial-gradient(circle_at_top,_rgba(251,113,133,0.12),_transparent_38%),linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(255,247,245,0.92))] px-4 py-10 shadow-[0_24px_80px_-48px_rgba(251,113,133,0.7)] sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="inline-flex items-center rounded-full border border-primary/15 bg-background/80 px-4 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-primary shadow-sm backdrop-blur">
+              Bonus Gift Unlock
+            </div>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-foreground sm:text-4xl md:text-5xl">
+              Limited-Time <span className="text-primary">100% Free</span>
             </h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              Buy these one-off on any song, on any plan. Pro & Platinum
-              subscribers already get video styles every month. These are for
-              everyone else, or for anything extra.
+            <p className="mt-3 text-lg font-bold text-primary sm:text-xl">
+              Claim these premium add-ons with any plan before this offer ends.
+            </p>
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+              Pro & Platinum already include monthly perks. This bonus is for
+              everyone else too, so you can unlock extra keepsakes at
+              checkout while the promotion is live.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {addOns.map((item) => {
               const Icon = item.icon;
+              const hasOverlayCta = isInteractiveAddOn(item);
 
               return (
                 <article
-                  className="rounded-2xl border border-border bg-background p-5 shadow-sm"
+                  className="group relative cursor-pointer overflow-hidden rounded-2xl bg-background/95 p-6 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.18),0_10px_24px_-18px_rgba(251,113,133,0.35)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:bg-background hover:shadow-[0_28px_55px_-30px_rgba(15,23,42,0.22),0_18px_36px_-22px_rgba(251,113,133,0.42)]"
                   key={item.title}
                 >
-                  <div className="mb-6 flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  {hasOverlayCta && (
+                    <div className="absolute inset-x-0 bottom-0 z-20 flex justify-center bg-[linear-gradient(180deg,rgba(255,248,245,0)_0%,rgba(255,248,245,0.72)_45%,rgba(255,248,245,0.92)_100%)] px-5 pb-6 pt-16 opacity-100 transition duration-300 sm:px-6 sm:pb-7 sm:pt-20 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+                      <div className="pointer-events-auto flex w-full justify-center sm:translate-y-3 sm:transition sm:duration-300 sm:group-hover:translate-y-0 sm:group-focus-within:translate-y-0">
+                        {item.trigger === "music-video" ? (
+                          <MusicVideoStudioCta
+                            className="inline-flex items-center justify-center gap-2 text-base font-black text-[#170A1E] transition hover:text-primary"
+                            isAuthenticated={isAuthenticated}
+                            label={item.ctaLabel}
+                            songOptions={musicVideoSongOptions}
+                          />
+                        ) : (
+                          <WallArtStudioCta
+                            className="inline-flex items-center justify-center gap-2 text-base font-black text-[#170A1E] transition hover:text-primary"
+                            isAuthenticated={isAuthenticated}
+                            label={item.ctaLabel}
+                            songOptions={wallArtSongOptions}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="absolute right-[-3.5rem] top-6 z-10 rotate-45 bg-gradient-to-r from-orange-400 via-primary to-rose-500 px-14 py-2 text-sm font-black uppercase tracking-[0.08em] text-white shadow-lg">
+                    Free Now
+                  </div>
+
+                  <div className="mb-6 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 ease-out group-hover:scale-110">
                     <Icon className="size-5" />
                   </div>
-                  <h3 className="text-xl font-black text-foreground">
+                  <h3 className="pr-16 text-2xl font-black leading-tight text-foreground">
                     {item.title}
                   </h3>
-                  <p className="mt-4 min-h-20 text-sm leading-6 text-muted-foreground">
+                  <p className="mt-4 min-h-24 text-base leading-7 text-muted-foreground">
                     {item.description}
                   </p>
-                  <div className="mt-5 border-t border-border pt-4">
-                    <span className="text-2xl font-black text-foreground">
-                      {item.price}
-                    </span>
-                    <span className="ml-2 text-xs font-bold text-muted-foreground">
-                      {item.suffix}
-                    </span>
+
+                  <div className="mt-8 border-t border-primary/10 pt-5">
+                    <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+                      <span className="text-xl font-black tracking-tight text-muted-foreground/75 line-through">
+                        From {item.originalPrice}
+                      </span>
+                      <span className="text-4xl font-black leading-none tracking-[-0.06em] text-foreground">
+                        $0
+                      </span>
+                      <span className="pb-1 text-sm font-bold text-foreground">
+                        {item.suffix}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm font-black uppercase tracking-[0.08em] text-primary">
+                      ({item.promoLabel})
+                    </p>
+                    <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
+                      <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-orange-400 via-primary to-rose-500 transition-all duration-500 group-hover:w-full" />
+                    </div>
+                    {hasOverlayCta ? (
+                      <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                        Hover to preview and open the studio
+                      </p>
+                    ) : (
+                      <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                        Add automatically with eligible checkout
+                      </p>
+                    )}
                   </div>
                 </article>
               );
@@ -238,15 +335,20 @@ export default async function PricingAll({
             const Icon = item.icon;
 
             return (
-              <div className="flex items-start gap-3" key={item.title}>
-                <Icon className="mt-1 size-5 shrink-0 text-primary" />
-                <div>
-                  <h3 className="text-sm font-black text-foreground">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {item.description}
-                  </p>
+              <div
+                className="group cursor-pointer rounded-xl px-2 py-2 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-muted/40"
+                key={item.title}
+              >
+                <div className="flex items-start gap-3">
+                  <Icon className="mt-1 size-5 shrink-0 text-primary transition-transform duration-300 ease-out group-hover:scale-110" />
+                  <div>
+                    <h3 className="text-sm font-black text-foreground">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
               </div>
             );
@@ -305,12 +407,12 @@ function PricingGiftCard({
   return (
     <article
       className={cn(
-        "relative flex min-h-[560px] flex-col rounded-2xl border p-5 shadow-sm",
+        "relative flex min-h-[560px] cursor-pointer flex-col rounded-2xl border p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
         isPro
-          ? "border-foreground bg-foreground text-primary-foreground"
+          ? "border-foreground bg-foreground text-primary-foreground hover:border-accent"
           : isPlatinum
-            ? "border-primary/30 bg-card"
-            : "border-border bg-card"
+            ? "border-primary/30 bg-card hover:border-primary/60 hover:bg-primary/5"
+            : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
       )}
     >
       {plan.highlightText && (
@@ -351,24 +453,38 @@ function PricingGiftCard({
       />
 
       <div>
-        <span
-          className={cn(
-            "text-4xl font-black tracking-tight",
-            isPro ? "text-primary-foreground" : "text-foreground"
-          )}
-        >
-          {plan.displayPrice}
-        </span>
-        {plan.priceSuffix && (
+        <div className="flex items-end gap-2">
           <span
             className={cn(
-              "ml-2 text-xs font-bold",
-              isPro ? "text-primary-foreground/60" : "text-muted-foreground"
+              "text-4xl font-black tracking-tight",
+              isPro ? "text-primary-foreground" : "text-foreground"
             )}
           >
-            / {plan.priceSuffix}
+            {plan.displayPrice}
           </span>
-        )}
+          {plan.originalPrice && (
+            <span
+              className={cn(
+                "pb-1 text-sm font-semibold line-through",
+                isPro
+                  ? "text-primary-foreground/50"
+                  : "text-muted-foreground"
+              )}
+            >
+              {plan.originalPrice}
+            </span>
+          )}
+          {plan.priceSuffix && (
+            <span
+              className={cn(
+                "ml-1 text-xs font-bold",
+                isPro ? "text-primary-foreground/60" : "text-muted-foreground"
+              )}
+            >
+              / {plan.priceSuffix}
+            </span>
+          )}
+        </div>
       </div>
 
       <div

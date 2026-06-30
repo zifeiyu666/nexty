@@ -1,4 +1,5 @@
 import { MusicLibraryCard } from "@/components/song/MusicLibraryCard";
+import { PageHero } from "@/components/shared/PageHero";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -152,22 +153,14 @@ export default async function SongsPage({
 
   return (
     <main className="min-h-screen w-full bg-[#fbfaf7] text-foreground">
-      <section className="w-full bg-[#f3eadf]">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-          <div className="max-w-4xl">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase text-primary shadow-sm">
-              <Library className="size-4" />
-              {t("hero.badge")}
-            </p>
-            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.96] tracking-normal text-stone-950 md:text-7xl">
-              {t("hero.title")}
-            </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-700">
-              {t("hero.description")}
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        badge={{
+          icon: <Library className="size-4" />,
+          label: t("hero.badge"),
+        }}
+        description={t("hero.description")}
+        titleLines={[t("hero.title")]}
+      />
 
       <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-8">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

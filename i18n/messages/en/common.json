@@ -1,7 +1,7 @@
 {
   "Home": {
     "title": "CustomSong",
-    "tagLine": "<strong>Say it with a custom song.</strong><br></br>Gift an unforgettable track for birthdays, anniversaries, or just because.",
+    "tagLine": "<strong>Say it with a custom song.</strong><br></br>  Gift an unforgettable track for birthdays, anniversaries, or just because.",
     "description": "Turn your memories into studio-quality custom songs in minutes. Create a personalized music gift for birthdays, weddings, anniversaries, and more."
   },
   "Login": {
@@ -339,8 +339,10 @@
         "href": "/pricing"
       },
       {
-        "name": "Blog",
-        "href": "/blog"
+        "id": "articles",
+        "name": "Articles",
+        "href": "/blog",
+        "items": []
       }
     ]
   },
@@ -411,8 +413,16 @@
           ]
         },
         {
-          "title": "Support",
+          "title": "Ai song tools",
           "links": [
+            {
+              "name": "Birthday Song",
+              "href": "/occasions/birthday"
+            },
+            {
+              "name": "Anniversary Songs",
+              "href": "/occasions/anniversary"
+            },
             {
               "name": "Privacy Policy",
               "href": "/privacy-policy"

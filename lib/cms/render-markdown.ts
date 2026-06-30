@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getMarkdownLinkAttributes } from "@/lib/cms/link-attributes";
 import type { Element, Root } from "hast";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize, {
@@ -223,34 +224,28 @@ function rehypeYoutubeEmbed() {
   };
 }
 
-function rehypeExternalLinks() {
+function rehypeLinks() {
   return (tree: Root) => {
     visit(tree, "element", (node: Element) => {
       if (node.tagName !== "a") return;
 
       const href = String(node.properties?.href || "");
-      if (!href || href.startsWith("#") || href.startsWith("/")) return;
+      const linkAttributes = getMarkdownLinkAttributes(
+        href,
+        node.properties?.rel,
+      );
+      const nextProperties = {
+        ...node.properties,
+        ...linkAttributes,
+      };
 
-      try {
-        const url = new URL(href);
-        if (url.protocol !== "http:" && url.protocol !== "https:") {
-          node.properties = {
-            ...node.properties,
-            href: "#",
-          };
-          return;
-        }
-      } catch {
-        return;
+      if (linkAttributes.href === "#") {
+        delete nextProperties.target;
+        delete nextProperties.rel;
+        delete nextProperties.className;
       }
 
-      node.properties = {
-        ...node.properties,
-        target: "_blank",
-        rel: "noopener noreferrer",
-        className:
-          "text-primary underline cursor-pointer hover:text-primary/80",
-      };
+      node.properties = nextProperties;
     });
   };
 }
@@ -324,7 +319,7 @@ const processor = unified()
   .use(rehypeImageGrid)
   .use(rehypeYoutubeEmbed)
   .use(rehypeHeadingIds)
-  .use(rehypeExternalLinks)
+  .use(rehypeLinks)
   .use(rehypeResponsiveImages)
   .use(rehypeSanitize, sanitizeSchema)
   .use(rehypeStringify);

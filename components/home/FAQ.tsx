@@ -3,6 +3,7 @@
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { useState } from "react";
 
 type FAQItem = {
@@ -10,12 +11,34 @@ type FAQItem = {
   answer: string;
 };
 
-export default function FAQ() {
+type FAQProps = {
+  title?: string;
+  description?: string;
+  items?: FAQItem[];
+  ctaTitle?: string;
+  ctaDescription?: ReactNode;
+  ctaButtonLabel?: string;
+  ctaHref?: string;
+};
+
+export default function FAQ({
+  title,
+  description,
+  items,
+  ctaTitle,
+  ctaDescription,
+  ctaButtonLabel,
+  ctaHref = "/create-song",
+}: FAQProps) {
   const t = useTranslations("Landing.FAQ");
   const cta = useTranslations("Landing.CTA");
   const [openItem, setOpenItem] = useState<string | null>(null);
 
-  const faqs: FAQItem[] = t.raw("items");
+  const faqs: FAQItem[] = items ?? t.raw("items");
+  const headingTitle = title ?? t("title");
+  const headingDescription = description ?? t("description");
+  const cardTitle = ctaTitle ?? cta("title");
+  const cardButtonLabel = ctaButtonLabel ?? cta("button");
 
   return (
     <section
@@ -27,10 +50,10 @@ export default function FAQ() {
         data-testid="faq-section-heading"
       >
         <h2 className="preset-title">
-          <span className="title-gradient">{t("title")}</span>
+          <span className="title-gradient">{headingTitle}</span>
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-base text-gray-600 dark:text-gray-400 md:text-lg">
-          {t("description")}
+          {headingDescription}
         </p>
       </div>
 
@@ -40,24 +63,26 @@ export default function FAQ() {
           style={{ boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)" }}
         >
           <h2
-            className="mb-3 font-normal leading-[1.1]"
+            className="mb-3 font-bold leading-[1.1]"
             style={{
               fontSize: "clamp(2rem, 7vw, 2.75rem)",
             }}
           >
-            {cta("title")}
+            {cardTitle}
           </h2>
           <p className="mb-6 text-[0.85rem] font-normal leading-6 opacity-85">
-            {cta.rich("description", {
-              strong: (chunks) => <strong>{chunks}</strong>,
-            })}
+            {ctaDescription ??
+              cta.rich("description", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
           </p>
           <MagneticButton
-            href="/create-song"
+            href={ctaHref}
             size="sm"
-            className="aspect-square !size-[8.75rem] rounded-full border-black bg-black px-5 text-center text-[0.9rem] font-semibold leading-tight text-white shadow-[0_18px_42px_rgba(0,0,0,0.34)] hover:bg-black hover:text-white hover:shadow-[0_22px_46px_rgba(0,0,0,0.42)] max-[420px]:!size-[7.75rem] sm:!size-[8.75rem] sm:px-5 sm:text-[0.9rem]"
+            trailingArrow
+            className="border-black bg-black px-5 text-center text-[0.9rem] font-semibold leading-tight text-white shadow-[0_18px_42px_rgba(0,0,0,0.34)] hover:bg-black hover:text-white hover:shadow-[0_22px_46px_rgba(0,0,0,0.42)] sm:px-5 sm:text-[0.9rem]"
           >
-            <span className="whitespace-normal">{cta("button")}</span>
+            <span className="whitespace-normal">{cardButtonLabel}</span>
           </MagneticButton>
         </div>
 

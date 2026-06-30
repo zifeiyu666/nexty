@@ -21,18 +21,15 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type MobileMenuProps = {
+  links: HeaderLink[];
   variant?: "default" | "adaptive";
 };
 
-export default function MobileMenu({ variant = "default" }: MobileMenuProps) {
+export default function MobileMenu({
+  links,
+  variant = "default",
+}: MobileMenuProps) {
   const t = useTranslations("Home");
-  const tHeader = useTranslations("Header");
-
-  const headerLinks: HeaderLink[] = tHeader.raw("links");
-  const pricingLink = headerLinks.find((link) => link.id === "pricing");
-  if (pricingLink) {
-    pricingLink.href = process.env.NEXT_PUBLIC_PRICING_PATH || pricingLink.href;
-  }
 
   return (
     <DropdownMenu>
@@ -47,7 +44,7 @@ export default function MobileMenu({ variant = "default" }: MobileMenuProps) {
       >
         <Menu className="h-5 w-5" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-40">
+      <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>
           <I18nLink
             href="/"
@@ -71,15 +68,15 @@ export default function MobileMenu({ variant = "default" }: MobileMenuProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {headerLinks.map((link) =>
+          {links.map((link) =>
             link.items ? (
               <DropdownMenuSub key={link.name}>
                 <DropdownMenuSubTrigger className="px-2 py-1.5">
                   {link.name}
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-40">
+                <DropdownMenuSubContent className="w-72 max-w-[calc(100vw-2rem)]">
                   {link.items.map((child) => (
-                    <DropdownMenuItem key={child.name} asChild>
+                    <DropdownMenuItem key={child.href} asChild>
                       <I18nLink
                         href={child.href}
                         title={child.name}
@@ -90,9 +87,11 @@ export default function MobileMenu({ variant = "default" }: MobileMenuProps) {
                         }
                         target={child.target || "_self"}
                         rel={child.rel || undefined}
-                        className="flex flex-col gap-y-1"
+                        className="flex min-w-0 flex-col gap-y-1"
                       >
-                        <span>{child.name}</span>
+                        <span className="whitespace-normal break-words leading-snug">
+                          {child.name}
+                        </span>
                         {child.description && (
                           <span className="text-xs text-muted-foreground">
                             {child.description}

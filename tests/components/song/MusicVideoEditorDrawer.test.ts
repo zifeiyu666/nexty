@@ -18,6 +18,26 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /Generate Video/);
   });
 
+  test("supports reusable song options from pricing and switches active songs", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /export type MusicVideoSongOption = \{/);
+    assert.match(source, /initialSong\?: MusicVideoSongOption;/);
+    assert.match(source, /songOptions\?: MusicVideoSongOption\[\];/);
+    assert.match(source, /const selectableSongs = useMemo/);
+    assert.match(source, /const hasSongs = selectableSongs\.length > 0;/);
+    assert.match(source, /aria-label="Choose song"/);
+    assert.match(source, /disabled=\{!hasSongs\}/);
+    assert.match(source, /function handleSongSelection\(nextSongId: string\)/);
+    assert.match(source, /setSelectedSongId\(nextSong\.id\)/);
+    assert.match(source, /const resetSongScopedState = useCallback/);
+    assert.match(source, /setPhotos\(\[\]\)/);
+    assert.match(source, /setLatestVideo\(null\)/);
+  });
+
   test("turns the upload area into media and lyrics configuration tabs", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),

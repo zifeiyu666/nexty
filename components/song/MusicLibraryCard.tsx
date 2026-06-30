@@ -34,8 +34,13 @@ export function MusicLibraryCard({
   title,
 }: MusicLibraryCardProps) {
   return (
-    <MagneticSongCard className={cn(dimmed && "opacity-55")}>
-      <div className="relative aspect-square overflow-hidden bg-[#111827]">
+    <MagneticSongCard>
+      <div
+        className={cn(
+          "relative aspect-square overflow-hidden bg-[#111827]",
+          dimmed && "opacity-55",
+        )}
+      >
         {imageUrl ? (
           <Image
             alt={imageAlt}
@@ -63,7 +68,12 @@ export function MusicLibraryCard({
         ) : null}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-3 px-3.5 py-4">
+      <div
+        className={cn(
+          "flex min-w-0 flex-1 flex-col gap-3 px-3.5 py-4",
+          dimmed && "opacity-55",
+        )}
+      >
         <h2 className="line-clamp-2 text-lg font-medium leading-tight text-foreground transition group-hover:text-primary">
           {title}
         </h2>

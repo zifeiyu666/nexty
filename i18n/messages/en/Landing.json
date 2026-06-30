@@ -99,6 +99,10 @@
       "gift": {
         "title": "Unleash the Ultimate Gift",
         "description": "Unlock the full <strong>custom song</strong> and get a free custom <strong>music video</strong> plus customizable <strong>wall art</strong> poster combo. Send it privately or post on socials to watch them cry tears of joy."
+      },
+      "deliver": {
+        "title": "Share the Surprise Anywhere",
+        "description": "Send the finished song privately, pair it with a <strong>music video</strong>, or print <strong>wall art</strong> lyrics to turn one memory into a gift they can replay and keep."
       }
     }
   },
