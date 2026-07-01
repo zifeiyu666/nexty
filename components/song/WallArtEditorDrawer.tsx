@@ -297,9 +297,66 @@ const wallArtFontFaceCss = wallArtFontFiles
       `@font-face{font-family:'${family}';src:url('${src}') format('truetype');font-style:normal;font-weight:${weight};font-display:swap;}`,
   )
   .join("");
+const wallArtMotionCss = `@keyframes wallArtDownloadIconDrift{0%{transform:translateY(0) scale(1)}45%{transform:translateY(2px) scale(1.12)}100%{transform:translateY(0) scale(1)}}`;
+const wallArtGlassPanelClassName =
+  "rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(247,241,233,0.64))] shadow-[0_18px_48px_rgba(70,53,38,0.1),0_1px_0_rgba(255,255,255,0.4)_inset,0_0_0_1px_rgba(255,255,255,0.18)_inset] backdrop-blur-2xl";
+const wallArtSubtleGlassPanelClassName =
+  "rounded-[16px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(250,246,240,0.54))] shadow-[0_12px_28px_rgba(72,56,41,0.08),0_1px_0_rgba(255,255,255,0.64)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] backdrop-blur-xl";
+const wallArtFieldClassName =
+  "h-10 rounded-full bg-white/72 px-3.5 text-[13px] font-medium text-[#302720] shadow-[0_10px_22px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.76)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition focus-visible:ring-[#c9bbac]/40";
+const wallArtTextareaClassName =
+  "rounded-[18px] bg-white/72 px-4 py-3 text-[13px] leading-6 text-[#302720] shadow-[0_12px_28px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition focus-visible:ring-[#c9bbac]/40";
+const wallArtPopoverClassName =
+  "rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(246,240,232,0.8))] p-1 shadow-[0_22px_56px_rgba(56,41,29,0.16),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-2xl";
+const wallArtPillButtonClassName =
+  "rounded-full bg-white/72 text-[#3a312a] shadow-[0_10px_22px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.74)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition hover:bg-white/90 hover:text-[#241b16]";
+const wallArtPillButtonActiveClassName =
+  "rounded-full border border-transparent bg-[#2d2622] text-[#f7f0e6] shadow-[0_14px_28px_rgba(45,38,34,0.24)] hover:bg-[#2d2622] hover:text-[#f7f0e6]";
+const wallArtPrimaryButtonClassName =
+  "rounded-full border border-[#3f342c]/10 bg-[#2f2823] px-5 text-[#faf4eb] shadow-[0_16px_30px_rgba(45,38,34,0.22)] transition hover:bg-[#26201d] hover:text-white";
+const wallArtSecondaryButtonClassName =
+  "rounded-full bg-white/78 text-[#2f2722] shadow-[0_10px_22px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition hover:bg-white";
+const wallArtEditorSectionClassName =
+  "space-y-4 rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,243,237,0.56))] p-4 shadow-[0_16px_34px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.74)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] backdrop-blur-xl";
+const wallArtInfoCardClassName =
+  "rounded-[16px] bg-[linear-gradient(180deg,rgba(255,255,255,0.64),rgba(248,243,237,0.44))] p-3.5 shadow-[0_12px_28px_rgba(70,53,38,0.06),0_1px_0_rgba(255,255,255,0.72)_inset,0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-xl";
+const wallArtTemplateCardBaseClassName =
+  "w-full rounded-[16px] bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,243,237,0.62))] p-1.5 text-left shadow-[0_14px_30px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] transition duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_34px_rgba(70,53,38,0.12)]";
+const wallArtTemplateThumbClassName =
+  "mx-auto aspect-[4/5] max-h-36 overflow-hidden rounded-[12px] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_8px_18px_rgba(63,47,33,0.08)]";
+const wallArtTemplatePopoverClassName =
+  "fixed left-[186px] top-[98px] z-[80] max-h-[calc(100svh-118px)] w-[220px] overflow-y-auto rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(246,240,232,0.76))] p-1.5 shadow-[0_22px_56px_rgba(56,41,29,0.2),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-2xl transition";
+const wallArtTemplatePresetCardClassName =
+  "overflow-hidden rounded-[12px] bg-white/74 shadow-[0_10px_22px_rgba(64,48,34,0.08),0_1px_0_rgba(255,255,255,0.76)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_16px_28px_rgba(64,48,34,0.12)]";
+const wallArtTemplateActiveBadgeClassName =
+  "rounded-full border-none bg-[#2d2622] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.16em] text-[#f7f0e6] shadow-[0_8px_16px_rgba(45,38,34,0.18)]";
+const wallArtSectionHeadingClassName =
+  "text-[10px] font-bold uppercase tracking-[0.16em] text-[#8f7f72]";
+const wallArtMicroButtonClassName =
+  "rounded-full bg-white/78 text-[#322821] shadow-[0_8px_18px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition hover:bg-white";
+const wallArtFloatingActionClassName =
+  "group absolute right-2.5 top-2.5 z-20 h-9 rounded-[14px] bg-[linear-gradient(180deg,rgba(43,34,29,0.76),rgba(31,24,21,0.92))] px-3.5 text-[11px] font-black text-[#fff8f0] shadow-[0_18px_40px_rgba(29,22,19,0.24),0_1px_0_rgba(255,255,255,0.18)_inset] backdrop-blur-2xl transition hover:scale-[1.02] hover:bg-[linear-gradient(180deg,rgba(49,39,33,0.8),rgba(34,27,23,0.96))] hover:text-white sm:right-3 sm:top-3 sm:h-10 sm:px-4 sm:text-[12px]";
 
 function clampNumber(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+function getWallArtTemplateCardClassName(active: boolean) {
+  return cn(
+    wallArtTemplateCardBaseClassName,
+    active
+      ? "border-transparent bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(246,238,229,0.82))] shadow-[0_26px_56px_rgba(70,53,38,0.16),inset_0_1px_0_rgba(255,255,255,0.82)]"
+      : "text-[#312821]",
+  );
+}
+
+function getWallArtTemplatePresetCardClassName(active: boolean) {
+  return cn(
+    wallArtTemplatePresetCardClassName,
+    active
+      ? "border-transparent bg-white shadow-[0_18px_38px_rgba(64,48,34,0.14),inset_0_1px_0_rgba(255,255,255,0.8)] ring-2 ring-[#2d2622]/10"
+      : "",
+  );
 }
 
 function loadHtmlImage(source: string): Promise<HTMLImageElement> {
@@ -577,16 +634,17 @@ function ControlRow({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3">
-        <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+    <div className="space-y-2 rounded-[18px] bg-white/40 px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_8px_18px_rgba(70,53,38,0.05)] backdrop-blur-xl">
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
           {label}
         </Label>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground">
+        <span className="rounded-full bg-white/72 px-2.5 py-0.5 text-[10px] font-bold text-[#5d5045] shadow-[inset_0_1px_0_rgba(255,255,255,0.74)]">
           {value}
         </span>
       </div>
       <Slider
+        className="[&_[data-slot=slider-range]]:bg-[#362e28] [&_[data-slot=slider-thumb]]:size-4 [&_[data-slot=slider-thumb]]:border-2 [&_[data-slot=slider-thumb]]:border-white/80 [&_[data-slot=slider-thumb]]:bg-[#fff8f1] [&_[data-slot=slider-thumb]]:shadow-[0_8px_16px_rgba(53,40,30,0.2)] [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/65"
         max={max}
         min={min}
         step={step}
@@ -608,18 +666,19 @@ function ColorInput({
 }) {
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+      <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
         {label}
       </Label>
       <div className="flex items-center gap-2">
         <Input
           aria-label={label}
-          className="h-10 w-12 shrink-0 cursor-pointer p-1"
+          className="h-10 w-11 shrink-0 cursor-pointer rounded-[16px] border-white/45 bg-white/76 p-1 shadow-[0_8px_18px_rgba(70,53,38,0.08),inset_0_1px_0_rgba(255,255,255,0.74)]"
           type="color"
           value={value}
           onChange={(event) => onChange(event.target.value)}
         />
         <Input
+          className={wallArtFieldClassName}
           value={value}
           onChange={(event) => onChange(event.target.value)}
         />
@@ -641,19 +700,22 @@ function FontSelect({
 
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+      <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
         Font
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             aria-expanded={open}
-            className="h-10 w-full justify-between rounded-md px-3 font-normal"
+            className={cn(
+              wallArtFieldClassName,
+              "w-full justify-between px-3.5 font-normal",
+            )}
             role="combobox"
             variant="outline"
           >
             <span
-              className="truncate text-left text-base"
+              className="truncate text-left text-[14px]"
               style={{ fontFamily: selectedFont?.previewFamily }}
             >
               {selectedFont?.label ?? "Select font"}
@@ -663,9 +725,12 @@ function FontSelect({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="flex max-h-[min(22rem,var(--radix-popover-content-available-height))] w-[--radix-popover-trigger-width] flex-col p-0"
+          className={cn(
+            wallArtPopoverClassName,
+            "flex max-h-[min(20rem,var(--radix-popover-content-available-height))] w-[--radix-popover-trigger-width] flex-col p-1 [&_[data-slot=command-group]]:p-1 [&_[data-slot=command-input-wrapper]]:h-10 [&_[data-slot=command-input-wrapper]]:rounded-[14px] [&_[data-slot=command-input-wrapper]]:border-none [&_[data-slot=command-input-wrapper]]:bg-white/72 [&_[data-slot=command-input-wrapper]]:px-3 [&_[data-slot=command-input]]:h-9 [&_[data-slot=command-item]]:rounded-[14px] [&_[data-slot=command-item]]:px-3 [&_[data-slot=command-item][data-selected=true]]:bg-[#2d2622] [&_[data-slot=command-item][data-selected=true]]:text-[#f7f0e6]",
+          )}
         >
-          <Command className="min-h-0">
+          <Command className="min-h-0 rounded-[18px] bg-transparent">
             <CommandInput placeholder="Search fonts..." />
             <CommandList className="min-h-0 flex-1 overscroll-contain">
               <CommandEmpty>No font found.</CommandEmpty>
@@ -686,7 +751,7 @@ function FontSelect({
                       )}
                     />
                     <span
-                      className="truncate text-lg leading-8"
+                      className="truncate text-[15px] leading-7"
                       style={{ fontFamily: font.previewFamily }}
                     >
                       {font.label}
@@ -711,14 +776,19 @@ function FontWeightSelect({
 }) {
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+      <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
         Font weight
       </Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent
+          className={cn(
+            wallArtPopoverClassName,
+            "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+          )}
+        >
           {[
             ["300", "Light"],
             ["400", "Regular"],
@@ -1891,10 +1961,12 @@ export function WallArtEditorDrawer({
           }
         }}
       >
-        <DialogContent className="max-h-[92svh] overflow-y-auto sm:max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Crop lyric portrait image</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="max-h-[92svh] overflow-y-auto rounded-[32px] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,239,231,0.78))] p-7 shadow-[0_32px_100px_rgba(49,37,28,0.2),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-2xl sm:max-w-4xl [&_[data-slot=dialog-close]]:top-5 [&_[data-slot=dialog-close]]:right-5 [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:border [&_[data-slot=dialog-close]]:border-white/50 [&_[data-slot=dialog-close]]:bg-white/72 [&_[data-slot=dialog-close]]:p-2 [&_[data-slot=dialog-close]]:opacity-100 [&_[data-slot=dialog-close]]:shadow-[0_12px_28px_rgba(70,53,38,0.12)]">
+          <DialogHeader className="gap-3">
+            <DialogTitle className="text-[1.65rem] font-black tracking-[-0.02em] text-[#241b16]">
+              Crop lyric portrait image
+            </DialogTitle>
+            <DialogDescription className="max-w-2xl text-[15px] leading-7 text-[#706356]">
               Choose the poster ratio, then move and scale the image before it
               becomes lyric texture.
             </DialogDescription>
@@ -1902,9 +1974,9 @@ export function WallArtEditorDrawer({
 
           {imageCropDraft && (
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
-              <div className="min-w-0 rounded-xl border bg-[#201f1c] p-3">
+              <div className="min-w-0 rounded-[28px] border border-white/25 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_38%),linear-gradient(180deg,#2e2925,#171412)] p-4 shadow-[0_22px_55px_rgba(31,24,19,0.28)]">
                 <div
-                  className="mx-auto max-w-full overflow-hidden rounded-md shadow-2xl"
+                  className="mx-auto max-w-full overflow-hidden rounded-[22px] shadow-[0_26px_50px_rgba(0,0,0,0.34)]"
                   style={{
                     aspectRatio: `${imageCropWidthCm} / ${imageCropHeightCm}`,
                     width: imageCropPreviewDisplayWidth,
@@ -1971,9 +2043,9 @@ export function WallArtEditorDrawer({
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className={cn(wallArtSubtleGlassPanelClassName, "space-y-4 p-5")}>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
                     Canvas size
                   </Label>
                   <Select
@@ -1982,10 +2054,15 @@ export function WallArtEditorDrawer({
                       updateImageCropCanvasSize({ printSizeId: value })
                     }
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent
+                      className={cn(
+                        wallArtPopoverClassName,
+                        "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+                      )}
+                    >
                       {printSizePresets.map((size) => (
                         <SelectItem key={size.id} value={size.id}>
                           {size.label}
@@ -2000,6 +2077,7 @@ export function WallArtEditorDrawer({
                     <div className="space-y-2">
                       <Label>Width cm</Label>
                       <Input
+                        className={wallArtFieldClassName}
                         min={5}
                         step={0.1}
                         type="number"
@@ -2014,6 +2092,7 @@ export function WallArtEditorDrawer({
                     <div className="space-y-2">
                       <Label>Height cm</Label>
                       <Input
+                        className={wallArtFieldClassName}
                         min={5}
                         step={0.1}
                         type="number"
@@ -2028,11 +2107,16 @@ export function WallArtEditorDrawer({
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
                     Transform
                   </Label>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
+                      className={
+                        imageCropDraft.crop.flipX
+                          ? wallArtPillButtonActiveClassName
+                          : wallArtPillButtonClassName
+                      }
                       type="button"
                       variant={imageCropDraft.crop.flipX ? "default" : "outline"}
                       onClick={() =>
@@ -2045,6 +2129,11 @@ export function WallArtEditorDrawer({
                       Flip H
                     </Button>
                     <Button
+                      className={
+                        imageCropDraft.crop.flipY
+                          ? wallArtPillButtonActiveClassName
+                          : wallArtPillButtonClassName
+                      }
                       type="button"
                       variant={imageCropDraft.crop.flipY ? "default" : "outline"}
                       onClick={() =>
@@ -2057,6 +2146,7 @@ export function WallArtEditorDrawer({
                       Flip V
                     </Button>
                     <Button
+                      className={wallArtPillButtonClassName}
                       type="button"
                       variant="outline"
                       onClick={() =>
@@ -2072,6 +2162,7 @@ export function WallArtEditorDrawer({
                       Rotate
                     </Button>
                     <Button
+                      className={wallArtPillButtonClassName}
                       type="button"
                       variant="outline"
                       onClick={() =>
@@ -2121,7 +2212,7 @@ export function WallArtEditorDrawer({
                   value={Math.round(imageCropDraft.crop.y)}
                   onChange={(y) => updateImageCropTransform({ y })}
                 />
-                <div className="rounded-xl border bg-muted/40 p-3 text-xs leading-5 text-muted-foreground">
+                <div className={cn(wallArtInfoCardClassName, "text-xs leading-5 text-[#7b6d62]")}>
                   The crop ratio matches the selected print canvas. Drag the
                   image directly for fine positioning.
                 </div>
@@ -2129,15 +2220,20 @@ export function WallArtEditorDrawer({
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="mt-2">
             <Button
+              className={wallArtSecondaryButtonClassName}
               type="button"
               variant="outline"
               onClick={() => setImageCropDraft(null)}
             >
               Cancel
             </Button>
-            <Button type="button" onClick={applyImageCrop}>
+            <Button
+              className={wallArtPrimaryButtonClassName}
+              type="button"
+              onClick={applyImageCrop}
+            >
               <Move className="size-4" />
               Apply crop
             </Button>
@@ -2146,20 +2242,33 @@ export function WallArtEditorDrawer({
       </Dialog>
 
       <Sheet>
-      <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent className="w-screen max-w-none gap-0 overflow-hidden p-0 sm:max-w-none">
-        <style>{wallArtFontFaceCss}</style>
-        <SheetHeader className="border-b bg-background/95 px-5 py-2 backdrop-blur">
-          <div className="flex min-w-0 items-center justify-between gap-4 pr-10">
+        <SheetTrigger asChild>{trigger}</SheetTrigger>
+        <SheetContent className="w-screen max-w-none gap-0 overflow-visible border-none bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.58),transparent_32%),linear-gradient(180deg,#f6f1eb_0%,#ede5dc_38%,#e8ded4_100%)] p-0 sm:max-w-none [&_[data-slot=sheet-close]]:top-4 [&_[data-slot=sheet-close]]:right-4 [&_[data-slot=sheet-close]]:size-9 [&_[data-slot=sheet-close]]:rounded-[14px] [&_[data-slot=sheet-close]]:border-none [&_[data-slot=sheet-close]]:bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(245,238,230,0.62))] [&_[data-slot=sheet-close]]:opacity-100 [&_[data-slot=sheet-close]]:text-[#473b33] [&_[data-slot=sheet-close]]:shadow-[0_14px_28px_rgba(66,51,37,0.12),0_1px_0_rgba(255,255,255,0.76)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] [&_[data-slot=sheet-close]]:backdrop-blur-2xl [&_[data-slot=sheet-close]]:transition-all [&_[data-slot=sheet-close]]:duration-200 hover:[&_[data-slot=sheet-close]]:scale-[1.03] hover:[&_[data-slot=sheet-close]]:bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,241,233,0.72))] hover:[&_[data-slot=sheet-close]]:text-[#2f2520]">
+        <style>{`${wallArtFontFaceCss}${wallArtMotionCss}`}</style>
+        {activeImageUrl && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+          >
+            <div
+              className="absolute inset-[-14%] scale-[1.18] bg-center bg-cover opacity-60 blur-[92px] saturate-[1.08]"
+              style={{ backgroundImage: `url("${activeImageUrl}")` }}
+            />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_14%,rgba(255,255,255,0.14),transparent_34%),linear-gradient(180deg,rgba(246,241,235,0.54)_0%,rgba(239,231,221,0.68)_36%,rgba(233,224,213,0.78)_100%)] backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.12),rgba(221,197,180,0.04)_42%,rgba(95,74,57,0.06)_100%)] mix-blend-soft-light" />
+          </div>
+        )}
+        <SheetHeader className="relative z-10 mx-3 mt-3 rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(247,241,233,0.66))] px-4 py-3 shadow-[0_16px_34px_rgba(70,53,38,0.1),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-2xl sm:mx-4 sm:mt-4 sm:px-5 lg:mx-5 lg:px-6">
+          <div className="flex min-w-0 flex-col gap-3 pr-10 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Disc3 className="size-4" />
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.95),rgba(255,247,241,0.62)_42%,rgba(232,198,176,0.34)_100%)] text-[#b56e4f] shadow-[0_12px_22px_rgba(181,110,79,0.14),inset_0_1px_0_rgba(255,255,255,0.84)]">
+                <Disc3 className="size-3.5" />
               </div>
-              <div className="flex min-w-0 items-baseline gap-3">
-                <SheetTitle className="shrink-0 text-xl font-black">
+              <div className="flex min-w-0 flex-col gap-0.5 lg:flex-row lg:items-baseline lg:gap-3">
+                <SheetTitle className="shrink-0 text-[1.45rem] font-black tracking-[-0.03em] text-[#241b16]">
                   Wall Art Studio
                 </SheetTitle>
-                <SheetDescription className="truncate text-sm">
+                <SheetDescription className="max-w-[32rem] text-[13px] leading-5 text-[#75695d] lg:truncate">
                   Choose a template, edit the spiral lyrics, and tune the poster
                   details.
                 </SheetDescription>
@@ -2169,12 +2278,18 @@ export function WallArtEditorDrawer({
             <Select value={selectedSongId} onValueChange={handleSongSelection}>
               <SelectTrigger
                 aria-label="Choose song"
-                className="h-10 w-[280px] shrink-0 rounded-lg border-primary/40 bg-white text-left font-bold shadow-sm"
+                className="h-11 w-full shrink-0 rounded-full bg-white/74 px-4 text-left text-[15px] font-black text-[#2d251f] shadow-[0_14px_28px_rgba(70,53,38,0.1),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.18)_inset] backdrop-blur-xl lg:w-[330px]"
                 disabled={!hasSongs}
               >
                 <SelectValue placeholder={hasSongs ? "Choose song" : "No songs yet"} />
               </SelectTrigger>
-              <SelectContent align="end" className="w-[280px]">
+              <SelectContent
+                align="end"
+                className={cn(
+                  wallArtPopoverClassName,
+                  "w-[260px] lg:w-[330px] [&_[data-slot=select-item]]:rounded-[14px] [&_[data-slot=select-item]]:py-2.5 [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+                )}
+              >
                 {selectableSongs.map((song) => (
                   <SelectItem key={song.id} value={song.id}>
                     <span className="block max-w-[220px] truncate">
@@ -2188,29 +2303,28 @@ export function WallArtEditorDrawer({
         </SheetHeader>
 
         {hasSongs ? (
-        <div className="grid min-h-0 flex-1 overflow-hidden bg-[#f2eee7] lg:grid-cols-[190px_minmax(0,1fr)_340px]">
-          <aside className="flex min-h-0 flex-col border-b bg-white/80 p-2 lg:border-b-0 lg:border-r">
-            <div className="flex shrink-0 items-center gap-2 text-sm font-black text-foreground">
-              <ImageIcon className="size-4" />
+        <div className="relative z-10 grid min-h-0 flex-1 overflow-hidden px-3 pb-3 pt-3 sm:px-4 sm:pb-4 lg:grid-cols-[185px_minmax(0,1fr)_310px] lg:gap-4 lg:px-5 lg:pb-5">
+          <aside className={cn(wallArtGlassPanelClassName, "flex min-h-0 flex-col p-2.5 lg:p-3")}>
+            <div className="flex shrink-0 items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#74685d]">
+              <span className="flex size-7 items-center justify-center rounded-full bg-white/72 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.76)]">
+                <ImageIcon className="size-3.5" />
+              </span>
               Templates
             </div>
-            <div className="mt-2.5 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+            <div className="mt-2.5 min-h-0 flex-1 space-y-2.5 overflow-y-auto pr-1">
               <div
                 className="group relative"
                 onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
                 onMouseLeave={schedulePresetPanelClose}
               >
                 <button
-                  className={cn(
-                    "w-full rounded-lg border p-1 text-left transition hover:border-primary/50 hover:bg-primary/15",
-                    activeTemplate === "imageLyrics"
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-background",
+                  className={getWallArtTemplateCardClassName(
+                    activeTemplate === "imageLyrics",
                   )}
                   type="button"
                   onClick={() => switchTemplate("imageLyrics")}
                 >
-                  <div className="mx-auto aspect-[4/5] max-h-44 overflow-hidden rounded-md border bg-muted">
+                  <div className={wallArtTemplateThumbClassName}>
                     <img
                       alt={
                         lyricPortraitPresetImages[imageLyricPresetIndex]
@@ -2223,13 +2337,13 @@ export function WallArtEditorDrawer({
                       }
                     />
                   </div>
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="text-[11px] font-bold">Lyric Portrait</p>
+                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                    <p className="text-[12px] font-black text-[#271d17]">Lyric Portrait</p>
                     {activeTemplate === "imageLyrics" && (
-                      <Badge className="px-1 py-0 text-[9px]">Active</Badge>
+                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[9px] leading-3 text-muted-foreground">
+                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
                     Hover to switch portrait presets.
                   </p>
                 </button>
@@ -2246,7 +2360,7 @@ export function WallArtEditorDrawer({
                 />
                 <div
                   className={cn(
-                    "fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 shadow-2xl transition",
+                    wallArtTemplatePopoverClassName,
                     openPresetPanel === "imageLyrics"
                       ? "visible opacity-100"
                       : "invisible opacity-0",
@@ -2254,16 +2368,13 @@ export function WallArtEditorDrawer({
                   onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
                   onMouseLeave={schedulePresetPanelClose}
                 >
-                  <div className="grid grid-cols-2 gap-1">
+                  <div className="grid grid-cols-2 gap-2">
                     {lyricPortraitPresetImages.map((preset, index) => (
                       <button
                         key={preset.src}
-                        className={cn(
-                          "overflow-hidden rounded-md border bg-muted transition hover:border-primary",
+                        className={getWallArtTemplatePresetCardClassName(
                           activeTemplate === "imageLyrics" &&
-                            imageLyricPresetIndex === index
-                            ? "border-primary ring-2 ring-primary/20"
-                            : "border-border",
+                            imageLyricPresetIndex === index,
                         )}
                         type="button"
                         onClick={() => {
@@ -2276,7 +2387,7 @@ export function WallArtEditorDrawer({
                           className="aspect-[4/5] w-full object-cover"
                           src={preset.src}
                         />
-                        <span className="block bg-background px-1 py-0.5 text-[9px] font-bold">
+                        <span className="block bg-white/72 px-2 py-1.5 text-[10px] font-bold text-[#342a23]">
                           {preset.name}
                         </span>
                       </button>
@@ -2285,35 +2396,28 @@ export function WallArtEditorDrawer({
                 </div>
               </div>
 
-              <div
-                className="group relative"
-                onMouseEnter={() => keepPresetPanelOpen("template2")}
-                onMouseLeave={schedulePresetPanelClose}
-              >
+              <div className="group relative">
                 <button
-                  className={cn(
-                    "w-full rounded-lg border p-1 text-left transition hover:border-primary/50 hover:bg-primary/15",
-                    activeTemplate === "heart"
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-background",
+                  className={getWallArtTemplateCardClassName(
+                    activeTemplate === "heart",
                   )}
                   type="button"
                   onClick={() => switchTemplate("heart")}
                 >
-                  <div className="mx-auto aspect-[4/5] max-h-44 overflow-hidden rounded-md border bg-muted">
+                  <div className={wallArtTemplateThumbClassName}>
                     <img
                       alt="Heart lyric"
                       className="size-full object-cover"
                       src={heartTemplatePreview}
                     />
                   </div>
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="text-[11px] font-bold">Heart Lyric</p>
+                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                    <p className="text-[12px] font-black text-[#271d17]">Heart Lyric</p>
                     {activeTemplate === "heart" && (
-                      <Badge className="px-1 py-0 text-[9px]">Active</Badge>
+                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[9px] leading-3 text-muted-foreground">
+                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
                     Heart-shaped lyric template.
                   </p>
                 </button>
@@ -2321,16 +2425,13 @@ export function WallArtEditorDrawer({
 
               <div className="group relative">
                 <button
-                  className={cn(
-                    "w-full rounded-lg border p-1 text-left transition hover:border-primary/50 hover:bg-primary/15",
-                    activeTemplate === "template2"
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-background",
+                  className={getWallArtTemplateCardClassName(
+                    activeTemplate === "template2",
                   )}
                   type="button"
                   onClick={() => switchTemplate("template2")}
                 >
-                  <div className="mx-auto aspect-[4/5] max-h-44 overflow-hidden rounded-md border bg-muted">
+                  <div className={wallArtTemplateThumbClassName}>
                     <img
                       alt={
                         template2PresetImages[template2PresetIndex]?.name ??
@@ -2343,13 +2444,13 @@ export function WallArtEditorDrawer({
                       }
                     />
                   </div>
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="text-[11px] font-bold">Record Poster</p>
+                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                    <p className="text-[12px] font-black text-[#271d17]">Record Poster</p>
                     {activeTemplate === "template2" && (
-                      <Badge className="px-1 py-0 text-[9px]">Active</Badge>
+                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[9px] leading-3 text-muted-foreground">
+                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
                     Hover to switch color presets.
                   </p>
                 </button>
@@ -2366,7 +2467,7 @@ export function WallArtEditorDrawer({
                 />
                 <div
                   className={cn(
-                    "fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 shadow-2xl transition",
+                    wallArtTemplatePopoverClassName,
                     openPresetPanel === "template2"
                       ? "visible opacity-100"
                       : "invisible opacity-0",
@@ -2374,16 +2475,13 @@ export function WallArtEditorDrawer({
                   onMouseEnter={() => keepPresetPanelOpen("template2")}
                   onMouseLeave={schedulePresetPanelClose}
                 >
-                  <div className="grid grid-cols-3 gap-1">
+                  <div className="grid grid-cols-3 gap-2">
                     {template2PresetImages.map((preset, index) => (
                       <button
                         key={preset.src}
-                        className={cn(
-                          "overflow-hidden rounded-md border bg-muted transition hover:border-primary",
+                        className={getWallArtTemplatePresetCardClassName(
                           activeTemplate === "template2" &&
-                            template2PresetIndex === index
-                            ? "border-primary ring-2 ring-primary/20"
-                            : "border-border",
+                            template2PresetIndex === index,
                         )}
                         type="button"
                         onClick={() => {
@@ -2396,7 +2494,7 @@ export function WallArtEditorDrawer({
                           className="aspect-[4/5] w-full object-cover"
                           src={preset.src}
                         />
-                        <span className="block bg-background px-1 py-0.5 text-[9px] font-bold">
+                        <span className="block bg-white/72 px-2 py-1.5 text-[10px] font-bold text-[#342a23]">
                           {preset.name}
                         </span>
                       </button>
@@ -2411,16 +2509,13 @@ export function WallArtEditorDrawer({
                 onMouseLeave={schedulePresetPanelClose}
               >
                 <button
-                  className={cn(
-                    "w-full rounded-lg border p-1 text-left transition hover:border-primary/50 hover:bg-primary/15",
-                    activeTemplate === "spiral"
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-background",
+                  className={getWallArtTemplateCardClassName(
+                    activeTemplate === "spiral",
                   )}
                   type="button"
                   onClick={() => switchTemplate("spiral")}
                 >
-                  <div className="mx-auto aspect-[4/5] max-h-44 overflow-hidden rounded-md border bg-muted">
+                  <div className={wallArtTemplateThumbClassName}>
                     <img
                       alt={
                         presetImages[activePresetIndex]?.name ?? "Spiral record"
@@ -2432,13 +2527,13 @@ export function WallArtEditorDrawer({
                       }
                     />
                   </div>
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <p className="text-[11px] font-bold">Spiral Record</p>
+                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                    <p className="text-[12px] font-black text-[#271d17]">Spiral Record</p>
                     {activeTemplate === "spiral" && (
-                      <Badge className="px-1 py-0 text-[9px]">Active</Badge>
+                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[9px] leading-3 text-muted-foreground">
+                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
                     Hover to switch color presets.
                   </p>
                 </button>
@@ -2455,7 +2550,7 @@ export function WallArtEditorDrawer({
                 />
                 <div
                   className={cn(
-                    "fixed left-[198px] top-[110px] z-50 max-h-[calc(100svh-126px)] w-[246px] overflow-y-auto rounded-lg border bg-background p-1 shadow-2xl transition",
+                    wallArtTemplatePopoverClassName,
                     openPresetPanel === "spiral"
                       ? "visible opacity-100"
                       : "invisible opacity-0",
@@ -2463,16 +2558,13 @@ export function WallArtEditorDrawer({
                   onMouseEnter={() => keepPresetPanelOpen("spiral")}
                   onMouseLeave={schedulePresetPanelClose}
                 >
-                  <div className="grid grid-cols-3 gap-1">
+                  <div className="grid grid-cols-3 gap-2">
                     {presetImages.map((preset, index) => (
                       <button
                         key={preset.src}
-                        className={cn(
-                          "overflow-hidden rounded-md border bg-muted transition hover:border-primary",
+                        className={getWallArtTemplatePresetCardClassName(
                           activeTemplate === "spiral" &&
-                            activePresetIndex === index
-                            ? "border-primary ring-2 ring-primary/20"
-                            : "border-border",
+                            activePresetIndex === index,
                         )}
                         type="button"
                         onClick={() => {
@@ -2485,7 +2577,7 @@ export function WallArtEditorDrawer({
                           className="aspect-[4/5] w-full object-cover"
                           src={preset.src}
                         />
-                        <span className="block bg-background px-1 py-0.5 text-[9px] font-bold">
+                        <span className="block bg-white/72 px-2 py-1.5 text-[10px] font-bold text-[#342a23]">
                           {preset.name}
                         </span>
                       </button>
@@ -2496,13 +2588,21 @@ export function WallArtEditorDrawer({
             </div>
           </aside>
 
-          <section className="min-h-0 overflow-hidden px-4 py-4 md:px-6">
-            <div className="mx-auto flex h-full max-w-[820px] flex-col items-center justify-start gap-3 pt-1">
+          <section className="min-h-0 overflow-hidden py-0.5">
+            <div className={cn(wallArtGlassPanelClassName, "relative flex h-full min-h-0 flex-col items-center justify-center px-4 py-4 md:px-5")}>
+              <Button
+                className={wallArtFloatingActionClassName}
+                type="button"
+                onClick={downloadPoster}
+              >
+                <Download className="size-3.5 transition-transform duration-300 group-hover:[animation:wallArtDownloadIconDrift_0.7s_ease]" />
+                Export
+              </Button>
               <div
-                className="w-auto max-w-full overflow-hidden rounded-[3px] shadow-2xl shadow-black/25 flex-1"
+                className="w-auto max-w-full flex-1 overflow-hidden rounded-[4px] shadow-[0_20px_48px_rgba(34,26,20,0.22)]"
                 style={{
                   aspectRatio: `${posterWidthCm} / ${posterHeightCm}`,
-                  maxHeight: "calc(100svh - 80px)",
+                  maxHeight: "calc(100svh - 176px)",
                 }}
               >
                 <svg
@@ -3153,22 +3253,16 @@ export function WallArtEditorDrawer({
                   )}
                 </svg>
               </div>
-              <Button
-                className="rounded-full shadow-lg"
-                type="button"
-                onClick={downloadPoster}
-              >
-                <Download className="size-4" />
-                Download 300dpi PNG
-              </Button>
             </div>
           </section>
 
-          <aside className="min-h-0 overflow-auto border-t bg-background p-4 lg:border-l lg:border-t-0">
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal className="size-4 text-primary" />
-              <h3 className="font-black">Edit</h3>
-              <Badge className="ml-auto" variant="secondary">
+          <aside className={cn(wallArtGlassPanelClassName, "min-h-0 overflow-auto p-3 lg:p-4")}>
+            <div className="flex items-center gap-2.5">
+              <span className="flex size-8 items-center justify-center rounded-full bg-white/76 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.78)]">
+                <SlidersHorizontal className="size-4" />
+              </span>
+              <h3 className="text-[0.95rem] font-black tracking-[-0.02em] text-[#241b16]">Edit</h3>
+              <Badge className="ml-auto rounded-full border-none bg-white/74 px-2.5 py-0.5 text-[10px] font-bold text-[#635649] shadow-[inset_0_1px_0_rgba(255,255,255,0.74)]" variant="secondary">
                 {activeTarget}
               </Badge>
             </div>
@@ -3182,7 +3276,11 @@ export function WallArtEditorDrawer({
               ).map(([key, label]) => (
                 <Button
                   key={key}
-                  className="h-9"
+                  className={
+                    activeTarget === key
+                      ? cn(wallArtPillButtonActiveClassName, "h-9 text-[13px] font-bold")
+                      : cn(wallArtPillButtonClassName, "h-9 text-[13px] font-bold")
+                  }
                   size="sm"
                   type="button"
                   variant={activeTarget === key ? "default" : "outline"}
@@ -3193,7 +3291,11 @@ export function WallArtEditorDrawer({
               ))}
             </div>
             <Button
-              className="mt-3 w-full"
+              className={
+                activeTarget === "customText"
+                  ? cn(wallArtPillButtonActiveClassName, "mt-2.5 h-10 w-full text-[13px] font-bold")
+                  : cn(wallArtPillButtonClassName, "mt-2.5 h-10 w-full text-[13px] font-bold")
+              }
               type="button"
               variant={activeTarget === "customText" ? "default" : "outline"}
               onClick={addCustomText}
@@ -3202,14 +3304,14 @@ export function WallArtEditorDrawer({
               Add text
             </Button>
 
-            <Separator className="my-5" />
+            <Separator className="my-5 bg-white/45" />
 
             {activeTarget === "image" ? (
-              <div className="space-y-5">
-                <div className="space-y-3 rounded-xl border bg-muted/30 p-3">
+              <div className={wallArtEditorSectionClassName}>
+                <div className={cn(wallArtInfoCardClassName, "space-y-2.5")}>
                   <div>
-                    <Label className="text-sm font-bold">Source image</Label>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    <Label className="text-[13px] font-bold text-[#241b16]">Source image</Label>
+                    <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
                       Upload and crop an image. The final portrait keeps the
                       original color only where lyric text is drawn.
                     </p>
@@ -3225,9 +3327,9 @@ export function WallArtEditorDrawer({
                   />
                   <label
                     className={cn(
-                      "group flex aspect-[4/3] w-full cursor-pointer items-center justify-center overflow-hidden rounded-md border border-dashed bg-background transition-all duration-200",
-                      "hover:border-primary/70 hover:bg-primary/5 hover:shadow-sm",
-                      "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
+                      "group flex aspect-[4/3] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[18px] border border-white/40 bg-white/66 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_10px_20px_rgba(70,53,38,0.06)]",
+                      "hover:bg-white/82 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_14px_28px_rgba(70,53,38,0.1)]",
+                      "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[#c9bbac]/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent",
                     )}
                     htmlFor={imageLyricUploadInputId}
                     title={
@@ -3240,25 +3342,25 @@ export function WallArtEditorDrawer({
                       <div className="relative size-full">
                         <img
                           alt="Lyric portrait source"
-                          className="size-full object-cover transition duration-200 group-hover:scale-[1.02]"
+                          className="size-full object-cover transition duration-200 group-hover:scale-[1.025]"
                           src={imageLyricSourceImage}
                         />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition duration-200 group-hover:bg-black/35">
-                          <span className="inline-flex translate-y-1 items-center gap-2 rounded-md bg-background/95 px-3 py-2 text-xs font-bold text-foreground opacity-0 shadow-sm transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition duration-200 group-hover:bg-black/28">
+                          <span className="inline-flex translate-y-1 items-center gap-1.5 rounded-full bg-white/92 px-3 py-1.5 text-[11px] font-bold text-[#2d251f] opacity-0 shadow-[0_12px_22px_rgba(27,21,17,0.18)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
                             <ImagePlus className="size-4" />
                             Replace image
                           </span>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center gap-2 px-4 text-center">
-                        <span className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors duration-200 group-hover:bg-primary/10 group-hover:text-primary">
-                          <ImagePlus className="size-5" />
+                      <div className="flex flex-col items-center gap-1.5 px-4 text-center">
+                        <span className="flex size-10 items-center justify-center rounded-full bg-white/82 text-[#8a7a6c] transition-colors duration-200 group-hover:bg-white group-hover:text-[#b56e4f]">
+                          <ImagePlus className="size-4.5" />
                         </span>
-                        <span className="text-sm font-bold text-foreground">
+                        <span className="text-[13px] font-bold text-[#241b16]">
                           Upload source image
                         </span>
-                        <span className="text-xs leading-5 text-muted-foreground">
+                        <span className="text-[11px] leading-4.5 text-[#76695d]">
                           Click to choose an image for the lyric portrait.
                         </span>
                       </div>
@@ -3266,7 +3368,7 @@ export function WallArtEditorDrawer({
                   </label>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  <Label className={wallArtSectionHeadingClassName}>
                     Render mode
                   </Label>
                   <Select
@@ -3275,10 +3377,15 @@ export function WallArtEditorDrawer({
                       setImageLyricMode(value as ImageLyricMode)
                     }
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent
+                      className={cn(
+                        wallArtPopoverClassName,
+                        "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+                      )}
+                    >
                       <SelectItem value="color">Color from image</SelectItem>
                       <SelectItem value="grayscale">
                         Black and white luminance
@@ -3310,21 +3417,22 @@ export function WallArtEditorDrawer({
                   value={Number(imageLyricOpacity.toFixed(2))}
                   onChange={setImageLyricOpacity}
                 />
-                <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/30 p-3">
+                <div className={cn(wallArtInfoCardClassName, "flex items-center justify-between gap-3")}>
                   <div>
-                    <Label className="text-sm font-bold">Invert source</Label>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    <Label className="text-[13px] font-bold text-[#241b16]">Invert source</Label>
+                    <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
                       Reverse the source image before applying the lyric mask.
                     </p>
                   </div>
                   <Switch
+                    className="[&_[data-slot=switch-thumb]]:bg-white [&_[data-slot=switch-thumb]]:shadow-[0_6px_14px_rgba(45,38,34,0.16)] data-[state=checked]:bg-[#2d2622] data-[state=unchecked]:bg-white/80"
                     checked={imageLyricInvert}
                     onCheckedChange={setImageLyricInvert}
                   />
                 </div>
               </div>
             ) : activeTarget === "poster" ? (
-              <div className="space-y-5">
+              <div className={wallArtEditorSectionClassName}>
                 <ColorInput
                   label="Background"
                   value={posterBackground}
@@ -3332,7 +3440,7 @@ export function WallArtEditorDrawer({
                 />
               </div>
             ) : activeTarget === "heart" ? (
-              <div className="space-y-5">
+              <div className={wallArtEditorSectionClassName}>
                 <ControlRow
                   label="Heart size"
                   max={1.28}
@@ -3343,7 +3451,7 @@ export function WallArtEditorDrawer({
                 />
               </div>
             ) : activeTarget === "frame" ? (
-              <div className="space-y-5">
+              <div className={wallArtEditorSectionClassName}>
                 <ColorInput
                   label="Frame color"
                   value={frameColor}
@@ -3358,16 +3466,21 @@ export function WallArtEditorDrawer({
                 />
               </div>
             ) : activeTarget === "print" ? (
-              <div className="space-y-5">
+              <div className={wallArtEditorSectionClassName}>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                  <Label className={wallArtSectionHeadingClassName}>
                     Print size
                   </Label>
                   <Select value={printSizeId} onValueChange={setPrintSizeId}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent
+                      className={cn(
+                        wallArtPopoverClassName,
+                        "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+                      )}
+                    >
                       {printSizePresets.map((size) => (
                         <SelectItem key={size.id} value={size.id}>
                           {size.label}
@@ -3382,6 +3495,7 @@ export function WallArtEditorDrawer({
                     <div className="space-y-2">
                       <Label>Width cm</Label>
                       <Input
+                        className={wallArtFieldClassName}
                         min={5}
                         step={0.1}
                         type="number"
@@ -3394,6 +3508,7 @@ export function WallArtEditorDrawer({
                     <div className="space-y-2">
                       <Label>Height cm</Label>
                       <Input
+                        className={wallArtFieldClassName}
                         min={5}
                         step={0.1}
                         type="number"
@@ -3405,30 +3520,31 @@ export function WallArtEditorDrawer({
                     </div>
                   </div>
                 )}
-                <div className="rounded-xl border bg-muted/40 p-3 text-xs leading-5 text-muted-foreground">
+                <div className={cn(wallArtInfoCardClassName, "text-[11px] leading-4.5 text-[#76695d]")}>
                   Download exports at 300dpi for the selected size.
                 </div>
-                <div className="space-y-4 rounded-xl border bg-muted/30 p-3">
+                <div className={cn(wallArtInfoCardClassName, "space-y-4")}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-2">
-                      <QrCodeIcon className="size-4 shrink-0 text-primary" />
+                      <QrCodeIcon className="size-4 shrink-0 text-[#b56e4f]" />
                       <div>
-                        <Label className="text-sm font-bold">
+                        <Label className="text-[13px] font-bold text-[#241b16]">
                           Show QR code
                         </Label>
-                        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                        <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
                           Print the playable share QR on the artwork.
                         </p>
                       </div>
                     </div>
                     <Switch
+                      className="[&_[data-slot=switch-thumb]]:bg-white [&_[data-slot=switch-thumb]]:shadow-[0_6px_14px_rgba(45,38,34,0.16)] data-[state=checked]:bg-[#2d2622] data-[state=unchecked]:bg-white/80"
                       checked={showQrCode}
                       disabled={!activeShareUrl}
                       onCheckedChange={setShowQrCode}
                     />
                   </div>
                   {!activeShareUrl && (
-                    <p className="text-xs leading-5 text-muted-foreground">
+                    <p className="text-[11px] leading-4.5 text-[#87786d]">
                       This song does not have a share link yet.
                     </p>
                   )}
@@ -3457,18 +3573,18 @@ export function WallArtEditorDrawer({
                     onChange={setQrCodeOffsetY}
                   />
                 </div>
-                <div className="space-y-4 rounded-xl border bg-muted/30 p-3">
+                <div className={cn(wallArtInfoCardClassName, "space-y-4")}>
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <Label className="text-sm font-bold">
+                      <Label className="text-[13px] font-bold text-[#241b16]">
                         Artwork position
                       </Label>
-                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
                         Crop-like fit controls for the selected print size.
                       </p>
                     </div>
                     <Button
-                      className="shrink-0"
+                      className={cn(wallArtMicroButtonClassName, "shrink-0")}
                       size="sm"
                       type="button"
                       variant="outline"
@@ -3504,7 +3620,7 @@ export function WallArtEditorDrawer({
                 </div>
               </div>
             ) : activeTarget === "disc" ? (
-              <div className="space-y-5">
+              <div className={wallArtEditorSectionClassName}>
                 <ColorInput
                   label="Disc color"
                   value={discColor}
@@ -3526,17 +3642,23 @@ export function WallArtEditorDrawer({
                   }
                 />
                 {activeTemplate !== "heart" && (
-                  <div className="space-y-3 rounded-xl border bg-muted/30 p-3">
+                  <div className={cn(wallArtInfoCardClassName, "space-y-3")}>
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <Label className="text-sm font-bold">
+                        <Label className="text-[13px] font-bold text-[#241b16]">
                           Disc artwork
                         </Label>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="mt-1 text-[11px] text-[#76695d]">
                           Use cover art or upload an image for the disc.
                         </p>
                       </div>
                       <Button
+                        className={cn(
+                          useCover
+                            ? wallArtPillButtonActiveClassName
+                            : wallArtMicroButtonClassName,
+                          "size-9",
+                        )}
                         size="sm"
                         type="button"
                         variant={useCover ? "default" : "outline"}
@@ -3547,6 +3669,7 @@ export function WallArtEditorDrawer({
                     </div>
                     <Input
                       accept="image/*"
+                      className={wallArtFieldClassName}
                       type="file"
                       onChange={(event) =>
                         handleImageUpload(event.target.files?.[0])
@@ -3556,14 +3679,15 @@ export function WallArtEditorDrawer({
                 )}
               </div>
             ) : activeTarget === "customText" ? (
-              <div className="space-y-5">
+              <div className={wallArtEditorSectionClassName}>
                 <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 text-sm font-black">
-                    <Type className="size-4 text-primary" />
+                  <div className="flex items-center gap-2 text-sm font-black text-[#241b16]">
+                    <Type className="size-4 text-[#b56e4f]" />
                     Text layer
                   </div>
                   {activeCustomText && (
                     <Button
+                      className={wallArtMicroButtonClassName}
                       size="sm"
                       type="button"
                       variant="outline"
@@ -3578,6 +3702,7 @@ export function WallArtEditorDrawer({
                     <div className="space-y-2">
                       <Label>Text</Label>
                       <Input
+                        className={wallArtFieldClassName}
                         value={activeCustomText.text}
                         onChange={(event) =>
                           updateActiveCustomText({ text: event.target.value })
@@ -3654,23 +3779,27 @@ export function WallArtEditorDrawer({
                     />
                   </>
                 ) : (
-                  <Button type="button" onClick={addCustomText}>
+                  <Button
+                    className={cn(wallArtPillButtonClassName, "h-10 w-full text-[13px] font-bold")}
+                    type="button"
+                    onClick={addCustomText}
+                  >
                     <Plus className="size-4" />
                     Add text
                   </Button>
                 )}
               </div>
             ) : (
-              <div className="space-y-5">
-                <div className="flex items-center gap-2 text-sm font-black">
-                  <Type className="size-4 text-primary" />
+              <div className={wallArtEditorSectionClassName}>
+                <div className="flex items-center gap-2 text-[13px] font-black text-[#241b16]">
+                  <Type className="size-4 text-[#b56e4f]" />
                   Text layer
                 </div>
                 {activeTextTarget === "lyrics" ? (
                   <div className="space-y-2">
                     <Label>Lyrics</Label>
                     <Textarea
-                      className="h-60 min-h-24 resize-none"
+                      className={cn(wallArtTextareaClassName, "h-48 min-h-24 resize-none")}
                       value={lyricText}
                       onChange={(event) =>
                         setLyricText(cleanWallArtLyrics(event.target.value))
@@ -3683,6 +3812,7 @@ export function WallArtEditorDrawer({
                     <div className="space-y-2">
                       <Label>Song title line 1</Label>
                       <Input
+                        className={wallArtFieldClassName}
                         value={template2TitleLine1}
                         onChange={(event) =>
                           updateTemplate2Title(
@@ -3695,6 +3825,7 @@ export function WallArtEditorDrawer({
                     <div className="space-y-2">
                       <Label>Song title line 2</Label>
                       <Input
+                        className={wallArtFieldClassName}
                         placeholder="Optional"
                         value={template2TitleLine2}
                         onChange={(event) =>
@@ -3724,6 +3855,7 @@ export function WallArtEditorDrawer({
                             : "Text"}
                     </Label>
                     <Input
+                      className={wallArtFieldClassName}
                       value={
                         activeTextTarget === "title"
                           ? title
@@ -3837,13 +3969,13 @@ export function WallArtEditorDrawer({
               </div>
             )}
 
-            <Separator className="my-5" />
-            <div className="rounded-xl border bg-muted/40 p-3">
-              <div className="flex items-center gap-2 text-sm font-black">
-                <Palette className="size-4 text-primary" />
+            <Separator className="my-6 bg-white/45" />
+            <div className={cn(wallArtInfoCardClassName, "space-y-2.5")}>
+              <div className="flex items-center gap-2 text-[13px] font-black text-[#241b16]">
+                <Palette className="size-4 text-[#b56e4f]" />
                 Quick note
               </div>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              <p className="text-[11px] leading-4.5 text-[#76695d]">
                 Click any text on the poster to switch the right panel to that
                 layer. The current version focuses on the spiral lyric template
                 from the reference.
@@ -3852,19 +3984,19 @@ export function WallArtEditorDrawer({
           </aside>
         </div>
         ) : (
-          <div className="flex min-h-0 flex-1 items-center justify-center bg-[#f2eee7] px-6 py-12">
-            <div className="w-full max-w-md rounded-2xl border border-black/10 bg-white/90 p-6 text-center shadow-sm">
-              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Disc3 className="size-5" />
+          <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-6 py-10">
+            <div className={cn(wallArtGlassPanelClassName, "w-full max-w-md p-6 text-center")}>
+              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.96),rgba(255,247,241,0.62)_42%,rgba(232,198,176,0.34)_100%)] text-[#b56e4f] shadow-[0_14px_24px_rgba(181,110,79,0.14),inset_0_1px_0_rgba(255,255,255,0.84)]">
+                <Disc3 className="size-4.5" />
               </div>
-              <h3 className="mt-4 text-2xl font-black text-foreground">
+              <h3 className="mt-4 text-[1.7rem] font-black tracking-[-0.03em] text-[#241b16]">
                 Create a song first
               </h3>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              <p className="mt-3 text-[13px] leading-6 text-[#76695d]">
                 Wall Art Studio uses your finalized song title, lyrics, cover
                 art, and share link to build printable keepsakes.
               </p>
-              <Button asChild className="mt-5 rounded-full">
+              <Button asChild className={cn(wallArtPrimaryButtonClassName, "mt-5 h-10 px-5 text-[13px] font-bold")}>
                 <Link href="/create-song">Create Song</Link>
               </Button>
             </div>

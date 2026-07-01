@@ -32,6 +32,15 @@ type IconBlock = {
   icon: ReactNode;
 };
 
+type SpecificPeopleSpotlight = {
+  title: string;
+  description: string;
+  searchTerms: string[];
+  promptHint: string;
+  icon: ReactNode;
+  cardClassName?: string;
+};
+
 const benefits: IconBlock[] = [
   {
     title: "Their name in the chorus",
@@ -48,7 +57,7 @@ const benefits: IconBlock[] = [
   {
     title: "Free preview in minutes",
     description:
-      "Hear a custom birthday song sample first, then adjust lyrics or style before unlocking the full track.",
+      "Use the AI birthday song generator to hear a custom sample first, then adjust lyrics or style before unlocking the full track.",
     icon: <Clock3 className="size-6" />,
   },
   {
@@ -125,6 +134,68 @@ const useCases: IconBlock[] = [
   },
 ];
 
+const specificPeopleSpotlights: SpecificPeopleSpotlight[] = [
+  {
+    title: "Birthday song for dad",
+    description:
+      "Cover the biggest dad-focused searches with a song that sounds warm, grateful, funny, or proud. This works well for milestone birthdays, surprise party reveals, and messages that sound more personal than a card.",
+    searchTerms: ["birthday song dad", "happy birthday daddy"],
+    promptHint:
+      "Mention his nickname, the life lesson everyone repeats, his signature joke, and the memory that instantly feels like him.",
+    icon: <Heart className="size-5" />,
+    cardClassName:
+      "lg:col-span-2 xl:col-span-2 bg-[linear-gradient(135deg,rgba(255,246,239,0.98),rgba(255,255,255,0.9))]",
+  },
+  {
+    title: "Birthday song for mom",
+    description:
+      "Use this angle when you want the lyrics to feel loving, thankful, and replayable. It fits family celebrations, tribute-style messages, and softer songs that center comfort and care.",
+    searchTerms: ["songs for mom", "happy birthday for mom song"],
+    promptHint:
+      "Add her name, the way she shows love, a family ritual, and one detail that only your family would recognize.",
+    icon: <MessageCircleHeart className="size-5" />,
+  },
+  {
+    title: "Birthday song for husband",
+    description:
+      "Blend birthday wishes with romance, shared memories, and private language that makes the song feel like it belongs inside the relationship instead of on a generic playlist.",
+    searchTerms: ["birthday song for husband", "songs for husband"],
+    promptHint:
+      "Include your favorite trip, the nickname you use in private, how he makes ordinary days better, and the mood you want for the reveal.",
+    icon: <Music2 className="size-5" />,
+  },
+  {
+    title: "Birthday song for brother",
+    description:
+      "This is a strong fit for playful, affectionate birthday songs that can handle sibling humor without losing the emotional payoff when the chorus lands.",
+    searchTerms: [
+      "happy birthday song to brother",
+      "songs to dedicate to your brother from sister",
+    ],
+    promptHint:
+      "Pull in a childhood story, the one argument you still laugh about, and the kind of bond you want the song to show.",
+    icon: <PlayCircle className="size-5" />,
+  },
+  {
+    title: "Birthday song for sister",
+    description:
+      "Turn sister-focused searches into something more specific with a song that can be sweet, funny, protective, or full of shared chaos from growing up together.",
+    searchTerms: ["sister songs"],
+    promptHint:
+      "Mention the memory no one else understands, her style or energy, and whether you want the song to feel sentimental or hilariously loud.",
+    icon: <Sparkles className="size-5" />,
+  },
+  {
+    title: "Birthday song from dad to son",
+    description:
+      "Use this parent-to-child angle for birthday lyrics that sound proud, encouraging, and personal. It works especially well for sons hitting a milestone year or stepping into a new chapter.",
+    searchTerms: ["dad songs for son"],
+    promptHint:
+      "Include the age or milestone, what makes him himself, a memory you are proud of, and what you hope he carries forward.",
+    icon: <Cake className="size-5" />,
+  },
+];
+
 const exampleBriefs = [
   {
     label: "Heartfelt parent",
@@ -177,6 +248,11 @@ const faqs = [
     question: "How fast can I preview a birthday song?",
     answer:
       "You can create a preview in minutes after sharing the story and style. Listen first, then decide whether to refine or unlock the full song.",
+  },
+  {
+    question: "Is this an AI birthday song generator?",
+    answer:
+      "Yes. The page works as an AI birthday song generator that turns your details into lyrics, vocals, and music for one specific person. You bring the memories and message, then the generator builds a birthday song you can preview and refine.",
   },
   {
     question: "Can the song be funny instead of emotional?",
@@ -266,14 +342,15 @@ export default function BirthdaySongsPage({
             </div>
 
             <h1 className="mt-5 max-w-[11ch] text-balance font-sans text-[2.5rem] font-black leading-[0.98] tracking-normal text-[#250f0b] min-[420px]:text-[2.9rem] sm:text-[3.7rem] lg:text-[4.45rem]">
-              Custom Personalized Birthday Songs
+              Personalized Happy Birthday Song
             </h1>
 
             <p className="mt-5 max-w-lg text-base leading-7 text-[#6c5f59] sm:text-lg">
               Turn their name, favorite memories, and birthday message into a
-              studio-quality custom song. Create a free preview, refine the
-              lyrics, then send a personalized music gift they can replay long
-              after the candles are gone.
+              studio-quality custom song with an AI birthday song generator.
+              Create a free preview, refine the lyrics, then send a
+              personalized music gift they can replay long after the candles
+              are gone.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -354,7 +431,7 @@ export default function BirthdaySongsPage({
       <HowItWorksSection
         eyebrow="How it works"
         title="From birthday memory to singable surprise"
-        description="You bring the real details. The song maker turns them into lyrics, music, vocals, and a gift that feels impossible to buy off a shelf."
+        description="You bring the real details. The AI birthday song generator turns them into lyrics, music, vocals, and a gift that feels impossible to buy off a shelf."
         steps={steps}
       />
 
@@ -381,6 +458,82 @@ export default function BirthdaySongsPage({
                 <p className="mt-3 text-sm leading-6 text-[#74665f]">
                   {useCase.description}
                 </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#fff6f1] px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            eyebrow="Specific people"
+            title="Birthday songs for the people you know by heart"
+            description="This section covers the birthday song searches people make most often: dad, mom, husband, brother, sister, and parent-to-child birthday tributes."
+          />
+
+          <p className="mx-auto mt-6 max-w-4xl text-center text-sm leading-7 text-[#7a6961] md:text-base">
+            If someone is searching for a birthday song for a specific person,
+            they usually want more than a generic happy birthday track. These
+            topic clusters help the page speak directly to family, partner, and
+            sibling gift intent while still guiding people into one custom-song
+            flow.
+          </p>
+
+          <div className="mt-12 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+            {specificPeopleSpotlights.map((spotlight) => (
+              <article
+                key={spotlight.title}
+                className={`rounded-[28px] border border-[#f0dcd2] bg-white p-6 shadow-[0_18px_48px_rgba(78,40,21,0.08)] ${spotlight.cardClassName ?? ""}`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#ffe4d6] text-[#b74b38]">
+                    {spotlight.icon}
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#b85a47]">
+                      Birthday song topic
+                    </p>
+                    <h3 className="mt-2 text-2xl font-black leading-tight text-[#261712]">
+                      {spotlight.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <p className="mt-5 text-sm leading-7 text-[#715f57]">
+                  {spotlight.description}
+                </p>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {spotlight.searchTerms.map((term) => (
+                    <span
+                      key={term}
+                      className="rounded-full border border-[#edd0c1] bg-[#fffaf7] px-3 py-1 text-xs font-semibold text-[#7a4e41]"
+                    >
+                      {term}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-5 rounded-2xl bg-[#fffaf7] p-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#b85a47]">
+                    Prompt direction
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#6e5d56]">
+                    {spotlight.promptHint}
+                  </p>
+                </div>
+
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="mt-5 h-auto px-0 text-sm font-black text-[#9a2f25] hover:bg-transparent hover:text-[#7d221a]"
+                >
+                  <I18nLink href={createBirthdaySongHref}>
+                    Create this birthday song
+                    <ArrowRight className="size-4" />
+                  </I18nLink>
+                </Button>
               </article>
             ))}
           </div>
