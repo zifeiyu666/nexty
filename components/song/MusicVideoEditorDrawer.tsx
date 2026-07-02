@@ -633,6 +633,9 @@ function MusicVideoPreview({
   const onPlayRef = useRef(onPlay);
   const previewTransitionLoopRef = useRef<TransitionPreviewLoop | null>(null);
   const [previewTime, setPreviewTime] = useState(0);
+  const [showPhotoSlideshowPoster, setShowPhotoSlideshowPoster] = useState(
+    timeline.templateId === "photo-slideshow",
+  );
   const lastPreviewTimeRef = useRef(0);
   const previousTimelineRef = useRef<MusicVideoTimeline | null>(null);
   const progress = duration ? Math.min(previewTime / duration, 1) * 100 : 0;
@@ -667,6 +670,11 @@ function MusicVideoPreview({
       ?.url ??
     timeline.photos.find((photo) => getUploadedMediaType(photo) === "image")
       ?.objectUrl;
+  const shouldShowInitialPoster =
+    (timeline.templateId === "photo-slideshow" ||
+      timeline.templateId === "minimal-vinyl") &&
+    showPhotoSlideshowPoster &&
+    Boolean(previewBackdropUrl);
 
   useEffect(() => {
     onPlayRef.current = onPlay;
@@ -675,6 +683,15 @@ function MusicVideoPreview({
   useEffect(() => {
     previewTransitionLoopRef.current = previewTransitionLoop;
   }, [previewTransitionLoop]);
+
+  useEffect(() => {
+    setShowPhotoSlideshowPoster(
+      timeline.templateId === "photo-slideshow" ||
+        timeline.templateId === "minimal-vinyl",
+    );
+    setPreviewTime(0);
+    lastPreviewTimeRef.current = 0;
+  }, [timeline.templateId, songTitle]);
 
   useEffect(() => {
     if (previousTimelineRef.current && previousTimelineRef.current !== timeline) {
@@ -694,6 +711,7 @@ function MusicVideoPreview({
     const player = playerRef.current;
     if (!player || !previewTransitionLoop) return;
 
+    setShowPhotoSlideshowPoster(false);
     logMusicVideoPreviewDebug("seekTo", {
       frame: previewTransitionLoop.startFrame,
       source: "transitionLoopStart",
@@ -776,6 +794,7 @@ function MusicVideoPreview({
       return;
     }
 
+    setShowPhotoSlideshowPoster(false);
     player.play();
     clearTransitionPreview();
     onPlay();
@@ -786,6 +805,7 @@ function MusicVideoPreview({
     const safeTime = Math.min(Math.max(nextTime, 0), duration);
 
     clearTransitionPreview();
+    setShowPhotoSlideshowPoster(false);
     lastPreviewTimeRef.current = safeTime;
     setPreviewTime(safeTime);
     if (player) {
@@ -890,6 +910,35 @@ function MusicVideoPreview({
               inputProps={playerInputProps}
               style={{ height: "100%", width: "100%" }}
             />
+            {shouldShowInitialPoster ? (
+              <div
+                aria-label={
+                  timeline.templateId === "minimal-vinyl"
+                    ? "Minimal vinyl cover poster"
+                    : "Photo slideshow cover poster"
+                }
+                className="pointer-events-none absolute inset-0"
+              >
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${previewBackdropUrl})` }}
+                />
+                {timeline.templateId === "minimal-vinyl" ? (
+                  <>
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_36%,rgba(10,17,24,0.08),rgba(3,7,12,0.42)_24%,rgba(2,5,10,0.82)_62%,rgba(1,3,7,0.94)_100%)]" />
+                    <div className="absolute inset-x-0 bottom-[12%] flex justify-center px-8">
+                      <div className="w-full max-w-[72%] text-center">
+                        <div className="text-[clamp(24px,3vw,48px)] font-black tracking-[-0.03em] text-white [text-shadow:0_6px_20px_rgba(0,0,0,0.52)]">
+                          {songTitle}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/52 via-black/14 to-transparent" />
+                )}
+              </div>
+            ) : null}
           </div>
           <div className="absolute left-1/2 top-2 h-0.5 w-10 -translate-x-1/2 rounded-full bg-white/18" />
         </div>

@@ -42,6 +42,23 @@ describe("PhotoSlideshowComposition", () => {
     );
   });
 
+  test("renders photo slideshow lyrics as centered plain text without timestamps or punctuation", () => {
+    const source = readFileSync(
+      join(process.cwd(), "remotion-src/PhotoSlideshowComposition.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /function stripLyricsPunctuation\(text: string\)/);
+    assert.match(source, /replace\(\/\[!"#\$%&'\(\)\*\+,\\-\.\/:;<=>\?@\[\\\\\]\^_`\{\|\}~\]\/g, ""\)/);
+    assert.match(source, /replace\(\/\[，。！？；：、（）【】《》〈〉「」『』“”‘’…—～·\]\/g, ""\)/);
+    assert.match(source, /textAlign: "center"/);
+    assert.match(source, /justifyContent: "center"/);
+    assert.match(source, /position: "center"/);
+    assert.doesNotMatch(source, /function formatTime\(seconds: number\)/);
+    assert.doesNotMatch(source, /backdropFilter: "blur\(18px\)"/);
+    assert.doesNotMatch(source, /background: "rgba\(255,255,255,.14\)"/);
+  });
+
   test("renders atmosphere overlays with Remotion OffthreadVideo", () => {
     const source = readFileSync(
       join(process.cwd(), "remotion-src/AtmosphereOverlay.tsx"),

@@ -1,4 +1,5 @@
 import { Readable } from "node:stream";
+import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 
 import { serverUploadFile, type UploadResult } from "@/lib/cloudflare/r2";
 
@@ -50,7 +51,9 @@ export async function fetchExternalUrlToR2(
   }
 
   const upload = await serverUploadFile({
-    data: Readable.fromWeb(response.body as globalThis.ReadableStream<Uint8Array>),
+    data: Readable.fromWeb(
+      response.body as unknown as NodeReadableStream<Uint8Array>
+    ),
     contentType,
     contentLength,
     key,

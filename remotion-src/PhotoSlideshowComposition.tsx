@@ -32,13 +32,6 @@ export type PhotoSlideshowCompositionProps = {
   timeline: MusicVideoTimeline;
 };
 
-function formatTime(seconds: number) {
-  if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
-
 function hasMediaSrc(value: string | null | undefined) {
   return Boolean(value?.trim());
 }
@@ -82,10 +75,17 @@ function normalizeLyricsStyle(
   return normalizeLyricsStyleConfig(lyricsStyle);
 }
 
+function stripLyricsPunctuation(text: string) {
+  return text
+    .replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, "")
+    .replace(/[，。！？；：、（）【】《》〈〉「」『』“”‘’…—～·]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getLyricsOverlayStyle(position: LyricsPosition): CSSProperties {
   if (position === "top") {
     return {
-      background: "linear-gradient(to bottom, rgba(0,0,0,.86), transparent)",
       left: 0,
       padding: "86px 64px 280px",
       position: "absolute",
@@ -96,8 +96,6 @@ function getLyricsOverlayStyle(position: LyricsPosition): CSSProperties {
 
   if (position === "center") {
     return {
-      background:
-        "linear-gradient(to bottom, transparent, rgba(0,0,0,.56) 34%, rgba(0,0,0,.56) 66%, transparent)",
       left: 0,
       padding: "0 64px",
       position: "absolute",
@@ -108,7 +106,6 @@ function getLyricsOverlayStyle(position: LyricsPosition): CSSProperties {
   }
 
   return {
-    background: "linear-gradient(to top, rgba(0,0,0,.9), transparent)",
     bottom: 0,
     left: 0,
     padding: "280px 64px 86px",
@@ -224,7 +221,6 @@ const ROLLING_FLOW_VERTICAL_PADDING_PX = 18;
 function AnimatedSingleLyric({
   cue,
   currentFrame,
-  currentTime,
   entrance,
   fps,
   lyricsStyle,
@@ -232,13 +228,12 @@ function AnimatedSingleLyric({
 }: {
   cue: LyricCue | null;
   currentFrame: number;
-  currentTime: number;
   entrance: Exclude<LyricsEntranceMode, "rolling-flow">;
   fps: number;
   lyricsStyle: LyricsStyleConfig;
   songTitle: string;
 }) {
-  const text = cue?.text ?? songTitle;
+  const text = stripLyricsPunctuation(cue?.text ?? songTitle);
   const textStyle = getLyricTextStyle(lyricsStyle);
   const slipInProgress = getCueProgress({
     cue,
@@ -459,7 +454,7 @@ function RollingLyrics({
                   WebkitLineClamp: ROLLING_FLOW_VISIBLE_LINES,
                 }}
               >
-                {cue?.text ?? (isCurrent ? songTitle : "")}
+                {stripLyricsPunctuation(cue?.text ?? (isCurrent ? songTitle : ""))}
               </span>
             </div>
           );
@@ -729,38 +724,23 @@ export function PhotoSlideshowComposition({
             boxSizing: "border-box",
             color: "white",
             ...lyricsOverlayStyle,
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "center",
+            textAlign: "center",
           }}
         >
-          <div
-            style={{
-              backdropFilter: "blur(18px)",
-              background: "rgba(255,255,255,.14)",
-              border: "1px solid rgba(255,255,255,.22)",
-              borderRadius: 28,
-              padding: 34,
+          <AnimatedSingleLyric
+            cue={activeCue}
+            currentFrame={frame}
+            entrance={lyricsStyle.entrance}
+            fps={fps}
+            lyricsStyle={{
+              ...lyricsStyle,
+              position: "center",
             }}
-          >
-            <div
-              style={{
-                color: "rgba(255,255,255,.62)",
-                fontSize: 24,
-                fontWeight: 800,
-                letterSpacing: 4,
-                textTransform: "uppercase",
-              }}
-            >
-              {formatTime(currentTime)}
-            </div>
-            <AnimatedSingleLyric
-              cue={activeCue}
-              currentFrame={frame}
-              currentTime={currentTime}
-              entrance={lyricsStyle.entrance}
-              fps={fps}
-              lyricsStyle={lyricsStyle}
-              songTitle={timeline.songTitle}
-            />
-          </div>
+            songTitle={timeline.songTitle}
+          />
         </div>
       )}
 

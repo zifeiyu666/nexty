@@ -253,6 +253,31 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /Photo lyric MV template demo/);
   });
 
+  test("shows the photo slideshow cover poster before playback starts", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const \[showPhotoSlideshowPoster, setShowPhotoSlideshowPoster\]/);
+    assert.match(source, /timeline\.templateId === "photo-slideshow"/);
+    assert.match(source, /aria-label="Photo slideshow cover poster"/);
+    assert.match(source, /setShowPhotoSlideshowPoster\(false\);[\s\S]*player\.play\(\)/);
+    assert.match(source, /setShowPhotoSlideshowPoster\(false\);[\s\S]*player\.seekTo\(targetFrame\)/);
+  });
+
+  test("shows the minimal vinyl cover poster and song title before playback starts", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /timeline\.templateId === "minimal-vinyl"/);
+    assert.match(source, /aria-label=\{[\s\S]*"Minimal vinyl cover poster"[\s\S]*\}/);
+    assert.match(source, /<div className="text-\[clamp\(24px,3vw,48px\)\] font-black tracking-\[-0\.03em\] text-white/);
+    assert.match(source, /\{songTitle\}/);
+  });
+
   test("uses the generated wave radio image as the dynamic template demo", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
