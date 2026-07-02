@@ -34,6 +34,7 @@ type MagneticButtonProps = React.HTMLAttributes<HTMLElement> &
   VariantProps<typeof magneticButtonVariants> & {
     disabled?: boolean;
     href?: string;
+    type?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
     magneticRange?: number;
     strength?: number;
     contentStrength?: number;
