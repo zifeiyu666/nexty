@@ -165,6 +165,11 @@ export const getArticleNavigationLinks = cache(
 export const getHeaderNavigationLinks = cache(async (locale: string) => {
   const tHeader = await getTranslations({ locale, namespace: "Header" });
   const headerLinks = tHeader.raw("links") as HeaderLink[];
+
+  if (!headerLinks.some(isArticlesHeaderLink)) {
+    return withPricingPath(headerLinks);
+  }
+
   const articleLinks = await getArticleNavigationLinks(locale);
 
   return withArticleHeaderLinks(headerLinks, articleLinks);

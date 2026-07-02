@@ -474,7 +474,7 @@ export function OrganicSongCover({
         />
       </svg>
       {showPlaybackControl ? (
-        <span className="absolute left-1/2 top-1/2 z-10 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/58 text-white shadow-[0_18px_48px_rgba(45,31,24,0.22),inset_0_1px_0_rgba(255,255,255,0.66)] backdrop-blur-[3px] transition duration-200 group-hover:scale-105 group-focus-visible:scale-105">
+        <span className="absolute left-1/2 top-1/2 z-10 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/38 text-white opacity-45 shadow-[0_12px_32px_rgba(45,31,24,0.14),inset_0_1px_0_rgba(255,255,255,0.48)] backdrop-blur-[3px] transition-[transform,opacity,background-color,box-shadow] duration-200 group-hover:scale-105 group-hover:bg-white/58 group-hover:opacity-100 group-hover:shadow-[0_18px_48px_rgba(45,31,24,0.22),inset_0_1px_0_rgba(255,255,255,0.66)] group-focus-visible:scale-105 group-focus-visible:bg-white/58 group-focus-visible:opacity-100 group-focus-visible:shadow-[0_18px_48px_rgba(45,31,24,0.22),inset_0_1px_0_rgba(255,255,255,0.66)]">
           <svg
             aria-hidden="true"
             className="absolute inset-0 size-full -rotate-90"

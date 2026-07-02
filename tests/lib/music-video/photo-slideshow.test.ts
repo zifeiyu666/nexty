@@ -13,6 +13,7 @@ import {
   DEFAULT_LYRICS_STYLE,
   DEFAULT_WAVE_RADIO_BACKGROUND,
   normalizeLyricsStyleConfig,
+  normalizeRenderDimensions,
   normalizeWaveRadioBackgroundId,
   WAVE_RADIO_BACKGROUND_OPTIONS,
   getUploadedMediaType,
@@ -150,6 +151,34 @@ describe("photo slideshow music video helpers", () => {
     assert.equal(getUploadedMediaType(resolved[1]?.photo), "video");
   });
 
+  test("infers video media type from file extensions when legacy payloads omit mediaType", () => {
+    assert.equal(
+      getUploadedMediaType({
+        id: "video-legacy-1",
+        name: "clip.mp4",
+        objectUrl: "blob:clip",
+      }),
+      "video",
+    );
+    assert.equal(
+      getUploadedMediaType({
+        id: "video-legacy-2",
+        name: "memory",
+        objectUrl: "https://cdn.example.com/path/scene.webm?token=1",
+      }),
+      "video",
+    );
+    assert.equal(
+      getUploadedMediaType({
+        id: "video-legacy-3",
+        name: "memory",
+        objectUrl: "blob:clip",
+        url: "https://cdn.example.com/path/scene.mov",
+      }),
+      "video",
+    );
+  });
+
   test("leading unassigned cues use the first uploaded photo", () => {
     const cues = parseTimestampedLyrics("[00:00] A\n[00:04] B", 8);
 
@@ -185,6 +214,7 @@ describe("photo slideshow music video helpers", () => {
       songTitle: "Our Song",
       audioUrl: "song.mp3",
       duration: 12,
+      dimensions: { width: 1920, height: 1080 },
       lyrics: "[00:00] A\n[00:06] B",
       photos: [],
       assignments: [],
@@ -195,6 +225,22 @@ describe("photo slideshow music video helpers", () => {
     assert.equal(timeline.coverPhoto?.objectUrl, "https://cdn.example.com/cover.jpg");
     assert.equal(timeline.coverPhoto?.url, "https://cdn.example.com/cover.jpg");
     assert.equal(timeline.coverPhoto?.isCover, true);
+    assert.equal(timeline.width, 1920);
+    assert.equal(timeline.height, 1080);
+  });
+
+  test("normalizes render dimensions with portrait defaults", () => {
+    assert.deepEqual(normalizeRenderDimensions(undefined), {
+      width: 1080,
+      height: 1920,
+    });
+    assert.deepEqual(
+      normalizeRenderDimensions({ width: 1919.6, height: 1079.5 }),
+      {
+        width: 1920,
+        height: 1080,
+      },
+    );
   });
 
   test("creates cross dissolve transitions between adjacent lyric cues by default", () => {
@@ -287,6 +333,14 @@ describe("photo slideshow music video helpers", () => {
     assert.equal(findActiveCue(cues, 4)?.text, "B");
     assert.equal(findActiveCue(cues, 11.9)?.text, "C");
     assert.equal(findActiveCue(cues, 99)?.text, "C");
+  });
+
+  test("returns no active cue before the first lyric starts", () => {
+    const cues = parseTimestampedLyrics("[00:18] First vocal line\n[00:24] Second line", 30);
+
+    assert.equal(findActiveCue(cues, 0), null);
+    assert.equal(findActiveCue(cues, 17.9), null);
+    assert.equal(findActiveCue(cues, 18)?.text, "First vocal line");
   });
 
   test("builds the render payload for the selected slideshow template", () => {
@@ -419,6 +473,33 @@ describe("photo slideshow music video helpers", () => {
       [
         { start: 1.1, end: 1.9, text: "Hello world" },
         { start: 3, end: 3.7, text: "This is us" },
+      ],
+    );
+  });
+
+  test("ignores title metadata when building lyric cues from KIE aligned words", () => {
+    const cues = buildLyricCuesFromAlignedWords({
+      lyrics: "Title: Safe Haven\n\n[Verse 1]\nIn the light\nYou are home",
+      alignedWords: [
+        { word: "[Verse 1]\nIn", startS: 0.08, endS: 0.16 },
+        { word: "the", startS: 0.2, endS: 0.3 },
+        { word: "light", startS: 0.35, endS: 0.6 },
+        { word: "You", startS: 1.1, endS: 1.3 },
+        { word: "are", startS: 1.35, endS: 1.5 },
+        { word: "home", startS: 1.55, endS: 1.9 },
+      ],
+      duration: 8,
+    });
+
+    assert.deepEqual(
+      cues.map((cue) => ({
+        start: cue.start,
+        end: cue.end,
+        text: cue.text,
+      })),
+      [
+        { start: 0.08, end: 0.6, text: "In the light" },
+        { start: 1.1, end: 1.9, text: "You are home" },
       ],
     );
   });

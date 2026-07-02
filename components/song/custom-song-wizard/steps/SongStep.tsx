@@ -37,6 +37,9 @@ type SelectedOccasionLike =
 type SongStepProps = {
   activeVersion: string;
   audioRef: RefObject<HTMLAudioElement | null>;
+  coverError: string;
+  coverImageUrl: string;
+  coverPrompt: string;
   currentVersion?: SongVersion;
   displayDuration: number;
   finalizingVersion: string | null;
@@ -56,8 +59,10 @@ type SongStepProps = {
   songVersions: SongVersion[];
   story: string;
   vocalGender: string;
+  isGeneratingCover: boolean;
   isPlaying: boolean;
   onChooseVersion: (version: string) => void;
+  onGenerateCover: () => void;
   onNoteChange: (value: string) => void;
   onPlaybackToggle: (version: string, audioUrl: string) => void;
   onRespin: () => void;
@@ -67,6 +72,9 @@ type SongStepProps = {
 export function SongStep({
   activeVersion,
   audioRef,
+  coverError,
+  coverImageUrl,
+  coverPrompt,
   currentVersion,
   displayDuration,
   finalizingVersion,
@@ -83,8 +91,10 @@ export function SongStep({
   songTitle,
   songVersions,
   vocalGender,
+  isGeneratingCover,
   isPlaying,
   onChooseVersion,
+  onGenerateCover,
   onNoteChange,
   onPlaybackToggle,
   onRespin,
@@ -117,7 +127,12 @@ export function SongStep({
 
     return (
       <SongGenerationPage
+        coverError={coverError}
+        coverImageUrl={coverImageUrl}
+        coverPrompt={coverPrompt}
+        isGeneratingCover={isGeneratingCover}
         note={personalNote}
+        onGenerateCover={onGenerateCover}
         onNoteChange={onNoteChange}
         progress={progress}
         recipientLabel={recipientLabel}
@@ -126,7 +141,8 @@ export function SongStep({
   }
 
   const displayTitle = songTitle || "Your Custom Song";
-  const coverImageUrl = currentVersion?.imageUrl || songVersions[0]?.imageUrl;
+  const resultCoverImageUrl =
+    coverImageUrl || currentVersion?.imageUrl || songVersions[0]?.imageUrl;
   const metadataPills: SongResultMetadataPill[] = [
     {
       icon: <Heart className="size-4" />,
@@ -146,7 +162,7 @@ export function SongStep({
       <audio ref={audioRef} preload="metadata" src={currentVersion?.audioUrl} />
       <SongResultView
         activeVersion={activeVersion}
-        coverImageUrl={coverImageUrl}
+        coverImageUrl={resultCoverImageUrl}
         displayDuration={displayDuration}
         heroEyebrow="Ta-da! Congratulation!"
         isPlaying={isPlaying}

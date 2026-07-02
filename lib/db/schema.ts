@@ -416,6 +416,7 @@ export const musicVideos = pgTable(
     lambdaBucketName: text('lambda_bucket_name'),
     lambdaOutputKey: text('lambda_output_key'),
     r2Key: text('r2_key'),
+    temporaryVideoUrl: text('temporary_video_url'),
     videoUrl: text('video_url'),
     thumbnailUrl: text('thumbnail_url'),
     duration: integer('duration'),

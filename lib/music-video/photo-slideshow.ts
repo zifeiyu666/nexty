@@ -68,10 +68,30 @@ export type WaveRadioBackgroundOption = {
   src: string;
 };
 
+const VIDEO_FILE_EXTENSION_PATTERN =
+  /\.(?:mp4|m4v|mov|webm|ogg|ogv)(?:[?#].*)?$/i;
+const LYRIC_METADATA_LINE = /^(?:title)\s*:/i;
+
+function inferMediaTypeFromValue(value?: string | null) {
+  if (!value) return null;
+  return VIDEO_FILE_EXTENSION_PATTERN.test(value.trim()) ? "video" : null;
+}
+
 export function getUploadedMediaType(
-  media: Pick<UploadedPhoto, "mediaType"> | null | undefined,
+  media:
+    | Pick<UploadedPhoto, "mediaType" | "name" | "objectUrl" | "url">
+    | null
+    | undefined,
 ) {
-  return media?.mediaType === "video" ? "video" : "image";
+  if (media?.mediaType === "video") return "video";
+  if (media?.mediaType === "image") return "image";
+
+  return (
+    inferMediaTypeFromValue(media?.name) ??
+    inferMediaTypeFromValue(media?.url) ??
+    inferMediaTypeFromValue(media?.objectUrl) ??
+    "image"
+  );
 }
 
 export type LyricsStyleInput = Omit<Partial<LyricsStyleConfig>, "entrance"> & {
@@ -85,11 +105,18 @@ export type MusicVideoTemplateId =
   | "minimal-vinyl"
   | "wave-radio";
 
+export type MusicVideoRenderDimensions = {
+  width: number;
+  height: number;
+};
+
 type BaseMusicVideoTimeline = {
   templateId: MusicVideoTemplateId;
   songTitle: string;
   audioUrl: string;
   duration: number;
+  width: number;
+  height: number;
   lyrics: LyricCue[];
   photos: UploadedPhoto[];
   assignments: PhotoAssignment[];
@@ -104,6 +131,8 @@ export type PhotoSlideshowTimeline = BaseMusicVideoTimeline & {
 };
 
 export type MinimalVinylTimeline = BaseMusicVideoTimeline & {
+  backgroundBlur?: number;
+  backgroundPhoto?: UploadedPhoto;
   templateId: "minimal-vinyl";
 };
 
@@ -131,6 +160,10 @@ export type AlignedLyricWord = {
 const DEFAULT_DURATION = 30;
 const OVERLAY_CDN_BASE_URL = "https://cdn.customsong.top/overlay";
 const overlayCdnSrc = (path: string) => `${OVERLAY_CDN_BASE_URL}/${path}`;
+const DEFAULT_RENDER_DIMENSIONS: MusicVideoRenderDimensions = {
+  width: 1080,
+  height: 1920,
+};
 
 export const DEFAULT_TRANSITION_TYPE: TransitionType = "cross-dissolve";
 export const ATMOSPHERE_OVERLAY_OPTIONS: AtmosphereOverlayOption[] = [
@@ -365,6 +398,27 @@ function normalizeDuration(duration?: number | null) {
     : DEFAULT_DURATION;
 }
 
+function normalizeRenderDimension(value: number | null | undefined, fallback: number) {
+  return Number.isFinite(value) && value && value > 0
+    ? Math.max(1, Math.round(value))
+    : fallback;
+}
+
+export function normalizeRenderDimensions(
+  dimensions?: Partial<MusicVideoRenderDimensions> | null,
+): MusicVideoRenderDimensions {
+  return {
+    width: normalizeRenderDimension(
+      dimensions?.width,
+      DEFAULT_RENDER_DIMENSIONS.width,
+    ),
+    height: normalizeRenderDimension(
+      dimensions?.height,
+      DEFAULT_RENDER_DIMENSIONS.height,
+    ),
+  };
+}
+
 function normalizeLyricsEntranceMode(
   entrance?: LyricsEntranceMode | "" | null,
 ): LyricsEntranceMode {
@@ -456,7 +510,7 @@ function cleanUntimedLines(lyrics: string) {
   return lyrics
     .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter((line) => line && !SECTION_LABEL.test(line));
+    .filter((line) => line && !SECTION_LABEL.test(line) && !LYRIC_METADATA_LINE.test(line));
 }
 
 function normalizeLyricWords(text: string) {
@@ -610,12 +664,11 @@ export function resolveCuePhotos({
 export function findActiveCue(cues: LyricCue[], time: number) {
   if (cues.length === 0) return null;
   const currentTime = Math.max(0, time);
+  const firstCue = cues[0];
 
-  return (
-    cues.find((cue) => currentTime >= cue.start && currentTime < cue.end) ??
-    cues[cues.length - 1] ??
-    null
-  );
+  if (firstCue && currentTime < firstCue.start) return null;
+
+  return cues.find((cue) => currentTime >= cue.start && currentTime < cue.end) ?? cues[cues.length - 1] ?? null;
 }
 
 export function buildDefaultTransitions(
@@ -708,6 +761,7 @@ export function buildPhotoSlideshowTimeline({
   songTitle,
   audioUrl,
   duration,
+  dimensions,
   lyrics,
   photos,
   assignments,
@@ -720,6 +774,7 @@ export function buildPhotoSlideshowTimeline({
   songTitle: string;
   audioUrl: string;
   duration?: number | null;
+  dimensions?: Partial<MusicVideoRenderDimensions> | null;
   lyrics: string;
   photos: UploadedPhoto[];
   assignments: PhotoAssignment[];
@@ -730,6 +785,7 @@ export function buildPhotoSlideshowTimeline({
   atmosphereOverlay?: AtmosphereOverlayInput;
 }): MusicVideoTimeline {
   const effectiveDuration = normalizeDuration(duration);
+  const renderDimensions = normalizeRenderDimensions(dimensions);
   const lyricCues = timestampedLyrics?.alignedWords?.length
     ? buildLyricCuesFromAlignedWords({
         lyrics,
@@ -743,6 +799,8 @@ export function buildPhotoSlideshowTimeline({
     songTitle,
     audioUrl,
     duration: effectiveDuration,
+    width: renderDimensions.width,
+    height: renderDimensions.height,
     lyrics: lyricCues,
     photos,
     assignments,
@@ -759,21 +817,30 @@ export function buildPhotoSlideshowTimeline({
 export function buildMinimalVinylTimeline({
   songTitle,
   audioUrl,
+  backgroundBlur,
+  backgroundPhoto,
   duration,
+  dimensions,
   lyrics,
   fallbackImageUrl,
+  coverPhoto,
   timestampedLyrics,
   lyricsStyle,
 }: {
   songTitle: string;
   audioUrl: string;
+  backgroundBlur?: number | null;
+  backgroundPhoto?: UploadedPhoto | null;
   duration?: number | null;
+  dimensions?: Partial<MusicVideoRenderDimensions> | null;
   lyrics: string;
   fallbackImageUrl?: string | null;
+  coverPhoto?: UploadedPhoto | null;
   timestampedLyrics?: { alignedWords: AlignedLyricWord[] } | null;
   lyricsStyle?: LyricsStyleConfig;
 }): MusicVideoTimeline {
   const effectiveDuration = normalizeDuration(duration);
+  const renderDimensions = normalizeRenderDimensions(dimensions);
   const lyricCues = timestampedLyrics?.alignedWords?.length
     ? buildLyricCuesFromAlignedWords({
         lyrics,
@@ -787,10 +854,17 @@ export function buildMinimalVinylTimeline({
     songTitle,
     audioUrl,
     duration: effectiveDuration,
+    width: renderDimensions.width,
+    height: renderDimensions.height,
     lyrics: lyricCues,
     photos: [],
     assignments: [],
-    coverPhoto: createCoverPhoto(fallbackImageUrl) ?? undefined,
+    backgroundBlur:
+      typeof backgroundBlur === "number" && Number.isFinite(backgroundBlur)
+        ? Math.min(Math.max(backgroundBlur, 0), 64)
+        : 42,
+    backgroundPhoto: backgroundPhoto ?? undefined,
+    coverPhoto: coverPhoto ?? createCoverPhoto(fallbackImageUrl) ?? undefined,
     lyricsStyle: normalizeLyricsStyleConfig(lyricsStyle),
     transitions: [],
   };
@@ -800,6 +874,7 @@ export function buildWaveRadioTimeline({
   songTitle,
   audioUrl,
   duration,
+  dimensions,
   lyrics,
   timestampedLyrics,
   lyricsStyle,
@@ -808,12 +883,14 @@ export function buildWaveRadioTimeline({
   songTitle: string;
   audioUrl: string;
   duration?: number | null;
+  dimensions?: Partial<MusicVideoRenderDimensions> | null;
   lyrics: string;
   timestampedLyrics?: { alignedWords: AlignedLyricWord[] } | null;
   lyricsStyle?: LyricsStyleConfig;
   waveRadioBackgroundId?: string | null;
 }): MusicVideoTimeline {
   const effectiveDuration = normalizeDuration(duration);
+  const renderDimensions = normalizeRenderDimensions(dimensions);
   const lyricCues = timestampedLyrics?.alignedWords?.length
     ? buildLyricCuesFromAlignedWords({
         lyrics,
@@ -828,6 +905,8 @@ export function buildWaveRadioTimeline({
     songTitle,
     audioUrl,
     duration: effectiveDuration,
+    width: renderDimensions.width,
+    height: renderDimensions.height,
     lyrics: lyricCues,
     photos: [],
     assignments: [],

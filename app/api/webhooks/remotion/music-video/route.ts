@@ -1,4 +1,5 @@
 import { getLogger } from "@/lib/logger";
+import { after } from "next/server";
 import {
   getMusicVideoById,
   type MusicVideoRender,
@@ -6,6 +7,7 @@ import {
 import {
   completeMusicVideoRender,
   failMusicVideoRender,
+  markMusicVideoTemporaryRenderOutput,
 } from "@/lib/music-video/render-completion";
 import {
   appRouterWebhook,
@@ -69,9 +71,23 @@ async function handleSuccess(payload: WebhookSuccessPayload) {
     "Received Remotion music video success webhook",
   );
 
-  await completeMusicVideoRender({
+  await markMusicVideoTemporaryRenderOutput({
     outputUrl: payload.outputUrl ?? payload.outputFile,
     video,
+  });
+
+  after(async () => {
+    try {
+      await completeMusicVideoRender({
+        outputUrl: payload.outputUrl ?? payload.outputFile,
+        video,
+      });
+    } catch (error) {
+      logger.error(
+        { err: error, renderId: payload.renderId, videoId: video.id },
+        "Failed to persist Remotion webhook output in background",
+      );
+    }
   });
 }
 
@@ -90,6 +106,7 @@ async function handleError(payload: WebhookErrorPayload) {
 
   await failMusicVideoRender({
     error: message,
+    temporaryVideoUrl: video.temporaryVideoUrl,
     videoId: video.id,
   });
 }
@@ -105,6 +122,7 @@ async function handleTimeout(payload: WebhookTimeoutPayload) {
 
   await failMusicVideoRender({
     error: "Remotion Lambda render timed out.",
+    temporaryVideoUrl: video.temporaryVideoUrl,
     videoId: video.id,
   });
 }
@@ -122,6 +140,11 @@ export async function POST(request: Request) {
   return createWebhookHandler()(request);
 }
 
-export async function OPTIONS(request: Request) {
-  return createWebhookHandler()(request);
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      Allow: "POST, OPTIONS",
+    },
+  });
 }

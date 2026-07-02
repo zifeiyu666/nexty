@@ -22,6 +22,8 @@ export type LambdaRenderProgress = {
 };
 
 type Env = NodeJS.ProcessEnv | Record<string, string | undefined>;
+const DEFAULT_REMOTION_CONCURRENCY = 100;
+const MAX_REMOTION_CONCURRENCY = 300;
 
 function requiredEnv(name: string, env: Env = process.env) {
   const value = env[name]?.trim();
@@ -50,9 +52,19 @@ export function getRemotionLambdaConfig({
 }: {
   env?: Env;
 } = {}) {
+  const configuredConcurrency = env.REMOTION_CONCURRENCY?.trim()
+    ?? env.REMOTION_CONCURRENCY_PER_LAMBDA?.trim();
+  const concurrency = configuredConcurrency
+    ? Math.min(
+        Math.max(Number.parseInt(configuredConcurrency, 10) || DEFAULT_REMOTION_CONCURRENCY, 1),
+        MAX_REMOTION_CONCURRENCY,
+      )
+    : DEFAULT_REMOTION_CONCURRENCY;
+
   return {
     codec: "h264" as const,
     composition: PHOTO_SLIDESHOW_COMPOSITION_ID,
+    concurrency,
     functionName: requiredEnv("REMOTION_FUNCTION_NAME", env),
     region: requiredEnv("REMOTION_AWS_REGION", env) as Parameters<
       typeof renderMediaOnLambda
@@ -73,7 +85,7 @@ export async function startLambdaRender({
   const result = await renderMediaOnLambda({
     codec: config.codec,
     composition: config.composition,
-    framesPerLambda: PHOTO_SLIDESHOW_FPS * 20,
+    concurrency: config.concurrency,
     functionName: config.functionName,
     inputProps,
     outName: process.env.REMOTION_FORCE_BUCKET_NAME

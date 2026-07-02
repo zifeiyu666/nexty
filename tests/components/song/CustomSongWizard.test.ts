@@ -78,6 +78,45 @@ describe("CustomSongWizard lyric version comparison", () => {
     );
   });
 
+  test("wires AI cover generation through the song waiting screen and finalize request", () => {
+    const wizardSource = readFileSync(
+      join(process.cwd(), "components/song/CustomSongWizard.tsx"),
+      "utf8",
+    );
+    const songStepSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/steps/SongStep.tsx",
+      ),
+      "utf8",
+    );
+    const uiSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/components/wizard-ui.tsx",
+      ),
+      "utf8",
+    );
+    const apiSource = readFileSync(
+      join(process.cwd(), "components/song/custom-song-wizard/api.ts"),
+      "utf8",
+    );
+
+    assert.match(apiSource, /export async function generateSongCover/);
+    assert.match(apiSource, /fetch\("\/api\/songs\/cover\/generate"/);
+    assert.match(wizardSource, /const \[coverImageUrl, setCoverImageUrl\]/);
+    assert.match(wizardSource, /async function generateCoverWithAi/);
+    assert.match(wizardSource, /generateSongCover\(\{/);
+    assert.match(wizardSource, /coverImageUrl,/);
+    assert.match(songStepSource, /onGenerateCover: \(\) => void/);
+    assert.match(songStepSource, /coverImageUrl=\{coverImageUrl\}/);
+    assert.match(uiSource, /isGeneratingCover/);
+    assert.match(uiSource, /onClick=\{onGenerateCover\}/);
+    assert.match(uiSource, /src=\{coverImageUrl\}/);
+    assert.match(uiSource, /coverError/);
+  });
+
+
   test("respin keeps users on the song step and starts a fresh preview", () => {
     const wizardSource = readFileSync(
       join(process.cwd(), "components/song/CustomSongWizard.tsx"),

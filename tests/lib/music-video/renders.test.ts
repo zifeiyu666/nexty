@@ -3,12 +3,14 @@ import { describe, test } from "node:test";
 
 import {
   assertTimelineIsRenderable,
+  buildMusicVideoInputProps,
   createMusicVideoRender,
   listMusicVideosForSong,
   listMusicVideosForUser,
   markMusicVideoFailed,
   markMusicVideoRendering,
   markMusicVideoSucceeded,
+  MUSIC_VIDEO_RENDER_DEFAULTS,
 } from "@/lib/music-video/renders";
 
 const timeline = {
@@ -16,6 +18,8 @@ const timeline = {
   songTitle: "Our Song",
   audioUrl: "https://cdn.example.com/song.mp3",
   duration: 30,
+  width: 1080,
+  height: 1920,
   lyrics: [{ id: "cue-1", start: 0, end: 30, text: "Hello" }],
   photos: [
     {
@@ -48,6 +52,18 @@ const waveRadioTimeline = {
 };
 
 describe("music video renders", () => {
+  test("builds render input props from timeline dimensions", () => {
+    const inputProps = buildMusicVideoInputProps({
+      ...minimalVinylTimeline,
+      width: 1920,
+      height: 1080,
+    });
+
+    assert.equal(inputProps.width, 1920);
+    assert.equal(inputProps.height, 1080);
+    assert.equal(inputProps.fps, MUSIC_VIDEO_RENDER_DEFAULTS.fps);
+  });
+
   test("rejects timelines that only contain browser object URLs", () => {
     assert.throws(
       () =>

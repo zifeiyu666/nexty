@@ -1,6 +1,18 @@
 "use client";
 
 import {
+  DiscArtworkCropDialog,
+  DISC_IMAGE_CROP_PREVIEW_WIDTH,
+  type DiscImageCropDraft,
+} from "@/components/song/DiscArtworkCropDialog";
+import {
+  getStudioPillButtonClassName,
+  getStudioTemplateCardClassName,
+  StudioBlurBackdrop,
+  studioGlassStyles,
+  StudioHeader,
+} from "@/components/song/StudioGlassPrimitives";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -39,9 +51,6 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
@@ -69,6 +78,7 @@ import {
   type LyricsEntranceMode,
   type LyricsPosition,
   type LyricsStyleConfig,
+  type MusicVideoRenderDimensions,
   type MusicVideoTimeline,
   type PhotoAssignment,
   type TransitionAssignment,
@@ -83,6 +93,7 @@ import {
 } from "@/lib/music-video/remotion-constants";
 import { cn } from "@/lib/utils";
 import { wallArtFontFiles, wallArtFonts } from "@/lib/wall-art/fonts";
+import { buildInitialImageCrop, clampImageCrop } from "@/lib/wall-art/image-lyrics";
 import { MinimalVinylComposition } from "@/remotion-src/MinimalVinylComposition";
 import { PhotoSlideshowComposition } from "@/remotion-src/PhotoSlideshowComposition";
 import { WaveRadioComposition } from "@/remotion-src/WaveRadioComposition";
@@ -120,10 +131,12 @@ import {
   Fragment,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type ChangeEvent,
   type ReactNode,
 } from "react";
 import { useDropzone } from "react-dropzone";
@@ -165,6 +178,7 @@ type MusicVideoRenderRecord = {
   error?: string | null;
   id: string;
   status: "queued" | "rendering" | "completed" | "failed";
+  temporaryVideoUrl?: string | null;
   videoUrl?: string | null;
 };
 
@@ -178,6 +192,16 @@ type TransitionPreviewLoop = {
   nonce: number;
   startFrame: number;
 };
+
+const PREVIEW_TIME_UPDATE_INTERVAL_SECONDS = 0.25;
+
+function logMusicVideoPreviewDebug(
+  message: string,
+  payload?: Record<string, unknown>,
+) {
+  if (process.env.NODE_ENV === "production") return;
+  console.debug(`[MusicVideoPreview] ${message}`, payload ?? {});
+}
 
 type PreviewAspectRatio = "portrait" | "landscape";
 
@@ -214,9 +238,9 @@ const templates: TemplateCard[] = [
   },
   {
     id: "wave-radio",
-    title: "Dynamic Wave Radio",
-    description: "Audio-reactive waves and captions for a broadcast mood.",
-    demoImageAlt: "Dynamic wave radio music visualizer template demo",
+    title: "Dynamic Lyrics Video",
+    description: "Blurred motion video with bold lyric captions and neon glow.",
+    demoImageAlt: "Dynamic lyrics video template demo",
     demoImageSrc: "/images/features/dynamic-wave-radio-template.webp",
     icon: Radio,
     status: "available",
@@ -229,6 +253,8 @@ const MIN_EDITOR_WIDTH = 380;
 const MAX_EDITOR_WIDTH = 760;
 const MAX_EDITOR_VIEWPORT_RATIO = 0.44;
 const MAX_MEDIA_BYTES = 80 * 1024 * 1024;
+const MV_RENDER_POLL_INTERVAL_MS = 4000;
+const MV_RENDER_TEMP_URL_POLL_INTERVAL_MS = 2500;
 const TRANSITION_PREVIEW_SECONDS = 1;
 const TRANSITION_PREVIEW_TAIL_SECONDS = 1;
 const wallArtFontFaceCss = wallArtFontFiles
@@ -237,12 +263,39 @@ const wallArtFontFaceCss = wallArtFontFiles
       `@font-face{font-family:'${family}';src:url('${src}') format('truetype');font-style:normal;font-weight:${weight};font-display:swap;}`,
   )
   .join("");
+const musicVideoMotionCss = `
+  @keyframes music-video-breathe {
+    0% { transform: scale(1.03); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1.03); }
+  }
+  @keyframes music-video-wand-float {
+    0% { transform: translateY(0) rotate(0deg); }
+    42% { transform: translateY(-1px) rotate(-8deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+`;
+const musicVideoFieldClassName = studioGlassStyles.field;
+const musicVideoPopoverClassName = studioGlassStyles.popover;
+const musicVideoPanelClassName = studioGlassStyles.panel;
+const musicVideoSubtlePanelClassName = studioGlassStyles.subtlePanel;
+const musicVideoScrollAreaClassName = studioGlassStyles.scrollArea;
+const musicVideoScrollAreaViewportClassName = studioGlassStyles.scrollAreaViewport;
+const musicVideoEditorSectionClassName = studioGlassStyles.editorSection;
+const musicVideoInfoCardClassName = studioGlassStyles.infoCard;
+const musicVideoSectionHeadingClassName = studioGlassStyles.sectionHeading;
+const musicVideoControlTitleClassName = studioGlassStyles.controlTitle;
+const musicVideoControlDescriptionClassName =
+  studioGlassStyles.controlDescription;
+const musicVideoPrimaryButtonClassName = studioGlassStyles.primaryButton;
+const musicVideoSecondaryButtonClassName = studioGlassStyles.secondaryButton;
+const musicVideoMicroButtonClassName = studioGlassStyles.microButton;
+const musicVideoPillButtonClassName = getStudioPillButtonClassName(false);
+const musicVideoPillButtonActiveClassName = getStudioPillButtonClassName(true);
 const previewAspectRatioOptions: Record<
   PreviewAspectRatio,
-  {
-    height: number;
+  MusicVideoRenderDimensions & {
     label: string;
-    width: number;
   }
 > = {
   landscape: {
@@ -330,6 +383,30 @@ function createUploadedPhoto(file: File): UploadedPhoto {
     name: file.name,
     objectUrl: URL.createObjectURL(file),
   };
+}
+
+function createUploadedPhotoFromObjectUrl({
+  fileName,
+  objectUrl,
+}: {
+  fileName: string;
+  objectUrl: string;
+}): UploadedPhoto {
+  return {
+    id: createPhotoId(),
+    mediaType: "image",
+    name: fileName,
+    objectUrl,
+  };
+}
+
+async function dataUrlToFile(dataUrl: string, fileName: string) {
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+
+  return new File([blob], fileName, {
+    type: blob.type || "image/png",
+  });
 }
 
 function MediaAssetPreview({
@@ -431,85 +508,88 @@ function TemplateRail({
   onSelectTemplate: (template: TemplateCard) => void;
 }) {
   return (
-    <aside className="flex min-h-0 flex-col border-b border-stone-200/70 bg-[#fffaf5]/80 p-2 lg:border-b-0 lg:border-r">
-      <div className="flex shrink-0 items-center gap-2 px-1.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-stone-500">
-        <Clapperboard className="size-3.5 text-rose-500" />
+    <aside className={cn(musicVideoPanelClassName, "flex min-h-0 flex-col p-1.5")}>
+      <div className="flex shrink-0 items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#74685d]">
+        <span className="flex size-6 items-center justify-center rounded-full bg-white/72 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.76)]">
+          <Clapperboard className="size-3" />
+        </span>
         Templates
       </div>
-      <div className="mt-2 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
-        {templates.map((template) => {
-          const Icon = template.icon;
-          const isActive = activeTemplate === template.id;
-          const isDisabled = template.status === "coming-soon";
+      <ScrollArea
+        className={cn(
+          musicVideoScrollAreaClassName,
+          musicVideoScrollAreaViewportClassName,
+          "mt-2 flex-1 overflow-hidden",
+        )}
+      >
+        <div className="space-y-1.5 pr-2">
+          {templates.map((template) => {
+            const Icon = template.icon;
+            const isActive = activeTemplate === template.id;
+            const isDisabled = template.status === "coming-soon";
 
-          return (
-            <button
-              key={template.id}
-              className={cn(
-                "group relative w-full cursor-pointer overflow-hidden rounded-lg p-1.5 text-left shadow-sm shadow-stone-950/[0.04] transition duration-300 ease-out will-change-transform",
-                isActive
-                  ? "bg-white shadow-[0_0_0_1px_rgba(251,113,133,0.36),0_18px_38px_rgba(120,53,15,0.13)]"
-                  : "bg-white/45 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_16px_32px_rgba(120,53,15,0.10)]",
-                isDisabled && "cursor-not-allowed opacity-60 hover:bg-white",
-              )}
-              disabled={isDisabled}
-              type="button"
-              onClick={() => onSelectTemplate(template)}
-            >
-              {isActive ? (
-                <span className="absolute inset-y-2 left-0 w-0.5 rounded-r-full bg-rose-500" />
-              ) : null}
-              <div className="overflow-hidden rounded-md bg-[#241d1b] shadow-inner shadow-black/20">
-                <div className="relative aspect-[4/3]">
-                  {template.demoImageSrc ? (
-                    <>
-                      <Image
-                        fill
-                        alt={template.demoImageAlt ?? template.title}
-                        className="object-cover transition duration-500 ease-out group-hover:scale-[1.035]"
-                        sizes="(min-width: 1024px) 204px, calc(100vw - 48px)"
-                        src={template.demoImageSrc}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10 transition duration-300 group-hover:from-black/20 group-hover:to-rose-100/20" />
-                    </>
-                  ) : (
-                    <>
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_18%,#fee2e2_0_18%,transparent_19%),linear-gradient(160deg,#fb7185_0%,#f8fafc_42%,#292524_43%,#0c0a09_100%)]" />
-                      <div className="absolute inset-x-4 bottom-5 space-y-2">
-                        <div className="h-16 rounded-lg bg-white/18 shadow-xl backdrop-blur" />
-                        <div className="h-2 w-3/4 rounded-full bg-white/65" />
-                        <div className="h-2 w-1/2 rounded-full bg-white/35" />
-                      </div>
-                    </>
-                  )}
-                  <span className="absolute left-2 top-2 flex size-7 items-center justify-center rounded-md bg-white/90 text-rose-500 shadow-sm transition duration-300 group-hover:scale-105 group-hover:bg-rose-50">
-                    <Icon className="size-4" />
-                  </span>
+            return (
+              <button
+                key={template.id}
+                className={cn(
+                  getStudioTemplateCardClassName(isActive),
+                  isDisabled && "cursor-not-allowed opacity-60 hover:bg-white",
+                )}
+                disabled={isDisabled}
+                type="button"
+                onClick={() => onSelectTemplate(template)}
+              >
+                <div className="overflow-hidden bg-[#241d1b] shadow-inner shadow-black/20">
+                  <div className="relative aspect-[4/3]">
+                    {template.demoImageSrc ? (
+                      <>
+                        <Image
+                          fill
+                          alt={template.demoImageAlt ?? template.title}
+                          className="object-cover transition duration-500 ease-out group-hover:scale-[1.035]"
+                          sizes="(min-width: 1024px) 156px, calc(100vw - 48px)"
+                          src={template.demoImageSrc}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10 transition duration-300 group-hover:from-black/20 group-hover:to-white/20" />
+                      </>
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_18%,#fee2e2_0_18%,transparent_19%),linear-gradient(160deg,#fb7185_0%,#f8fafc_42%,#292524_43%,#0c0a09_100%)]" />
+                        <div className="absolute inset-x-4 bottom-5 space-y-2">
+                          <div className="h-16 rounded-lg bg-white/18 shadow-xl backdrop-blur" />
+                          <div className="h-2 w-3/4 rounded-full bg-white/65" />
+                          <div className="h-2 w-1/2 rounded-full bg-white/35" />
+                        </div>
+                      </>
+                    )}
+                    <span className="absolute left-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-white/78 text-[#b56e4f] shadow-[0_6px_12px_rgba(29,22,19,0.12)] backdrop-blur-xl transition duration-300 group-hover:scale-105 group-hover:bg-white">
+                      <Icon className="size-3.5" />
+                    </span>
+                    {isActive ? (
+                      <span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-[#e59622] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-[0_8px_14px_rgba(149,94,16,0.24)]">
+                        Selected
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-2 flex items-start justify-between gap-2 pl-1">
-                <p className="line-clamp-2 text-[11px] font-black leading-4 text-stone-900">
-                  {template.title}
-                </p>
-                {isActive ? (
-                  <Badge className="px-1.5 py-0 text-[10px]">Active</Badge>
-                ) : null}
-                {isDisabled ? (
-                  <Badge
-                    className="px-1.5 py-0 text-[10px]"
-                    variant="secondary"
-                  >
-                    Coming soon
-                  </Badge>
-                ) : null}
-              </div>
-              <p className="mt-1 line-clamp-2 pl-1 text-[10px] leading-4 text-muted-foreground">
-                {template.description}
-              </p>
-            </button>
-          );
-        })}
-      </div>
+                <div className="px-1.5 py-1.5">
+                  <p className="line-clamp-2 text-[10.5px] font-black leading-3.5 text-[#241b16]">
+                    {template.title}
+                  </p>
+                  {isDisabled ? (
+                    <Badge
+                      className="mt-1 rounded-full border-none bg-white/64 px-1.5 py-0 text-[9px] text-[#7a6d62]"
+                      variant="secondary"
+                    >
+                      Coming soon
+                    </Badge>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </ScrollArea>
     </aside>
   );
 }
@@ -519,6 +599,7 @@ function MusicVideoPreview({
   duration,
   isPlaying,
   latestVideo,
+  latestVideoTemplate,
   onGenerateVideo,
   onPause,
   onPlay,
@@ -535,6 +616,7 @@ function MusicVideoPreview({
   duration: number;
   isPlaying: boolean;
   latestVideo: MusicVideoRenderRecord | null;
+  latestVideoTemplate: TemplateId | null;
   onGenerateVideo: () => void;
   onPause: () => void;
   onPlay: () => void;
@@ -552,7 +634,13 @@ function MusicVideoPreview({
   const previewTransitionLoopRef = useRef<TransitionPreviewLoop | null>(null);
   const [previewTime, setPreviewTime] = useState(0);
   const lastPreviewTimeRef = useRef(0);
+  const previousTimelineRef = useRef<MusicVideoTimeline | null>(null);
   const progress = duration ? Math.min(previewTime / duration, 1) * 100 : 0;
+  const renderProgressPercent = Math.min(
+    Math.max(renderProgress * 100, 0),
+    100,
+  );
+  const matchesCurrentTemplate = latestVideoTemplate === timeline.templateId;
   const previewDimensions = previewAspectRatioOptions[aspectRatio];
   const AspectIcon =
     aspectRatio === "portrait" ? RectangleHorizontal : RectangleVertical;
@@ -571,6 +659,7 @@ function MusicVideoPreview({
       : timeline.templateId === "wave-radio"
         ? WaveRadioComposition
       : PhotoSlideshowComposition;
+  const playerInputProps = useMemo(() => ({ timeline }), [timeline]);
   const previewBackdropUrl =
     timeline.coverPhoto?.url ??
     timeline.coverPhoto?.objectUrl ??
@@ -588,9 +677,27 @@ function MusicVideoPreview({
   }, [previewTransitionLoop]);
 
   useEffect(() => {
+    if (previousTimelineRef.current && previousTimelineRef.current !== timeline) {
+      logMusicVideoPreviewDebug("Timeline props changed", {
+        isPlaying,
+        templateId: timeline.templateId,
+        lyricCues: timeline.lyrics.length,
+        photos: timeline.photos.length,
+        transitions: timeline.transitions.length,
+      });
+    }
+
+    previousTimelineRef.current = timeline;
+  }, [isPlaying, timeline]);
+
+  useEffect(() => {
     const player = playerRef.current;
     if (!player || !previewTransitionLoop) return;
 
+    logMusicVideoPreviewDebug("seekTo", {
+      frame: previewTransitionLoop.startFrame,
+      source: "transitionLoopStart",
+    });
     player.seekTo(previewTransitionLoop.startFrame);
     player.play();
     onPlayRef.current();
@@ -605,7 +712,7 @@ function MusicVideoPreview({
       if (
         !force &&
         Math.abs(safeTime - lastPreviewTimeRef.current) <
-          1 / PHOTO_SLIDESHOW_FPS
+          PREVIEW_TIME_UPDATE_INTERVAL_SECONDS
       ) {
         return;
       }
@@ -621,6 +728,10 @@ function MusicVideoPreview({
     }) => {
       const loop = previewTransitionLoopRef.current;
       if (loop && detail.frame >= loop.endFrame) {
+        logMusicVideoPreviewDebug("seekTo", {
+          frame: loop.startFrame,
+          source: "transitionLoopWrap",
+        });
         player.seekTo(loop.startFrame);
         updatePreviewTime(loop.startFrame / PHOTO_SLIDESHOW_FPS, true);
         return;
@@ -678,19 +789,24 @@ function MusicVideoPreview({
     lastPreviewTimeRef.current = safeTime;
     setPreviewTime(safeTime);
     if (player) {
-      player.seekTo(Math.round(safeTime * PHOTO_SLIDESHOW_FPS));
+      const targetFrame = Math.round(safeTime * PHOTO_SLIDESHOW_FPS);
+      logMusicVideoPreviewDebug("seekTo", {
+        frame: targetFrame,
+        source: "manualSeek",
+      });
+      player.seekTo(targetFrame);
     }
   }
 
   return (
-    <section className="relative flex min-h-0 flex-col overflow-hidden bg-[#f7f3ee] px-4 py-3 xl:px-6">
+    <section className={cn(musicVideoPanelClassName, "relative flex min-h-0 flex-col overflow-hidden px-2.5 py-2.5 xl:px-3")}>
       {previewBackdropUrl ? (
         <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
           <div
-            className="absolute inset-[-9%] bg-cover bg-center opacity-35 blur-3xl"
+            className="absolute inset-[-9%] bg-cover bg-center opacity-45 blur-[26px] saturate-[1.08]"
             style={{ backgroundImage: `url(${previewBackdropUrl})` }}
           />
-          <div className="absolute inset-0 bg-[#f7f3ee]/78 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-[#f7f0e8]/64 backdrop-blur-[2px]" />
         </div>
       ) : (
         <div
@@ -698,68 +814,69 @@ function MusicVideoPreview({
           className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.78),transparent_34%),linear-gradient(180deg,#faf7f2_0%,#f4eee7_100%)]"
         />
       )}
-      <div className="relative z-10 flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative z-10 flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="h-px w-6 bg-rose-400/80" />
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-stone-500">
+            <span className="h-px w-5 bg-[#8f7f72]/70" />
+            <p className={musicVideoSectionHeadingClassName}>
               Remotion Preview
             </p>
           </div>
-          <h3 className="mt-1 truncate text-lg font-black text-stone-950">
+          <h3 className="mt-0.5 truncate text-[14px] font-black tracking-[-0.02em] text-[#241b16]">
             {songTitle}
           </h3>
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
           <Button
-            className="rounded-full bg-[#191411]/88 text-white shadow-[0_16px_34px_rgba(28,25,23,0.22)] backdrop-blur-xl hover:bg-[#241d1b]/92"
+            className={cn(musicVideoPrimaryButtonClassName, "group h-8 px-3 text-[10.5px]")}
             disabled={isRendering || renderStatus === "uploading"}
             type="button"
             onClick={onGenerateVideo}
           >
             {isRendering ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader2 className="size-3.5 animate-spin" />
             ) : (
-              <Wand2 className="size-4" />
+              <Wand2 className="size-3.5 group-hover:[animation:music-video-wand-float_0.85s_ease-in-out_infinite]" />
             )}
             Generate Video
           </Button>
           <Button
             aria-label="Switch preview aspect ratio"
-            className="rounded-full border-0 bg-white/58 px-3 font-black text-stone-800 shadow-[0_12px_28px_rgba(28,25,23,0.10)] backdrop-blur-xl hover:bg-white/76 hover:text-rose-600"
+            className={cn(getStudioPillButtonClassName(false), "h-8 px-2.5 text-[10.5px]")}
             title={`Switch to ${nextAspectRatioLabel}`}
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={onToggleAspectRatio}
           >
-            <AspectIcon className="size-4" />
+            <AspectIcon className="size-3.5" />
             {previewDimensions.label}
           </Button>
           <Button
-            className="rounded-full bg-white/58 text-stone-900 shadow-[0_12px_28px_rgba(28,25,23,0.10)] backdrop-blur-xl hover:bg-white/76 hover:text-rose-600"
+            className={cn(getStudioPillButtonClassName(false), "h-8 px-2.5 text-[10.5px]")}
             type="button"
+            variant="ghost"
             onClick={togglePlayback}
           >
             {isPlaying ? (
-              <Pause className="size-4" />
+              <Pause className="size-3.5" />
             ) : (
-              <Play className="size-4" />
+              <Play className="size-3.5" />
             )}
             {isPlaying ? "Pause" : "Play"}
           </Button>
         </div>
       </div>
 
-      <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center py-4 xl:py-5">
+      <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center py-2.5 xl:py-3">
         <div
           className={cn(
-            "relative overflow-hidden border-[8px] border-[#171412] bg-[#171412] shadow-xl shadow-stone-950/20",
+            "relative overflow-hidden bg-[#171412] shadow-[0_18px_42px_rgba(28,22,18,0.24)]",
             aspectRatio === "portrait"
-              ? "aspect-[9/16] h-full max-h-[min(72vh,760px)] min-h-[420px] rounded-[30px]"
-              : "aspect-[16/9] w-full max-w-[min(100%,1180px,calc(177.78vh-23.11rem))] rounded-[24px]",
+              ? "aspect-[9/16] h-full max-h-[min(72vh,760px)] min-h-[360px] rounded-[14px] p-1.5"
+              : "aspect-[16/9] w-full max-w-[min(100%,1180px,calc(177.78vh-21rem))] rounded-[13px] p-1.5",
           )}
         >
-          <div className="absolute inset-0 rounded-[20px] bg-black">
+          <div className="absolute inset-1.5 overflow-hidden rounded-[9px] bg-black">
             <Player
               ref={playerRef}
               key={`${timeline.templateId}-${previewDimensions.label}`}
@@ -770,41 +887,47 @@ function MusicVideoPreview({
               controls={false}
               durationInFrames={durationInFrames}
               fps={PHOTO_SLIDESHOW_FPS}
-              inputProps={{ timeline }}
+              inputProps={playerInputProps}
               style={{ height: "100%", width: "100%" }}
             />
           </div>
-          <div className="absolute left-1/2 top-2 h-1 w-14 -translate-x-1/2 rounded-full bg-white/20" />
+          <div className="absolute left-1/2 top-2 h-0.5 w-10 -translate-x-1/2 rounded-full bg-white/18" />
         </div>
       </div>
 
       <div className="relative z-10 shrink-0">
-        <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
-          {latestVideo?.videoUrl ? (
+        <div className="mb-2 flex flex-wrap items-center justify-center gap-1.5">
+          {matchesCurrentTemplate && latestVideo?.videoUrl ? (
             <Button
               asChild
-              className="rounded-full border-0 bg-white/58 shadow-[0_12px_28px_rgba(28,25,23,0.10)] backdrop-blur-xl hover:bg-white/76"
+              className={cn(musicVideoSecondaryButtonClassName, "h-8 px-3 text-[10.5px]")}
               type="button"
-              variant="outline"
+              variant="ghost"
             >
               <a download href={latestVideo.videoUrl}>
-                <Download className="size-4" />
+                <Download className="size-3.5" />
                 Download MP4
+              </a>
+            </Button>
+          ) : matchesCurrentTemplate && latestVideo?.temporaryVideoUrl ? (
+            <Button
+              asChild
+              className={cn(musicVideoPrimaryButtonClassName, "h-8 px-3 text-[10.5px]")}
+              type="button"
+            >
+              <a download href={latestVideo.temporaryVideoUrl}>
+                <Download className="size-3.5" />
+                Download Now (Temporary)
               </a>
             </Button>
           ) : null}
         </div>
-        {isRendering ? (
-          <div className="mb-3 rounded-lg bg-white/70 px-3 py-2 text-xs font-bold text-stone-600 shadow-sm shadow-stone-950/[0.04]">
-            Rendering video... {Math.round(renderProgress * 100)}%
-          </div>
+        {isRendering && !latestVideo?.temporaryVideoUrl ? (
+          <RenderProgressBar progress={renderProgressPercent} />
         ) : null}
         <div className="relative h-4">
           <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 overflow-hidden rounded-full bg-white/80 shadow-inner shadow-stone-200/70">
-            <div
-              className="h-full rounded-full bg-rose-500/90 transition-[width]"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="h-full rounded-full bg-[#362e28] transition-[width]" style={{ width: `${progress}%` }} />
           </div>
           <input
             aria-label="Seek music video preview"
@@ -818,16 +941,170 @@ function MusicVideoPreview({
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-rose-500 shadow-sm"
+            className="pointer-events-none absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#fff8f1] shadow-[0_6px_12px_rgba(53,40,30,0.18),0_0_0_1px_rgba(255,255,255,0.72)_inset]"
             style={{ left: `${progress}%` }}
           />
         </div>
-        <div className="mt-1.5 flex justify-between text-[11px] font-bold text-stone-500">
+        <div className="mt-1 flex justify-between text-[10px] font-bold tabular-nums text-[#76695d]">
           <span>{formatTime(previewTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
     </section>
+  );
+}
+
+function RenderProgressBar({ progress }: { progress: number }) {
+  const safeProgress = Math.min(Math.max(progress, 0), 100);
+  const indicatorStyle = {
+    width: `${safeProgress}%`,
+    "--render-progress": `${safeProgress}%`,
+  } as CSSProperties;
+  const dots = [0, 1, 2];
+
+  return (
+    <div
+      className={cn(
+        musicVideoInfoCardClassName,
+        "relative mb-2 overflow-hidden rounded-[22px] bg-[linear-gradient(135deg,rgba(255,255,255,0.5),rgba(250,243,234,0.22)_52%,rgba(232,214,201,0.18))] px-3.5 py-3 text-[#4f4339] shadow-[0_16px_34px_rgba(66,51,37,0.11),inset_0_1px_0_rgba(255,255,255,0.72),inset_0_0_0_1px_rgba(255,255,255,0.08)] backdrop-blur-2xl",
+      )}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.45),transparent_32%),linear-gradient(120deg,rgba(255,255,255,0.12),transparent_55%)]"
+      />
+      <div className="relative z-10 flex items-end justify-between gap-3">
+        <div className="space-y-0.5">
+          <div className="flex items-center text-[12px] font-black tracking-[-0.02em] text-[#463930]">
+            <span>Rendering video</span>
+            <span aria-hidden="true" className="ml-0.5 inline-flex items-end motion-reduce:hidden">
+              {dots.map((dot) => (
+                <span
+                  key={dot}
+                  className="render-progress-dot w-[0.32em] text-center"
+                  style={{ animationDelay: `${dot * 0.18}s` }}
+                >
+                  .
+                </span>
+              ))}
+            </span>
+          </div>
+          <div className="text-[10px] font-semibold text-[#7c6d61]">
+            Frames are being exported and stitched in sequence.
+          </div>
+        </div>
+        <div className="rounded-full border border-white/45 bg-white/40 px-2.5 py-1 text-[11px] font-black tabular-nums text-[#382d26] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+          {Math.round(safeProgress)}%
+        </div>
+      </div>
+      <div className="relative z-10 mt-3">
+        <div className="relative h-3 overflow-hidden rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.44),rgba(233,223,214,0.26))] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),inset_0_-6px_12px_rgba(87,68,52,0.08)]">
+          <div
+            className="render-progress-indicator absolute inset-y-0 left-0 overflow-hidden rounded-full bg-[linear-gradient(90deg,rgba(116,87,68,0.92)_0%,rgba(168,130,101,0.98)_36%,rgba(244,214,173,0.96)_68%,rgba(255,244,225,0.88)_100%)] shadow-[0_0_20px_rgba(217,180,128,0.22),inset_0_1px_0_rgba(255,255,255,0.34)] transition-[width] duration-700 ease-out motion-reduce:transition-none"
+            style={indicatorStyle}
+          >
+            <div className="render-progress-sheen absolute inset-0 opacity-90 motion-reduce:hidden" />
+            <div className="render-progress-beam absolute inset-y-[-35%] w-20 rounded-full bg-[radial-gradient(circle,rgba(255,252,245,0.94)_0%,rgba(255,234,204,0.8)_28%,rgba(255,227,190,0.22)_60%,transparent_76%)] blur-[1px] motion-reduce:hidden" />
+            <div className="render-progress-glow absolute right-0 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.98)_0%,rgba(255,241,219,0.8)_32%,rgba(255,215,170,0.3)_58%,transparent_78%)] motion-reduce:hidden" />
+          </div>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-[18%] left-2 right-2 rounded-full bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.34),transparent)] opacity-70"
+          />
+        </div>
+      </div>
+      <style jsx>{`
+        .render-progress-indicator::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(255, 255, 255, 0.36) 0%,
+              rgba(255, 255, 255, 0.08) 36%,
+              rgba(120, 77, 52, 0.12) 100%
+            );
+          mix-blend-mode: screen;
+        }
+
+        .render-progress-sheen {
+          background-image: linear-gradient(
+            105deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.12) 18%,
+            rgba(255, 250, 241, 0.82) 38%,
+            rgba(255, 255, 255, 0.14) 58%,
+            transparent 78%
+          );
+          background-size: 180% 100%;
+          animation: renderProgressSheen 2.8s linear infinite;
+        }
+
+        .render-progress-dot {
+          animation: renderProgressDot 1.2s ease-in-out infinite;
+        }
+
+        .render-progress-beam {
+          left: -4rem;
+          animation: renderProgressBeam 2.2s ease-in-out infinite;
+          box-shadow: 0 0 22px rgba(255, 226, 187, 0.44);
+        }
+
+        .render-progress-glow {
+          animation: renderProgressGlow 1.35s ease-in-out infinite;
+          box-shadow: 0 0 18px rgba(255, 236, 205, 0.46);
+        }
+
+        @keyframes renderProgressSheen {
+          0% {
+            transform: translateX(-42%);
+          }
+          100% {
+            transform: translateX(42%);
+          }
+        }
+
+        @keyframes renderProgressBeam {
+          0% {
+            transform: translateX(0) scaleX(0.72);
+            opacity: 0;
+          }
+          18% {
+            opacity: 0.88;
+          }
+          100% {
+            transform: translateX(calc(var(--render-progress) + 4.5rem)) scaleX(1.08);
+            opacity: 0;
+          }
+        }
+
+        @keyframes renderProgressDot {
+          0%,
+          80%,
+          100% {
+            opacity: 0.28;
+            transform: translateY(0);
+          }
+          40% {
+            opacity: 1;
+            transform: translateY(-1px);
+          }
+        }
+
+        @keyframes renderProgressGlow {
+          0%,
+          100% {
+            opacity: 0.7;
+            transform: translateY(-50%) scale(0.92);
+          }
+          50% {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.08);
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 
@@ -860,29 +1137,29 @@ function PhotoUploadPool({
   return (
     <section className="min-w-0">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2 text-sm font-black text-foreground">
-          <Images className="size-4 shrink-0" />
+        <div className="flex min-w-0 items-center gap-1.5 text-[11.5px] font-black text-[#241b16]">
+          <Images className="size-3.5 shrink-0 text-[#b56e4f]" />
           <span className="leading-tight break-words">Media Assets</span>
         </div>
-        <Badge className="shrink-0" variant="secondary">
+        <Badge className="shrink-0 rounded-full border-none bg-white/64 px-2 py-0.5 text-[10px] font-black text-[#5b5047]" variant="secondary">
           {photos.length} assets
         </Badge>
       </div>
       <div
         {...getRootProps()}
         className={cn(
-          "mt-3 flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-lg bg-[#ebe7e1] px-3 py-5 text-center transition",
+          "mt-2 flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-[10px] bg-white/48 px-3 py-4 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.68),0_8px_18px_rgba(70,53,38,0.045)] backdrop-blur-xl transition",
           isDragActive
-            ? "bg-[#e8dfd8]"
-            : "hover:bg-[#e6e1da]",
+            ? "bg-white/78"
+            : "hover:bg-white/66",
         )}
       >
         <input {...getInputProps()} />
-        <UploadCloud className="size-7 shrink-0 text-stone-500" />
-        <p className="mt-2 max-w-[26rem] text-balance text-sm font-bold leading-6 text-foreground sm:text-[15px]">
+        <UploadCloud className="size-6 shrink-0 text-[#8f7f72]" />
+        <p className="mt-2 max-w-[24rem] text-balance text-[12px] font-black leading-4 text-[#241b16]">
           Drag media here or click to upload
         </p>
-        <p className="mt-1 max-w-[30rem] text-pretty text-xs leading-5 text-muted-foreground">
+        <p className="mt-1 max-w-[28rem] text-pretty text-[10px] leading-3.5 text-[#76695d]">
           JPG, PNG, WebP, GIF, MP4, MOV, or WebM. Up to 80MB each.
         </p>
       </div>
@@ -906,21 +1183,21 @@ function LyricsFontPicker({
   }
 
   return (
-    <div className="space-y-2">
-      <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+    <div className="space-y-1.5">
+      <Label className={musicVideoSectionHeadingClassName}>
         Font
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             aria-expanded={open}
-            className="h-9 w-full justify-between rounded-lg border-stone-200 bg-white px-3 text-left font-bold"
+            className={cn(musicVideoFieldClassName, "w-full justify-between px-2.5 text-left")}
             role="combobox"
             type="button"
-            variant="outline"
+            variant="ghost"
           >
             <span
-              className="min-w-0 truncate text-sm"
+              className="min-w-0 truncate text-[11.5px]"
               style={{ fontFamily: selectedFont?.previewFamily }}
             >
               {selectedFont?.label ?? "Select font"}
@@ -930,7 +1207,10 @@ function LyricsFontPicker({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="flex max-h-[min(20rem,var(--radix-popover-content-available-height))] w-[--radix-popover-trigger-width] flex-col p-0"
+          className={cn(
+            musicVideoPopoverClassName,
+            "flex max-h-[min(20rem,var(--radix-popover-content-available-height))] w-[--radix-popover-trigger-width] flex-col p-1 [&_[data-slot=command-group]]:p-1 [&_[data-slot=command-input-wrapper]]:h-9 [&_[data-slot=command-input-wrapper]]:rounded-[10px] [&_[data-slot=command-input-wrapper]]:border-none [&_[data-slot=command-input-wrapper]]:bg-white/72 [&_[data-slot=command-input-wrapper]]:px-2.5 [&_[data-slot=command-input]]:h-8 [&_[data-slot=command-item]]:rounded-[9px] [&_[data-slot=command-item]]:px-2.5 [&_[data-slot=command-item][data-selected=true]]:bg-[#2d2622] [&_[data-slot=command-item][data-selected=true]]:text-[#f7f0e6]",
+          )}
         >
           <Command className="min-h-0">
             <CommandInput placeholder="Search fonts..." />
@@ -951,12 +1231,12 @@ function LyricsFontPicker({
                   >
                     <Check
                       className={cn(
-                        "size-4",
+                        "size-3.5",
                         font.value === value ? "opacity-100" : "opacity-0",
                       )}
                     />
                     <span
-                      className="min-w-0 truncate text-base leading-7"
+                      className="min-w-0 truncate text-[12px] leading-6"
                       style={{ fontFamily: font.previewFamily }}
                     >
                       {font.label}
@@ -988,14 +1268,14 @@ function LyricsSliderField({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-1 rounded-[8px] bg-white/38 px-2 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.68),0_6px_14px_rgba(70,53,38,0.04)] backdrop-blur-xl">
       <div className="flex items-center justify-between gap-3">
-        <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+        <Label className={musicVideoSectionHeadingClassName}>
           {label}
         </Label>
         <Input
           aria-label={label}
-          className="h-8 w-16 rounded-lg bg-white px-2 text-right text-xs font-black"
+          className={cn(musicVideoFieldClassName, "h-7 w-14 px-1.5 text-right text-[10px] tabular-nums")}
           max={max}
           min={min}
           step={step}
@@ -1010,6 +1290,7 @@ function LyricsSliderField({
         />
       </div>
       <Slider
+        className={studioGlassStyles.slider}
         max={max}
         min={min}
         step={step}
@@ -1030,21 +1311,21 @@ function LyricsColorField({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+    <div className="space-y-1.5">
+      <Label className={musicVideoSectionHeadingClassName}>
         {label}
       </Label>
-      <div className="grid min-w-0 grid-cols-[44px_minmax(0,1fr)] gap-2">
+      <div className="grid min-w-0 grid-cols-[36px_minmax(0,1fr)] gap-1.5">
         <Input
           aria-label={`${label} swatch`}
-          className="h-9 cursor-pointer rounded-lg bg-white p-1"
+          className="h-8 cursor-pointer rounded-[8px] border-none bg-white/76 p-1 shadow-[0_6px_14px_rgba(70,53,38,0.075),inset_0_1px_0_rgba(255,255,255,0.74),0_0_0_1px_rgba(255,255,255,0.1)_inset]"
           type="color"
           value={value}
           onChange={(event) => onChange(event.currentTarget.value)}
         />
         <Input
           aria-label={label}
-          className="h-9 rounded-lg bg-white px-2 text-xs font-bold uppercase"
+          className={cn(musicVideoFieldClassName, "h-8 px-2 text-[10.5px] font-bold uppercase")}
           value={value}
           onChange={(event) => onChange(event.currentTarget.value)}
         />
@@ -1066,7 +1347,7 @@ function LyricsStyleSettings({
   const lockCenterPosition = forceCenterPosition || isRollingFlow;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2.5">
       <LyricsFontPicker
         value={lyricsStyle.fontFamily}
         onChange={(fontFamily) => onChangeLyricsStyle({ fontFamily })}
@@ -1079,7 +1360,7 @@ function LyricsStyleSettings({
         value={lyricsStyle.fontSize}
         onChange={(fontSize) => onChangeLyricsStyle({ fontSize })}
       />
-      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
         <LyricsColorField
           label="Text color"
           value={lyricsStyle.color}
@@ -1099,9 +1380,9 @@ function LyricsStyleSettings({
         value={lyricsStyle.strokeWidth}
         onChange={(strokeWidth) => onChangeLyricsStyle({ strokeWidth })}
       />
-      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label className={musicVideoSectionHeadingClassName}>
             Position
           </Label>
           <Select
@@ -1111,14 +1392,14 @@ function LyricsStyleSettings({
             }
           >
             <SelectTrigger
-              className="h-9 rounded-lg bg-white px-2 text-xs font-bold"
+              className={cn(musicVideoFieldClassName, "w-full")}
               disabled={lockCenterPosition}
             >
               <SelectValue
                 placeholder={lockCenterPosition ? "Center only" : undefined}
               />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={cn(musicVideoPopoverClassName, studioGlassStyles.selectContentItems)}>
               {lyricsPositionOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -1127,8 +1408,8 @@ function LyricsStyleSettings({
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-2">
-          <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+        <div className="space-y-1.5">
+          <Label className={musicVideoSectionHeadingClassName}>
             Entrance
           </Label>
           <Select
@@ -1139,10 +1420,10 @@ function LyricsStyleSettings({
               })
             }
           >
-            <SelectTrigger className="h-9 rounded-lg bg-white px-2 text-xs font-bold">
+            <SelectTrigger className={cn(musicVideoFieldClassName, "w-full")}>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={cn(musicVideoPopoverClassName, studioGlassStyles.selectContentItems)}>
               {lyricsEntranceOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -1181,54 +1462,54 @@ function PhotoUploadLyricsTabs({
   return (
     <Tabs
       defaultValue="photos"
-      className="min-w-0 rounded-lg bg-white/60 p-3 shadow-sm shadow-stone-950/[0.04]"
+      className={cn(musicVideoEditorSectionClassName, "min-w-0")}
     >
       <div className="flex items-center justify-center">
-        <TabsList className="h-8 w-fit rounded-full bg-stone-100/75 p-1 shadow-inner shadow-stone-300/60">
+        <TabsList className="h-7 w-fit rounded-full bg-white/55 p-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.66),inset_0_0_12px_rgba(70,53,38,0.04)] backdrop-blur-xl">
           <TabsTrigger
-            className="h-6 flex-none gap-1.5 rounded-full px-3 text-[11px] font-black tracking-[0.01em] data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
+            className="h-6 flex-none gap-1 rounded-full px-2.5 text-[10.5px] font-black tracking-[0.01em] text-[#6d5f53] data-[state=active]:bg-[#2d2622] data-[state=active]:text-[#f7f0e6] data-[state=active]:shadow-[0_7px_14px_rgba(45,38,34,0.16)]"
             value="photos"
           >
-            <ImagePlus className="size-3.5" />
+            <ImagePlus className="size-3" />
             Media
           </TabsTrigger>
           <TabsTrigger
-            className="h-6 flex-none gap-1.5 rounded-full px-3 text-[11px] font-black tracking-[0.01em] data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
+            className="h-6 flex-none gap-1 rounded-full px-2.5 text-[10.5px] font-black tracking-[0.01em] text-[#6d5f53] data-[state=active]:bg-[#2d2622] data-[state=active]:text-[#f7f0e6] data-[state=active]:shadow-[0_7px_14px_rgba(45,38,34,0.16)]"
             value="lyrics"
           >
-            <Type className="size-3.5" />
+            <Type className="size-3" />
             Lyrics
           </TabsTrigger>
           <TabsTrigger
-            className="h-6 flex-none gap-1.5 rounded-full px-3 text-[11px] font-black tracking-[0.01em] data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm"
+            className="h-6 flex-none gap-1 rounded-full px-2.5 text-[10.5px] font-black tracking-[0.01em] text-[#6d5f53] data-[state=active]:bg-[#2d2622] data-[state=active]:text-[#f7f0e6] data-[state=active]:shadow-[0_7px_14px_rgba(45,38,34,0.16)]"
             value="overlay"
           >
-            <Sparkles className="size-3.5" />
+            <Sparkles className="size-3" />
             FX
           </TabsTrigger>
         </TabsList>
       </div>
 
-      <TabsContent className="mt-3 space-y-3" value="photos">
+      <TabsContent className="mt-2 space-y-2" value="photos">
         <PhotoUploadPool photos={photos} onDropPhotos={onDropPhotos} />
         {selectedUploadedPhoto ? (
-          <div className="flex min-w-0 items-center gap-2 rounded-lg bg-white/75 px-3 py-2 text-xs font-bold text-stone-600 shadow-sm shadow-stone-950/[0.04]">
-            <Waves className="size-4 shrink-0 text-rose-500" />
+          <div className={cn(musicVideoInfoCardClassName, "flex min-w-0 items-center gap-1.5 text-[10.5px] font-bold text-[#5d5045]")}>
+            <Waves className="size-3.5 shrink-0 text-[#b56e4f]" />
             <span className="truncate">Selected: {selectedUploadedPhoto.name}</span>
           </div>
         ) : null}
       </TabsContent>
 
-      <TabsContent className="mt-3 space-y-4" value="lyrics">
+      <TabsContent className="mt-2 space-y-2.5" value="lyrics">
         <LyricsStyleSettings
           lyricsStyle={lyricsStyle}
           onChangeLyricsStyle={onChangeLyricsStyle}
         />
       </TabsContent>
 
-      <TabsContent className="mt-3 space-y-4" value="overlay">
-        <div className="space-y-2">
-          <Label className="text-[11px] font-black uppercase tracking-[0.12em] text-stone-500">
+      <TabsContent className="mt-2 space-y-2.5" value="overlay">
+        <div className="space-y-1.5">
+          <Label className={musicVideoSectionHeadingClassName}>
             Atmosphere overlay
           </Label>
           <Select
@@ -1239,10 +1520,10 @@ function PhotoUploadLyricsTabs({
               })
             }
           >
-            <SelectTrigger className="h-9 rounded-lg bg-white px-2 text-xs font-bold">
+            <SelectTrigger className={cn(musicVideoFieldClassName, "w-full")}>
               <SelectValue placeholder="No Overlay" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={cn(musicVideoPopoverClassName, studioGlassStyles.selectContentItems)}>
               <SelectItem value="none">No Overlay</SelectItem>
               {ATMOSPHERE_OVERLAY_OPTIONS.map((option) => (
                 <SelectItem key={option.id} value={option.id}>
@@ -1254,7 +1535,7 @@ function PhotoUploadLyricsTabs({
         </div>
 
         {selectedOverlay ? (
-          <div className="overflow-hidden rounded-lg bg-stone-950 shadow-sm shadow-stone-950/15">
+          <div className="overflow-hidden rounded-[9px] bg-stone-950 shadow-[0_10px_22px_rgba(28,25,23,0.12)]">
             <video
               muted
               loop
@@ -1299,29 +1580,32 @@ function PhotoMediaRail({
 
   return (
     <section
-      className="flex min-h-0 flex-col rounded-lg bg-white/60 p-2 shadow-sm shadow-stone-950/[0.04]"
+      className={cn(musicVideoEditorSectionClassName, "flex min-h-0 flex-col p-1.5")}
       data-photo-media-rail
     >
       <div className="flex shrink-0 items-center justify-between gap-2 px-1">
-        <div className="flex min-w-0 items-center gap-1.5 text-[11px] font-black uppercase text-stone-600">
-          <Images className="size-3.5 text-rose-500" />
+        <div className="flex min-w-0 items-center gap-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#8f7f72]">
+          <Images className="size-3 text-[#b56e4f]" />
           Media
         </div>
-        <Badge className="h-5 px-1.5 text-[10px]" variant="secondary">
+        <Badge className="h-5 rounded-full border-none bg-white/64 px-1.5 text-[9px] text-[#5b5047]" variant="secondary">
           {media.length}
         </Badge>
       </div>
 
       <ScrollArea
-        className="mt-2 min-h-0 flex-1 overflow-y-auto"
+        className={cn(
+          musicVideoScrollAreaClassName,
+          musicVideoScrollAreaViewportClassName,
+          "mt-2 flex-1 overflow-hidden",
+        )}
         data-photo-media-rail-scroll
-        style={{ scrollbarGutter: "stable" }}
       >
-        <div className="space-y-2 pb-2 pr-3">
+        <div className="space-y-1.5 pb-2 pr-2">
           {media.length === 0 ? (
-            <div className="flex min-h-[180px] flex-col items-center justify-center rounded-lg bg-stone-50/80 px-2 text-center shadow-inner shadow-stone-950/[0.04]">
-              <ImagePlus className="size-6 text-stone-300" />
-              <p className="mt-2 text-[11px] font-black leading-4 text-stone-500">
+            <div className="flex min-h-[150px] flex-col items-center justify-center rounded-[8px] bg-white/42 px-2 text-center shadow-inner shadow-stone-950/[0.04]">
+              <ImagePlus className="size-5 text-[#a99b8f]" />
+              <p className="mt-2 text-[10px] font-black leading-3.5 text-[#76695d]">
                 No media
               </p>
             </div>
@@ -1332,10 +1616,10 @@ function PhotoMediaRail({
                 <div
                   key={photo.id}
                   className={cn(
-                    "group relative overflow-hidden rounded-lg bg-stone-100 text-left shadow-sm shadow-stone-950/[0.06] transition",
+                    "group relative overflow-hidden rounded-[8px] bg-white/72 text-left shadow-[0_8px_17px_rgba(70,53,38,0.06)] transition",
                     selectedPhotoId === photo.id
-                      ? "shadow-[0_0_0_2px_rgba(244,63,94,0.45),0_12px_28px_rgba(28,25,23,0.12)]"
-                      : "hover:shadow-md hover:shadow-stone-950/[0.10]",
+                      ? "shadow-[0_12px_24px_rgba(45,38,34,0.15),inset_0_0_0_2px_rgba(45,38,34,0.16)]"
+                      : "hover:shadow-[0_12px_22px_rgba(70,53,38,0.10)]",
                   )}
                   data-cover-photo={photo.isCover ? true : undefined}
                   draggable
@@ -1358,7 +1642,7 @@ function PhotoMediaRail({
                       media={photo}
                     />
                   </button>
-                  <span className="absolute left-1 top-1 rounded-full bg-black/65 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  <span className="absolute left-1 top-1 rounded-full bg-black/62 px-1.5 py-0.5 text-[9px] font-bold text-white backdrop-blur">
                     {photo.isCover
                       ? "Cover"
                       : getUploadedMediaType(photo) === "video"
@@ -1366,14 +1650,14 @@ function PhotoMediaRail({
                         : index + 1}
                   </span>
                   {selectedPhotoId === photo.id ? (
-                    <span className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm">
+                    <span className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-[#2d2622] text-[#f7f0e6] shadow-sm">
                       <Check className="size-3" />
                     </span>
                   ) : null}
                   {photo.isCover ? null : (
                     <button
                       aria-label={`Remove ${photo.name}`}
-                      className="absolute bottom-1 right-1 flex size-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition hover:bg-rose-500 group-hover:opacity-100"
+                      className="absolute bottom-1 right-1 flex size-6 items-center justify-center rounded-full bg-black/70 text-white opacity-0 backdrop-blur transition hover:bg-[#2d2622] group-hover:opacity-100"
                       title={`Remove ${photo.name}`}
                       type="button"
                       onClick={(event) => {
@@ -1422,21 +1706,21 @@ function TransitionNode({
       aria-label="Transition Node"
       className="relative flex items-center justify-center py-1"
     >
-      <div className="absolute left-7 top-0 h-full w-px bg-stone-200/70" />
+      <div className="absolute left-7 top-0 h-full w-px bg-white/45" />
       <Popover>
         <PopoverTrigger asChild>
           <button
-            className="relative z-10 inline-flex max-w-full cursor-pointer items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-black text-stone-600 shadow-sm shadow-stone-950/[0.04] transition hover:bg-white hover:text-rose-600 hover:shadow-md hover:shadow-stone-950/[0.06]"
+            className={cn(musicVideoMicroButtonClassName, "relative z-10 inline-flex max-w-full cursor-pointer items-center gap-1.5 px-2 py-1 text-[10px]")}
             type="button"
             onClick={() => onPreviewTransition(toCueId)}
           >
-            <Film className="size-3 text-rose-500" />
+            <Film className="size-3 text-[#b56e4f]" />
             <span className="truncate">{getTransitionLabel(activeType)}</span>
           </button>
         </PopoverTrigger>
         <PopoverContent
           align="center"
-          className="w-auto max-w-[min(420px,calc(100vw-32px))] rounded-lg border-0 bg-white/95 p-2 shadow-xl shadow-stone-950/15"
+          className={cn(musicVideoPopoverClassName, "w-auto max-w-[min(420px,calc(100vw-32px))] p-1.5")}
           side="top"
         >
           <div className="flex gap-2">
@@ -1448,10 +1732,10 @@ function TransitionNode({
                 <button
                   key={option.type}
                   className={cn(
-                    "group flex w-[92px] cursor-pointer flex-col items-center gap-1 rounded-lg px-2 py-2 text-center shadow-sm shadow-stone-950/[0.04] transition",
+                    "group flex w-[86px] cursor-pointer flex-col items-center gap-1 rounded-[8px] px-2 py-2 text-center shadow-[0_7px_15px_rgba(70,53,38,0.055)] transition",
                     isActive
-                      ? "bg-rose-50/80 text-rose-600 shadow-[0_10px_24px_rgba(244,63,94,0.12)]"
-                      : "bg-white text-stone-600 hover:bg-rose-50/50 hover:shadow-md hover:shadow-stone-950/[0.07]",
+                      ? "bg-[#2d2622] text-[#f7f0e6] shadow-[0_10px_20px_rgba(45,38,34,0.18)]"
+                      : "bg-white/72 text-[#5b5047] hover:bg-white hover:shadow-[0_10px_20px_rgba(70,53,38,0.09)]",
                   )}
                   title={option.description}
                   type="button"
@@ -1459,7 +1743,6 @@ function TransitionNode({
                     onSelectTransition(fromCueId, toCueId, option.type);
                     onPreviewTransition(toCueId);
                   }}
-                  onMouseEnter={() => onPreviewTransition(toCueId)}
                 >
                   <Icon className="size-4" />
                   <span className="text-[10px] font-black leading-3">
@@ -1514,16 +1797,16 @@ function LyricPhotoTimeline({
   );
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-2.5">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm font-black text-stone-900">
-          <Film className="size-4 text-rose-500" />
+        <div className="flex items-center gap-1.5 text-[11.5px] font-black text-[#241b16]">
+          <Film className="size-3.5 text-[#b56e4f]" />
           Lyrics Storyline
         </div>
-        <Badge variant="secondary">{cues.length} cues</Badge>
+        <Badge className="rounded-full border-none bg-white/64 px-2 py-0.5 text-[10px] font-black text-[#5b5047]" variant="secondary">{cues.length} cues</Badge>
       </div>
 
-      <div className="space-y-2 pb-4">
+      <div className="space-y-1.5 pb-3">
         {cues.map((cue, index) => {
           const assignedPhotoId = getAssignedPhotoId(assignments, cue.id);
           const resolvedPhoto = resolvedPhotoByCueId.get(cue.id) ?? null;
@@ -1545,7 +1828,7 @@ function LyricPhotoTimeline({
           return (
             <Fragment key={cue.id}>
               <div
-                className="grid min-w-0 grid-cols-[56px_minmax(0,1fr)] gap-2.5 rounded-lg bg-white/82 p-2 shadow-[0_10px_24px_rgba(28,25,23,0.10)] transition hover:bg-white hover:shadow-[0_14px_30px_rgba(28,25,23,0.13)]"
+                className={cn(musicVideoInfoCardClassName, "grid min-w-0 grid-cols-[50px_minmax(0,1fr)] gap-2 p-1.5 transition hover:bg-white/76 hover:shadow-[0_12px_24px_rgba(70,53,38,0.08)]")}
                 data-lyric-photo-card
                 onDragOver={(event) => {
                   event.preventDefault();
@@ -1559,11 +1842,11 @@ function LyricPhotoTimeline({
               >
                 <button
                   className={cn(
-                    "relative aspect-square w-full cursor-pointer overflow-hidden rounded-md bg-stone-100 shadow-inner shadow-stone-950/[0.08] transition",
+                    "relative aspect-square w-full cursor-pointer overflow-hidden rounded-[7px] bg-white/64 shadow-inner shadow-stone-950/[0.08] transition",
                     assignedPhotoId
-                      ? "shadow-[inset_0_0_0_2px_rgba(251,113,133,0.7)]"
+                      ? "shadow-[inset_0_0_0_2px_rgba(45,38,34,0.22)]"
                       : "shadow-inner shadow-stone-950/[0.08]",
-                    selectedPhotoId && "hover:shadow-[inset_0_0_0_2px_rgba(244,63,94,0.7)]",
+                    selectedPhotoId && "hover:shadow-[inset_0_0_0_2px_rgba(45,38,34,0.24)]",
                   )}
                   type="button"
                   onClick={() => {
@@ -1584,12 +1867,12 @@ function LyricPhotoTimeline({
                       media={resolvedPhoto}
                     />
                   ) : (
-                    <span className="flex size-full items-center justify-center px-1 text-center text-[10px] font-bold text-stone-400">
+                    <span className="flex size-full items-center justify-center px-1 text-center text-[10px] font-bold text-[#9a8e82]">
                       Drop
                     </span>
                   )}
                   {assignedPhotoId ? (
-                    <span className="absolute bottom-1 left-1 rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
+                    <span className="absolute bottom-1 left-1 rounded-full bg-[#2d2622] px-1.5 py-0.5 text-[9px] font-bold text-[#f7f0e6]">
                       Set
                     </span>
                   ) : null}
@@ -1601,15 +1884,15 @@ function LyricPhotoTimeline({
                 </button>
 
                 <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-stone-500">
+                  <div className="flex items-center gap-1.5 text-[9.5px] font-black uppercase tracking-[0.12em] text-[#8f7f72]">
                     <span>{formatTime(cue.start)}</span>
-                    <span className="text-stone-300">-</span>
+                    <span className="text-[#c3b6aa]">-</span>
                     <span>{formatTime(cue.end)}</span>
                   </div>
-                  <p className="mt-1 line-clamp-1 text-[13px] font-bold leading-5 text-foreground">
+                  <p className="mt-0.5 line-clamp-1 text-[11.5px] font-black leading-4 text-[#241b16]">
                     {cue.text}
                   </p>
-                  <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                  <p className="mt-0.5 text-[10px] leading-3.5 text-[#76695d]">
                     {assignedPhotoId
                       ? `Pinned ${getUploadedMediaType(resolvedPhoto)}`
                       : resolvedPhoto?.isCover
@@ -1625,12 +1908,12 @@ function LyricPhotoTimeline({
                   >
                     <SelectTrigger
                       aria-label={`Select media for lyric ${cue.text}`}
-                      className="h-7 w-36 min-w-0 rounded-md bg-white/65 px-2 text-xs text-stone-500 shadow-inner shadow-stone-200/70 [&>span]:min-w-0 [&>span]:truncate"
+                      className={cn(musicVideoFieldClassName, "mt-1 h-7 w-32 min-w-0 px-2 text-[10.5px] text-[#5d5045] [&>span]:min-w-0 [&>span]:truncate")}
                       disabled={photos.length === 0}
                     >
                       <SelectValue placeholder="Media" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className={cn(musicVideoPopoverClassName, studioGlassStyles.selectContentItems)}>
                       {photos.map((photo) => (
                         <SelectItem key={photo.id} value={photo.id}>
                           {photo.name}
@@ -1658,26 +1941,190 @@ function LyricPhotoTimeline({
 }
 
 function MinimalVinylEditor({
+  backgroundBlur,
+  backgroundImage,
+  backgroundImageInputId,
+  discArtwork,
+  discArtworkInputId,
   lyricsStyle,
+  onChangeBackgroundBlur,
   onChangeLyricsStyle,
+  onUploadBackgroundImage,
+  onUploadDiscArtwork,
 }: {
+  backgroundBlur: number;
+  backgroundImage: UploadedPhoto | null;
+  backgroundImageInputId: string;
+  discArtwork: UploadedPhoto | null;
+  discArtworkInputId: string;
   lyricsStyle: LyricsStyleConfig;
+  onChangeBackgroundBlur: (value: number) => void;
   onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
+  onUploadBackgroundImage: (event: ChangeEvent<HTMLInputElement>) => void;
+  onUploadDiscArtwork: (event: ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <ScrollArea
-      className="min-h-0 min-w-0 overflow-y-auto rounded-lg bg-white/60 shadow-sm shadow-stone-950/[0.04]"
+      className={cn(
+        musicVideoSubtlePanelClassName,
+        musicVideoScrollAreaClassName,
+        musicVideoScrollAreaViewportClassName,
+        "min-h-0 min-w-0 flex-1 overflow-hidden p-1",
+      )}
       data-minimal-vinyl-editor
       data-music-video-editor-scroll
       data-music-video-editor-main
     >
-      <div className="min-h-full min-w-0 space-y-3">
-        <section className="rounded-lg bg-white/70 p-3 shadow-sm shadow-stone-950/[0.04]">
-          <div className="flex items-center gap-2 text-sm font-black text-stone-900">
-            <Type className="size-4 text-rose-500" />
+      <div className="min-h-full min-w-0 space-y-2">
+        <section className={musicVideoEditorSectionClassName}>
+          <div className="flex items-center gap-1.5 text-[11.5px] font-black text-[#241b16]">
+            <Sparkles className="size-3.5 text-[#b56e4f]" />
+            Background
+          </div>
+          <div className={cn(musicVideoInfoCardClassName, "mt-2 space-y-2.5")}>
+            <div>
+              <Label className={musicVideoControlTitleClassName}>
+                Full-screen background
+              </Label>
+              <p className={musicVideoControlDescriptionClassName}>
+                Defaults to the current song cover. Upload another image to replace
+                the full-screen blurred background.
+              </p>
+            </div>
+            <Input
+              accept="image/*"
+              className="peer sr-only"
+              id={backgroundImageInputId}
+              type="file"
+              onChange={onUploadBackgroundImage}
+            />
+            <label
+              className={cn(
+                "group flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-[10px] border-none bg-white/72 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_8px_17px_rgba(70,53,38,0.055),0_0_0_1px_rgba(255,255,255,0.1)_inset]",
+                "hover:bg-white/82 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_12px_24px_rgba(70,53,38,0.095)]",
+              )}
+              htmlFor={backgroundImageInputId}
+            >
+              {backgroundImage ? (
+                <div className="relative size-full">
+                  <img
+                    alt="Background artwork"
+                    className="size-full object-cover transition duration-200 group-hover:scale-[1.025]"
+                    src={backgroundImage.objectUrl}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition duration-200 group-hover:bg-black/28">
+                    <span className="inline-flex translate-y-1 items-center gap-1.5 rounded-full bg-white/92 px-2.5 py-1 text-[10.5px] font-bold text-[#2d251f] opacity-0 shadow-[0_10px_20px_rgba(27,21,17,0.17)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+                      <ImagePlus className="size-4" />
+                      Replace background
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1.5 px-4 text-center">
+                  <span className="flex size-9 items-center justify-center rounded-full bg-white/82 text-[#8a7a6c] transition-colors duration-200 group-hover:bg-white group-hover:text-[#b56e4f]">
+                    <ImagePlus className="size-4" />
+                  </span>
+                  <span className="text-[11.5px] font-black text-[#241b16]">
+                    Upload background
+                  </span>
+                  <span className="text-[10px] leading-3.5 text-[#76695d]">
+                    Default uses the song cover as the full-screen background.
+                  </span>
+                </div>
+              )}
+            </label>
+            <div className="space-y-1">
+              <Label className={musicVideoControlTitleClassName}>Background blur</Label>
+              <div className="rounded-[8px] bg-white/38 px-2 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.68),0_6px_14px_rgba(70,53,38,0.04)] backdrop-blur-xl">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className={musicVideoSectionHeadingClassName}>Blur</span>
+                  <span className="rounded-full bg-white/72 px-1.5 py-0.5 text-[9px] font-black tabular-nums text-[#5d5045] shadow-[inset_0_1px_0_rgba(255,255,255,0.74)]">
+                    {backgroundBlur}
+                  </span>
+                </div>
+                <Slider
+                  className={studioGlassStyles.slider}
+                  max={64}
+                  min={0}
+                  step={1}
+                  value={[backgroundBlur]}
+                  onValueChange={(next) => onChangeBackgroundBlur(next[0] ?? backgroundBlur)}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className={musicVideoEditorSectionClassName}>
+          <div className="flex items-center gap-1.5 text-[11.5px] font-black text-[#241b16]">
+            <Music2 className="size-3.5 text-[#b56e4f]" />
+            Disc Artwork
+          </div>
+          <div className={cn(musicVideoInfoCardClassName, "mt-2 space-y-2.5")}>
+            <div>
+              <Label className={musicVideoControlTitleClassName}>
+                Record center image
+              </Label>
+              <p className={musicVideoControlDescriptionClassName}>
+                Upload a custom photo for the vinyl center label. A circular crop
+                dialog opens before it replaces the default cover art.
+              </p>
+            </div>
+            <Input
+              accept="image/*"
+              className="peer sr-only"
+              id={discArtworkInputId}
+              type="file"
+              onChange={onUploadDiscArtwork}
+            />
+            <label
+              className={cn(
+                "group flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-[10px] border-none bg-white/72 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_8px_17px_rgba(70,53,38,0.055),0_0_0_1px_rgba(255,255,255,0.1)_inset]",
+                "hover:bg-white/82 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_12px_24px_rgba(70,53,38,0.095)]",
+                "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[#c9bbac]/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent",
+              )}
+              htmlFor={discArtworkInputId}
+              title={
+                discArtwork
+                  ? "Click to replace disc artwork"
+                  : "Click to upload disc artwork"
+              }
+            >
+              {discArtwork ? (
+                <div className="relative size-full">
+                  <img
+                    alt="Disc artwork source"
+                    className="size-full object-cover transition duration-200 group-hover:scale-[1.025]"
+                    src={discArtwork.objectUrl}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition duration-200 group-hover:bg-black/28">
+                    <span className="inline-flex translate-y-1 items-center gap-1.5 rounded-full bg-white/92 px-2.5 py-1 text-[10.5px] font-bold text-[#2d251f] opacity-0 shadow-[0_10px_20px_rgba(27,21,17,0.17)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+                      <ImagePlus className="size-4" />
+                      Replace artwork
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1.5 px-4 text-center">
+                  <span className="flex size-9 items-center justify-center rounded-full bg-white/82 text-[#8a7a6c] transition-colors duration-200 group-hover:bg-white group-hover:text-[#b56e4f]">
+                    <ImagePlus className="size-4" />
+                  </span>
+                  <span className="text-[11.5px] font-black text-[#241b16]">
+                    Upload disc artwork
+                  </span>
+                  <span className="text-[10px] leading-3.5 text-[#76695d]">
+                    Click to crop a circular record image.
+                  </span>
+                </div>
+              )}
+            </label>
+          </div>
+        </section>
+        <section className={musicVideoEditorSectionClassName}>
+          <div className="flex items-center gap-1.5 text-[11.5px] font-black text-[#241b16]">
+            <Type className="size-3.5 text-[#b56e4f]" />
             Lyrics Config
           </div>
-          <div className="mt-3">
+          <div className="mt-2">
             <LyricsStyleSettings
               lyricsStyle={lyricsStyle}
               onChangeLyricsStyle={onChangeLyricsStyle}
@@ -1702,24 +2149,29 @@ function WaveRadioEditor({
 }) {
   return (
     <ScrollArea
-      className="min-h-0 min-w-0 overflow-y-auto rounded-lg bg-white/60 shadow-sm shadow-stone-950/[0.04]"
+      className={cn(
+        musicVideoSubtlePanelClassName,
+        musicVideoScrollAreaClassName,
+        musicVideoScrollAreaViewportClassName,
+        "min-h-0 min-w-0 flex-1 overflow-hidden p-1",
+      )}
       data-music-video-editor-main
       data-music-video-editor-scroll
       data-wave-radio-editor
     >
-      <div className="min-h-full min-w-0 space-y-3">
-        <section className="rounded-lg bg-white/70 p-3 shadow-sm shadow-stone-950/[0.04]">
+      <div className="min-h-full min-w-0 space-y-2">
+        <section className={musicVideoEditorSectionClassName}>
           <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2 text-sm font-black text-stone-900">
-              <Radio className="size-4 shrink-0 text-rose-500" />
+            <div className="flex min-w-0 items-center gap-1.5 text-[11.5px] font-black text-[#241b16]">
+              <Radio className="size-3.5 shrink-0 text-[#b56e4f]" />
               <span className="truncate">Background Video</span>
             </div>
-            <Badge className="shrink-0" variant="secondary">
+            <Badge className="shrink-0 rounded-full border-none bg-white/64 px-2 py-0.5 text-[10px] font-black text-[#5b5047]" variant="secondary">
               {WAVE_RADIO_BACKGROUND_OPTIONS.length} clips
             </Badge>
           </div>
 
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {WAVE_RADIO_BACKGROUND_OPTIONS.map(
               (background: WaveRadioBackgroundOption) => {
                 const isActive = background.id === backgroundId;
@@ -1728,10 +2180,10 @@ function WaveRadioEditor({
                   <button
                     key={background.id}
                     className={cn(
-                      "group cursor-pointer overflow-hidden rounded-lg bg-stone-950 text-left shadow-sm shadow-stone-950/15 transition",
+                      "group cursor-pointer overflow-hidden rounded-[9px] bg-stone-950 text-left shadow-[0_9px_18px_rgba(28,25,23,0.12)] transition",
                       isActive
-                        ? "shadow-[0_0_0_2px_rgba(251,113,133,0.55),0_14px_32px_rgba(28,25,23,0.18)]"
-                        : "hover:shadow-md hover:shadow-stone-950/20",
+                        ? "shadow-[0_14px_28px_rgba(45,38,34,0.18),inset_0_0_0_2px_rgba(255,255,255,0.22)]"
+                        : "hover:shadow-[0_12px_24px_rgba(28,25,23,0.18)]",
                     )}
                     data-wave-radio-background-option
                     type="button"
@@ -1748,7 +2200,7 @@ function WaveRadioEditor({
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-white/10" />
                       {isActive ? (
-                        <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm">
+                        <span className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-[#2d2622] text-[#f7f0e6] shadow-sm">
                           <Check className="size-3.5" />
                         </span>
                       ) : null}
@@ -1763,12 +2215,12 @@ function WaveRadioEditor({
           </div>
         </section>
 
-        <section className="rounded-lg bg-white/70 p-3 shadow-sm shadow-stone-950/[0.04]">
-          <div className="flex items-center gap-2 text-sm font-black text-stone-900">
-            <Type className="size-4 text-rose-500" />
+        <section className={musicVideoEditorSectionClassName}>
+          <div className="flex items-center gap-1.5 text-[11.5px] font-black text-[#241b16]">
+            <Type className="size-3.5 text-[#b56e4f]" />
             Lyrics Config
           </div>
-          <div className="mt-3">
+          <div className="mt-2">
             <LyricsStyleSettings
               forceCenterPosition
               lyricsStyle={lyricsStyle}
@@ -1832,6 +2284,21 @@ export function MusicVideoEditorDrawer({
   const [waveRadioBackgroundId, setWaveRadioBackgroundId] = useState(
     DEFAULT_WAVE_RADIO_BACKGROUND.id,
   );
+  const [minimalVinylDiscArtwork, setMinimalVinylDiscArtwork] =
+    useState<UploadedPhoto | null>(null);
+  const [minimalVinylBackgroundArtwork, setMinimalVinylBackgroundArtwork] =
+    useState<UploadedPhoto | null>(null);
+  const [minimalVinylBackgroundBlur, setMinimalVinylBackgroundBlur] =
+    useState(42);
+  const [minimalVinylDiscCropDraft, setMinimalVinylDiscCropDraft] =
+    useState<DiscImageCropDraft | null>(null);
+  const [minimalVinylDiscCropDragStart, setMinimalVinylDiscCropDragStart] =
+    useState<{
+      pointerX: number;
+      pointerY: number;
+      cropX: number;
+      cropY: number;
+    } | null>(null);
   const [atmosphereOverlay, setAtmosphereOverlay] =
     useState<AtmosphereOverlayConfig>(DEFAULT_ATMOSPHERE_OVERLAY);
   const [editorWidth, setEditorWidth] = useState(() =>
@@ -1839,6 +2306,8 @@ export function MusicVideoEditorDrawer({
   );
   const [latestVideo, setLatestVideo] =
     useState<MusicVideoRenderRecord | null>(null);
+  const [latestVideoTemplate, setLatestVideoTemplate] =
+    useState<TemplateId | null>(null);
   const [renderProgress, setRenderProgress] = useState(0);
   const [renderStatus, setRenderStatus] = useState<
     "idle" | "uploading" | "rendering" | "completed" | "failed"
@@ -1846,6 +2315,8 @@ export function MusicVideoEditorDrawer({
   const [playerDuration, setPlayerDuration] = useState(
     songDuration && songDuration > 0 ? songDuration : DEFAULT_DURATION,
   );
+  const minimalVinylBackgroundImageInputId = useId();
+  const minimalVinylDiscArtworkInputId = useId();
   const photosRef = useRef<UploadedPhoto[]>([]);
   const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -1861,6 +2332,9 @@ export function MusicVideoEditorDrawer({
     [lyrics, playerDuration, timestampedLyrics],
   );
   const coverPhoto = useMemo(() => createCoverPhoto(imageUrl), [imageUrl]);
+  const minimalVinylCoverPhoto = minimalVinylDiscArtwork ?? coverPhoto;
+  const minimalVinylBackgroundPhoto =
+    minimalVinylBackgroundArtwork ?? coverPhoto;
   const timelineTransitions = useMemo(
     () =>
       normalizeTransitions({
@@ -1896,22 +2370,32 @@ export function MusicVideoEditorDrawer({
     : null;
   const selectedUploadedPhoto =
     selectedPhoto && !selectedPhoto.isCover ? selectedPhoto : null;
+  const studioBackdropUrl =
+    imageUrl ??
+    photos.find((photo) => getUploadedMediaType(photo) === "image")?.objectUrl ??
+    photos.find((photo) => getUploadedMediaType(photo) === "image")?.url ??
+    null;
   const canOneClickMovie =
     activeTemplate === "photo-slideshow" && photos.length > 0 && cues.length > 0;
+  const renderDimensions = previewAspectRatioOptions[previewAspectRatio];
   const previewTimeline = useMemo(
     (): MusicVideoTimeline =>
       activeTemplate === "minimal-vinyl"
         ? {
             assignments: [],
             audioUrl,
-            coverPhoto: coverPhoto ?? undefined,
+            backgroundBlur: minimalVinylBackgroundBlur,
+            backgroundPhoto: minimalVinylBackgroundPhoto ?? undefined,
+            coverPhoto: minimalVinylCoverPhoto ?? undefined,
             duration: playerDuration,
+            height: renderDimensions.height,
             lyrics: cues,
             photos: [],
             songTitle,
             templateId: "minimal-vinyl",
             lyricsStyle,
             transitions: [],
+            width: renderDimensions.width,
           }
         : activeTemplate === "wave-radio"
           ? {
@@ -1919,6 +2403,7 @@ export function MusicVideoEditorDrawer({
               audioUrl,
               coverPhoto: coverPhoto ?? undefined,
               duration: playerDuration,
+              height: renderDimensions.height,
               lyrics: cues,
               photos: [],
               songTitle,
@@ -1929,6 +2414,7 @@ export function MusicVideoEditorDrawer({
               },
               transitions: [],
               waveRadioBackgroundId,
+              width: renderDimensions.width,
             }
         : {
             assignments,
@@ -1936,12 +2422,14 @@ export function MusicVideoEditorDrawer({
             audioUrl,
             coverPhoto: coverPhoto ?? undefined,
             duration: playerDuration,
+            height: renderDimensions.height,
             lyrics: cues,
             photos,
             songTitle,
             templateId: "photo-slideshow",
             lyricsStyle,
             transitions: timelineTransitions,
+            width: renderDimensions.width,
           },
     [
       activeTemplate,
@@ -1951,8 +2439,13 @@ export function MusicVideoEditorDrawer({
       coverPhoto,
       cues,
       lyricsStyle,
+      minimalVinylBackgroundBlur,
+      minimalVinylBackgroundPhoto,
+      minimalVinylCoverPhoto,
       photos,
       playerDuration,
+      renderDimensions.height,
+      renderDimensions.width,
       songTitle,
       timelineTransitions,
       waveRadioBackgroundId,
@@ -1962,6 +2455,25 @@ export function MusicVideoEditorDrawer({
   useEffect(() => {
     photosRef.current = photos;
   }, [photos]);
+
+  useEffect(() => {
+    return () => {
+      if (minimalVinylDiscArtwork && minimalVinylDiscArtwork.url !== minimalVinylDiscArtwork.objectUrl) {
+        URL.revokeObjectURL(minimalVinylDiscArtwork.objectUrl);
+      }
+    };
+  }, [minimalVinylDiscArtwork]);
+
+  useEffect(() => {
+    return () => {
+      if (
+        minimalVinylBackgroundArtwork &&
+        minimalVinylBackgroundArtwork.url !== minimalVinylBackgroundArtwork.objectUrl
+      ) {
+        URL.revokeObjectURL(minimalVinylBackgroundArtwork.objectUrl);
+      }
+    };
+  }, [minimalVinylBackgroundArtwork]);
 
   useEffect(() => {
     function handleWindowResize() {
@@ -2004,6 +2516,22 @@ export function MusicVideoEditorDrawer({
       setSelectedPhotoId(null);
       setIsPlaying(false);
       setLatestVideo(null);
+      setLatestVideoTemplate(null);
+      setMinimalVinylDiscArtwork((current) => {
+        if (current && current.url !== current.objectUrl) {
+          URL.revokeObjectURL(current.objectUrl);
+        }
+        return null;
+      });
+      setMinimalVinylBackgroundArtwork((current) => {
+        if (current && current.url !== current.objectUrl) {
+          URL.revokeObjectURL(current.objectUrl);
+        }
+        return null;
+      });
+      setMinimalVinylBackgroundBlur(42);
+      setMinimalVinylDiscCropDraft(null);
+      setMinimalVinylDiscCropDragStart(null);
       setRenderProgress(0);
       setRenderStatus("idle");
       setPlayerDuration(
@@ -2058,6 +2586,293 @@ export function MusicVideoEditorDrawer({
           : photo,
       ),
     );
+  }
+
+  function openMinimalVinylDiscCropDraft(file: File | undefined) {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const source = String(reader.result || "");
+      const image = new window.Image();
+      image.onload = () => {
+        const crop = buildInitialImageCrop({
+          imageWidth: image.width,
+          imageHeight: image.height,
+          canvasWidth: DISC_IMAGE_CROP_PREVIEW_WIDTH,
+          canvasHeight: DISC_IMAGE_CROP_PREVIEW_WIDTH,
+        });
+        setMinimalVinylDiscCropDraft({
+          crop,
+          imageHeight: image.height,
+          imageWidth: image.width,
+          source,
+        });
+      };
+      image.src = source;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateMinimalVinylDiscCropTransform(
+    patch: Partial<Pick<DiscImageCropDraft["crop"], "x" | "y" | "scale">>,
+  ) {
+    setMinimalVinylDiscCropDraft((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        crop: clampImageCrop(
+          {
+            x: patch.x ?? current.crop.x,
+            y: patch.y ?? current.crop.y,
+            scale: patch.scale ?? current.crop.scale,
+            rotate: current.crop.rotate,
+            flipX: current.crop.flipX,
+            flipY: current.crop.flipY,
+          },
+          {
+            imageWidth: current.imageWidth,
+            imageHeight: current.imageHeight,
+            canvasWidth: DISC_IMAGE_CROP_PREVIEW_WIDTH,
+            canvasHeight: DISC_IMAGE_CROP_PREVIEW_WIDTH,
+            maxScale: Math.max(current.crop.scale * 3, current.crop.scale + 2),
+          },
+        ),
+      };
+    });
+  }
+
+  function updateMinimalVinylDiscCropOrientation(
+    patch: Partial<Pick<DiscImageCropDraft["crop"], "rotate" | "flipX" | "flipY">>,
+  ) {
+    setMinimalVinylDiscCropDraft((current) => {
+      if (!current) return current;
+
+      const rotate = patch.rotate ?? current.crop.rotate;
+      const flipX = patch.flipX ?? current.crop.flipX;
+      const flipY = patch.flipY ?? current.crop.flipY;
+
+      if (patch.rotate !== undefined && patch.rotate !== current.crop.rotate) {
+        return {
+          ...current,
+          crop: buildInitialImageCrop({
+            imageWidth: current.imageWidth,
+            imageHeight: current.imageHeight,
+            canvasWidth: DISC_IMAGE_CROP_PREVIEW_WIDTH,
+            canvasHeight: DISC_IMAGE_CROP_PREVIEW_WIDTH,
+            rotate,
+            flipX,
+            flipY,
+          }),
+        };
+      }
+
+      return {
+        ...current,
+        crop: {
+          ...current.crop,
+          rotate,
+          flipX,
+          flipY,
+        },
+      };
+    });
+  }
+
+  async function applyMinimalVinylDiscCrop() {
+    if (!minimalVinylDiscCropDraft) return;
+
+    const targetSize = DISC_IMAGE_CROP_PREVIEW_WIDTH;
+    const source = minimalVinylDiscCropDraft.source;
+    const crop = minimalVinylDiscCropDraft.crop;
+    const image = new window.Image();
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = targetSize;
+        canvas.height = targetSize;
+        const context = canvas.getContext("2d");
+        if (!context) {
+          reject(new Error("Canvas is not available."));
+          return;
+        }
+
+        context.save();
+        context.beginPath();
+        context.arc(
+          targetSize / 2,
+          targetSize / 2,
+          targetSize / 2,
+          0,
+          Math.PI * 2,
+        );
+        context.clip();
+        const scale = targetSize / DISC_IMAGE_CROP_PREVIEW_WIDTH;
+        const renderedImageWidth =
+          minimalVinylDiscCropDraft.imageWidth * crop.scale * scale;
+        const renderedImageHeight =
+          minimalVinylDiscCropDraft.imageHeight * crop.scale * scale;
+        context.translate(
+          (crop.x + crop.renderedWidth / 2) * scale,
+          (crop.y + crop.renderedHeight / 2) * scale,
+        );
+        context.rotate((crop.rotate * Math.PI) / 180);
+        context.scale(crop.flipX ? -1 : 1, crop.flipY ? -1 : 1);
+        context.drawImage(
+          image,
+          -renderedImageWidth / 2,
+          -renderedImageHeight / 2,
+          renderedImageWidth,
+          renderedImageHeight,
+        );
+        context.restore();
+
+        resolve(canvas.toDataURL("image/png"));
+      };
+      image.onerror = () => reject(new Error("Unable to load crop image."));
+      image.src = source;
+    });
+
+    const file = await dataUrlToFile(
+      dataUrl,
+      `minimal-vinyl-disc-${songId || "artwork"}.png`,
+    );
+    const objectUrl = URL.createObjectURL(file);
+    const localPhoto = createUploadedPhotoFromObjectUrl({
+      fileName: file.name,
+      objectUrl,
+    });
+
+    setMinimalVinylDiscArtwork((current) => {
+      if (current && current.url !== current.objectUrl) {
+        URL.revokeObjectURL(current.objectUrl);
+      }
+      return localPhoto;
+    });
+    setMinimalVinylDiscCropDraft(null);
+    setMinimalVinylDiscCropDragStart(null);
+    setRenderStatus("uploading");
+
+    try {
+      const presignResponse = await fetch(
+        `/api/songs/${songId}/mv/assets/presign`,
+        {
+          body: JSON.stringify({
+            contentType: file.type,
+            fileName: file.name,
+          }),
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+        },
+      );
+      const presign =
+        await parseApiResponse<PresignedUploadResponse>(presignResponse);
+      const uploadResponse = await fetch(presign.presignedUrl, {
+        body: file,
+        headers: { "Content-Type": file.type },
+        method: "PUT",
+      });
+      if (!uploadResponse.ok) {
+        throw new Error(`Failed to upload ${file.name}.`);
+      }
+
+      setMinimalVinylDiscArtwork((current) =>
+        current?.id === localPhoto.id
+          ? {
+              ...current,
+              r2Key: presign.key,
+              url: presign.publicObjectUrl,
+            }
+          : current,
+      );
+      toast.success("Disc artwork updated.");
+    } catch (error) {
+      setMinimalVinylDiscArtwork((current) =>
+        current?.id === localPhoto.id ? null : current,
+      );
+      URL.revokeObjectURL(objectUrl);
+      const message =
+        error instanceof Error ? error.message : "Failed to upload disc artwork.";
+      toast.error(message);
+    } finally {
+      setRenderStatus("idle");
+    }
+  }
+
+  function handleMinimalVinylDiscArtworkUpload(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    openMinimalVinylDiscCropDraft(event.target.files?.[0]);
+    event.target.value = "";
+  }
+
+  async function handleMinimalVinylBackgroundArtworkUpload(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file for the background.");
+      return;
+    }
+
+    const localPhoto = createUploadedPhoto(file);
+    setMinimalVinylBackgroundArtwork((current) => {
+      if (current && current.url !== current.objectUrl) {
+        URL.revokeObjectURL(current.objectUrl);
+      }
+      return localPhoto;
+    });
+    setRenderStatus("uploading");
+
+    try {
+      const presignResponse = await fetch(
+        `/api/songs/${songId}/mv/assets/presign`,
+        {
+          body: JSON.stringify({
+            contentType: file.type,
+            fileName: file.name,
+          }),
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+        },
+      );
+      const presign =
+        await parseApiResponse<PresignedUploadResponse>(presignResponse);
+      const uploadResponse = await fetch(presign.presignedUrl, {
+        body: file,
+        headers: { "Content-Type": file.type },
+        method: "PUT",
+      });
+      if (!uploadResponse.ok) {
+        throw new Error(`Failed to upload ${file.name}.`);
+      }
+
+      setMinimalVinylBackgroundArtwork((current) =>
+        current?.id === localPhoto.id
+          ? {
+              ...current,
+              r2Key: presign.key,
+              url: presign.publicObjectUrl,
+            }
+          : current,
+      );
+      toast.success("Background image updated.");
+    } catch (error) {
+      setMinimalVinylBackgroundArtwork((current) =>
+        current?.id === localPhoto.id ? null : current,
+      );
+      URL.revokeObjectURL(localPhoto.objectUrl);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to upload background image.";
+      toast.error(message);
+    } finally {
+      setRenderStatus("idle");
+    }
   }
 
   async function handleDropPhotos(files: File[]) {
@@ -2248,6 +3063,10 @@ export function MusicVideoEditorDrawer({
   }
 
   function scheduleRenderRefresh(videoId: string) {
+    scheduleRenderRefreshWithDelay(videoId, MV_RENDER_POLL_INTERVAL_MS);
+  }
+
+  function scheduleRenderRefreshWithDelay(videoId: string, delayMs: number) {
     if (pollingTimeoutRef.current) {
       clearTimeout(pollingTimeoutRef.current);
     }
@@ -2276,7 +3095,12 @@ export function MusicVideoEditorDrawer({
           return;
         }
 
-        scheduleRenderRefresh(videoId);
+        scheduleRenderRefreshWithDelay(
+          videoId,
+          data.video?.temporaryVideoUrl && !data.video.videoUrl
+            ? MV_RENDER_TEMP_URL_POLL_INTERVAL_MS
+            : MV_RENDER_POLL_INTERVAL_MS,
+        );
       } catch (error) {
         setRenderStatus("failed");
         const message =
@@ -2286,7 +3110,7 @@ export function MusicVideoEditorDrawer({
         console.error("[MusicVideoEditorDrawer] Render status refresh failed", error);
         toast.error(message);
       }
-    }, 3500);
+    }, delayMs);
   }
 
   async function handleRenderMv() {
@@ -2298,8 +3122,26 @@ export function MusicVideoEditorDrawer({
       activeTemplate === "photo-slideshow"
         ? photos.find((photo) => !photo.url)
         : null;
+    const pendingMinimalVinylDiscPhoto =
+      activeTemplate === "minimal-vinyl" && minimalVinylDiscArtwork && !minimalVinylDiscArtwork.url
+        ? minimalVinylDiscArtwork
+        : null;
+    const pendingMinimalVinylBackgroundPhoto =
+      activeTemplate === "minimal-vinyl" &&
+      minimalVinylBackgroundArtwork &&
+      !minimalVinylBackgroundArtwork.url
+        ? minimalVinylBackgroundArtwork
+        : null;
     if (pendingPhoto) {
       toast.error(`Wait for "${pendingPhoto.name}" to finish uploading.`);
+      return;
+    }
+    if (pendingMinimalVinylDiscPhoto) {
+      toast.error(`Wait for "${pendingMinimalVinylDiscPhoto.name}" to finish uploading.`);
+      return;
+    }
+    if (pendingMinimalVinylBackgroundPhoto) {
+      toast.error(`Wait for "${pendingMinimalVinylBackgroundPhoto.name}" to finish uploading.`);
       return;
     }
 
@@ -2308,7 +3150,11 @@ export function MusicVideoEditorDrawer({
         ? buildMinimalVinylTimeline({
             songTitle,
             audioUrl,
+            backgroundBlur: minimalVinylBackgroundBlur,
+            backgroundPhoto: minimalVinylBackgroundPhoto,
+            coverPhoto: minimalVinylCoverPhoto,
             duration: playerDuration,
+            dimensions: renderDimensions,
             lyrics,
             fallbackImageUrl: imageUrl,
             timestampedLyrics,
@@ -2319,6 +3165,7 @@ export function MusicVideoEditorDrawer({
               songTitle,
               audioUrl,
               duration: playerDuration,
+              dimensions: renderDimensions,
               lyrics,
               timestampedLyrics,
               lyricsStyle,
@@ -2328,6 +3175,7 @@ export function MusicVideoEditorDrawer({
             songTitle,
             audioUrl,
             duration: playerDuration,
+            dimensions: renderDimensions,
             lyrics,
             photos,
             assignments,
@@ -2348,6 +3196,7 @@ export function MusicVideoEditorDrawer({
       });
       const video = await parseApiResponse<MusicVideoRenderRecord>(response);
       setLatestVideo(video);
+      setLatestVideoTemplate(activeTemplate);
       scheduleRenderRefresh(video.id);
       toast.success("Music video render started.");
     } catch (error) {
@@ -2361,59 +3210,84 @@ export function MusicVideoEditorDrawer({
   }
 
   return (
-    <Sheet>
+    <>
+      <DiscArtworkCropDialog
+        draft={minimalVinylDiscCropDraft}
+        dragStart={minimalVinylDiscCropDragStart}
+        infoCardClassName={musicVideoInfoCardClassName}
+        minScale={
+          minimalVinylDiscCropDraft
+            ? minimalVinylDiscCropDraft.crop.scale *
+              Math.max(
+                DISC_IMAGE_CROP_PREVIEW_WIDTH /
+                  minimalVinylDiscCropDraft.crop.renderedWidth,
+                DISC_IMAGE_CROP_PREVIEW_WIDTH /
+                  minimalVinylDiscCropDraft.crop.renderedHeight,
+              )
+            : 0
+        }
+        pillButtonActiveClassName={musicVideoPillButtonActiveClassName}
+        pillButtonClassName={musicVideoPillButtonClassName}
+        primaryButtonClassName={musicVideoPrimaryButtonClassName}
+        secondaryButtonClassName={musicVideoSecondaryButtonClassName}
+        sectionHeadingClassName={musicVideoSectionHeadingClassName}
+        subtlePanelClassName={musicVideoSubtlePanelClassName}
+        onApply={applyMinimalVinylDiscCrop}
+        onClose={() => {
+          setMinimalVinylDiscCropDraft(null);
+          setMinimalVinylDiscCropDragStart(null);
+        }}
+        onDragStartChange={setMinimalVinylDiscCropDragStart}
+        onOrientationChange={updateMinimalVinylDiscCropOrientation}
+        onTransformChange={updateMinimalVinylDiscCropTransform}
+      />
+      <Sheet>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent className="w-screen max-w-none gap-0 overflow-hidden p-0 sm:max-w-none">
+      <SheetContent className={cn(studioGlassStyles.sheetContent, "overflow-hidden")}>
         <style>{wallArtFontFaceCss}</style>
-        <style>{`
-          @keyframes music-video-breathe {
-            0% { transform: scale(1.03); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1.03); }
-          }
-        `}</style>
-        <SheetHeader className="border-b bg-white px-5 py-2 backdrop-blur">
-          <div className="flex min-w-0 items-center justify-between gap-4 pr-10">
-            <div className="flex min-w-0 items-center gap-3">
-              <Video className="size-4 shrink-0 text-rose-600" />
-              <div className="flex min-w-0 items-baseline gap-3">
-                <SheetTitle className="shrink-0 text-lg font-black text-stone-950">
-                  Music Video Studio
-                </SheetTitle>
-                <SheetDescription className="truncate text-sm text-stone-500">
-                  Create, preview, and render your music video.
-                </SheetDescription>
-              </div>
-            </div>
-
+        <style>{musicVideoMotionCss}</style>
+        <StudioBlurBackdrop imageUrl={studioBackdropUrl} />
+        <StudioHeader
+          closeLabel="Close music video studio"
+          description="Create, preview, and render your music video."
+          icon={Video}
+          title="Music Video Studio"
+          action={
             <Select value={activeSongId} onValueChange={handleSongSelection}>
               <SelectTrigger
                 aria-label="Choose song"
-                className="h-10 w-[280px] shrink-0 rounded-lg border-rose-300 bg-white text-left font-bold text-stone-950 shadow-sm"
+                className="h-9 w-full shrink-0 rounded-full border-none bg-white/74 px-3 text-left text-[12px] font-black text-[#2d251f] shadow-[0_10px_21px_rgba(70,53,38,0.095),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] backdrop-blur-xl lg:w-[280px]"
                 disabled={!hasSongs}
               >
                 <SelectValue
                   placeholder={hasSongs ? "Choose song" : "No songs yet"}
                 />
               </SelectTrigger>
-              <SelectContent align="end" className="w-[280px]">
+              <SelectContent
+                align="end"
+                className={cn(
+                  musicVideoPopoverClassName,
+                  "w-[240px] lg:w-[280px]",
+                  studioGlassStyles.selectContentItems,
+                )}
+              >
                 {selectableSongs.map((song) => (
                   <SelectItem key={song.id} value={song.id}>
-                    <span className="block max-w-[220px] truncate">
+                    <span className="block max-w-[200px] truncate lg:max-w-[232px]">
                       {song.title || "Untitled song"}
                     </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
-        </SheetHeader>
+          }
+        />
 
         {emptyState ? (
-          <div className="min-h-0 flex-1 bg-[#f7f3ee]">{emptyState}</div>
+          <div className="relative z-10 min-h-0 flex-1">{emptyState}</div>
         ) : (
           <div
-            className="grid min-h-0 flex-1 overflow-hidden bg-[#f7f3ee] lg:grid-cols-[184px_minmax(280px,1fr)_minmax(380px,var(--music-video-editor-width))] xl:grid-cols-[200px_minmax(320px,1fr)_minmax(420px,var(--music-video-editor-width))] 2xl:grid-cols-[220px_minmax(360px,1fr)_minmax(460px,var(--music-video-editor-width))]"
+            className="relative z-10 grid min-h-0 flex-1 overflow-hidden px-2 pb-2 pt-2 sm:px-2.5 sm:pb-2.5 lg:grid-cols-[156px_minmax(280px,1fr)_minmax(320px,var(--music-video-editor-width))] lg:gap-2.5 lg:px-3 lg:pb-3 xl:grid-cols-[164px_minmax(320px,1fr)_minmax(340px,var(--music-video-editor-width))]"
             style={
               {
                 "--music-video-editor-width": `${editorWidth}px`,
@@ -2430,6 +3304,7 @@ export function MusicVideoEditorDrawer({
               duration={playerDuration}
               isPlaying={isPlaying}
               latestVideo={latestVideo}
+              latestVideoTemplate={latestVideoTemplate}
               previewTransitionLoop={previewTransitionLoop}
               renderProgress={renderProgress}
               renderStatus={renderStatus}
@@ -2443,10 +3318,10 @@ export function MusicVideoEditorDrawer({
               songTitle={songTitle}
             />
 
-            <aside className="relative flex min-h-0 min-w-0 flex-col border-t border-stone-200/70 bg-[#fffaf5]/80 lg:border-l lg:border-t-0">
+            <aside className={cn(musicVideoPanelClassName, "relative flex min-h-0 min-w-0 flex-col p-2")}>
               <button
                 aria-label="Resize editor panel"
-                className="absolute inset-y-0 left-0 z-20 hidden w-3 -translate-x-1/2 cursor-col-resize items-center justify-center rounded-full text-rose-500 transition hover:bg-rose-100/60 lg:flex"
+                className="absolute inset-y-3 left-0 z-20 hidden w-3 -translate-x-1/2 cursor-col-resize items-center justify-center   text-[#6d5f53]  transition lg:flex"
                 data-music-video-editor-resizer
                 type="button"
                 onMouseDown={(event) => {
@@ -2458,19 +3333,19 @@ export function MusicVideoEditorDrawer({
                   if (touch) handleEditorResizeStart(touch.clientX);
                 }}
               >
-                <span className="h-12 w-1 rounded-full bg-rose-300/70 shadow-sm" />
+                <span className="h-10 w-1 rounded-full bg-[#3a312a]/45 shadow-sm" />
               </button>
 
-              <div className="mx-3 mt-3 flex shrink-0 items-center justify-between gap-3 border-b border-stone-200/70 px-0 pb-3">
+              <div className="flex shrink-0 items-center justify-between gap-2 px-1 pb-2">
                 <div>
-                  <p className="text-[11px] font-black uppercase tracking-[0.18em] text-stone-500">
+                  <p className={musicVideoSectionHeadingClassName}>
                     Smart Editor
                   </p>
-                  <p className="text-sm font-black text-stone-950">
+                  <p className="mt-0.5 text-[12px] font-black tracking-[-0.01em] text-[#241b16]">
                     {activeTemplate === "minimal-vinyl"
                       ? "Minimal Vinyl"
                       : activeTemplate === "wave-radio"
-                        ? "Dynamic Wave Radio"
+                        ? "Dynamic Lyrics Video"
                         : "Photo Slideshow"}
                   </p>
                 </div>
@@ -2478,15 +3353,15 @@ export function MusicVideoEditorDrawer({
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
-                        className="shrink-0 rounded-full bg-white px-4 text-sm font-black text-rose-700 shadow-sm shadow-rose-950/[0.08] hover:bg-rose-50"
+                        className={cn(musicVideoPrimaryButtonClassName, "h-8 shrink-0 px-3 text-[10.5px]")}
                         size="sm"
                         type="button"
                       >
-                        <Wand2 className="size-4" />
+                        <Wand2 className="size-3.5 group-hover:[animation:music-video-wand-float_0.85s_ease-in-out_infinite]" />
                         Auto Movie
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="border-stone-200">
+                    <AlertDialogContent className={musicVideoPopoverClassName}>
                       <AlertDialogHeader>
                         <AlertDialogTitle>Auto Movie</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -2499,7 +3374,7 @@ export function MusicVideoEditorDrawer({
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          className="bg-rose-600 text-white hover:bg-rose-700"
+                          className={musicVideoPrimaryButtonClassName}
                           onClick={handleOneClickMovie}
                         >
                           Apply
@@ -2508,21 +3383,31 @@ export function MusicVideoEditorDrawer({
                     </AlertDialogContent>
                   </AlertDialog>
                 ) : (
-                  <Badge className="shrink-0 capitalize" variant="secondary">
+                  <Badge className="shrink-0 rounded-full border-none bg-white/64 px-2 py-0.5 text-[10px] font-black capitalize text-[#5b5047] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]" variant="secondary">
                     {renderStatus === "idle" ? "Ready" : renderStatus}
                   </Badge>
                 )}
               </div>
 
               {activeTemplate === "minimal-vinyl" ? (
-                <div className="min-h-0 flex-1 p-3">
+                <div className="flex min-h-0 flex-1 overflow-hidden pt-1">
                   <MinimalVinylEditor
+                    backgroundBlur={minimalVinylBackgroundBlur}
+                    backgroundImage={minimalVinylBackgroundArtwork}
+                    backgroundImageInputId={minimalVinylBackgroundImageInputId}
+                    discArtwork={minimalVinylDiscArtwork}
+                    discArtworkInputId={minimalVinylDiscArtworkInputId}
                     lyricsStyle={lyricsStyle}
+                    onChangeBackgroundBlur={setMinimalVinylBackgroundBlur}
                     onChangeLyricsStyle={handleChangeLyricsStyle}
+                    onUploadBackgroundImage={
+                      handleMinimalVinylBackgroundArtworkUpload
+                    }
+                    onUploadDiscArtwork={handleMinimalVinylDiscArtworkUpload}
                   />
                 </div>
               ) : activeTemplate === "wave-radio" ? (
-                <div className="min-h-0 flex-1 p-3">
+                <div className="flex min-h-0 flex-1 overflow-hidden pt-1">
                   <WaveRadioEditor
                     backgroundId={waveRadioBackgroundId}
                     lyricsStyle={{
@@ -2534,7 +3419,7 @@ export function MusicVideoEditorDrawer({
                   />
                 </div>
               ) : (
-                <div className="grid min-h-0 flex-1 grid-cols-[92px_minmax(0,1fr)] gap-3 p-3 xl:grid-cols-[104px_minmax(0,1fr)]">
+                <div className="grid min-h-0 flex-1 grid-cols-[82px_minmax(0,1fr)] gap-2 pt-1 xl:grid-cols-[92px_minmax(0,1fr)]">
                   <PhotoMediaRail
                     media={visibleMedia}
                     selectedPhotoId={selectedPhotoId}
@@ -2543,11 +3428,16 @@ export function MusicVideoEditorDrawer({
                   />
 
                   <ScrollArea
-                    className="min-h-0 min-w-0 overflow-y-auto rounded-lg bg-[#faf7f2]/80 shadow-sm shadow-stone-950/[0.04]"
+                    className={cn(
+                      musicVideoSubtlePanelClassName,
+                      musicVideoScrollAreaClassName,
+                      musicVideoScrollAreaViewportClassName,
+                      "min-h-0 min-w-0 overflow-hidden p-1",
+                    )}
                     data-music-video-editor-scroll
                     data-music-video-editor-main
                   >
-                    <div className="min-h-full min-w-0 space-y-3">
+                    <div className="min-h-full min-w-0 space-y-2">
                       <PhotoUploadLyricsTabs
                         atmosphereOverlay={atmosphereOverlay}
                         lyricsStyle={lyricsStyle}
@@ -2580,6 +3470,7 @@ export function MusicVideoEditorDrawer({
           </div>
         )}
       </SheetContent>
-    </Sheet>
+      </Sheet>
+    </>
   );
 }

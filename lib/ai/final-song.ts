@@ -190,11 +190,13 @@ export async function getSharedSongByShortCode(
 }
 
 export async function finalizeSongFromSample({
+  coverImageUrl,
   dbClient = db,
   sample,
   userId,
   versionId,
 }: {
+  coverImageUrl?: string;
   dbClient?: FinalizeSongDbClient;
   sample: SongSampleView;
   userId: string;
@@ -370,7 +372,7 @@ export async function finalizeSongFromSample({
               recipientNamesJsonb: sample.recipientNames,
               story: sample.story,
               audioUrl: selectedVersion.audioUrl,
-              imageUrl: selectedVersion.imageUrl,
+              imageUrl: coverImageUrl || selectedVersion.imageUrl,
               duration: normalizeSongDuration(selectedVersion.duration),
               shareToken: createSongShareToken(),
               metadataJsonb: {

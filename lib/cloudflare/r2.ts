@@ -1,10 +1,12 @@
 import { createR2Client } from "@/lib/cloudflare/r2-client";
 import { _Object, DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import type { Readable } from "node:stream";
 
 export interface UploadOptions {
-  data: Buffer | string;
+  data: Buffer | string | Readable;
   contentType: string;
+  contentLength?: number;
   path?: string;
   key: string;
 }
@@ -16,6 +18,7 @@ export interface UploadResult {
 export const serverUploadFile = async ({
   data,
   contentType,
+  contentLength,
   path = '',
   key,
 }: UploadOptions): Promise<UploadResult> => {
@@ -24,9 +27,10 @@ export const serverUploadFile = async ({
   }
 
   const s3Client = createR2Client();
-  const fileBuffer = Buffer.isBuffer(data)
-    ? data
-    : Buffer.from(data.replace(/^data:.*?;base64,/, ''), 'base64');
+  const body =
+    typeof data === "string"
+      ? Buffer.from(data.replace(/^data:.*?;base64,/, ''), 'base64')
+      : data;
 
   const finalKey = path
     ? path.endsWith('/') ? `${path}${key}` : `${path}/${key}`
@@ -36,8 +40,9 @@ export const serverUploadFile = async ({
     await s3Client.send(new PutObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME,
       Key: finalKey,
-      Body: fileBuffer,
+      Body: body,
       ContentType: contentType,
+      ContentLength: contentLength,
     }));
 
     const url = `${process.env.R2_PUBLIC_URL}/${finalKey}`;

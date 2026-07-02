@@ -18,10 +18,15 @@ export async function GET(req: Request) {
 
     console.log("[songs/generate/status] Task refreshed", {
       songId: task.songId,
+      externalId: task.externalId,
       status: task.status,
       expiresAt: task.expiresAt,
       versions: task.versions?.length || 0,
+      timestampedLyrics: task.versions?.filter(
+        (version) => version.timestampedLyrics?.alignedWords?.length,
+      ).length || 0,
       isSubscriber: task.isSubscriber,
+      error: task.error,
     });
 
     return apiResponse.success({

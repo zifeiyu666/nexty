@@ -18,6 +18,8 @@ import {
 
 export type RadialVisualizerProps = {
   audioSrc: string;
+  backgroundBlur?: number;
+  backgroundImageSrc?: string | null;
   baseRadius?: number;
   coverImageSrc?: string | null;
   density?: number;
@@ -226,29 +228,30 @@ function drawBackground(
   context: CanvasRenderingContext2D,
   width: number,
   height: number,
-  coverImage?: HTMLImageElement | null,
+  backgroundBlur = 42,
+  backgroundImage?: HTMLImageElement | null,
 ) {
-  if (coverImage?.complete && coverImage.naturalWidth > 0) {
+  if (backgroundImage?.complete && backgroundImage.naturalWidth > 0) {
     const backgroundRect = getCoverFillRect({
-      imageHeight: coverImage.naturalHeight,
-      imageWidth: coverImage.naturalWidth,
+      imageHeight: backgroundImage.naturalHeight,
+      imageWidth: backgroundImage.naturalWidth,
       targetHeight: height,
       targetWidth: width,
     });
 
     context.save();
-    context.filter = "blur(42px) saturate(1.55) brightness(0.78)";
+    context.filter = `blur(${backgroundBlur}px) saturate(1.55) brightness(0.78)`;
     context.drawImage(
-      coverImage,
+      backgroundImage,
       backgroundRect.x - 54,
       backgroundRect.y - 54,
       backgroundRect.width + 108,
       backgroundRect.height + 108,
     );
     context.globalAlpha = 0.46;
-    context.filter = "blur(18px) saturate(1.35) brightness(0.82)";
+    context.filter = `blur(${Math.max(8, backgroundBlur * 0.43)}px) saturate(1.35) brightness(0.82)`;
     context.drawImage(
-      coverImage,
+      backgroundImage,
       backgroundRect.x - 20,
       backgroundRect.y - 20,
       backgroundRect.width + 40,
@@ -581,6 +584,8 @@ function drawRecord({
 }
 
 function drawLoadingState({
+  backgroundBlur = 42,
+  backgroundImage,
   centerX,
   centerY,
   context,
@@ -591,6 +596,8 @@ function drawLoadingState({
   title,
   width,
 }: {
+  backgroundBlur?: number;
+  backgroundImage?: HTMLImageElement | null;
   centerX: number;
   centerY: number;
   context: CanvasRenderingContext2D;
@@ -601,7 +608,13 @@ function drawLoadingState({
   title?: string;
   width: number;
 }) {
-  drawBackground(context, width, height, coverImage);
+  drawBackground(
+    context,
+    width,
+    height,
+    backgroundBlur,
+    backgroundImage ?? coverImage,
+  );
   drawRecord({
     angle: frame * 0.01,
     centerX,
@@ -621,6 +634,8 @@ function drawLoadingState({
 
 export function RadialVisualizer({
   audioSrc,
+  backgroundBlur = 42,
+  backgroundImageSrc = null,
   baseRadius = DEFAULT_BASE_RADIUS,
   coverImageSrc = null,
   density = DEFAULT_DENSITY,
@@ -631,6 +646,7 @@ export function RadialVisualizer({
   title,
 }: RadialVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backgroundImageRef = useRef<HTMLImageElement>(null);
   const coverImageRef = useRef<HTMLImageElement>(null);
   const frame = useCurrentFrame();
   const { fps, height, width } = useVideoConfig();
@@ -665,7 +681,8 @@ export function RadialVisualizer({
         centerX,
         centerY,
         context,
-        coverImage: coverImageRef.current,
+        backgroundBlur,
+        backgroundImage: backgroundImageRef.current ?? coverImageRef.current,
         frame,
         height,
         radius: fitted.radius,
@@ -704,7 +721,13 @@ export function RadialVisualizer({
     const pulseRadius = fitted.radius + clamp(bassEnergy) * BASS_PULSE_FACTOR;
     const mirroredBars = createMirroredFrequencies(frequencies, safeDensity);
 
-    drawBackground(context, width, height, coverImageRef.current);
+    drawBackground(
+      context,
+      width,
+      height,
+      backgroundBlur,
+      backgroundImageRef.current ?? coverImageRef.current,
+    );
     drawVisualizerBars({
       bars: mirroredBars,
       centerX,
@@ -749,11 +772,20 @@ export function RadialVisualizer({
     safeDensity,
     title,
     width,
+    backgroundBlur,
   ]);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#070a10" }}>
       <Audio src={audioSrc} />
+      {backgroundImageSrc ? (
+        <img
+          ref={backgroundImageRef}
+          alt=""
+          src={backgroundImageSrc}
+          style={{ display: "none" }}
+        />
+      ) : null}
       {coverImageSrc ? (
         <img
           ref={coverImageRef}

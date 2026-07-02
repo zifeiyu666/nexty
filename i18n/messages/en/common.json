@@ -337,12 +337,6 @@
       {
         "name": "Pricing",
         "href": "/pricing"
-      },
-      {
-        "id": "articles",
-        "name": "Articles",
-        "href": "/blog",
-        "items": []
       }
     ]
   },
@@ -422,6 +416,14 @@
             {
               "name": "Anniversary Songs",
               "href": "/occasions/anniversary"
+            },
+            {
+              "name": "Music Gifts",
+              "href": "/occasions/music-gift"
+            },
+            {
+              "name": "Lyric Gifts",
+              "href": "/free-custom-song-lyric-gifts"
             },
             {
               "name": "Privacy Policy",

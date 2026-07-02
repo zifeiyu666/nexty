@@ -1,11 +1,13 @@
 import { apiResponse } from "@/lib/api-response";
 import { getSession } from "@/lib/auth/server";
+import { after } from "next/server";
 import {
   getMusicVideoForOwner,
 } from "@/lib/music-video/renders";
 import {
   completeMusicVideoRender,
   failMusicVideoRender,
+  markMusicVideoTemporaryRenderOutput,
 } from "@/lib/music-video/render-completion";
 import { getLambdaRenderProgress } from "@/lib/music-video/remotion-lambda";
 
@@ -17,7 +19,7 @@ export async function POST(_request: Request, { params }: { params: Params }) {
   if (!user) return apiResponse.unauthorized();
 
   const { videoId } = await params;
-  const video = await getMusicVideoForOwner({
+  let video = await getMusicVideoForOwner({
     userId: user.id,
     videoId,
   });
@@ -39,26 +41,41 @@ export async function POST(_request: Request, { params }: { params: Params }) {
     if (progress.errorMessage) {
       const failed = await failMusicVideoRender({
         error: progress.errorMessage,
+        temporaryVideoUrl: video.temporaryVideoUrl,
         videoId: video.id,
       });
       return apiResponse.success({ progress: progress.progress, video: failed });
+    }
+
+    if (progress.outputFile && video.temporaryVideoUrl !== progress.outputFile) {
+      video = (await markMusicVideoTemporaryRenderOutput({
+        outputUrl: progress.outputFile,
+        video,
+      })) ?? video;
     }
 
     if (!progress.done || !progress.outputFile) {
       return apiResponse.success({ progress: progress.progress, video });
     }
 
-    const completed = await completeMusicVideoRender({
-      outputUrl: progress.outputFile,
-      video,
+    after(async () => {
+      try {
+        await completeMusicVideoRender({
+          outputUrl: progress.outputFile,
+          video,
+        });
+      } catch (error) {
+        console.error("[music-video-refresh] Failed to persist Remotion output", error);
+      }
     });
 
-    return apiResponse.success({ progress: 1, video: completed });
+    return apiResponse.success({ progress: 1, video });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to refresh MV render.";
     const failed = await failMusicVideoRender({
       error: message,
+      temporaryVideoUrl: video.temporaryVideoUrl,
       videoId: video.id,
     });
     return apiResponse.success({ progress: 0, video: failed });

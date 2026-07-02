@@ -14,11 +14,12 @@ import {
   SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
   parseLyricsText,
 } from "../../../lib/ai/song-lyrics";
-import { buildLyricsPrompt, buildStoryPrompt } from "../../../lib/ai/song";
+import { buildLyricsPrompt, buildStoryPrompt, refreshSongGeneration } from "../../../lib/ai/song";
 import {
   createSongSampleFromTask,
   getSampleAccessExpiresAt,
 } from "../../../lib/ai/song-sample-store";
+import { songTaskStore } from "../../../lib/ai/song-task-store";
 
 describe("song lyrics prompt", () => {
   test("builds an English lyric prompt with user customization", () => {
@@ -158,6 +159,46 @@ describe("Replicate GPT-5 lyrics adapter", () => {
       normalizeReplicateTextOutput({ output: ["Line ", "one"] }),
       "Line one"
     );
+  });
+});
+
+describe("song generation status refresh", () => {
+  test("reads processing song tasks locally without external polling", async () => {
+    const originalGetSong = (songTaskStore as any).getSong;
+    const originalFetch = globalThis.fetch;
+    const task = {
+      songId: "song-1",
+      externalId: "kie-task",
+      status: "processing" as const,
+      userId: "user-1",
+      email: "user@example.com",
+      isSubscriber: true,
+      title: "Waiting Song",
+      lyrics: "[Verse]\nHello",
+      genre: "Pop",
+      occasion: "birthday",
+      recipientNames: ["Maya"],
+      story: "A birthday story",
+      vocalGender: "Female",
+      language: "English",
+      versions: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      expiresAt: Date.now() + 1000,
+    };
+
+    try {
+      (songTaskStore as any).getSong = async (songId: string) =>
+        songId === task.songId ? task : null;
+      globalThis.fetch = (async () => {
+        throw new Error("Status refresh should not call external services");
+      }) as typeof fetch;
+
+      assert.deepEqual(await refreshSongGeneration(task.songId), task);
+    } finally {
+      (songTaskStore as any).getSong = originalGetSong;
+      globalThis.fetch = originalFetch;
+    }
   });
 });
 

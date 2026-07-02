@@ -1,10 +1,10 @@
 const KIE_BASE_URL = "https://api.kie.ai";
-const DEFAULT_MOCK_KIE_SUNO_TASK_ID = "de2f8263ef5a1238d1b4570b88dcc8fb";
 
 export type SongTaskStatus = "processing" | "succeeded" | "failed";
 
 export type KieSongVersion = {
   id: string;
+  audioId?: string;
   title: string;
   audioUrl: string;
   imageUrl?: string;
@@ -93,12 +93,33 @@ function logKieRequest(endpoint: string, payload: Record<string, unknown>): void
   });
 }
 
+const SUNO_LYRIC_METADATA_LINE = /^(?:title)\s*:/i;
+const SUNO_INTRO_TAG_LINE = /^\[(?:instrumental\s+intro|intro)\]$/i;
+
+export function buildKieSunoMusicPrompt(lyrics: string): string {
+  const lines = lyrics
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter((line) => !SUNO_LYRIC_METADATA_LINE.test(line.trim()));
+  const hasIntroTag = lines.some((line) => SUNO_INTRO_TAG_LINE.test(line.trim()));
+
+  if (hasIntroTag) {
+    return lines.join("\n").trim();
+  }
+
+  const firstContentIndex = lines.findIndex((line) => line.trim());
+  if (firstContentIndex === -1) {
+    return "[Instrumental Intro]";
+  }
+
+  lines.splice(firstContentIndex, 0, "[Instrumental Intro]", "");
+  return lines.join("\n").trim();
+}
+
 export function getMockKieSunoTaskId(): string | null {
   const configuredTaskId = process.env.KIE_SUNO_MOCK_TASK_ID?.trim();
   if (configuredTaskId === "false") return null;
-  if (configuredTaskId) return configuredTaskId;
-
-  return DEFAULT_MOCK_KIE_SUNO_TASK_ID;
+  return configuredTaskId || null;
 }
 
 function escapeControlCharactersInsideJsonStrings(input: string): string {
@@ -547,6 +568,14 @@ function normalizeTrack(track: any, index: number): KieSongVersion | null {
 
   const title = firstStringAtKeys(track, ["title", "name"]) || `Version ${index + 1}`;
   const id = firstStringAtKeys(track, ["id", "taskId"]) || `${index + 1}`;
+  const audioId = firstStringAtKeys(track, [
+    "audioId",
+    "audio_id",
+    "songId",
+    "song_id",
+    "itemId",
+    "item_id",
+  ]);
   const imageUrl = firstStringAtKeys(track, [
     "imageUrl",
     "image_url",
@@ -558,6 +587,7 @@ function normalizeTrack(track: any, index: number): KieSongVersion | null {
 
   return {
     id,
+    audioId,
     title,
     audioUrl,
     imageUrl,
@@ -667,18 +697,20 @@ export async function submitMusicTask(input: SubmitMusicInput): Promise<string> 
     .filter(Boolean)
     .join(", ");
 
+  const musicPrompt = buildKieSunoMusicPrompt(input.lyrics);
   const payload = {
     callBackUrl: buildKieSunoCallbackUrl(),
     customMode: true,
     instrumental: false,
-    prompt: input.lyrics,
+    prompt: musicPrompt,
     style,
     title: input.title,
     model: process.env.KIE_SUNO_MODEL || "V5_5",
   };
   logKieRequest("/api/v1/generate", {
     ...payload,
-    promptLength: input.lyrics.length,
+    originalPromptLength: input.lyrics.length,
+    promptLength: musicPrompt.length,
     styleLength: style.length,
     titleLength: input.title.length,
   });

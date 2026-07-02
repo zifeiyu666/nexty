@@ -5,7 +5,7 @@ import { PostType } from "@/lib/db/schema";
 import { PostBase, PublicPost, Tag } from "@/types/cms";
 import dayjs from "dayjs";
 import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { toast } from "sonner";
 import { PostCard } from "./PostCard";
@@ -74,10 +74,6 @@ export function PostList({
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
-  const { ref, inView } = useInView({
-    threshold: 0,
-    triggerOnce: false,
-  });
 
   // Default grid class based on showCover if not provided
   // When showCover is false, always use single column layout regardless of gridClassName
@@ -125,17 +121,15 @@ export function PostList({
     locale,
   ]);
 
-  useEffect(() => {
-    if (inView && hasMore && !isLoading) {
-      loadMorePosts();
-    }
-  }, [inView, hasMore, isLoading, loadMorePosts]);
-
-  useEffect(() => {
-    setPosts(initialPosts);
-    setPageIndex(1);
-    setHasMore(initialPosts.length < initialTotal);
-  }, [initialPosts, initialTotal]);
+  const { ref } = useInView({
+    threshold: 0,
+    triggerOnce: false,
+    onChange: (nextInView) => {
+      if (nextInView) {
+        loadMorePosts();
+      }
+    },
+  });
 
   const handleTagSelect = async (tagId: string | null) => {
     if (tagId === selectedTagId) return;
@@ -165,6 +159,17 @@ export function PostList({
     setIsLoading(false);
   };
 
+  const localPostSlugs = new Set(
+    localPosts.map((post) => post.slug.replace(/^\//, "").replace(/\/$/, ""))
+  );
+  const shouldShowLocalPosts = !showTagSelector || selectedTagId === null;
+  const visibleServerPosts = shouldShowLocalPosts
+    ? posts.filter(
+        (post) =>
+          !localPostSlugs.has(post.slug.replace(/^\//, "").replace(/\/$/, ""))
+      )
+    : posts;
+
   return (
     <>
       {showTagSelector && serverTags.length > 0 && (
@@ -182,7 +187,7 @@ export function PostList({
       ) : (
         <>
           <div className={gridClass}>
-            {(!showTagSelector || selectedTagId === null) &&
+            {shouldShowLocalPosts &&
               localPosts.map((post) => (
                 <PostCard
                   key={`local-${post.slug}`}
@@ -197,7 +202,7 @@ export function PostList({
                 />
               ))}
 
-            {posts.map((post) => (
+            {visibleServerPosts.map((post) => (
               <PostCard
                 key={`server-${post.id}`}
                 post={mapServerPostToCard(post, locale)}

@@ -2,6 +2,7 @@ import { fetchExternalUrlToR2 as defaultFetchExternalUrlToR2 } from "@/lib/cloud
 import { getLogger } from "@/lib/logger";
 import {
   markMusicVideoFailed,
+  markMusicVideoTemporaryOutputReady,
   markMusicVideoSucceeded,
   type MusicVideoRender,
 } from "@/lib/music-video/renders";
@@ -17,6 +18,7 @@ type UploadToR2 = (
 
 type MarkSucceeded = typeof markMusicVideoSucceeded;
 type MarkFailed = typeof markMusicVideoFailed;
+type MarkTemporaryReady = typeof markMusicVideoTemporaryOutputReady;
 
 export function getMusicVideoRenderR2Key(video: RenderVideoRef) {
   return `music-videos/renders/${video.userId}/${video.songId}/${video.id}.mp4`;
@@ -25,13 +27,25 @@ export function getMusicVideoRenderR2Key(video: RenderVideoRef) {
 export async function failMusicVideoRender({
   error,
   markFailed = markMusicVideoFailed,
+  temporaryVideoUrl,
   videoId,
 }: {
   error: string;
   markFailed?: MarkFailed;
+  temporaryVideoUrl?: string | null;
   videoId: string;
 }) {
-  logger.warn({ error, videoId }, "Music video render failed");
+  logger.warn({ error, temporaryVideoUrl, videoId }, "Music video render failed");
+
+  if (temporaryVideoUrl) {
+    return {
+      error,
+      id: videoId,
+      status: "rendering" as const,
+      temporaryVideoUrl,
+      videoUrl: null,
+    };
+  }
 
   return markFailed({
     error,
@@ -39,16 +53,37 @@ export async function failMusicVideoRender({
   });
 }
 
+export async function markMusicVideoTemporaryRenderOutput({
+  markTemporaryReady = markMusicVideoTemporaryOutputReady,
+  outputUrl,
+  video,
+}: {
+  markTemporaryReady?: MarkTemporaryReady;
+  outputUrl?: string | null;
+  video: RenderVideoRef;
+}) {
+  if (!outputUrl) {
+    throw new Error("Remotion render completed but is missing an output URL.");
+  }
+
+  return markTemporaryReady({
+    temporaryVideoUrl: outputUrl,
+    videoId: video.id,
+  });
+}
+
 export async function completeMusicVideoRender({
   fetchExternalUrlToR2 = defaultFetchExternalUrlToR2,
   markFailed = markMusicVideoFailed,
   markSucceeded = markMusicVideoSucceeded,
+  markTemporaryReady = markMusicVideoTemporaryOutputReady,
   outputUrl,
   video,
 }: {
   fetchExternalUrlToR2?: UploadToR2;
   markFailed?: MarkFailed;
   markSucceeded?: MarkSucceeded;
+  markTemporaryReady?: MarkTemporaryReady;
   outputUrl?: string | null;
   video: RenderVideoRef;
 }) {
@@ -60,12 +95,19 @@ export async function completeMusicVideoRender({
     });
   }
 
+  await markMusicVideoTemporaryRenderOutput({
+    markTemporaryReady,
+    outputUrl,
+    video,
+  });
+
   const key = getMusicVideoRenderR2Key(video);
 
   try {
     const upload = await fetchExternalUrlToR2(outputUrl, key);
     const completed = await markSucceeded({
       r2Key: upload.key,
+      temporaryVideoUrl: null,
       videoId: video.id,
       videoUrl: upload.url,
     });
@@ -92,6 +134,7 @@ export async function completeMusicVideoRender({
           ? error.message
           : "Failed to persist Remotion output.",
       markFailed,
+      temporaryVideoUrl: outputUrl,
       videoId: video.id,
     });
   }

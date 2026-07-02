@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth/server";
 import { z } from "zod";
 
 const finalizeSchema = z.object({
+  coverImageUrl: z.string().trim().url().max(2000).optional(),
   songId: z.string().trim().min(1),
   versionId: z.string().trim().min(1),
 });
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
   });
 
   const result = await finalizeSongFromSample({
+    coverImageUrl: input.coverImageUrl,
     sample,
     userId: session.user.id,
     versionId: input.versionId,

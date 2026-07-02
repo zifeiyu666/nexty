@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  DiscArtworkCropDialog,
+  DISC_IMAGE_CROP_PREVIEW_WIDTH,
+} from "@/components/song/DiscArtworkCropDialog";
+import {
+  getStudioTemplateCardClassName,
+  getStudioTemplatePresetCardClassName,
+  StudioBlurBackdrop,
+  studioGlassStyles,
+  StudioHeader,
+} from "@/components/song/StudioGlassPrimitives";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,12 +44,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
@@ -82,16 +91,11 @@ import {
   ChevronsUpDown,
   Disc3,
   Download,
-  FlipHorizontal,
-  FlipVertical,
   Image as ImageIcon,
   ImagePlus,
-  Move,
   Palette,
   Plus,
   QrCode as QrCodeIcon,
-  RotateCcw,
-  RotateCw,
   SlidersHorizontal,
   Trash2,
   Type,
@@ -99,13 +103,15 @@ import {
 import { QRCodeSVG } from "qrcode.react";
 import {
   ReactNode,
-  type PointerEvent as ReactPointerEvent,
   useEffect,
   useId,
   useMemo,
   useRef,
   useState,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
+import { createPortal } from "react-dom";
 
 type EditableTextKey = "lyrics" | "title" | "subtitle" | "description";
 type ActiveTarget =
@@ -114,7 +120,6 @@ type ActiveTarget =
   | "poster"
   | "disc"
   | "image"
-  | "frame"
   | "print"
   | "heart";
 type WallArtTemplateKey = "spiral" | "template2" | "heart" | "imageLyrics";
@@ -192,6 +197,7 @@ export type WallArtSongOption = {
 };
 
 type ImageCropDraft = {
+  target: "lyrics" | "disc";
   source: string;
   imageWidth: number;
   imageHeight: number;
@@ -261,7 +267,6 @@ const editTargets: Array<[ActiveTarget, string]> = [
   ["description", "Message"],
   ["poster", "Poster"],
   ["disc", "Disc"],
-  ["frame", "Frame"],
   ["print", "Print"],
 ];
 const heartEditTargets: Array<[ActiveTarget, string]> = [
@@ -269,7 +274,6 @@ const heartEditTargets: Array<[ActiveTarget, string]> = [
   ["lyrics", "Lyrics"],
   ["poster", "Poster"],
   ["heart", "Heart"],
-  ["frame", "Frame"],
   ["print", "Print"],
 ];
 const imageLyricEditTargets: Array<[ActiveTarget, string]> = [
@@ -279,7 +283,6 @@ const imageLyricEditTargets: Array<[ActiveTarget, string]> = [
   ["subtitle", "Subtitle"],
   ["description", "Message"],
   ["poster", "Poster"],
-  ["frame", "Frame"],
   ["print", "Print"],
 ];
 const heartTemplateShape = {
@@ -289,8 +292,11 @@ const heartTemplateShape = {
   width: 960,
 };
 const heartTitleFont = '"Shadows Into Light", cursive';
+const PRESET_PANEL_WIDTH = 220;
+const PRESET_PANEL_GAP = 10;
+const PRESET_PANEL_SAFE_MARGIN = 14;
 const presetHoverBridgeClassName =
-  "fixed left-[176px] top-[110px] z-40 h-[calc(100svh-126px)] w-[28px] opacity-0";
+  "fixed z-[140] hidden opacity-0";
 const wallArtFontFaceCss = wallArtFontFiles
   .map(
     ([family, src, weight]) =>
@@ -298,65 +304,37 @@ const wallArtFontFaceCss = wallArtFontFiles
   )
   .join("");
 const wallArtMotionCss = `@keyframes wallArtDownloadIconDrift{0%{transform:translateY(0) scale(1)}45%{transform:translateY(2px) scale(1.12)}100%{transform:translateY(0) scale(1)}}`;
-const wallArtGlassPanelClassName =
-  "rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(247,241,233,0.64))] shadow-[0_18px_48px_rgba(70,53,38,0.1),0_1px_0_rgba(255,255,255,0.4)_inset,0_0_0_1px_rgba(255,255,255,0.18)_inset] backdrop-blur-2xl";
-const wallArtSubtleGlassPanelClassName =
-  "rounded-[16px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(250,246,240,0.54))] shadow-[0_12px_28px_rgba(72,56,41,0.08),0_1px_0_rgba(255,255,255,0.64)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] backdrop-blur-xl";
-const wallArtFieldClassName =
-  "h-10 rounded-full bg-white/72 px-3.5 text-[13px] font-medium text-[#302720] shadow-[0_10px_22px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.76)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition focus-visible:ring-[#c9bbac]/40";
-const wallArtTextareaClassName =
-  "rounded-[18px] bg-white/72 px-4 py-3 text-[13px] leading-6 text-[#302720] shadow-[0_12px_28px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition focus-visible:ring-[#c9bbac]/40";
-const wallArtPopoverClassName =
-  "rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(246,240,232,0.8))] p-1 shadow-[0_22px_56px_rgba(56,41,29,0.16),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-2xl";
-const wallArtPillButtonClassName =
-  "rounded-full bg-white/72 text-[#3a312a] shadow-[0_10px_22px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.74)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition hover:bg-white/90 hover:text-[#241b16]";
-const wallArtPillButtonActiveClassName =
-  "rounded-full border border-transparent bg-[#2d2622] text-[#f7f0e6] shadow-[0_14px_28px_rgba(45,38,34,0.24)] hover:bg-[#2d2622] hover:text-[#f7f0e6]";
-const wallArtPrimaryButtonClassName =
-  "rounded-full border border-[#3f342c]/10 bg-[#2f2823] px-5 text-[#faf4eb] shadow-[0_16px_30px_rgba(45,38,34,0.22)] transition hover:bg-[#26201d] hover:text-white";
-const wallArtSecondaryButtonClassName =
-  "rounded-full bg-white/78 text-[#2f2722] shadow-[0_10px_22px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition hover:bg-white";
-const wallArtEditorSectionClassName =
-  "space-y-4 rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(248,243,237,0.56))] p-4 shadow-[0_16px_34px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.74)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] backdrop-blur-xl";
-const wallArtInfoCardClassName =
-  "rounded-[16px] bg-[linear-gradient(180deg,rgba(255,255,255,0.64),rgba(248,243,237,0.44))] p-3.5 shadow-[0_12px_28px_rgba(70,53,38,0.06),0_1px_0_rgba(255,255,255,0.72)_inset,0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-xl";
-const wallArtTemplateCardBaseClassName =
-  "w-full rounded-[16px] bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(248,243,237,0.62))] p-1.5 text-left shadow-[0_14px_30px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] transition duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_34px_rgba(70,53,38,0.12)]";
-const wallArtTemplateThumbClassName =
-  "mx-auto aspect-[4/5] max-h-36 overflow-hidden rounded-[12px] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_8px_18px_rgba(63,47,33,0.08)]";
-const wallArtTemplatePopoverClassName =
-  "fixed left-[186px] top-[98px] z-[80] max-h-[calc(100svh-118px)] w-[220px] overflow-y-auto rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(246,240,232,0.76))] p-1.5 shadow-[0_22px_56px_rgba(56,41,29,0.2),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-2xl transition";
-const wallArtTemplatePresetCardClassName =
-  "overflow-hidden rounded-[12px] bg-white/74 shadow-[0_10px_22px_rgba(64,48,34,0.08),0_1px_0_rgba(255,255,255,0.76)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_16px_28px_rgba(64,48,34,0.12)]";
-const wallArtTemplateActiveBadgeClassName =
-  "rounded-full border-none bg-[#2d2622] px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.16em] text-[#f7f0e6] shadow-[0_8px_16px_rgba(45,38,34,0.18)]";
-const wallArtSectionHeadingClassName =
-  "text-[10px] font-bold uppercase tracking-[0.16em] text-[#8f7f72]";
-const wallArtMicroButtonClassName =
-  "rounded-full bg-white/78 text-[#322821] shadow-[0_8px_18px_rgba(70,53,38,0.08),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-xl transition hover:bg-white";
-const wallArtFloatingActionClassName =
-  "group absolute right-2.5 top-2.5 z-20 h-9 rounded-[14px] bg-[linear-gradient(180deg,rgba(43,34,29,0.76),rgba(31,24,21,0.92))] px-3.5 text-[11px] font-black text-[#fff8f0] shadow-[0_18px_40px_rgba(29,22,19,0.24),0_1px_0_rgba(255,255,255,0.18)_inset] backdrop-blur-2xl transition hover:scale-[1.02] hover:bg-[linear-gradient(180deg,rgba(49,39,33,0.8),rgba(34,27,23,0.96))] hover:text-white sm:right-3 sm:top-3 sm:h-10 sm:px-4 sm:text-[12px]";
+const wallArtGlassPanelClassName = studioGlassStyles.panel;
+const wallArtSubtleGlassPanelClassName = studioGlassStyles.subtlePanel;
+const wallArtFieldClassName = studioGlassStyles.field;
+const wallArtTextareaClassName = studioGlassStyles.textarea;
+const wallArtPopoverClassName = studioGlassStyles.popover;
+const wallArtPillButtonClassName = studioGlassStyles.pillButton;
+const wallArtPillButtonActiveClassName = studioGlassStyles.pillButtonActive;
+const wallArtPrimaryButtonClassName = studioGlassStyles.primaryButton;
+const wallArtSecondaryButtonClassName = studioGlassStyles.secondaryButton;
+const wallArtEditorSectionClassName = studioGlassStyles.editorSection;
+const wallArtInfoCardClassName = studioGlassStyles.infoCard;
+const wallArtTemplateThumbClassName = studioGlassStyles.templateThumb;
+const wallArtTemplatePopoverClassName = studioGlassStyles.templatePopover;
+const wallArtScrollAreaClassName = studioGlassStyles.scrollArea;
+const wallArtScrollAreaViewportClassName = studioGlassStyles.scrollAreaViewport;
+const wallArtSectionHeadingClassName = studioGlassStyles.sectionHeading;
+const wallArtControlTitleClassName = studioGlassStyles.controlTitle;
+const wallArtControlDescriptionClassName = studioGlassStyles.controlDescription;
+const wallArtMicroButtonClassName = studioGlassStyles.microButton;
+const wallArtFloatingActionClassName = studioGlassStyles.floatingAction;
 
 function clampNumber(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
 function getWallArtTemplateCardClassName(active: boolean) {
-  return cn(
-    wallArtTemplateCardBaseClassName,
-    active
-      ? "border-transparent bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(246,238,229,0.82))] shadow-[0_26px_56px_rgba(70,53,38,0.16),inset_0_1px_0_rgba(255,255,255,0.82)]"
-      : "text-[#312821]",
-  );
+  return getStudioTemplateCardClassName(active);
 }
 
 function getWallArtTemplatePresetCardClassName(active: boolean) {
-  return cn(
-    wallArtTemplatePresetCardClassName,
-    active
-      ? "border-transparent bg-white shadow-[0_18px_38px_rgba(64,48,34,0.14),inset_0_1px_0_rgba(255,255,255,0.8)] ring-2 ring-[#2d2622]/10"
-      : "",
-  );
+  return getStudioTemplatePresetCardClassName(active);
 }
 
 function loadHtmlImage(source: string): Promise<HTMLImageElement> {
@@ -510,8 +488,8 @@ function createWallArtTemplateSettings(
     qrCodeOffsetX: 0,
     qrCodeOffsetY: 0,
     qrCodeSize: 112,
-    frameColor: "#6f4b2f",
-    frameWidth: 34,
+    frameColor: "#745238",
+    frameWidth: 24,
     centerRadius: 168,
     template2DiscRadius: 390,
     textOuterRadius: 470,
@@ -597,17 +575,6 @@ function isEditableTextKey(value: ActiveTarget): value is EditableTextKey {
   return textTargets.includes(value as EditableTextKey);
 }
 
-function getNextImageCropRotation(
-  rotate: ImageCropRotation,
-  direction: 1 | -1,
-): ImageCropRotation {
-  const rotations: ImageCropRotation[] = [0, 90, 180, 270];
-  const currentIndex = rotations.indexOf(rotate);
-  const nextIndex = (currentIndex + direction + rotations.length) % rotations.length;
-
-  return rotations[nextIndex] ?? 0;
-}
-
 function getImageCropPreviewTransform({
   rotate,
   flipX,
@@ -634,17 +601,17 @@ function ControlRow({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="space-y-2 rounded-[18px] bg-white/40 px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_8px_18px_rgba(70,53,38,0.05)] backdrop-blur-xl">
+    <div className="space-y-1 rounded-[8px] bg-white/38 px-2 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.68),0_6px_14px_rgba(70,53,38,0.04)] backdrop-blur-xl">
       <div className="flex items-center justify-between gap-2">
-        <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
+        <Label className={wallArtSectionHeadingClassName}>
           {label}
         </Label>
-        <span className="rounded-full bg-white/72 px-2.5 py-0.5 text-[10px] font-bold text-[#5d5045] shadow-[inset_0_1px_0_rgba(255,255,255,0.74)]">
+        <span className="rounded-full bg-white/72 px-1.5 py-0.5 text-[9px] font-black tabular-nums text-[#5d5045] shadow-[inset_0_1px_0_rgba(255,255,255,0.74)]">
           {value}
         </span>
       </div>
       <Slider
-        className="[&_[data-slot=slider-range]]:bg-[#362e28] [&_[data-slot=slider-thumb]]:size-4 [&_[data-slot=slider-thumb]]:border-2 [&_[data-slot=slider-thumb]]:border-white/80 [&_[data-slot=slider-thumb]]:bg-[#fff8f1] [&_[data-slot=slider-thumb]]:shadow-[0_8px_16px_rgba(53,40,30,0.2)] [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/65"
+        className="[&_[data-slot=slider-range]]:bg-[#362e28] [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-none [&_[data-slot=slider-thumb]]:bg-[#fff8f1] [&_[data-slot=slider-thumb]]:shadow-[0_6px_12px_rgba(53,40,30,0.18),0_0_0_1px_rgba(255,255,255,0.72)_inset] [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/65"
         max={max}
         min={min}
         step={step}
@@ -665,14 +632,14 @@ function ColorInput({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
+    <div className="space-y-1.5">
+      <Label className={wallArtSectionHeadingClassName}>
         {label}
       </Label>
       <div className="flex items-center gap-2">
         <Input
           aria-label={label}
-          className="h-10 w-11 shrink-0 cursor-pointer rounded-[16px] border-white/45 bg-white/76 p-1 shadow-[0_8px_18px_rgba(70,53,38,0.08),inset_0_1px_0_rgba(255,255,255,0.74)]"
+          className="h-8 w-9 shrink-0 cursor-pointer rounded-[8px] border-none bg-white/76 p-1 shadow-[0_6px_14px_rgba(70,53,38,0.075),inset_0_1px_0_rgba(255,255,255,0.74),0_0_0_1px_rgba(255,255,255,0.1)_inset]"
           type="color"
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -699,8 +666,8 @@ function FontSelect({
     wallArtFonts.find((font) => font.value === value) ?? wallArtFonts[0];
 
   return (
-    <div className="space-y-2">
-      <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
+    <div className="space-y-1.5">
+      <Label className={wallArtSectionHeadingClassName}>
         Font
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
@@ -709,28 +676,28 @@ function FontSelect({
             aria-expanded={open}
             className={cn(
               wallArtFieldClassName,
-              "w-full justify-between px-3.5 font-normal",
+              "w-full justify-between px-2.5 font-semibold",
             )}
             role="combobox"
-            variant="outline"
+            variant="ghost"
           >
             <span
-              className="truncate text-left text-[14px]"
+              className="truncate text-left text-[11.5px]"
               style={{ fontFamily: selectedFont?.previewFamily }}
             >
               {selectedFont?.label ?? "Select font"}
             </span>
-            <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="size-3.5 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
           align="start"
           className={cn(
             wallArtPopoverClassName,
-            "flex max-h-[min(20rem,var(--radix-popover-content-available-height))] w-[--radix-popover-trigger-width] flex-col p-1 [&_[data-slot=command-group]]:p-1 [&_[data-slot=command-input-wrapper]]:h-10 [&_[data-slot=command-input-wrapper]]:rounded-[14px] [&_[data-slot=command-input-wrapper]]:border-none [&_[data-slot=command-input-wrapper]]:bg-white/72 [&_[data-slot=command-input-wrapper]]:px-3 [&_[data-slot=command-input]]:h-9 [&_[data-slot=command-item]]:rounded-[14px] [&_[data-slot=command-item]]:px-3 [&_[data-slot=command-item][data-selected=true]]:bg-[#2d2622] [&_[data-slot=command-item][data-selected=true]]:text-[#f7f0e6]",
+            "flex max-h-[min(18rem,var(--radix-popover-content-available-height))] w-[--radix-popover-trigger-width] flex-col p-1 [&_[data-slot=command-group]]:p-1 [&_[data-slot=command-input-wrapper]]:h-8 [&_[data-slot=command-input-wrapper]]:rounded-[8px] [&_[data-slot=command-input-wrapper]]:border-none [&_[data-slot=command-input-wrapper]]:bg-white/72 [&_[data-slot=command-input-wrapper]]:px-2 [&_[data-slot=command-input]]:h-7 [&_[data-slot=command-input]]:text-[11.5px] [&_[data-slot=command-item]]:rounded-[8px] [&_[data-slot=command-item]]:px-2 [&_[data-slot=command-item]]:py-1.5 [&_[data-slot=command-item]]:text-[11.5px] [&_[data-slot=command-item][data-selected=true]]:bg-[#2d2622] [&_[data-slot=command-item][data-selected=true]]:text-[#f7f0e6]",
           )}
         >
-          <Command className="min-h-0 rounded-[18px] bg-transparent">
+          <Command className="min-h-0 rounded-[10px] bg-transparent">
             <CommandInput placeholder="Search fonts..." />
             <CommandList className="min-h-0 flex-1 overscroll-contain">
               <CommandEmpty>No font found.</CommandEmpty>
@@ -746,12 +713,12 @@ function FontSelect({
                   >
                     <Check
                       className={cn(
-                        "size-4",
+                        "size-3.5",
                         font.value === value ? "opacity-100" : "opacity-0",
                       )}
                     />
                     <span
-                      className="truncate text-[15px] leading-7"
+                      className="truncate text-[11.5px] leading-5"
                       style={{ fontFamily: font.previewFamily }}
                     >
                       {font.label}
@@ -775,8 +742,8 @@ function FontWeightSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
+    <div className="space-y-1.5">
+      <Label className={wallArtSectionHeadingClassName}>
         Font weight
       </Label>
       <Select value={value} onValueChange={onChange}>
@@ -786,7 +753,7 @@ function FontWeightSelect({
         <SelectContent
           className={cn(
             wallArtPopoverClassName,
-            "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+            "[&_[data-slot=select-item]]:rounded-[8px] [&_[data-slot=select-item]]:py-1.5 [&_[data-slot=select-item]]:text-[11.5px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
           )}
         >
           {[
@@ -815,6 +782,7 @@ export function WallArtEditorDrawer({
   const spiralId = useId().replace(/:/g, "");
   const template2Id = useId().replace(/:/g, "");
   const imageLyricUploadInputId = `${template2Id}-image-lyric-upload`;
+  const discArtworkUploadInputId = `${template2Id}-disc-artwork-upload`;
   const svgRef = useRef<SVGSVGElement | null>(null);
   const presetPanelCloseTimeoutRef = useRef<number | null>(null);
   const selectableSongs = useMemo(() => {
@@ -844,11 +812,20 @@ export function WallArtEditorDrawer({
     () => createWallArtTemplateSettingsMap(activeSongTitle, activeLyrics),
     [activeLyrics, activeSongTitle],
   );
+  const [isStudioOpen, setIsStudioOpen] = useState(false);
   const [activeTarget, setActiveTarget] = useState<ActiveTarget>("lyrics");
   const [activeTemplate, setActiveTemplate] =
     useState<WallArtTemplateKey>("template2");
   const [openPresetPanel, setOpenPresetPanel] =
     useState<PresetPanelKey | null>(null);
+  const [presetPanelPosition, setPresetPanelPosition] = useState({
+    bridgeLeft: 0,
+    bridgeTop: 98,
+    height: 220,
+    left: 0,
+    panelHeight: 220,
+    top: 98,
+  });
   const [templateSettings, setTemplateSettings] = useState<
     Record<WallArtTemplateKey, WallArtTemplateSettings>
   >(() => initialTemplateSettings);
@@ -985,18 +962,23 @@ export function WallArtEditorDrawer({
       : (selectedPrintSize?.heightCm ?? 29.7);
   const posterAspectRatio = posterWidthCm / posterHeightCm;
   const posterViewBoxHeight = Math.round(BASE_POSTER_WIDTH / posterAspectRatio);
+  const imageCropIsDisc = imageCropDraft?.target === "disc";
   const imageCropSelectedPrintSize =
-    imageCropDraft?.printSizeId === "custom"
+    !imageCropIsDisc && imageCropDraft?.printSizeId === "custom"
       ? null
       : printSizePresets.find((item) => item.id === imageCropDraft?.printSizeId);
   const imageCropWidthCm =
-    imageCropDraft?.printSizeId === "custom"
-      ? (imageCropDraft?.customWidthCm ?? posterWidthCm)
-      : (imageCropSelectedPrintSize?.widthCm ?? posterWidthCm);
+    imageCropIsDisc
+      ? 1
+      : imageCropDraft?.printSizeId === "custom"
+        ? (imageCropDraft?.customWidthCm ?? posterWidthCm)
+        : (imageCropSelectedPrintSize?.widthCm ?? posterWidthCm);
   const imageCropHeightCm =
-    imageCropDraft?.printSizeId === "custom"
-      ? (imageCropDraft?.customHeightCm ?? posterHeightCm)
-      : (imageCropSelectedPrintSize?.heightCm ?? posterHeightCm);
+    imageCropIsDisc
+      ? 1
+      : imageCropDraft?.printSizeId === "custom"
+        ? (imageCropDraft?.customHeightCm ?? posterHeightCm)
+        : (imageCropSelectedPrintSize?.heightCm ?? posterHeightCm);
   const imageCropPreviewHeight = imageCropDraft
     ? Math.round(IMAGE_CROP_PREVIEW_WIDTH / (imageCropWidthCm / imageCropHeightCm))
     : 0;
@@ -1343,6 +1325,43 @@ export function WallArtEditorDrawer({
     setOpenPresetPanel(panel);
   }
 
+  function openTemplatePresetPanel(
+    panel: PresetPanelKey,
+    event: ReactMouseEvent<HTMLElement>,
+  ) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const panelHeight = Math.min(420, window.innerHeight - 118);
+    const panelLeft = Math.min(
+      rect.right + PRESET_PANEL_GAP,
+      window.innerWidth - PRESET_PANEL_WIDTH - PRESET_PANEL_SAFE_MARGIN,
+    );
+    const panelTop = clampNumber(
+      rect.top + rect.height / 2 - panelHeight / 2,
+      PRESET_PANEL_SAFE_MARGIN,
+      window.innerHeight - panelHeight - PRESET_PANEL_SAFE_MARGIN,
+    );
+    const bridgeTop = Math.min(rect.top, panelTop);
+    const bridgeBottom = Math.max(rect.bottom, panelTop + panelHeight);
+
+    setPresetPanelPosition({
+      bridgeLeft: rect.right,
+      bridgeTop,
+      height: bridgeBottom - bridgeTop,
+      left: Math.max(PRESET_PANEL_SAFE_MARGIN, panelLeft),
+      panelHeight,
+      top: panelTop,
+    });
+    keepPresetPanelOpen(panel);
+  }
+
+  function closePresetPanelImmediately() {
+    if (presetPanelCloseTimeoutRef.current) {
+      window.clearTimeout(presetPanelCloseTimeoutRef.current);
+      presetPanelCloseTimeoutRef.current = null;
+    }
+    setOpenPresetPanel(null);
+  }
+
   function schedulePresetPanelClose() {
     if (presetPanelCloseTimeoutRef.current) {
       window.clearTimeout(presetPanelCloseTimeoutRef.current);
@@ -1545,7 +1564,6 @@ export function WallArtEditorDrawer({
           "customText",
           "poster",
           "heart",
-          "frame",
           "print",
         ].includes(current)
           ? current
@@ -1563,7 +1581,6 @@ export function WallArtEditorDrawer({
           "description",
           "customText",
           "poster",
-          "frame",
           "print",
         ].includes(current)
           ? current
@@ -1582,32 +1599,25 @@ export function WallArtEditorDrawer({
     setPrintContentOffsetY(0);
   }
 
-  function handleImageUpload(file?: File) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setUploadedImage(String(reader.result || ""));
-      setUseCover(true);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function handleImageLyricUpload(file?: File) {
+  function openImageCropDraft(file: File | undefined, target: "lyrics" | "disc") {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
       const source = String(reader.result || "");
       const image = new Image();
       image.onload = () => {
+        const canvasHeight =
+          target === "disc"
+            ? IMAGE_CROP_PREVIEW_WIDTH
+            : Math.round(IMAGE_CROP_PREVIEW_WIDTH / posterAspectRatio);
         const crop = buildInitialImageCrop({
           imageWidth: image.width,
           imageHeight: image.height,
           canvasWidth: IMAGE_CROP_PREVIEW_WIDTH,
-          canvasHeight: Math.round(
-            IMAGE_CROP_PREVIEW_WIDTH / posterAspectRatio,
-          ),
+          canvasHeight,
         });
         setImageCropDraft({
+          target,
           source,
           imageWidth: image.width,
           imageHeight: image.height,
@@ -1620,6 +1630,14 @@ export function WallArtEditorDrawer({
       image.src = source;
     };
     reader.readAsDataURL(file);
+  }
+
+  function handleImageUpload(file?: File) {
+    openImageCropDraft(file, "disc");
+  }
+
+  function handleImageLyricUpload(file?: File) {
+    openImageCropDraft(file, "lyrics");
   }
 
   function updateImageCropCanvasSize({
@@ -1738,7 +1756,7 @@ export function WallArtEditorDrawer({
   async function applyImageCrop() {
     if (!imageCropDraft) return;
 
-    const targetWidth = 1200;
+    const targetWidth = imageCropDraft.target === "disc" ? 900 : 1200;
     const targetHeight = Math.round(
       targetWidth / (imageCropWidthCm / imageCropHeightCm),
     );
@@ -1754,6 +1772,18 @@ export function WallArtEditorDrawer({
         if (!context) {
           reject(new Error("Canvas is not available."));
           return;
+        }
+        if (imageCropDraft.target === "disc") {
+          context.save();
+          context.beginPath();
+          context.arc(
+            targetWidth / 2,
+            targetHeight / 2,
+            Math.min(targetWidth, targetHeight) / 2,
+            0,
+            Math.PI * 2,
+          );
+          context.clip();
         }
         const scale = targetWidth / IMAGE_CROP_PREVIEW_WIDTH;
         const renderedImageWidth = image.width * crop.scale * scale;
@@ -1773,16 +1803,24 @@ export function WallArtEditorDrawer({
           renderedImageHeight,
         );
         context.restore();
+        if (imageCropDraft.target === "disc") {
+          context.restore();
+        }
         resolve(canvas.toDataURL("image/png"));
       };
       image.onerror = () => reject(new Error("Unable to load crop image."));
       image.src = source;
     });
 
-    setImageLyricUploadedImage(dataUrl);
-    setPrintSizeId(imageCropDraft.printSizeId);
-    setCustomWidthCm(imageCropDraft.customWidthCm);
-    setCustomHeightCm(imageCropDraft.customHeightCm);
+    if (imageCropDraft.target === "disc") {
+      setUploadedImage(dataUrl);
+      setUseCover(true);
+    } else {
+      setImageLyricUploadedImage(dataUrl);
+      setPrintSizeId(imageCropDraft.printSizeId);
+      setCustomWidthCm(imageCropDraft.customWidthCm);
+      setCustomHeightCm(imageCropDraft.customHeightCm);
+    }
     setImageCropDraft(null);
   }
 
@@ -1950,33 +1988,189 @@ export function WallArtEditorDrawer({
     });
   }
 
+  const templatePresetPanel =
+    hasSongs && isStudioOpen && typeof document !== "undefined"
+      ? createPortal(
+          <>
+            <div
+              data-wall-art-preset-panel="true"
+              className={cn(
+                presetHoverBridgeClassName,
+                openPresetPanel
+                  ? "pointer-events-auto block"
+                  : "pointer-events-none",
+              )}
+              style={{
+                height: presetPanelPosition.height,
+                left: presetPanelPosition.bridgeLeft,
+                top: presetPanelPosition.bridgeTop,
+                width: Math.max(
+                  0,
+                  presetPanelPosition.left - presetPanelPosition.bridgeLeft,
+                ),
+              }}
+              onMouseEnter={() => {
+                if (openPresetPanel) keepPresetPanelOpen(openPresetPanel);
+              }}
+              onMouseLeave={schedulePresetPanelClose}
+            />
+            <div
+              data-wall-art-preset-panel="true"
+              className={cn(
+                wallArtTemplatePopoverClassName,
+                openPresetPanel
+                  ? "pointer-events-auto block opacity-100"
+                  : "pointer-events-none opacity-0",
+              )}
+              style={{
+                height: presetPanelPosition.panelHeight,
+                left: presetPanelPosition.left,
+                top: presetPanelPosition.top,
+              }}
+              onMouseEnter={() => {
+                if (openPresetPanel) keepPresetPanelOpen(openPresetPanel);
+              }}
+              onMouseLeave={schedulePresetPanelClose}
+            >
+              {openPresetPanel === "imageLyrics" && (
+                <div className="grid grid-cols-2 gap-2">
+                  {lyricPortraitPresetImages.map((preset, index) => (
+                    <button
+                      key={preset.src}
+                      className={getWallArtTemplatePresetCardClassName(
+                        activeTemplate === "imageLyrics" &&
+                          imageLyricPresetIndex === index,
+                      )}
+                      type="button"
+                      onClick={() => {
+                        switchTemplate("imageLyrics");
+                        applyImageLyricPreset(index);
+                      }}
+                    >
+                      <img
+                        alt={preset.name}
+                        className="aspect-[4/5] w-full object-cover"
+                        src={preset.src}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+              {openPresetPanel === "template2" && (
+                <div className="grid grid-cols-3 gap-2">
+                  {template2PresetImages.map((preset, index) => (
+                    <button
+                      key={preset.src}
+                      className={getWallArtTemplatePresetCardClassName(
+                        activeTemplate === "template2" &&
+                          template2PresetIndex === index,
+                      )}
+                      type="button"
+                      onClick={() => {
+                        switchTemplate("template2");
+                        applyTemplate2Preset(index);
+                      }}
+                    >
+                      <img
+                        alt={preset.name}
+                        className="aspect-[4/5] w-full object-cover"
+                        src={preset.src}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+              {openPresetPanel === "spiral" && (
+                <div className="grid grid-cols-3 gap-2">
+                  {presetImages.map((preset, index) => (
+                    <button
+                      key={preset.src}
+                      className={getWallArtTemplatePresetCardClassName(
+                        activeTemplate === "spiral" &&
+                          activePresetIndex === index,
+                      )}
+                      type="button"
+                      onClick={() => {
+                        switchTemplate("spiral");
+                        applyPreset(index);
+                      }}
+                    >
+                      <img
+                        alt={preset.name}
+                        className="aspect-[4/5] w-full object-cover"
+                        src={preset.src}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>,
+          document.body,
+        )
+      : null;
+
   return (
     <>
-      <Dialog
-        open={Boolean(imageCropDraft)}
-        onOpenChange={(open) => {
-          if (!open) {
+      {templatePresetPanel}
+      {imageCropIsDisc ? (
+        <DiscArtworkCropDialog
+          draft={
+            imageCropDraft
+              ? {
+                  crop: imageCropDraft.crop,
+                  imageHeight: imageCropDraft.imageHeight,
+                  imageWidth: imageCropDraft.imageWidth,
+                  source: imageCropDraft.source,
+                }
+              : null
+          }
+          dragStart={imageCropDragStart}
+          infoCardClassName={wallArtInfoCardClassName}
+          minScale={imageCropMinScale}
+          pillButtonActiveClassName={wallArtPillButtonActiveClassName}
+          pillButtonClassName={wallArtPillButtonClassName}
+          primaryButtonClassName={wallArtPrimaryButtonClassName}
+          secondaryButtonClassName={wallArtSecondaryButtonClassName}
+          sectionHeadingClassName={wallArtSectionHeadingClassName}
+          subtlePanelClassName={wallArtSubtleGlassPanelClassName}
+          onApply={applyImageCrop}
+          onClose={() => {
             setImageCropDraft(null);
             setImageCropDragStart(null);
-          }
-        }}
-      >
-        <DialogContent className="max-h-[92svh] overflow-y-auto rounded-[32px] border border-white/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,239,231,0.78))] p-7 shadow-[0_32px_100px_rgba(49,37,28,0.2),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-2xl sm:max-w-4xl [&_[data-slot=dialog-close]]:top-5 [&_[data-slot=dialog-close]]:right-5 [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:border [&_[data-slot=dialog-close]]:border-white/50 [&_[data-slot=dialog-close]]:bg-white/72 [&_[data-slot=dialog-close]]:p-2 [&_[data-slot=dialog-close]]:opacity-100 [&_[data-slot=dialog-close]]:shadow-[0_12px_28px_rgba(70,53,38,0.12)]">
-          <DialogHeader className="gap-3">
-            <DialogTitle className="text-[1.65rem] font-black tracking-[-0.02em] text-[#241b16]">
-              Crop lyric portrait image
-            </DialogTitle>
-            <DialogDescription className="max-w-2xl text-[15px] leading-7 text-[#706356]">
-              Choose the poster ratio, then move and scale the image before it
-              becomes lyric texture.
-            </DialogDescription>
-          </DialogHeader>
+          }}
+          onDragStartChange={setImageCropDragStart}
+          onOrientationChange={updateImageCropOrientation}
+          onTransformChange={updateImageCropTransform}
+        />
+      ) : (
+        <Dialog
+          open={Boolean(imageCropDraft)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setImageCropDraft(null);
+              setImageCropDragStart(null);
+            }
+          }}
+        >
+          <DialogContent className="max-h-[92svh] overflow-y-auto rounded-[18px] border-none bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,239,231,0.78))] p-4 shadow-[0_28px_84px_rgba(49,37,28,0.2),0_1px_0_rgba(255,255,255,0.82)_inset,0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-2xl sm:max-w-4xl [&_[data-slot=dialog-close]]:top-3.5 [&_[data-slot=dialog-close]]:right-3.5 [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:border-none [&_[data-slot=dialog-close]]:bg-white/72 [&_[data-slot=dialog-close]]:p-1.5 [&_[data-slot=dialog-close]]:opacity-100 [&_[data-slot=dialog-close]]:shadow-[0_10px_22px_rgba(70,53,38,0.12)]">
+            <DialogHeader className="gap-2">
+              <DialogTitle className="text-[1.35rem] font-black tracking-[-0.02em] text-[#241b16]">
+                Crop lyric portrait image
+              </DialogTitle>
+              <DialogDescription className="max-w-2xl text-[12px] leading-5 text-[#706356]">
+                Choose the poster ratio, then move and scale the image before it becomes lyric texture.
+              </DialogDescription>
+            </DialogHeader>
 
-          {imageCropDraft && (
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
-              <div className="min-w-0 rounded-[28px] border border-white/25 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_38%),linear-gradient(180deg,#2e2925,#171412)] p-4 shadow-[0_22px_55px_rgba(31,24,19,0.28)]">
+            {imageCropDraft && (
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_248px]">
+              <div className="min-w-0 rounded-[14px] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_38%),linear-gradient(180deg,#2e2925,#171412)] p-2.5 shadow-[0_20px_48px_rgba(31,24,19,0.28),0_1px_0_rgba(255,255,255,0.12)_inset]">
                 <div
-                  className="mx-auto max-w-full overflow-hidden rounded-[22px] shadow-[0_26px_50px_rgba(0,0,0,0.34)]"
+                  className={cn(
+                    "mx-auto max-w-full overflow-hidden shadow-[0_24px_46px_rgba(0,0,0,0.32)]",
+                    imageCropIsDisc ? "rounded-full" : "rounded-[10px]",
+                  )}
                   style={{
                     aspectRatio: `${imageCropWidthCm} / ${imageCropHeightCm}`,
                     width: imageCropPreviewDisplayWidth,
@@ -1984,7 +2178,10 @@ export function WallArtEditorDrawer({
                   }}
                 >
                 <div
-                  className="relative origin-top-left touch-none overflow-hidden bg-black"
+                  className={cn(
+                    "relative origin-top-left touch-none overflow-hidden bg-black",
+                    imageCropIsDisc && "rounded-full",
+                  )}
                   style={{
                     height: imageCropPreviewHeight || IMAGE_CROP_PREVIEW_WIDTH,
                     transform: `scale(${imageCropPreviewDisplayScale})`,
@@ -2036,145 +2233,152 @@ export function WallArtEditorDrawer({
                       }}
                     />
                   </div>
-                  <div className="pointer-events-none absolute inset-0 ring-1 ring-white/60" />
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,.18)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,.18)_1px,transparent_1px)] bg-[size:33.333%_33.333%]" />
+                  <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.36)]" />
+                  {!imageCropIsDisc && (
+                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,.18)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,.18)_1px,transparent_1px)] bg-[size:33.333%_33.333%]" />
+                  )}
+                  {imageCropIsDisc && (
+                    <div className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_0_2px_rgba(255,255,255,0.42),inset_0_0_34px_rgba(0,0,0,0.28)]" />
+                  )}
                   <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_9999px_rgba(0,0,0,0.02)]" />
                 </div>
                 </div>
               </div>
 
-              <div className={cn(wallArtSubtleGlassPanelClassName, "space-y-4 p-5")}>
-                <div className="space-y-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
-                    Canvas size
-                  </Label>
-                  <Select
-                    value={imageCropDraft.printSizeId}
-                    onValueChange={(value) =>
-                      updateImageCropCanvasSize({ printSizeId: value })
-                    }
-                  >
-                    <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent
-                      className={cn(
-                        wallArtPopoverClassName,
-                        "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
-                      )}
-                    >
-                      {printSizePresets.map((size) => (
-                        <SelectItem key={size.id} value={size.id}>
-                          {size.label}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="custom">Custom size</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {imageCropDraft.printSizeId === "custom" && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Width cm</Label>
-                      <Input
-                        className={wallArtFieldClassName}
-                        min={5}
-                        step={0.1}
-                        type="number"
-                        value={imageCropDraft.customWidthCm}
-                        onChange={(event) =>
-                          updateImageCropCanvasSize({
-                            customWidthCm: Number(event.target.value) || 1,
-                          })
+              <div className={cn(wallArtSubtleGlassPanelClassName, "space-y-2.5 p-2.5")}>
+                  <>
+                    <div className="space-y-1.5">
+                      <Label className={wallArtSectionHeadingClassName}>
+                        Canvas size
+                      </Label>
+                      <Select
+                        value={imageCropDraft.printSizeId}
+                        onValueChange={(value) =>
+                          updateImageCropCanvasSize({ printSizeId: value })
                         }
-                      />
+                      >
+                        <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent
+                          className={cn(
+                            wallArtPopoverClassName,
+                            "[&_[data-slot=select-item]]:rounded-[8px] [&_[data-slot=select-item]]:py-1.5 [&_[data-slot=select-item]]:text-[11.5px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+                          )}
+                        >
+                          {printSizePresets.map((size) => (
+                            <SelectItem key={size.id} value={size.id}>
+                              {size.label}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="custom">Custom size</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Height cm</Label>
-                      <Input
-                        className={wallArtFieldClassName}
-                        min={5}
-                        step={0.1}
-                        type="number"
-                        value={imageCropDraft.customHeightCm}
-                        onChange={(event) =>
-                          updateImageCropCanvasSize({
-                            customHeightCm: Number(event.target.value) || 1,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
-                <div className="space-y-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8f7f72]">
+                    {imageCropDraft.printSizeId === "custom" && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1.5">
+                          <Label className={wallArtSectionHeadingClassName}>Width cm</Label>
+                          <Input
+                            className={wallArtFieldClassName}
+                            min={5}
+                            step={0.1}
+                            type="number"
+                            value={imageCropDraft.customWidthCm}
+                            onChange={(event) =>
+                              updateImageCropCanvasSize({
+                                customWidthCm: Number(event.target.value) || 1,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className={wallArtSectionHeadingClassName}>Height cm</Label>
+                          <Input
+                            className={wallArtFieldClassName}
+                            min={5}
+                            step={0.1}
+                            type="number"
+                            value={imageCropDraft.customHeightCm}
+                            onChange={(event) =>
+                              updateImageCropCanvasSize({
+                                customHeightCm: Number(event.target.value) || 1,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                <div className="space-y-1.5">
+                  <Label className={wallArtSectionHeadingClassName}>
                     Transform
                   </Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-1.5">
                     <Button
-                      className={
+                      className={cn(
                         imageCropDraft.crop.flipX
                           ? wallArtPillButtonActiveClassName
-                          : wallArtPillButtonClassName
-                      }
+                          : wallArtPillButtonClassName,
+                        "h-8 px-2",
+                      )}
                       type="button"
-                      variant={imageCropDraft.crop.flipX ? "default" : "outline"}
+                      variant={imageCropDraft.crop.flipX ? "default" : "ghost"}
                       onClick={() =>
                         updateImageCropOrientation({
                           flipX: !imageCropDraft.crop.flipX,
                         })
                       }
                     >
-                      <FlipHorizontal className="size-4" />
                       Flip H
                     </Button>
                     <Button
-                      className={
+                      className={cn(
                         imageCropDraft.crop.flipY
                           ? wallArtPillButtonActiveClassName
-                          : wallArtPillButtonClassName
-                      }
+                          : wallArtPillButtonClassName,
+                        "h-8 px-2",
+                      )}
                       type="button"
-                      variant={imageCropDraft.crop.flipY ? "default" : "outline"}
+                      variant={imageCropDraft.crop.flipY ? "default" : "ghost"}
                       onClick={() =>
                         updateImageCropOrientation({
                           flipY: !imageCropDraft.crop.flipY,
                         })
                       }
                     >
-                      <FlipVertical className="size-4" />
                       Flip V
                     </Button>
                     <Button
-                      className={wallArtPillButtonClassName}
+                      className={cn(wallArtPillButtonClassName, "h-8 px-2")}
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       onClick={() =>
                         updateImageCropOrientation({
-                          rotate: getNextImageCropRotation(
-                            imageCropDraft.crop.rotate,
-                            -1,
-                          ),
+                          rotate: (
+                            imageCropDraft.crop.rotate === 0
+                              ? 270
+                              : imageCropDraft.crop.rotate - 90
+                          ) as ImageCropRotation,
                         })
                       }
                     >
-                      <RotateCcw className="size-4" />
                       Rotate
                     </Button>
                     <Button
-                      className={wallArtPillButtonClassName}
+                      className={cn(wallArtPillButtonClassName, "h-8 px-2")}
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       onClick={() =>
                         updateImageCropOrientation({
-                          rotate: getNextImageCropRotation(
-                            imageCropDraft.crop.rotate,
-                            1,
-                          ),
+                          rotate: (
+                            imageCropDraft.crop.rotate === 270
+                              ? 0
+                              : imageCropDraft.crop.rotate + 90
+                          ) as ImageCropRotation,
                         })
                       }
                     >
-                      <RotateCw className="size-4" />
                       {imageCropDraft.crop.rotate}°
                     </Button>
                   </div>
@@ -2212,384 +2416,239 @@ export function WallArtEditorDrawer({
                   value={Math.round(imageCropDraft.crop.y)}
                   onChange={(y) => updateImageCropTransform({ y })}
                 />
-                <div className={cn(wallArtInfoCardClassName, "text-xs leading-5 text-[#7b6d62]")}>
-                  The crop ratio matches the selected print canvas. Drag the
-                  image directly for fine positioning.
+                <div className={cn(wallArtInfoCardClassName, "text-[10px] leading-4 text-[#7b6d62]")}>
+                  The crop ratio matches the selected print canvas. Drag the image directly for fine positioning.
                 </div>
               </div>
             </div>
-          )}
+            )}
 
-          <DialogFooter className="mt-2">
-            <Button
-              className={wallArtSecondaryButtonClassName}
-              type="button"
-              variant="outline"
-              onClick={() => setImageCropDraft(null)}
-            >
-              Cancel
-            </Button>
-            <Button
-              className={wallArtPrimaryButtonClassName}
-              type="button"
-              onClick={applyImageCrop}
-            >
-              <Move className="size-4" />
-              Apply crop
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter className="mt-2">
+              <Button
+                className={wallArtSecondaryButtonClassName}
+                type="button"
+                variant="ghost"
+                onClick={() => setImageCropDraft(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className={wallArtPrimaryButtonClassName}
+                type="button"
+                onClick={applyImageCrop}
+              >
+                Apply crop
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
-      <Sheet>
+      <Sheet
+        open={isStudioOpen}
+        onOpenChange={(open) => {
+          setIsStudioOpen(open);
+          if (!open) closePresetPanelImmediately();
+        }}
+      >
         <SheetTrigger asChild>{trigger}</SheetTrigger>
-        <SheetContent className="w-screen max-w-none gap-0 overflow-visible border-none bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.58),transparent_32%),linear-gradient(180deg,#f6f1eb_0%,#ede5dc_38%,#e8ded4_100%)] p-0 sm:max-w-none [&_[data-slot=sheet-close]]:top-4 [&_[data-slot=sheet-close]]:right-4 [&_[data-slot=sheet-close]]:size-9 [&_[data-slot=sheet-close]]:rounded-[14px] [&_[data-slot=sheet-close]]:border-none [&_[data-slot=sheet-close]]:bg-[linear-gradient(180deg,rgba(255,255,255,0.76),rgba(245,238,230,0.62))] [&_[data-slot=sheet-close]]:opacity-100 [&_[data-slot=sheet-close]]:text-[#473b33] [&_[data-slot=sheet-close]]:shadow-[0_14px_28px_rgba(66,51,37,0.12),0_1px_0_rgba(255,255,255,0.76)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] [&_[data-slot=sheet-close]]:backdrop-blur-2xl [&_[data-slot=sheet-close]]:transition-all [&_[data-slot=sheet-close]]:duration-200 hover:[&_[data-slot=sheet-close]]:scale-[1.03] hover:[&_[data-slot=sheet-close]]:bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,241,233,0.72))] hover:[&_[data-slot=sheet-close]]:text-[#2f2520]">
+        <SheetContent
+          className={studioGlassStyles.sheetContent}
+          onPointerDownOutside={(event) => {
+            const target = event.target as HTMLElement;
+            if (target.closest("[data-wall-art-preset-panel]")) {
+              event.preventDefault();
+            }
+          }}
+        >
         <style>{`${wallArtFontFaceCss}${wallArtMotionCss}`}</style>
-        {activeImageUrl && (
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0"
-          >
-            <div
-              className="absolute inset-[-14%] scale-[1.18] bg-center bg-cover opacity-60 blur-[92px] saturate-[1.08]"
-              style={{ backgroundImage: `url("${activeImageUrl}")` }}
-            />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_14%,rgba(255,255,255,0.14),transparent_34%),linear-gradient(180deg,rgba(246,241,235,0.54)_0%,rgba(239,231,221,0.68)_36%,rgba(233,224,213,0.78)_100%)] backdrop-blur-[2px]" />
-            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.12),rgba(221,197,180,0.04)_42%,rgba(95,74,57,0.06)_100%)] mix-blend-soft-light" />
-          </div>
-        )}
-        <SheetHeader className="relative z-10 mx-3 mt-3 rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(247,241,233,0.66))] px-4 py-3 shadow-[0_16px_34px_rgba(70,53,38,0.1),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.16)_inset] backdrop-blur-2xl sm:mx-4 sm:mt-4 sm:px-5 lg:mx-5 lg:px-6">
-          <div className="flex min-w-0 flex-col gap-3 pr-10 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.95),rgba(255,247,241,0.62)_42%,rgba(232,198,176,0.34)_100%)] text-[#b56e4f] shadow-[0_12px_22px_rgba(181,110,79,0.14),inset_0_1px_0_rgba(255,255,255,0.84)]">
-                <Disc3 className="size-3.5" />
-              </div>
-              <div className="flex min-w-0 flex-col gap-0.5 lg:flex-row lg:items-baseline lg:gap-3">
-                <SheetTitle className="shrink-0 text-[1.45rem] font-black tracking-[-0.03em] text-[#241b16]">
-                  Wall Art Studio
-                </SheetTitle>
-                <SheetDescription className="max-w-[32rem] text-[13px] leading-5 text-[#75695d] lg:truncate">
-                  Choose a template, edit the spiral lyrics, and tune the poster
-                  details.
-                </SheetDescription>
-              </div>
-            </div>
-
-            <Select value={selectedSongId} onValueChange={handleSongSelection}>
-              <SelectTrigger
-                aria-label="Choose song"
-                className="h-11 w-full shrink-0 rounded-full bg-white/74 px-4 text-left text-[15px] font-black text-[#2d251f] shadow-[0_14px_28px_rgba(70,53,38,0.1),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.18)_inset] backdrop-blur-xl lg:w-[330px]"
-                disabled={!hasSongs}
-              >
-                <SelectValue placeholder={hasSongs ? "Choose song" : "No songs yet"} />
-              </SelectTrigger>
-              <SelectContent
-                align="end"
-                className={cn(
-                  wallArtPopoverClassName,
-                  "w-[260px] lg:w-[330px] [&_[data-slot=select-item]]:rounded-[14px] [&_[data-slot=select-item]]:py-2.5 [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
-                )}
-              >
-                {selectableSongs.map((song) => (
-                  <SelectItem key={song.id} value={song.id}>
-                    <span className="block max-w-[220px] truncate">
-                      {song.title || "Untitled song"}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </SheetHeader>
+        <StudioBlurBackdrop imageUrl={activeImageUrl} />
+        <StudioHeader
+          closeLabel="Close wall art studio"
+          description="Choose a template, edit the spiral lyrics, and tune the poster details."
+          icon={Disc3}
+          title="Wall Art Studio"
+          action={
+              <Select value={selectedSongId} onValueChange={handleSongSelection}>
+                <SelectTrigger
+                  aria-label="Choose song"
+                  className="h-9 w-full shrink-0 rounded-full border-none bg-white/74 px-3 text-left text-[12px] font-black text-[#2d251f] shadow-[0_10px_21px_rgba(70,53,38,0.095),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.14)_inset] backdrop-blur-xl lg:w-[280px]"
+                  disabled={!hasSongs}
+                >
+                  <SelectValue placeholder={hasSongs ? "Choose song" : "No songs yet"} />
+                </SelectTrigger>
+                <SelectContent
+                  align="end"
+                  className={cn(
+                    wallArtPopoverClassName,
+                    "w-[240px] lg:w-[280px]",
+                    studioGlassStyles.selectContentItems,
+                  )}
+                >
+                  {selectableSongs.map((song) => (
+                    <SelectItem key={song.id} value={song.id}>
+                      <span className="block max-w-[200px] truncate lg:max-w-[232px]">
+                        {song.title || "Untitled song"}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+          }
+        />
 
         {hasSongs ? (
-        <div className="relative z-10 grid min-h-0 flex-1 overflow-hidden px-3 pb-3 pt-3 sm:px-4 sm:pb-4 lg:grid-cols-[185px_minmax(0,1fr)_310px] lg:gap-4 lg:px-5 lg:pb-5">
-          <aside className={cn(wallArtGlassPanelClassName, "flex min-h-0 flex-col p-2.5 lg:p-3")}>
-            <div className="flex shrink-0 items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#74685d]">
-              <span className="flex size-7 items-center justify-center rounded-full bg-white/72 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.76)]">
-                <ImageIcon className="size-3.5" />
+        <div className="relative z-10 grid min-h-0 flex-1 overflow-hidden px-2 pb-2 pt-2 sm:px-2.5 sm:pb-2.5 lg:grid-cols-[148px_minmax(0,1fr)_280px] lg:gap-2.5 lg:px-3 lg:pb-3">
+          <aside className={cn(wallArtGlassPanelClassName, "relative z-30 flex min-h-0 flex-col p-1.5")}>
+            <div className="flex shrink-0 items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#74685d]">
+              <span className="flex size-6 items-center justify-center rounded-full bg-white/72 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.76)]">
+                <ImageIcon className="size-3" />
               </span>
               Templates
             </div>
-            <div className="mt-2.5 min-h-0 flex-1 space-y-2.5 overflow-y-auto pr-1">
-              <div
-                className="group relative"
-                onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
-                onMouseLeave={schedulePresetPanelClose}
-              >
-                <button
-                  className={getWallArtTemplateCardClassName(
-                    activeTemplate === "imageLyrics",
-                  )}
-                  type="button"
-                  onClick={() => switchTemplate("imageLyrics")}
+            <ScrollArea
+              className={cn(
+                wallArtScrollAreaClassName,
+                wallArtScrollAreaViewportClassName,
+                "relative z-[90] mt-2 flex-1 overflow-hidden",
+              )}
+            >
+              <div className="space-y-1.5 pr-2">
+                <div
+                  className="group relative overflow-x-visible"
+                  onMouseEnter={(event) =>
+                    openTemplatePresetPanel("imageLyrics", event)
+                  }
+                  onMouseLeave={schedulePresetPanelClose}
                 >
-                  <div className={wallArtTemplateThumbClassName}>
-                    <img
-                      alt={
-                        lyricPortraitPresetImages[imageLyricPresetIndex]
-                          ?.name ?? "Image lyric portrait"
-                      }
-                      className="size-full object-cover"
-                      src={
-                        lyricPortraitPresetImages[imageLyricPresetIndex]?.src ??
-                        lyricPortraitPresetImages[0].src
-                      }
-                    />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
-                    <p className="text-[12px] font-black text-[#271d17]">Lyric Portrait</p>
-                    {activeTemplate === "imageLyrics" && (
-                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
+                  <button
+                    className={getWallArtTemplateCardClassName(
+                      activeTemplate === "imageLyrics",
                     )}
-                  </div>
-                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
-                    Hover to switch portrait presets.
-                  </p>
-                </button>
+                    type="button"
+                    onClick={() => switchTemplate("imageLyrics")}
+                  >
+                    <div className={wallArtTemplateThumbClassName}>
+                      <img
+                        alt={
+                          lyricPortraitPresetImages[imageLyricPresetIndex]
+                            ?.name ?? "Image lyric portrait"
+                        }
+                        className="size-full object-cover"
+                        src={
+                          lyricPortraitPresetImages[imageLyricPresetIndex]?.src ??
+                          lyricPortraitPresetImages[0].src
+                        }
+                      />
+                    </div>
+                    {activeTemplate === "imageLyrics" ? (
+                      <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-[#e59622] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-[0_8px_14px_rgba(149,94,16,0.24)]">
+                        Selected
+                      </span>
+                    ) : null}
+                  </button>
+                </div>
 
                 <div
-                  className={cn(
-                    presetHoverBridgeClassName,
-                    openPresetPanel === "imageLyrics"
-                      ? "pointer-events-auto"
-                      : "pointer-events-none",
-                  )}
-                  onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
-                  onMouseLeave={schedulePresetPanelClose}
-                />
+                  className="group relative"
+                  onMouseEnter={closePresetPanelImmediately}
+                >
+                  <button
+                    className={getWallArtTemplateCardClassName(
+                      activeTemplate === "heart",
+                    )}
+                    type="button"
+                    onClick={() => switchTemplate("heart")}
+                  >
+                    <div className={wallArtTemplateThumbClassName}>
+                      <img
+                        alt="Heart lyric"
+                        className="size-full object-cover"
+                        src={heartTemplatePreview}
+                      />
+                    </div>
+                    {activeTemplate === "heart" ? (
+                      <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-[#e59622] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-[0_8px_14px_rgba(149,94,16,0.24)]">
+                        Selected
+                      </span>
+                    ) : null}
+                  </button>
+                </div>
+
                 <div
-                  className={cn(
-                    wallArtTemplatePopoverClassName,
-                    openPresetPanel === "imageLyrics"
-                      ? "visible opacity-100"
-                      : "invisible opacity-0",
-                  )}
-                  onMouseEnter={() => keepPresetPanelOpen("imageLyrics")}
+                  className="group relative"
+                  onMouseEnter={(event) =>
+                    openTemplatePresetPanel("template2", event)
+                  }
                   onMouseLeave={schedulePresetPanelClose}
                 >
-                  <div className="grid grid-cols-2 gap-2">
-                    {lyricPortraitPresetImages.map((preset, index) => (
-                      <button
-                        key={preset.src}
-                        className={getWallArtTemplatePresetCardClassName(
-                          activeTemplate === "imageLyrics" &&
-                            imageLyricPresetIndex === index,
-                        )}
-                        type="button"
-                        onClick={() => {
-                          switchTemplate("imageLyrics");
-                          applyImageLyricPreset(index);
-                        }}
-                      >
-                        <img
-                          alt={preset.name}
-                          className="aspect-[4/5] w-full object-cover"
-                          src={preset.src}
-                        />
-                        <span className="block bg-white/72 px-2 py-1.5 text-[10px] font-bold text-[#342a23]">
-                          {preset.name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
+                  <button
+                    className={getWallArtTemplateCardClassName(
+                      activeTemplate === "template2",
+                    )}
+                    type="button"
+                    onClick={() => switchTemplate("template2")}
+                  >
+                    <div className={wallArtTemplateThumbClassName}>
+                      <img
+                        alt={
+                          template2PresetImages[template2PresetIndex]?.name ??
+                          "Record poster"
+                        }
+                        className="size-full object-cover"
+                        src={
+                          template2PresetImages[template2PresetIndex]?.src ??
+                          template2PresetImages[0].src
+                        }
+                      />
+                    </div>
+                    {activeTemplate === "template2" ? (
+                      <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-[#e59622] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-[0_8px_14px_rgba(149,94,16,0.24)]">
+                        Selected
+                      </span>
+                    ) : null}
+                  </button>
+                </div>
+
+                <div
+                  className="group relative"
+                  onMouseEnter={(event) =>
+                    openTemplatePresetPanel("spiral", event)
+                  }
+                  onMouseLeave={schedulePresetPanelClose}
+                >
+                  <button
+                    className={getWallArtTemplateCardClassName(
+                      activeTemplate === "spiral",
+                    )}
+                    type="button"
+                    onClick={() => switchTemplate("spiral")}
+                  >
+                    <div className={wallArtTemplateThumbClassName}>
+                      <img
+                        alt={
+                          presetImages[activePresetIndex]?.name ?? "Spiral record"
+                        }
+                        className="size-full object-cover"
+                        src={
+                          presetImages[activePresetIndex]?.src ??
+                          presetImages[0].src
+                        }
+                      />
+                    </div>
+                    {activeTemplate === "spiral" ? (
+                      <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-[#e59622] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-[0_8px_14px_rgba(149,94,16,0.24)]">
+                        Selected
+                      </span>
+                    ) : null}
+                  </button>
                 </div>
               </div>
-
-              <div className="group relative">
-                <button
-                  className={getWallArtTemplateCardClassName(
-                    activeTemplate === "heart",
-                  )}
-                  type="button"
-                  onClick={() => switchTemplate("heart")}
-                >
-                  <div className={wallArtTemplateThumbClassName}>
-                    <img
-                      alt="Heart lyric"
-                      className="size-full object-cover"
-                      src={heartTemplatePreview}
-                    />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
-                    <p className="text-[12px] font-black text-[#271d17]">Heart Lyric</p>
-                    {activeTemplate === "heart" && (
-                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
-                    )}
-                  </div>
-                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
-                    Heart-shaped lyric template.
-                  </p>
-                </button>
-              </div>
-
-              <div className="group relative">
-                <button
-                  className={getWallArtTemplateCardClassName(
-                    activeTemplate === "template2",
-                  )}
-                  type="button"
-                  onClick={() => switchTemplate("template2")}
-                >
-                  <div className={wallArtTemplateThumbClassName}>
-                    <img
-                      alt={
-                        template2PresetImages[template2PresetIndex]?.name ??
-                        "Record poster"
-                      }
-                      className="size-full object-cover"
-                      src={
-                        template2PresetImages[template2PresetIndex]?.src ??
-                        template2PresetImages[0].src
-                      }
-                    />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
-                    <p className="text-[12px] font-black text-[#271d17]">Record Poster</p>
-                    {activeTemplate === "template2" && (
-                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
-                    )}
-                  </div>
-                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
-                    Hover to switch color presets.
-                  </p>
-                </button>
-
-                <div
-                  className={cn(
-                    presetHoverBridgeClassName,
-                    openPresetPanel === "template2"
-                      ? "pointer-events-auto"
-                      : "pointer-events-none",
-                  )}
-                  onMouseEnter={() => keepPresetPanelOpen("template2")}
-                  onMouseLeave={schedulePresetPanelClose}
-                />
-                <div
-                  className={cn(
-                    wallArtTemplatePopoverClassName,
-                    openPresetPanel === "template2"
-                      ? "visible opacity-100"
-                      : "invisible opacity-0",
-                  )}
-                  onMouseEnter={() => keepPresetPanelOpen("template2")}
-                  onMouseLeave={schedulePresetPanelClose}
-                >
-                  <div className="grid grid-cols-3 gap-2">
-                    {template2PresetImages.map((preset, index) => (
-                      <button
-                        key={preset.src}
-                        className={getWallArtTemplatePresetCardClassName(
-                          activeTemplate === "template2" &&
-                            template2PresetIndex === index,
-                        )}
-                        type="button"
-                        onClick={() => {
-                          switchTemplate("template2");
-                          applyTemplate2Preset(index);
-                        }}
-                      >
-                        <img
-                          alt={preset.name}
-                          className="aspect-[4/5] w-full object-cover"
-                          src={preset.src}
-                        />
-                        <span className="block bg-white/72 px-2 py-1.5 text-[10px] font-bold text-[#342a23]">
-                          {preset.name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="group relative"
-                onMouseEnter={() => keepPresetPanelOpen("spiral")}
-                onMouseLeave={schedulePresetPanelClose}
-              >
-                <button
-                  className={getWallArtTemplateCardClassName(
-                    activeTemplate === "spiral",
-                  )}
-                  type="button"
-                  onClick={() => switchTemplate("spiral")}
-                >
-                  <div className={wallArtTemplateThumbClassName}>
-                    <img
-                      alt={
-                        presetImages[activePresetIndex]?.name ?? "Spiral record"
-                      }
-                      className="size-full object-cover"
-                      src={
-                        presetImages[activePresetIndex]?.src ??
-                        presetImages[0].src
-                      }
-                    />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between gap-2 px-1">
-                    <p className="text-[12px] font-black text-[#271d17]">Spiral Record</p>
-                    {activeTemplate === "spiral" && (
-                      <Badge className={wallArtTemplateActiveBadgeClassName}>Active</Badge>
-                    )}
-                  </div>
-                  <p className="mt-1 px-1 text-[10px] leading-4.5 text-[#7c6f64]">
-                    Hover to switch color presets.
-                  </p>
-                </button>
-
-                <div
-                  className={cn(
-                    presetHoverBridgeClassName,
-                    openPresetPanel === "spiral"
-                      ? "pointer-events-auto"
-                      : "pointer-events-none",
-                  )}
-                  onMouseEnter={() => keepPresetPanelOpen("spiral")}
-                  onMouseLeave={schedulePresetPanelClose}
-                />
-                <div
-                  className={cn(
-                    wallArtTemplatePopoverClassName,
-                    openPresetPanel === "spiral"
-                      ? "visible opacity-100"
-                      : "invisible opacity-0",
-                  )}
-                  onMouseEnter={() => keepPresetPanelOpen("spiral")}
-                  onMouseLeave={schedulePresetPanelClose}
-                >
-                  <div className="grid grid-cols-3 gap-2">
-                    {presetImages.map((preset, index) => (
-                      <button
-                        key={preset.src}
-                        className={getWallArtTemplatePresetCardClassName(
-                          activeTemplate === "spiral" &&
-                            activePresetIndex === index,
-                        )}
-                        type="button"
-                        onClick={() => {
-                          switchTemplate("spiral");
-                          applyPreset(index);
-                        }}
-                      >
-                        <img
-                          alt={preset.name}
-                          className="aspect-[4/5] w-full object-cover"
-                          src={preset.src}
-                        />
-                        <span className="block bg-white/72 px-2 py-1.5 text-[10px] font-bold text-[#342a23]">
-                          {preset.name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            </ScrollArea>
           </aside>
 
-          <section className="min-h-0 overflow-hidden py-0.5">
-            <div className={cn(wallArtGlassPanelClassName, "relative flex h-full min-h-0 flex-col items-center justify-center px-4 py-4 md:px-5")}>
+          <section className="relative z-0 min-h-0 overflow-visible py-0.5">
+            <div className={cn(wallArtGlassPanelClassName, "relative z-0 flex h-full min-h-0 flex-col items-center justify-center px-2.5 py-2.5 md:px-3")}>
               <Button
                 className={wallArtFloatingActionClassName}
                 type="button"
@@ -2652,26 +2711,50 @@ export function WallArtEditorDrawer({
                         stdDeviation="6"
                       />
                     </filter>
+                    <linearGradient
+                      id={`${spiralId}-wood-base`}
+                      x1="0"
+                      x2="1"
+                      y1="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="#8a6547" />
+                      <stop offset="36%" stopColor={frameColor} />
+                      <stop offset="62%" stopColor="#5f3f29" />
+                      <stop offset="100%" stopColor="#967154" />
+                    </linearGradient>
                     <pattern
-                      height="90"
+                      height="160"
                       id={`${spiralId}-wood`}
                       patternUnits="userSpaceOnUse"
-                      width="140"
+                      width="220"
                     >
-                      <rect fill={frameColor} height="90" width="140" />
-                      <path
-                        d="M0 22 C32 5 68 42 140 18 M0 50 C42 73 88 30 140 58 M0 76 C38 54 76 84 140 72"
-                        fill="none"
-                        opacity="0.22"
-                        stroke="#f6e2bc"
-                        strokeWidth="5"
+                      <rect
+                        fill={`url(#${spiralId}-wood-base)`}
+                        height="160"
+                        width="220"
                       />
                       <path
-                        d="M0 36 C46 18 92 57 140 35 M0 64 C44 44 88 83 140 61"
+                        d="M-10 28 C42 18 91 35 126 24 C158 14 181 22 230 15 M-12 76 C34 91 74 68 120 78 C158 88 190 74 232 88 M-10 124 C45 112 92 134 132 118 C166 105 188 117 232 108"
                         fill="none"
-                        opacity="0.18"
-                        stroke="#1f130d"
-                        strokeWidth="3"
+                        opacity="0.14"
+                        stroke="#e7c99f"
+                        strokeLinecap="round"
+                        strokeWidth="2.2"
+                      />
+                      <path
+                        d="M-8 47 C44 55 92 39 132 50 C168 60 190 51 230 58 M-8 104 C31 95 72 109 112 101 C151 93 184 103 230 96"
+                        fill="none"
+                        opacity="0.12"
+                        stroke="#2f1d13"
+                        strokeLinecap="round"
+                        strokeWidth="1.8"
+                      />
+                      <path
+                        d="M12 0 V160 M76 0 V160 M154 0 V160"
+                        opacity="0.08"
+                        stroke="#fff0d4"
+                        strokeWidth="1"
                       />
                     </pattern>
                     {centerImage && (
@@ -3198,7 +3281,6 @@ export function WallArtEditorDrawer({
                         fill={`url(#${spiralId}-wood)`}
                         fillRule="evenodd"
                         filter={`url(#${spiralId}-frame-shadow)`}
-                        onClick={() => setActiveTarget("frame")}
                       />
                       <rect
                         data-preview-frame="true"
@@ -3207,8 +3289,8 @@ export function WallArtEditorDrawer({
                         height={posterViewBoxHeight - frameWidth * 2}
                         pointerEvents="none"
                         stroke="#000000"
-                        strokeOpacity="0.22"
-                        strokeWidth="10"
+                        strokeOpacity="0.2"
+                        strokeWidth={Math.max(4, Math.round(frameWidth * 0.28))}
                         width={BASE_POSTER_WIDTH - frameWidth * 2}
                         x={frameWidth}
                         y={frameWidth}
@@ -3219,8 +3301,8 @@ export function WallArtEditorDrawer({
                         height={posterViewBoxHeight - frameWidth * 2}
                         pointerEvents="none"
                         stroke="#000000"
-                        strokeOpacity="0.12"
-                        strokeWidth={Math.max(8, Math.round(frameWidth * 0.38))}
+                        strokeOpacity="0.1"
+                        strokeWidth={Math.max(3, Math.round(frameWidth * 0.2))}
                         width={BASE_POSTER_WIDTH - frameWidth * 2}
                         x={frameWidth}
                         y={frameWidth}
@@ -3230,9 +3312,9 @@ export function WallArtEditorDrawer({
                         fill="none"
                         height={posterViewBoxHeight - frameWidth}
                         pointerEvents="none"
-                        stroke="#f8dfb2"
-                        strokeOpacity="0.28"
-                        strokeWidth={Math.max(3, Math.round(frameWidth * 0.16))}
+                        stroke="#f6dfbb"
+                        strokeOpacity="0.22"
+                        strokeWidth={Math.max(2, Math.round(frameWidth * 0.1))}
                         width={BASE_POSTER_WIDTH - frameWidth}
                         x={frameWidth / 2}
                         y={frameWidth / 2}
@@ -3243,11 +3325,11 @@ export function WallArtEditorDrawer({
                         height={posterViewBoxHeight - frameWidth * 2}
                         pointerEvents="none"
                         stroke="#ffffff"
-                        strokeOpacity="0.16"
-                        strokeWidth="5"
+                        strokeOpacity="0.12"
+                        strokeWidth={Math.max(2, Math.round(frameWidth * 0.12))}
                         width={BASE_POSTER_WIDTH - frameWidth * 2}
-                        x={frameWidth + 3}
-                        y={frameWidth + 3}
+                        x={frameWidth + 1.5}
+                        y={frameWidth + 1.5}
                       />
                     </>
                   )}
@@ -3256,62 +3338,73 @@ export function WallArtEditorDrawer({
             </div>
           </section>
 
-          <aside className={cn(wallArtGlassPanelClassName, "min-h-0 overflow-auto p-3 lg:p-4")}>
-            <div className="flex items-center gap-2.5">
-              <span className="flex size-8 items-center justify-center rounded-full bg-white/76 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.78)]">
-                <SlidersHorizontal className="size-4" />
-              </span>
-              <h3 className="text-[0.95rem] font-black tracking-[-0.02em] text-[#241b16]">Edit</h3>
-              <Badge className="ml-auto rounded-full border-none bg-white/74 px-2.5 py-0.5 text-[10px] font-bold text-[#635649] shadow-[inset_0_1px_0_rgba(255,255,255,0.74)]" variant="secondary">
-                {activeTarget}
-              </Badge>
-            </div>
+          <ScrollArea
+            className={cn(
+              wallArtGlassPanelClassName,
+              wallArtScrollAreaClassName,
+              wallArtScrollAreaViewportClassName,
+              "min-h-0 overflow-hidden p-2 lg:p-2.5",
+            )}
+          >
+            <div className="pr-2">
+              <div className="flex items-center gap-1.5">
+                <span className="flex size-[26px] items-center justify-center rounded-full bg-white/72 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.78)]">
+                  <SlidersHorizontal className="size-3" />
+                </span>
+                <div>
+                  <h3 className="text-[0.76rem] font-black tracking-[-0.02em] text-[#241b16]">Edit</h3>
+                  <p className="text-[9.5px] font-medium leading-3.5 text-[#8a7c70]">Tune active artwork layer</p>
+                </div>
+                <Badge className="ml-auto rounded-full border-none bg-white/68 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-[0.1em] text-[#635649] shadow-[inset_0_1px_0_rgba(255,255,255,0.74)]" variant="secondary">
+                  {activeTarget}
+                </Badge>
+              </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {(activeTemplate === "heart"
-                ? heartEditTargets
-                : activeTemplate === "imageLyrics"
-                  ? imageLyricEditTargets
-                : editTargets
-              ).map(([key, label]) => (
-                <Button
-                  key={key}
-                  className={
-                    activeTarget === key
-                      ? cn(wallArtPillButtonActiveClassName, "h-9 text-[13px] font-bold")
-                      : cn(wallArtPillButtonClassName, "h-9 text-[13px] font-bold")
-                  }
-                  size="sm"
-                  type="button"
-                  variant={activeTarget === key ? "default" : "outline"}
-                  onClick={() => setActiveTarget(key as ActiveTarget)}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-            <Button
-              className={
-                activeTarget === "customText"
-                  ? cn(wallArtPillButtonActiveClassName, "mt-2.5 h-10 w-full text-[13px] font-bold")
-                  : cn(wallArtPillButtonClassName, "mt-2.5 h-10 w-full text-[13px] font-bold")
-              }
-              type="button"
-              variant={activeTarget === "customText" ? "default" : "outline"}
-              onClick={addCustomText}
-            >
-              <Plus className="size-4" />
-              Add text
-            </Button>
+              <div className="mt-2.5 grid grid-cols-3 gap-1">
+                {(activeTemplate === "heart"
+                  ? heartEditTargets
+                  : activeTemplate === "imageLyrics"
+                    ? imageLyricEditTargets
+                    : editTargets
+                ).map(([key, label]) => (
+                  <Button
+                    key={key}
+                    className={
+                      activeTarget === key
+                        ? cn(wallArtPillButtonActiveClassName, "h-[30px] px-1.5 text-[10.5px]")
+                        : cn(wallArtPillButtonClassName, "h-[30px] px-1.5 text-[10.5px]")
+                    }
+                    size="sm"
+                    type="button"
+                    variant={activeTarget === key ? "default" : "ghost"}
+                    onClick={() => setActiveTarget(key as ActiveTarget)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                className={
+                  activeTarget === "customText"
+                    ? cn(wallArtPillButtonActiveClassName, "mt-2 h-[32px] w-full text-[10.5px]")
+                    : cn(wallArtPillButtonClassName, "mt-2 h-[32px] w-full text-[10.5px]")
+                }
+                type="button"
+                variant={activeTarget === "customText" ? "default" : "ghost"}
+                onClick={addCustomText}
+              >
+                <Plus className="size-3.5" />
+                Add text
+              </Button>
 
-            <Separator className="my-5 bg-white/45" />
+              <Separator className="my-3 bg-white/30" />
 
-            {activeTarget === "image" ? (
+              {activeTarget === "image" ? (
               <div className={wallArtEditorSectionClassName}>
                 <div className={cn(wallArtInfoCardClassName, "space-y-2.5")}>
                   <div>
-                    <Label className="text-[13px] font-bold text-[#241b16]">Source image</Label>
-                    <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
+                    <Label className={wallArtControlTitleClassName}>Source image</Label>
+                    <p className={wallArtControlDescriptionClassName}>
                       Upload and crop an image. The final portrait keeps the
                       original color only where lyric text is drawn.
                     </p>
@@ -3327,8 +3420,8 @@ export function WallArtEditorDrawer({
                   />
                   <label
                     className={cn(
-                      "group flex aspect-[4/3] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[18px] border border-white/40 bg-white/66 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_10px_20px_rgba(70,53,38,0.06)]",
-                      "hover:bg-white/82 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_14px_28px_rgba(70,53,38,0.1)]",
+                      "group flex aspect-[4/3] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[8px] border-none bg-white/66 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_8px_17px_rgba(70,53,38,0.055),0_0_0_1px_rgba(255,255,255,0.1)_inset]",
+                      "hover:bg-white/82 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_12px_24px_rgba(70,53,38,0.095)]",
                       "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[#c9bbac]/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent",
                     )}
                     htmlFor={imageLyricUploadInputId}
@@ -3346,7 +3439,7 @@ export function WallArtEditorDrawer({
                           src={imageLyricSourceImage}
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition duration-200 group-hover:bg-black/28">
-                          <span className="inline-flex translate-y-1 items-center gap-1.5 rounded-full bg-white/92 px-3 py-1.5 text-[11px] font-bold text-[#2d251f] opacity-0 shadow-[0_12px_22px_rgba(27,21,17,0.18)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+                          <span className="inline-flex translate-y-1 items-center gap-1.5 rounded-full bg-white/92 px-2.5 py-1 text-[10.5px] font-bold text-[#2d251f] opacity-0 shadow-[0_10px_20px_rgba(27,21,17,0.17)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
                             <ImagePlus className="size-4" />
                             Replace image
                           </span>
@@ -3354,13 +3447,13 @@ export function WallArtEditorDrawer({
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-1.5 px-4 text-center">
-                        <span className="flex size-10 items-center justify-center rounded-full bg-white/82 text-[#8a7a6c] transition-colors duration-200 group-hover:bg-white group-hover:text-[#b56e4f]">
-                          <ImagePlus className="size-4.5" />
+                        <span className="flex size-9 items-center justify-center rounded-full bg-white/82 text-[#8a7a6c] transition-colors duration-200 group-hover:bg-white group-hover:text-[#b56e4f]">
+                          <ImagePlus className="size-4" />
                         </span>
-                        <span className="text-[13px] font-bold text-[#241b16]">
+                        <span className="text-[11.5px] font-black text-[#241b16]">
                           Upload source image
                         </span>
-                        <span className="text-[11px] leading-4.5 text-[#76695d]">
+                        <span className="text-[10px] leading-3.5 text-[#76695d]">
                           Click to choose an image for the lyric portrait.
                         </span>
                       </div>
@@ -3383,7 +3476,7 @@ export function WallArtEditorDrawer({
                     <SelectContent
                       className={cn(
                         wallArtPopoverClassName,
-                        "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+                        "[&_[data-slot=select-item]]:rounded-[8px] [&_[data-slot=select-item]]:py-1.5 [&_[data-slot=select-item]]:text-[11.5px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
                       )}
                     >
                       <SelectItem value="color">Color from image</SelectItem>
@@ -3419,8 +3512,8 @@ export function WallArtEditorDrawer({
                 />
                 <div className={cn(wallArtInfoCardClassName, "flex items-center justify-between gap-3")}>
                   <div>
-                    <Label className="text-[13px] font-bold text-[#241b16]">Invert source</Label>
-                    <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
+                    <Label className={wallArtControlTitleClassName}>Invert source</Label>
+                    <p className={wallArtControlDescriptionClassName}>
                       Reverse the source image before applying the lyric mask.
                     </p>
                   </div>
@@ -3450,21 +3543,6 @@ export function WallArtEditorDrawer({
                   onChange={setHeartSize}
                 />
               </div>
-            ) : activeTarget === "frame" ? (
-              <div className={wallArtEditorSectionClassName}>
-                <ColorInput
-                  label="Frame color"
-                  value={frameColor}
-                  onChange={setFrameColor}
-                />
-                <ControlRow
-                  label="Frame width"
-                  max={80}
-                  min={12}
-                  value={frameWidth}
-                  onChange={setFrameWidth}
-                />
-              </div>
             ) : activeTarget === "print" ? (
               <div className={wallArtEditorSectionClassName}>
                 <div className="space-y-2">
@@ -3478,7 +3556,7 @@ export function WallArtEditorDrawer({
                     <SelectContent
                       className={cn(
                         wallArtPopoverClassName,
-                        "[&_[data-slot=select-item]]:rounded-[16px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
+                        "[&_[data-slot=select-item]]:rounded-[8px] [&_[data-slot=select-item]]:py-1.5 [&_[data-slot=select-item]]:text-[11.5px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
                       )}
                     >
                       {printSizePresets.map((size) => (
@@ -3491,9 +3569,9 @@ export function WallArtEditorDrawer({
                   </Select>
                 </div>
                 {printSizeId === "custom" && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Width cm</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1.5">
+                      <Label className={wallArtSectionHeadingClassName}>Width cm</Label>
                       <Input
                         className={wallArtFieldClassName}
                         min={5}
@@ -3505,8 +3583,8 @@ export function WallArtEditorDrawer({
                         }
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Height cm</Label>
+                    <div className="space-y-1.5">
+                      <Label className={wallArtSectionHeadingClassName}>Height cm</Label>
                       <Input
                         className={wallArtFieldClassName}
                         min={5}
@@ -3520,18 +3598,18 @@ export function WallArtEditorDrawer({
                     </div>
                   </div>
                 )}
-                <div className={cn(wallArtInfoCardClassName, "text-[11px] leading-4.5 text-[#76695d]")}>
+                <div className={cn(wallArtInfoCardClassName, "text-[10px] leading-3.5 text-[#76695d]")}>
                   Download exports at 300dpi for the selected size.
                 </div>
-                <div className={cn(wallArtInfoCardClassName, "space-y-4")}>
-                  <div className="flex items-center justify-between gap-3">
+                <div className={cn(wallArtInfoCardClassName, "space-y-3")}>
+                  <div className="flex items-center justify-between gap-2.5">
                     <div className="flex min-w-0 items-center gap-2">
-                      <QrCodeIcon className="size-4 shrink-0 text-[#b56e4f]" />
+                      <QrCodeIcon className="size-3.5 shrink-0 text-[#b56e4f]" />
                       <div>
-                        <Label className="text-[13px] font-bold text-[#241b16]">
+                        <Label className={wallArtControlTitleClassName}>
                           Show QR code
                         </Label>
-                        <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
+                        <p className={wallArtControlDescriptionClassName}>
                           Print the playable share QR on the artwork.
                         </p>
                       </div>
@@ -3544,7 +3622,7 @@ export function WallArtEditorDrawer({
                     />
                   </div>
                   {!activeShareUrl && (
-                    <p className="text-[11px] leading-4.5 text-[#87786d]">
+                    <p className="text-[10px] leading-3.5 text-[#87786d]">
                       This song does not have a share link yet.
                     </p>
                   )}
@@ -3573,13 +3651,13 @@ export function WallArtEditorDrawer({
                     onChange={setQrCodeOffsetY}
                   />
                 </div>
-                <div className={cn(wallArtInfoCardClassName, "space-y-4")}>
-                  <div className="flex items-center justify-between gap-3">
+                <div className={cn(wallArtInfoCardClassName, "space-y-3")}>
+                  <div className="flex items-center justify-between gap-2.5">
                     <div>
-                      <Label className="text-[13px] font-bold text-[#241b16]">
+                      <Label className={wallArtControlTitleClassName}>
                         Artwork position
                       </Label>
-                      <p className="mt-1 text-[11px] leading-4.5 text-[#76695d]">
+                      <p className={wallArtControlDescriptionClassName}>
                         Crop-like fit controls for the selected print size.
                       </p>
                     </div>
@@ -3587,7 +3665,7 @@ export function WallArtEditorDrawer({
                       className={cn(wallArtMicroButtonClassName, "shrink-0")}
                       size="sm"
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       onClick={resetPrintContentPosition}
                     >
                       Reset
@@ -3642,13 +3720,13 @@ export function WallArtEditorDrawer({
                   }
                 />
                 {activeTemplate !== "heart" && (
-                  <div className={cn(wallArtInfoCardClassName, "space-y-3")}>
-                    <div className="flex items-center justify-between gap-3">
+                  <div className={cn(wallArtInfoCardClassName, "space-y-2.5")}>
+                    <div className="flex items-center justify-between gap-2.5">
                       <div>
-                        <Label className="text-[13px] font-bold text-[#241b16]">
+                        <Label className={wallArtControlTitleClassName}>
                           Disc artwork
                         </Label>
-                        <p className="mt-1 text-[11px] text-[#76695d]">
+                        <p className={wallArtControlDescriptionClassName}>
                           Use cover art or upload an image for the disc.
                         </p>
                       </div>
@@ -3657,11 +3735,11 @@ export function WallArtEditorDrawer({
                           useCover
                             ? wallArtPillButtonActiveClassName
                             : wallArtMicroButtonClassName,
-                          "size-9",
+                          "size-8",
                         )}
                         size="sm"
                         type="button"
-                        variant={useCover ? "default" : "outline"}
+                        variant={useCover ? "default" : "ghost"}
                         onClick={() => setUseCover((current) => !current)}
                       >
                         <ImagePlus className="size-4" />
@@ -3669,20 +3747,62 @@ export function WallArtEditorDrawer({
                     </div>
                     <Input
                       accept="image/*"
-                      className={wallArtFieldClassName}
+                      className="peer sr-only"
+                      id={discArtworkUploadInputId}
                       type="file"
                       onChange={(event) =>
                         handleImageUpload(event.target.files?.[0])
                       }
                     />
+                    <label
+                      className={cn(
+                        "group flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-[8px] border-none bg-white/66 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_8px_17px_rgba(70,53,38,0.055),0_0_0_1px_rgba(255,255,255,0.1)_inset]",
+                        "hover:bg-white/82 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_12px_24px_rgba(70,53,38,0.095)]",
+                        "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[#c9bbac]/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent",
+                      )}
+                      htmlFor={discArtworkUploadInputId}
+                      title={
+                        uploadedImage
+                          ? "Click to replace disc artwork"
+                          : "Click to upload disc artwork"
+                      }
+                    >
+                      {uploadedImage ? (
+                        <div className="relative size-full">
+                          <img
+                            alt="Disc artwork source"
+                            className="size-full object-cover transition duration-200 group-hover:scale-[1.025]"
+                            src={uploadedImage}
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition duration-200 group-hover:bg-black/28">
+                            <span className="inline-flex translate-y-1 items-center gap-1.5 rounded-full bg-white/92 px-2.5 py-1 text-[10.5px] font-bold text-[#2d251f] opacity-0 shadow-[0_10px_20px_rgba(27,21,17,0.17)] transition duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+                              <ImagePlus className="size-4" />
+                              Replace artwork
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-1.5 px-4 text-center">
+                          <span className="flex size-9 items-center justify-center rounded-full bg-white/82 text-[#8a7a6c] transition-colors duration-200 group-hover:bg-white group-hover:text-[#b56e4f]">
+                            <ImagePlus className="size-4" />
+                          </span>
+                          <span className="text-[11.5px] font-black text-[#241b16]">
+                            Upload disc artwork
+                          </span>
+                          <span className="text-[10px] leading-3.5 text-[#76695d]">
+                            Click to crop a circular record image.
+                          </span>
+                        </div>
+                      )}
+                    </label>
                   </div>
                 )}
               </div>
             ) : activeTarget === "customText" ? (
               <div className={wallArtEditorSectionClassName}>
                 <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 text-sm font-black text-[#241b16]">
-                    <Type className="size-4 text-[#b56e4f]" />
+                  <div className="flex items-center gap-2 text-[12px] font-black text-[#241b16]">
+                    <Type className="size-3.5 text-[#b56e4f]" />
                     Text layer
                   </div>
                   {activeCustomText && (
@@ -3690,7 +3810,7 @@ export function WallArtEditorDrawer({
                       className={wallArtMicroButtonClassName}
                       size="sm"
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       onClick={removeActiveCustomText}
                     >
                       <Trash2 className="size-4" />
@@ -3699,8 +3819,8 @@ export function WallArtEditorDrawer({
                 </div>
                 {activeCustomText ? (
                   <>
-                    <div className="space-y-2">
-                      <Label>Text</Label>
+                    <div className="space-y-1.5">
+                      <Label className={wallArtSectionHeadingClassName}>Text</Label>
                       <Input
                         className={wallArtFieldClassName}
                         value={activeCustomText.text}
@@ -3780,26 +3900,29 @@ export function WallArtEditorDrawer({
                   </>
                 ) : (
                   <Button
-                    className={cn(wallArtPillButtonClassName, "h-10 w-full text-[13px] font-bold")}
+                    className={cn(wallArtPillButtonClassName, "h-[32px] w-full text-[10.5px]")}
                     type="button"
                     onClick={addCustomText}
                   >
-                    <Plus className="size-4" />
+                    <Plus className="size-3.5" />
                     Add text
                   </Button>
                 )}
               </div>
             ) : (
               <div className={wallArtEditorSectionClassName}>
-                <div className="flex items-center gap-2 text-[13px] font-black text-[#241b16]">
-                  <Type className="size-4 text-[#b56e4f]" />
+                <div className="flex items-center gap-2 text-[12px] font-black text-[#241b16]">
+                  <Type className="size-3.5 text-[#b56e4f]" />
                   Text layer
                 </div>
                 {activeTextTarget === "lyrics" ? (
-                  <div className="space-y-2">
-                    <Label>Lyrics</Label>
+                  <div className="space-y-1.5">
+                    <Label className={wallArtSectionHeadingClassName}>Lyrics</Label>
                     <Textarea
-                      className={cn(wallArtTextareaClassName, "h-48 min-h-24 resize-none")}
+                      className={cn(
+                        wallArtTextareaClassName,
+                        "h-36 min-h-24 resize-none text-[10.5px] leading-4",
+                      )}
                       value={lyricText}
                       onChange={(event) =>
                         setLyricText(cleanWallArtLyrics(event.target.value))
@@ -3808,9 +3931,9 @@ export function WallArtEditorDrawer({
                   </div>
                 ) : activeTemplate === "template2" &&
                   activeTextTarget === "title" ? (
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      <Label>Song title line 1</Label>
+                  <div className="space-y-2.5">
+                    <div className="space-y-1.5">
+                      <Label className={wallArtSectionHeadingClassName}>Song title line 1</Label>
                       <Input
                         className={wallArtFieldClassName}
                         value={template2TitleLine1}
@@ -3822,8 +3945,8 @@ export function WallArtEditorDrawer({
                         }
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Song title line 2</Label>
+                    <div className="space-y-1.5">
+                      <Label className={wallArtSectionHeadingClassName}>Song title line 2</Label>
                       <Input
                         className={wallArtFieldClassName}
                         placeholder="Optional"
@@ -3838,8 +3961,8 @@ export function WallArtEditorDrawer({
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    <Label>
+                  <div className="space-y-1.5">
+                    <Label className={wallArtSectionHeadingClassName}>
                       {(activeTemplate === "template2" ||
                         activeTemplate === "imageLyrics") &&
                       activeTextTarget === "title"
@@ -3969,19 +4092,20 @@ export function WallArtEditorDrawer({
               </div>
             )}
 
-            <Separator className="my-6 bg-white/45" />
-            <div className={cn(wallArtInfoCardClassName, "space-y-2.5")}>
-              <div className="flex items-center gap-2 text-[13px] font-black text-[#241b16]">
-                <Palette className="size-4 text-[#b56e4f]" />
-                Quick note
+              <Separator className="my-3 bg-white/25" />
+              <div className={cn(wallArtInfoCardClassName, "space-y-1.5")}>
+                <div className="flex items-center gap-1.5 text-[10.5px] font-black text-[#3b3028]">
+                  <Palette className="size-3 text-[#b56e4f]" />
+                  Quick note
+                </div>
+                <p className="text-[10px] leading-3.5 text-[#7d7065]">
+                  Click any text on the poster to switch the right panel to that
+                  layer. The current version focuses on the spiral lyric template
+                  from the reference.
+                </p>
               </div>
-              <p className="text-[11px] leading-4.5 text-[#76695d]">
-                Click any text on the poster to switch the right panel to that
-                layer. The current version focuses on the spiral lyric template
-                from the reference.
-              </p>
             </div>
-          </aside>
+          </ScrollArea>
         </div>
         ) : (
           <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center px-6 py-10">

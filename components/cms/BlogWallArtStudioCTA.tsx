@@ -6,7 +6,7 @@ import {
   WallArtEditorDrawer,
   type WallArtSongOption,
 } from "@/components/song/WallArtEditorDrawer";
-import { ArrowRight, Disc3, Frame } from "lucide-react";
+import { Disc3, Frame } from "lucide-react";
 import { useState } from "react";
 
 type BlogWallArtStudioCTAProps = {
@@ -20,15 +20,12 @@ export function BlogWallArtStudioCTA({
 }: BlogWallArtStudioCTAProps) {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
-  const triggerClassName =
-    "group inline-flex items-center gap-2 rounded-full border border-[#f08d63]/35 bg-[#f26f4d] px-5 py-3 text-sm font-bold text-white shadow-[0_18px_40px_rgba(242,111,77,0.30)] transition hover:bg-[#e76241] sm:px-6 sm:text-base";
-
-  const triggerContent = (
-    <>
-      Open Wall Art Studio
-      <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-    </>
-  );
+  const sharedButtonClassName =
+    "min-w-[300px] justify-center border-0 px-8 text-base font-extrabold shadow-[0_18px_40px_rgba(121,72,39,0.14)] hover:border-0 sm:min-w-[420px] sm:px-10 sm:text-[1.05rem]";
+  const primaryButtonClassName =
+    `${sharedButtonClassName} bg-[#f46f4b] text-white hover:bg-[#eb6540] hover:text-white hover:shadow-[0_22px_46px_rgba(244,111,75,0.32)]`;
+  const secondaryButtonClassName =
+    `${sharedButtonClassName} bg-[linear-gradient(180deg,#fffdfa_0%,#fff7f0_100%)] text-[#5b3b2b] shadow-[0_16px_34px_rgba(121,72,39,0.12)] hover:bg-[linear-gradient(180deg,#fffaf6_0%,#fff2e8_100%)] hover:text-[#402619] hover:shadow-[0_20px_40px_rgba(121,72,39,0.18)]`;
 
   return (
     <>
@@ -69,20 +66,33 @@ export function BlogWallArtStudioCTA({
                   initialSong={songOptions[0]}
                   songOptions={songOptions}
                   trigger={
-                    <button type="button" className={triggerClassName}>
-                      {triggerContent}
-                    </button>
+                    <MagneticButton
+                      type="button"
+                      size="lg"
+                      magneticRange={120}
+                      strength={0.24}
+                      contentStrength={0.13}
+                      trailingArrow
+                      className={primaryButtonClassName}
+                    >
+                      Open Wall Art Studio
+                    </MagneticButton>
                   }
                 />
               ) : (
                 <>
-                  <button
+                  <MagneticButton
                     type="button"
-                    className={triggerClassName}
+                    size="lg"
+                    magneticRange={120}
+                    strength={0.24}
+                    contentStrength={0.13}
+                    trailingArrow
+                    className={primaryButtonClassName}
                     onClick={() => setIsLoginDialogOpen(true)}
                   >
-                    {triggerContent}
-                  </button>
+                    Open Wall Art Studio
+                  </MagneticButton>
                   <LoginDialog
                     open={isLoginDialogOpen}
                     onOpenChange={setIsLoginDialogOpen}
@@ -92,10 +102,12 @@ export function BlogWallArtStudioCTA({
 
               <MagneticButton
                 href="/create-song"
-                size="sm"
-                variant="light"
+                size="lg"
+                magneticRange={120}
+                strength={0.24}
+                contentStrength={0.13}
                 trailingArrow
-                className="border-[#d7c7ba] bg-white text-[#4f3426] shadow-[0_14px_28px_rgba(79,52,38,0.10)] hover:border-[#cdb7a6] hover:bg-white hover:text-[#362117]"
+                className={secondaryButtonClassName}
               >
                 Create a custom song first
               </MagneticButton>

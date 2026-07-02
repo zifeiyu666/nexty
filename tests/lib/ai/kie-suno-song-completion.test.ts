@@ -1,16 +1,23 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, test } from "node:test";
 
-import { completeSongTaskFromKieResult } from "../../../lib/ai/kie-suno-song-completion";
+import {
+  completeSongTaskFromKieResult,
+} from "../../../lib/ai/kie-suno-song-completion";
+import { songTaskStore } from "../../../lib/ai/song-task-store";
 
 describe("KIE Suno song completion", () => {
   const originalFetch = globalThis.fetch;
+  const originalRedis = (songTaskStore as any).getSong;
+  const originalUpdateSong = (songTaskStore as any).updateSong;
 
   afterEach(() => {
     delete process.env.KIE_SUNO_MOCK_TASK_ID;
     delete process.env.KIE_SUNO_MOCK_VERSIONS_JSON;
     delete process.env.KIE_SUNO_MOCK_RESULT_JSON;
     globalThis.fetch = originalFetch;
+    (songTaskStore as any).getSong = originalRedis;
+    (songTaskStore as any).updateSong = originalUpdateSong;
   });
 
   test("does not fetch external media or timestamped lyrics for mock task results", async () => {
@@ -58,4 +65,5 @@ describe("KIE Suno song completion", () => {
     assert.equal(updated, null);
     assert.equal(fetchCalls, 0);
   });
+
 });

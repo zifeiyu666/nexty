@@ -15,6 +15,10 @@
     "update:next": "pnpm i next@latest react@latest react-dom@latest @next/env@latest @next/bundle-analyzer@latest @types/react@latest @types/react-dom@latest",
     "env:clear": "node scripts/clear-env-from-github.mjs",
     "env:sync": "node scripts/sync-env-to-github.mjs",
+    "remotion:function:deploy": "node scripts/deploy-remotion-function.mjs",
+    "remotion:deploy": "pnpm exec remotion lambda sites create remotion-src/index.ts --region=us-east-1",
+    "remotion:deploy:auto": "node scripts/deploy-remotion-site.mjs",
+    "remotion:deploy:watch": "node scripts/deploy-remotion-site.mjs --watch",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -184,6 +188,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.16",
+    "@remotion/cli": "4.0.478",
     "@types/hast": "^3.0.4",
     "@types/node": "^20",
     "@types/pg": "^8.15.5",

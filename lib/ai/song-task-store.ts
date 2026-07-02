@@ -34,6 +34,8 @@ export type SongGenerationTask = {
   language: string;
   versions: KieSongVersion[];
   error?: string;
+  lastKiePollAt?: number;
+  nextKiePollAt?: number;
   createdAt: number;
   updatedAt: number;
   expiresAt: number;

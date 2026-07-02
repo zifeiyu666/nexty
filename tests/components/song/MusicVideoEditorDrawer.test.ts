@@ -16,6 +16,9 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /Media Assets/);
     assert.match(source, /Lyrics Storyline/);
     assert.match(source, /Generate Video/);
+    assert.match(source, /StudioHeader/);
+    assert.match(source, /StudioBlurBackdrop/);
+    assert.match(source, /studioGlassStyles/);
   });
 
   test("supports reusable song options from pricing and switches active songs", () => {
@@ -116,6 +119,8 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /@remotion\/player/);
     assert.match(source, /PhotoSlideshowComposition/);
     assert.match(source, /Download MP4/);
+    assert.match(source, /Download Now \(Temporary\)/);
+    assert.match(source, /Saving permanent copy/);
   });
 
   test("lets users drag the preview progress bar to seek", () => {
@@ -125,11 +130,36 @@ describe("MusicVideoEditorDrawer", () => {
     );
 
     assert.match(source, /function handleSeek/);
-    assert.match(source, /player\.seekTo\(Math\.round\(safeTime \* PHOTO_SLIDESHOW_FPS\)\)/);
+    assert.match(source, /const targetFrame = Math\.round\(safeTime \* PHOTO_SLIDESHOW_FPS\);/);
+    assert.match(source, /player\.seekTo\(targetFrame\)/);
     assert.match(source, /type="range"/);
     assert.match(source, /aria-label="Seek music video preview"/);
     assert.doesNotMatch(source, /const \[currentTime, setCurrentTime\]/);
     assert.match(source, /const \[previewTime, setPreviewTime\]/);
+  });
+
+  test("keeps Remotion Player input props stable during passive playback", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const playerInputProps = useMemo\(\(\) => \(\{ timeline \}\), \[timeline\]\);/);
+    assert.match(source, /inputProps=\{playerInputProps\}/);
+    assert.doesNotMatch(source, /inputProps=\{\{ timeline \}\}/);
+  });
+
+  test("throttles passive preview progress updates to avoid audio resync churn", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const PREVIEW_TIME_UPDATE_INTERVAL_SECONDS = 0\.25;/);
+    assert.match(
+      source,
+      /Math\.abs\(safeTime - lastPreviewTimeRef\.current\) <[\s\S]*PREVIEW_TIME_UPDATE_INTERVAL_SECONDS/,
+    );
   });
 
   test("lets users switch the preview between 9:16 and 16:9", () => {
@@ -148,6 +178,10 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /compositionWidth=\{previewDimensions\.width\}/);
     assert.match(source, /key=\{`\$\{timeline\.templateId\}-\$\{previewDimensions\.label\}`\}/);
     assert.match(source, /onToggleAspectRatio/);
+    assert.match(source, /const renderDimensions = previewAspectRatioOptions\[previewAspectRatio\]/);
+    assert.match(source, /dimensions: renderDimensions/);
+    assert.match(source, /height: renderDimensions\.height/);
+    assert.match(source, /width: renderDimensions\.width/);
   });
 
   test("places video generation in the preview header controls", () => {
@@ -158,7 +192,7 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(
       source,
-      /<div className="flex shrink-0 flex-wrap items-center gap-2">[\s\S]*Generate Video[\s\S]*aria-label="Switch preview aspect ratio"[\s\S]*onClick=\{togglePlayback\}/,
+      /<div className="flex shrink-0 flex-wrap items-center gap-1\.5">[\s\S]*Generate Video[\s\S]*aria-label="Switch preview aspect ratio"[\s\S]*onClick=\{togglePlayback\}/,
     );
   });
 
@@ -188,7 +222,7 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(source, /Photo Stream Memory Slideshow/);
     assert.match(source, /Minimal Vinyl Record/);
-    assert.match(source, /Dynamic Wave Radio/);
+    assert.match(source, /Dynamic Lyrics Video/);
     assert.match(source, /WaveRadioComposition/);
     assert.match(source, /buildWaveRadioTimeline/);
     assert.match(source, /WaveRadioEditor/);
@@ -250,7 +284,8 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(source, /data-photo-media-rail/);
     assert.match(source, /data-photo-media-rail-scroll/);
-    assert.match(source, /grid-cols-\[104px_minmax\(0,1fr\)\]/);
+    assert.match(source, /grid-cols-\[82px_minmax\(0,1fr\)\]/);
+    assert.match(source, /xl:grid-cols-\[92px_minmax\(0,1fr\)\]/);
   });
 
   test("reserves room for the media rail scrollbar beside thumbnails", () => {
@@ -260,7 +295,7 @@ describe("MusicVideoEditorDrawer", () => {
     );
 
     assert.match(source, /scrollbarGutter: "stable"/);
-    assert.match(source, /space-y-2 pb-2 pr-3/);
+    assert.match(source, /space-y-1\.5 pb-2 pr-3/);
   });
 
   test("keeps narrow lyric cards inside the editor column after media upload", () => {
@@ -271,7 +306,7 @@ describe("MusicVideoEditorDrawer", () => {
 
     assert.match(source, /data-music-video-editor-main/);
     assert.match(source, /data-lyric-photo-card/);
-    assert.match(source, /grid-cols-\[56px_minmax\(0,1fr\)\]/);
+    assert.match(source, /grid-cols-\[50px_minmax\(0,1fr\)\]/);
     assert.match(source, /text-balance/);
     assert.match(source, /text-pretty/);
   });
@@ -298,15 +333,11 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /data-music-video-editor-resizer/);
     assert.match(
       source,
-      /lg:grid-cols-\[184px_minmax\(280px,1fr\)_minmax\(380px,var\(--music-video-editor-width\)\)\]/,
+      /lg:grid-cols-\[156px_minmax\(280px,1fr\)_minmax\(320px,var\(--music-video-editor-width\)\)\]/,
     );
     assert.match(
       source,
-      /xl:grid-cols-\[200px_minmax\(320px,1fr\)_minmax\(420px,var\(--music-video-editor-width\)\)\]/,
-    );
-    assert.match(
-      source,
-      /2xl:grid-cols-\[220px_minmax\(360px,1fr\)_minmax\(460px,var\(--music-video-editor-width\)\)\]/,
+      /xl:grid-cols-\[164px_minmax\(320px,1fr\)_minmax\(340px,var\(--music-video-editor-width\)\)\]/,
     );
     assert.match(source, /MAX_EDITOR_VIEWPORT_RATIO/);
     assert.match(source, /getResponsiveEditorMaxWidth/);
@@ -417,6 +448,15 @@ describe("MusicVideoEditorDrawer", () => {
       source,
       /player\.seekTo\(previewTransitionLoop\.startFrame\);[\s\S]*player\.play\(\);[\s\S]*onPlayRef\.current\(\);[\s\S]*}, \[previewTransitionLoop\]\);/,
     );
+  });
+
+  test("does not seek the preview when hovering transition options", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.doesNotMatch(source, /onMouseEnter=\{\(\) => onPreviewTransition\(toCueId\)\}/);
   });
 
   test("resets preview playback when switching editable templates", () => {

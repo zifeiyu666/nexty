@@ -26,6 +26,8 @@ describe("music video render route", () => {
     assert.match(source, /overlayId: z\.string\(\)\.nullable\(\)/);
     assert.match(source, /opacity: z\.number\(\)\.min\(0\)\.max\(1\)/);
     assert.match(source, /atmosphereOverlay: atmosphereOverlaySchema\.optional\(\)/);
+    assert.match(source, /height: z\.number\(\)\.int\(\)\.positive\(\)/);
+    assert.match(source, /width: z\.number\(\)\.int\(\)\.positive\(\)/);
   });
 
   test("accepts wave radio timelines with a bundled background id", () => {

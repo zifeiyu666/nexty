@@ -15,7 +15,7 @@ export function BlogPostCTA() {
         strength={0.22}
         contentStrength={0.12}
         trailingArrow
-        className="mt-5 min-w-[180px] border-[#b64772] bg-[#b64772] px-7 text-sm font-bold text-white shadow-[0_14px_32px_rgba(182,71,114,0.24)] hover:bg-[#a43d65] hover:text-white hover:shadow-[0_18px_38px_rgba(182,71,114,0.32)] sm:min-w-[200px]"
+        className="mt-5 min-w-[180px] border-[#ef5b4e] bg-[#ae4372] px-7 text-sm font-bold text-white shadow-[0_14px_32px_rgba(174,67,114,0.24)] hover:border-[#f36a5d] hover:bg-[#bb4b7b] hover:text-white hover:shadow-[0_18px_38px_rgba(174,67,114,0.3)] sm:min-w-[200px]"
       >
         <span>Create your song</span>
       </MagneticButton>

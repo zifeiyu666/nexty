@@ -7,7 +7,10 @@ import {
   markMusicVideoFailed,
   markMusicVideoRendering,
 } from "@/lib/music-video/renders";
-import { DEFAULT_LYRICS_STYLE } from "@/lib/music-video/photo-slideshow";
+import {
+  DEFAULT_LYRICS_STYLE,
+  type MusicVideoTimeline,
+} from "@/lib/music-video/photo-slideshow";
 import { startLambdaRender } from "@/lib/music-video/remotion-lambda";
 import { z } from "zod";
 
@@ -63,13 +66,17 @@ const baseTimelineSchema = {
   assignments: z.array(assignmentSchema),
   atmosphereOverlay: atmosphereOverlaySchema.optional(),
   audioUrl: z.string().url(),
+  backgroundBlur: z.number().min(0).max(64).optional(),
+  backgroundPhoto: photoSchema.optional(),
   coverPhoto: photoSchema.optional(),
   duration: z.number().positive(),
+  height: z.number().int().positive(),
   lyrics: z.array(lyricCueSchema),
   lyricsStyle: lyricsStyleSchema.optional(),
   photos: z.array(photoSchema),
   songTitle: z.string(),
   transitions: z.array(transitionSchema).default([]),
+  width: z.number().int().positive(),
 };
 
 const photoSlideshowTimelineSchema = z.object({
@@ -100,6 +107,62 @@ const timelineSchema = z.discriminatedUnion("templateId", [
   waveRadioTimelineSchema,
 ]);
 
+function summarizePhoto(
+  photo:
+    | {
+        id: string;
+        isCover?: boolean;
+        mediaType?: "image" | "video";
+        name: string;
+        objectUrl: string;
+        r2Key?: string;
+        url?: string;
+      }
+    | null
+    | undefined,
+) {
+  if (!photo) return null;
+
+  return {
+    id: photo.id,
+    isCover: photo.isCover ?? false,
+    mediaType: photo.mediaType ?? null,
+    name: photo.name,
+    objectUrl: photo.objectUrl,
+    r2Key: photo.r2Key ?? null,
+    url: photo.url ?? null,
+  };
+}
+
+function summarizeTimelineMedia(
+  timeline: MusicVideoTimeline,
+) {
+  const minimalVinylBackground =
+    timeline.templateId === "minimal-vinyl"
+      ? {
+          backgroundBlur: timeline.backgroundBlur ?? null,
+          backgroundPhoto: summarizePhoto(timeline.backgroundPhoto),
+        }
+      : {
+          backgroundBlur: null,
+          backgroundPhoto: null,
+        };
+
+  return {
+    assignments: timeline.assignments.map((assignment) => ({
+      cueId: assignment.cueId,
+      photoId: assignment.photoId,
+    })),
+    ...minimalVinylBackground,
+    coverPhoto: summarizePhoto(timeline.coverPhoto),
+    height: timeline.height,
+    photoCount: timeline.photos.length,
+    photos: timeline.photos.map((photo) => summarizePhoto(photo)),
+    templateId: timeline.templateId,
+    width: timeline.width,
+  };
+}
+
 export async function POST(
   request: Request,
   { params }: { params: Params },
@@ -117,6 +180,15 @@ export async function POST(
     return apiResponse.badRequest(parsed.error.errors[0]?.message ?? "Invalid MV timeline.");
   }
 
+  logger.info(
+    {
+      songId,
+      userId: user.id,
+      ...summarizeTimelineMedia(parsed.data),
+    },
+    "Received music video render timeline",
+  );
+
   const video = await createMusicVideoRender({
     song,
     timeline: parsed.data,
@@ -126,6 +198,17 @@ export async function POST(
     const inputProps = video.inputPropsJsonb as Parameters<
       typeof startLambdaRender
     >[0]["inputProps"];
+
+    logger.info(
+      {
+        songId,
+        userId: user.id,
+        videoId: video.id,
+        ...summarizeTimelineMedia(inputProps.timeline),
+      },
+      "Prepared music video render input props",
+    );
+
     const lambda = await startLambdaRender({
       inputProps,
       video,

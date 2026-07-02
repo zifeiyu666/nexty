@@ -278,12 +278,22 @@ export function PaywallModal({
 }
 
 export function SongGenerationPage({
+  coverError,
+  coverImageUrl,
+  coverPrompt,
+  isGeneratingCover,
   note,
+  onGenerateCover,
   onNoteChange,
   progress,
   recipientLabel,
 }: {
+  coverError: string;
+  coverImageUrl: string;
+  coverPrompt: string;
+  isGeneratingCover: boolean;
   note: string;
+  onGenerateCover: () => void;
   onNoteChange: (value: string) => void;
   progress: number;
   recipientLabel: string;
@@ -343,20 +353,48 @@ export function SongGenerationPage({
               Upload your own photo or let us dream one up.
             </p>
           </div>
-          <div className="mx-auto flex aspect-square w-full max-w-56 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted text-muted-foreground">
-            <ImageIcon className="size-9" />
-            <p className="mt-4 text-sm font-medium">Pick a cover below</p>
+          <div className="mx-auto flex aspect-square w-full max-w-56 flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-muted text-muted-foreground">
+            {coverImageUrl ? (
+              <img
+                alt="Generated album cover"
+                className="size-full object-cover"
+                src={coverImageUrl}
+                title={coverPrompt || undefined}
+              />
+            ) : isGeneratingCover ? (
+              <>
+                <Loader2 className="size-9 animate-spin text-primary" />
+                <p className="mt-4 text-sm font-medium">Dreaming up a cover...</p>
+              </>
+            ) : (
+              <>
+                <ImageIcon className="size-9" />
+                <p className="mt-4 text-sm font-medium">Pick a cover below</p>
+              </>
+            )}
           </div>
+          {coverError && (
+            <p className="mt-3 rounded-2xl bg-primary/10 px-4 py-3 text-xs font-medium leading-5 text-primary">
+              {coverError}
+            </p>
+          )}
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <Button
               className="h-11 flex-1 rounded-full bg-foreground text-sm font-bold text-primary-foreground hover:bg-foreground/90"
+              disabled={isGeneratingCover}
               type="button"
+              onClick={onGenerateCover}
             >
-              <Wand2 className="size-4" />
-              Generate with AI
+              {isGeneratingCover ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Wand2 className="size-4" />
+              )}
+              {coverImageUrl ? "Regenerate with AI" : "Generate with AI"}
             </Button>
             <Button
               className="h-11 rounded-full text-sm font-bold text-muted-foreground hover:text-foreground"
+              disabled
               type="button"
               variant="ghost"
             >

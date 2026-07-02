@@ -32,6 +32,7 @@ import {
 import {
   createCheckoutSession,
   finalizeSongVersion,
+  generateSongCover,
   generateStoryFromHelper,
   getLyricsGenerationStatus,
   getSongGenerationStatus,
@@ -147,6 +148,10 @@ export function CustomSongWizard() {
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
   const [leadData, setLeadData] = useState<CaptureLeadResponse | null>(null);
   const [personalNote, setPersonalNote] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [coverPrompt, setCoverPrompt] = useState("");
+  const [coverError, setCoverError] = useState("");
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [previewTime, setPreviewTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(60);
@@ -271,6 +276,7 @@ export function CustomSongWizard() {
     const params = new URLSearchParams(window.location.search);
     const stepFromUrl = slugToStep[params.get("step") || ""] || 1;
     const queryLyrics = params.get("lyrics") || "";
+    const queryOccasion = params.get("occasion");
 
     try {
       const savedDraft = window.localStorage.getItem(draftStorageKey);
@@ -334,7 +340,6 @@ export function CustomSongWizard() {
         .split(",")
         .map((relationship) => relationship.trim())
         .slice(0, 3);
-      const queryOccasion = params.get("occasion");
 
       setGenre(params.get("genre") || defaultGenre);
       setVocalGender(params.get("vocalGender") || defaultVocalGender);
@@ -359,6 +364,13 @@ export function CustomSongWizard() {
       setStep(queryOccasion ? 4 : stepFromUrl);
       setIsHydrated(true);
       return;
+    }
+
+    if (queryOccasion) {
+      setOccasion(queryOccasion);
+      if (isCustomOccasion(queryOccasion)) {
+        setCustomOccasionInput(queryOccasion);
+      }
     }
 
     setStep(stepFromUrl);
@@ -432,6 +444,13 @@ export function CustomSongWizard() {
     }
   }, [email, session?.user?.email]);
 
+  const resetCoverGeneration = useCallback(() => {
+    setCoverImageUrl("");
+    setCoverPrompt("");
+    setCoverError("");
+    setIsGeneratingCover(false);
+  }, []);
+
   const requestLyricsGeneration = useCallback(
     async ({
       comparisonSource,
@@ -452,6 +471,7 @@ export function CustomSongWizard() {
         setLyricsInputKey("");
         setSongTitle("");
         setGeneratedLyrics("");
+        resetCoverGeneration();
       }
       setPendingLyricsComparisonSource(comparisonSource ?? null);
       setLyricsRequestInputKey(currentLyricsInputKey);
@@ -512,6 +532,7 @@ export function CustomSongWizard() {
       cleanRecipientList,
       recipientNameList,
       recipientRelationshipList,
+      resetCoverGeneration,
       story,
       vocalGender,
     ],
@@ -654,6 +675,7 @@ export function CustomSongWizard() {
     setPreviewTime(0);
     setIsPlaying(false);
     setProgress(8);
+    setCoverError("");
 
     try {
       const data = await startSongGeneration({
@@ -783,6 +805,44 @@ export function CustomSongWizard() {
     (step === 4 &&
       songTitle.trim().length > 0 &&
       generatedLyrics.trim().length > 0);
+
+  async function generateCoverWithAi() {
+    if (!occasion || !songTitle.trim() || !generatedLyrics.trim()) {
+      setCoverError("Finish the lyrics before generating a cover.");
+      return;
+    }
+
+    setCoverError("");
+    setIsGeneratingCover(true);
+
+    try {
+      const result = await generateSongCover({
+        occasion,
+        genre,
+        language,
+        recipients: cleanRecipientList,
+        recipientNames: recipientNameList,
+        recipientRelationships: recipientRelationshipList,
+        story,
+        title: songTitle,
+        lyrics: generatedLyrics,
+        vocalGender,
+        songId: leadData?.songId || songTaskId || undefined,
+      });
+
+      setCoverImageUrl(result.imageUrl);
+      setCoverPrompt(result.prompt);
+      toast.success("Your album cover is ready.");
+    } catch (error) {
+      setCoverError(
+        error instanceof Error
+          ? error.message
+          : "Unable to generate cover image.",
+      );
+    } finally {
+      setIsGeneratingCover(false);
+    }
+  }
 
   function appendHelperText(text: string) {
     setStory((current) => {
@@ -1056,6 +1116,7 @@ export function CustomSongWizard() {
     setLyricRewriteInstruction("");
     setLyricRewriteError("");
     setLyricsVersionComparison(null);
+    resetCoverGeneration();
   }
 
   function rewriteLyrics() {
@@ -1104,10 +1165,12 @@ export function CustomSongWizard() {
     setLyricRewriteSuggestions([]);
     setLyricRewriteInstruction("");
     setLyricRewriteError("");
+    resetCoverGeneration();
     toast.success("New lyrics version applied.");
   }
 
   function updateLyricLine(lineId: string, text: string) {
+    resetCoverGeneration();
     setGeneratedLyrics((current) =>
       composeLyricsText(
         parseLyricsText(current).map((line) =>
@@ -1237,6 +1300,7 @@ export function CustomSongWizard() {
       setSongError("");
       setPreviewTime(0);
       setIsPlaying(false);
+      resetCoverGeneration();
       audioRef.current?.pause();
     }
     setWizardStep(Math.max(1, step - 1) as WizardStep);
@@ -1253,6 +1317,7 @@ export function CustomSongWizard() {
       setSongStage("loading");
       setSongTaskId("");
       setSongError("");
+      setCoverError("");
       setWizardStep(5);
       return;
     }
@@ -1269,6 +1334,7 @@ export function CustomSongWizard() {
     setSongError("");
     setProgress(8);
     setSongStage("loading");
+    resetCoverGeneration();
   }
 
   async function submitLead(event: FormEvent<HTMLFormElement>) {
@@ -1291,6 +1357,7 @@ export function CustomSongWizard() {
     setLeadData(null);
     setSongTaskId("");
     setSongError("");
+    resetCoverGeneration();
     setIsLeadModalOpen(false);
     setSongStage("loading");
     setWizardStep(5);
@@ -1406,6 +1473,7 @@ export function CustomSongWizard() {
 
     try {
       const result = await finalizeSongVersion({
+        coverImageUrl: coverImageUrl || undefined,
         songId: leadData.songId,
         versionId: providerVersionId,
       });
@@ -1569,6 +1637,9 @@ export function CustomSongWizard() {
               <SongStep
                 activeVersion={activeVersion}
                 audioRef={audioRef}
+                coverError={coverError}
+                coverImageUrl={coverImageUrl}
+                coverPrompt={coverPrompt}
                 currentVersion={currentVersion}
                 displayDuration={displayDuration}
                 finalizingVersion={finalizingVersion}
@@ -1588,8 +1659,10 @@ export function CustomSongWizard() {
                 songVersions={songVersions}
                 story={story}
                 vocalGender={vocalGender}
+                isGeneratingCover={isGeneratingCover}
                 isPlaying={isPlaying}
                 onChooseVersion={chooseSongVersion}
+                onGenerateCover={generateCoverWithAi}
                 onNoteChange={setPersonalNote}
                 onPlaybackToggle={toggleSongPlayback}
                 onRespin={respinSongPreview}

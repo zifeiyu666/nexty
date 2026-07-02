@@ -20,12 +20,24 @@ export function MinimalVinylComposition({
   const audioSrc = hasMediaSrc(timeline.audioUrl) ? timeline.audioUrl : "";
   const coverImageSrc =
     timeline.coverPhoto?.url ?? timeline.coverPhoto?.objectUrl ?? null;
+  const backgroundImageSrc =
+    timeline.templateId === "minimal-vinyl"
+      ? timeline.backgroundPhoto?.url ??
+        timeline.backgroundPhoto?.objectUrl ??
+        coverImageSrc
+      : coverImageSrc;
   const shortSide = Math.min(width, height);
   const lyricsStyle = normalizeLyricsStyleConfig(timeline.lyricsStyle);
 
   return (
     <RadialVisualizer
       audioSrc={audioSrc}
+      backgroundBlur={
+        timeline.templateId === "minimal-vinyl"
+          ? timeline.backgroundBlur ?? 42
+          : 42
+      }
+      backgroundImageSrc={hasMediaSrc(backgroundImageSrc) ? backgroundImageSrc : null}
       baseRadius={shortSide * 0.22}
       coverImageSrc={hasMediaSrc(coverImageSrc) ? coverImageSrc : null}
       density={128}

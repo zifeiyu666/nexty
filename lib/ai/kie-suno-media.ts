@@ -64,9 +64,7 @@ export async function persistKieSongVersionMediaToR2({
   uploadExternalUrlToR2?: UploadExternalUrlToR2;
   versions: KieSongVersion[];
 }): Promise<KieSongVersion[]> {
-  const persistedVersions: KieSongVersion[] = [];
-
-  for (const version of versions) {
+  return Promise.all(versions.map(async (version) => {
     const audioUpload = await uploadExternalUrlToR2(
       version.audioUrl,
       getKieSongVersionMediaR2Key({
@@ -79,11 +77,10 @@ export async function persistKieSongVersionMediaToR2({
     );
 
     if (!version.imageUrl) {
-      persistedVersions.push({
+      return {
         ...version,
         audioUrl: audioUpload.url,
-      });
-      continue;
+      };
     }
 
     const coverUpload = await uploadExternalUrlToR2(
@@ -97,12 +94,10 @@ export async function persistKieSongVersionMediaToR2({
       })
     );
 
-    persistedVersions.push({
+    return {
       ...version,
       audioUrl: audioUpload.url,
       imageUrl: coverUpload.url,
-    });
-  }
-
-  return persistedVersions;
+    };
+  }));
 }

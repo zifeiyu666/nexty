@@ -48,6 +48,20 @@ function getMediaUrl(media: UploadedPhoto | null | undefined) {
   return hasMediaSrc(mediaUrl) ? mediaUrl : null;
 }
 
+function getMediaIdentity(media: UploadedPhoto | null | undefined) {
+  return media?.id ?? getMediaUrl(media) ?? null;
+}
+
+function isSameMedia(
+  left: UploadedPhoto | null | undefined,
+  right: UploadedPhoto | null | undefined,
+) {
+  const leftIdentity = getMediaIdentity(left);
+  const rightIdentity = getMediaIdentity(right);
+
+  return Boolean(leftIdentity && rightIdentity && leftIdentity === rightIdentity);
+}
+
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(Math.max(value, min), max);
 }
@@ -490,6 +504,39 @@ function getTransitionForBoundary({
   );
 }
 
+function getContiguousMediaSegmentStart({
+  cues,
+  currentIndex,
+  resolved,
+}: {
+  cues: LyricCue[];
+  currentIndex: number;
+  resolved: ReturnType<typeof resolveCuePhotos>;
+}) {
+  if (currentIndex < 0) return 0;
+
+  let segmentStartIndex = currentIndex;
+  const currentPhoto = getCuePhoto({
+    cue: cues[currentIndex] ?? null,
+    resolved,
+  });
+
+  while (segmentStartIndex > 0) {
+    const previousPhoto = getCuePhoto({
+      cue: cues[segmentStartIndex - 1] ?? null,
+      resolved,
+    });
+
+    if (!isSameMedia(previousPhoto, currentPhoto)) {
+      break;
+    }
+
+    segmentStartIndex -= 1;
+  }
+
+  return cues[segmentStartIndex]?.start ?? 0;
+}
+
 export function PhotoSlideshowComposition({
   timeline,
 }: PhotoSlideshowCompositionProps) {
@@ -517,21 +564,29 @@ export function PhotoSlideshowComposition({
   const activePhotoUrl = getMediaUrl(activePhoto);
   const previousPhotoUrl = getMediaUrl(previousPhoto);
   const nextPhotoUrl = getMediaUrl(nextPhoto);
+  const sameAsPreviousPhoto = isSameMedia(previousPhoto, activePhoto);
+  const sameAsNextPhoto = isSameMedia(activePhoto, nextPhoto);
+  const mediaSegmentStart = getContiguousMediaSegmentStart({
+    cues: timeline.lyrics,
+    currentIndex: activeCueIndex,
+    resolved,
+  });
   const loopProgress = (Math.sin((frame / (fps * 7)) * Math.PI * 2) + 1) / 2;
   const breathingScale = interpolate(loopProgress, [0, 1], [1.03, 1.1]);
   const transitionFrames = Math.max(12, Math.round(fps * 0.55));
   const incomingProgress =
-    activeCue && previousCue
+    activeCue && previousCue && !sameAsPreviousPhoto
       ? clamp((frame - activeCue.start * fps) / transitionFrames)
       : 1;
   const outgoingProgress =
-    activeCue && nextCue
+    activeCue && nextCue && !sameAsNextPhoto
       ? clamp((nextCue.start * fps - frame) / transitionFrames)
       : 1;
   const isIncomingTransition =
-    Boolean(activeCue && previousCue) && incomingProgress < 1;
+    Boolean(activeCue && previousCue && !sameAsPreviousPhoto) &&
+    incomingProgress < 1;
   const isOutgoingTransition =
-    Boolean(activeCue && nextCue) && outgoingProgress < 1;
+    Boolean(activeCue && nextCue && !sameAsNextPhoto) && outgoingProgress < 1;
   const incomingTransition = getTransitionForBoundary({
     fromCue: previousCue,
     timeline,
@@ -618,7 +673,7 @@ export function PhotoSlideshowComposition({
             mediaUrl={activePhotoUrl}
             opacity={0.55}
             scale={1.18}
-            startFromFrame={Math.max(0, frame - (activeCue?.start ?? 0) * fps)}
+            startFromFrame={Math.max(0, frame - mediaSegmentStart * fps)}
           />
           {secondaryPhotoUrl ? (
             <SlideshowMediaLayer
@@ -640,7 +695,7 @@ export function PhotoSlideshowComposition({
             mediaUrl={activePhotoUrl}
             opacity={activeOpacity}
             scale={activeScale}
-            startFromFrame={Math.max(0, frame - (activeCue?.start ?? 0) * fps)}
+            startFromFrame={Math.max(0, frame - mediaSegmentStart * fps)}
           />
         </>
       ) : null}

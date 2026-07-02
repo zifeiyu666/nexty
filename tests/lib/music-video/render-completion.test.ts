@@ -4,6 +4,7 @@ import { describe, test } from "node:test";
 import {
   completeMusicVideoRender,
   failMusicVideoRender,
+  markMusicVideoTemporaryRenderOutput,
 } from "@/lib/music-video/render-completion";
 
 const video = {
@@ -27,17 +28,30 @@ describe("music video render completion", () => {
         calls.push(input);
         return { id: input.videoId, status: "completed", videoUrl: input.videoUrl };
       },
+      markTemporaryReady: async (input) => {
+        calls.push(input);
+        return {
+          id: input.videoId,
+          status: "rendering",
+          temporaryVideoUrl: input.temporaryVideoUrl,
+        };
+      },
       outputUrl: "https://remotion.example.com/out.mp4",
       video,
     });
 
     assert.deepEqual(calls, [
       {
+        temporaryVideoUrl: "https://remotion.example.com/out.mp4",
+        videoId: "mv-1",
+      },
+      {
         key: "music-videos/renders/user-1/song-1/mv-1.mp4",
         url: "https://remotion.example.com/out.mp4",
       },
       {
         r2Key: "music-videos/renders/user-1/song-1/mv-1.mp4",
+        temporaryVideoUrl: null,
         videoId: "mv-1",
         videoUrl: "https://r2.example.com/final.mp4",
       },
@@ -57,6 +71,38 @@ describe("music video render completion", () => {
 
     assert.equal(failed?.status, "failed");
     assert.match(failed?.error ?? "", /missing an output URL/);
+  });
+
+  test("stores the temporary Remotion output before the permanent copy exists", async () => {
+    const temporary = await markMusicVideoTemporaryRenderOutput({
+      markTemporaryReady: async (input) => ({
+        id: input.videoId,
+        status: "rendering",
+        temporaryVideoUrl: input.temporaryVideoUrl,
+      }),
+      outputUrl: "https://remotion.example.com/out.mp4",
+      video,
+    });
+
+    assert.deepEqual(temporary, {
+      id: "mv-1",
+      status: "rendering",
+      temporaryVideoUrl: "https://remotion.example.com/out.mp4",
+    });
+  });
+
+  test("keeps the temporary URL available when R2 persistence fails", async () => {
+    const failed = await completeMusicVideoRender({
+      fetchExternalUrlToR2: async () => {
+        throw new Error("upload failed");
+      },
+      markTemporaryReady: async () => ({ id: video.id, status: "rendering" }),
+      outputUrl: "https://remotion.example.com/out.mp4",
+      video,
+    });
+
+    assert.equal(failed?.status, "rendering");
+    assert.equal(failed?.temporaryVideoUrl, "https://remotion.example.com/out.mp4");
   });
 
   test("uses shared failure helper for render failures", async () => {

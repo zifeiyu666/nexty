@@ -1,3 +1,5 @@
+import { Readable } from "node:stream";
+
 import { serverUploadFile, type UploadResult } from "@/lib/cloudflare/r2";
 
 /**
@@ -25,6 +27,7 @@ export async function fetchExternalUrlToR2(
   externalUrl: string,
   key: string
 ): Promise<UploadResult> {
+  const startedAt = Date.now();
   const response = await fetch(externalUrl);
   if (!response.ok) {
     throw new Error(
@@ -34,8 +37,31 @@ export async function fetchExternalUrlToR2(
 
   const contentType =
     response.headers.get("content-type") || "application/octet-stream";
-  const arrayBuffer = await response.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
+  const contentLengthHeader = response.headers.get("content-length");
+  const contentLength =
+    contentLengthHeader && Number.isFinite(Number(contentLengthHeader))
+      ? Number.parseInt(contentLengthHeader, 10)
+      : undefined;
 
-  return serverUploadFile({ data: buffer, contentType, key });
+  if (!response.body) {
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return serverUploadFile({ data: buffer, contentType, contentLength, key });
+  }
+
+  const upload = await serverUploadFile({
+    data: Readable.fromWeb(response.body as globalThis.ReadableStream<Uint8Array>),
+    contentType,
+    contentLength,
+    key,
+  });
+
+  console.info("[fetchExternalUrlToR2] persisted external file to R2", {
+    contentLength: contentLength ?? null,
+    durationMs: Date.now() - startedAt,
+    externalUrl,
+    key,
+  });
+
+  return upload;
 }

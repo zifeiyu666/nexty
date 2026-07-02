@@ -7,6 +7,7 @@ import {
 import { and, desc, eq } from "drizzle-orm";
 import {
   getUploadedMediaType,
+  normalizeRenderDimensions,
   type MusicVideoTimeline,
   type UploadedPhoto,
 } from "./photo-slideshow";
@@ -98,12 +99,13 @@ export function buildMusicVideoInputProps(
   timeline: MusicVideoTimeline,
 ): MusicVideoInputProps {
   assertTimelineIsRenderable(timeline);
+  const renderDimensions = normalizeRenderDimensions(timeline);
 
   return {
     fps: MUSIC_VIDEO_RENDER_DEFAULTS.fps,
-    height: MUSIC_VIDEO_RENDER_DEFAULTS.height,
+    height: renderDimensions.height,
     timeline,
-    width: MUSIC_VIDEO_RENDER_DEFAULTS.width,
+    width: renderDimensions.width,
   };
 }
 
@@ -293,12 +295,14 @@ export async function markMusicVideoRendering({
 export async function markMusicVideoSucceeded({
   dbClient = db,
   r2Key,
+  temporaryVideoUrl,
   thumbnailUrl,
   videoId,
   videoUrl,
 }: {
   dbClient?: Pick<DbClient, "update">;
   r2Key: string;
+  temporaryVideoUrl?: string | null;
   thumbnailUrl?: string | null;
   videoId: string;
   videoUrl: string;
@@ -310,8 +314,28 @@ export async function markMusicVideoSucceeded({
       error: null,
       r2Key,
       status: "completed",
+      temporaryVideoUrl: temporaryVideoUrl ?? null,
       thumbnailUrl,
       videoUrl,
+    },
+    videoId,
+  });
+}
+
+export async function markMusicVideoTemporaryOutputReady({
+  dbClient = db,
+  temporaryVideoUrl,
+  videoId,
+}: {
+  dbClient?: Pick<DbClient, "update">;
+  temporaryVideoUrl: string;
+  videoId: string;
+}) {
+  return updateMusicVideo({
+    dbClient,
+    values: {
+      error: null,
+      temporaryVideoUrl,
     },
     videoId,
   });

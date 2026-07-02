@@ -21,6 +21,12 @@ type SongGenerationInput = SongWizardInput & {
   title: string;
 };
 
+type SongCoverGenerationInput = SongWizardInput & {
+  lyrics: string;
+  songId?: string;
+  title: string;
+};
+
 type LyricsRewriteInput = SongWizardInput & {
   fullLyrics: string;
   instruction: string;
@@ -139,6 +145,19 @@ export async function getSongGenerationStatus(songId: string) {
   }>(response, "Unable to check song status.");
 }
 
+export async function generateSongCover(input: SongCoverGenerationInput) {
+  const response = await fetch("/api/songs/cover/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+
+  return parseApiResponse<{
+    imageUrl: string;
+    prompt: string;
+  }>(response, "Unable to generate cover image.");
+}
+
 export async function createCheckoutSession({
   leadEmail,
   songId,
@@ -179,9 +198,11 @@ export async function createCheckoutSession({
 }
 
 export async function finalizeSongVersion({
+  coverImageUrl,
   songId,
   versionId,
 }: {
+  coverImageUrl?: string;
   songId: string;
   versionId: string;
 }) {
@@ -189,6 +210,7 @@ export async function finalizeSongVersion({
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      coverImageUrl,
       songId,
       versionId,
     }),

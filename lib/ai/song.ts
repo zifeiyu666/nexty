@@ -4,7 +4,7 @@ import {
   user as userSchema,
 } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { submitMusicTask } from "./adapters/kie-suno";
+import { getMockKieSunoMusicResult, submitMusicTask } from "./adapters/kie-suno";
 import {
   generateTextWithReplicateGpt5,
   getReplicateGpt5LyricsModel,
@@ -21,7 +21,7 @@ import {
   SongLyricsTask,
   songTaskStore,
 } from "./song-task-store";
-import { refreshProcessingSongTaskFromKie } from "./kie-suno-song-completion";
+import { completeSongTaskFromKieResult } from "./kie-suno-song-completion";
 
 export type SongInputContext = {
   occasion: string;
@@ -480,14 +480,20 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
   });
 
   await songTaskStore.setSong(task);
+  const mockResult = getMockKieSunoMusicResult(externalId);
+  if (mockResult) {
+    console.log("[songs/generate] Completing offline mock song task", {
+      songId: task.songId,
+      externalId,
+      status: mockResult.status,
+      versions: mockResult.versions.length,
+    });
+    return (await completeSongTaskFromKieResult({ result: mockResult, task })) || task;
+  }
+
   return task;
 }
 
 export async function refreshSongGeneration(songId: string): Promise<SongGenerationTask | null> {
-  const task = await songTaskStore.getSong(songId);
-  if (!task || task.status !== "processing") {
-    return task;
-  }
-
-  return refreshProcessingSongTaskFromKie(task);
+  return songTaskStore.getSong(songId);
 }

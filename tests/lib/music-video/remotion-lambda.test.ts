@@ -38,6 +38,47 @@ describe("remotion lambda config", () => {
     );
   });
 
+  test("uses configured remotion concurrency when provided", () => {
+    const config = getRemotionLambdaConfig({
+      env: {
+        REMOTION_AWS_REGION: "us-east-1",
+        REMOTION_CONCURRENCY: "180",
+        REMOTION_FUNCTION_NAME: "remotion-render",
+        REMOTION_SERVE_URL: "https://bucket.s3.us-east-1.amazonaws.com/index.html",
+        REMOTION_WEBHOOK_SECRET: "secret-value",
+      },
+    });
+
+    assert.equal(config.concurrency, 180);
+  });
+
+  test("uses a conservative default remotion concurrency when not configured", () => {
+    const config = getRemotionLambdaConfig({
+      env: {
+        REMOTION_AWS_REGION: "us-east-1",
+        REMOTION_FUNCTION_NAME: "remotion-render",
+        REMOTION_SERVE_URL: "https://bucket.s3.us-east-1.amazonaws.com/index.html",
+        REMOTION_WEBHOOK_SECRET: "secret-value",
+      },
+    });
+
+    assert.equal(config.concurrency, 100);
+  });
+
+  test("caps configured remotion concurrency to the application safety limit", () => {
+    const config = getRemotionLambdaConfig({
+      env: {
+        REMOTION_AWS_REGION: "us-east-1",
+        REMOTION_CONCURRENCY: "999",
+        REMOTION_FUNCTION_NAME: "remotion-render",
+        REMOTION_SERVE_URL: "https://bucket.s3.us-east-1.amazonaws.com/index.html",
+        REMOTION_WEBHOOK_SECRET: "secret-value",
+      },
+    });
+
+    assert.equal(config.concurrency, 300);
+  });
+
   test("requires WEBHOOK_BASE_URL for music video webhooks", () => {
     assert.throws(
       () =>

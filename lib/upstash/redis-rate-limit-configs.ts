@@ -11,6 +11,11 @@ export const REDIS_RATE_LIMIT_CONFIGS = {
     maxRequests: 100,
     window: "1 d"
   },
+  songCoverGeneration: {
+    prefix: `${LOWER_CASE_SITE_NAME}:rl:song-cover-generation`,
+    maxRequests: 20,
+    window: "1 d",
+  },
   newsletter: {
     prefix: `${LOWER_CASE_SITE_NAME}:rl:newsletter`,
     maxRequests: 10,

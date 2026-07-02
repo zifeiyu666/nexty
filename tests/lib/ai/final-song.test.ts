@@ -361,6 +361,33 @@ describe("final song helpers", () => {
     });
   });
 
+  test("uses a generated cover image override when finalizing a sample", async () => {
+    const fakeDb = createFinalizeFakeDb();
+
+    const result = await finalizeSongFromSample({
+      coverImageUrl: "https://r2.example.com/song-covers/generated.webp",
+      dbClient: fakeDb.dbClient,
+      sample: createSample({
+        versions: [
+          {
+            id: "provider-a",
+            title: "Version A",
+            audioUrl: "https://cdn.example.com/a.mp3",
+            imageUrl: "https://cdn.example.com/original.webp",
+          },
+        ],
+      }),
+      userId: "user-1",
+      versionId: "provider-a",
+    });
+
+    assert.equal(result.success, true);
+    assert.equal(
+      fakeDb.state.insertedSong?.imageUrl,
+      "https://r2.example.com/song-covers/generated.webp",
+    );
+  });
+
   test("does not skip deduction for historical unlockedVersionIds data", async () => {
     const fakeDb = createFinalizeFakeDb({
       usageBalanceJsonb: {
