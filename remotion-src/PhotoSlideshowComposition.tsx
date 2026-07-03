@@ -315,7 +315,7 @@ function AnimatedSingleLyric({
           }}
         >
           {Array.from(text).map((char, index) => {
-            const cueStartFrame = (cue?.start ?? currentTime) * fps;
+            const cueStartFrame = cue ? cue.start * fps : currentFrame;
             const charProgress = interpolate(
               currentFrame,
               [cueStartFrame + index * 2, cueStartFrame + index * 2 + 8],
