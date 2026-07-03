@@ -120,7 +120,8 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /PhotoSlideshowComposition/);
     assert.match(source, /Download MP4/);
     assert.match(source, /Download Now \(Temporary\)/);
-    assert.match(source, /Saving permanent copy/);
+    assert.match(source, /\/api\/musicvideos\/\$\{latestVideo\.id\}\/download/);
+    assert.doesNotMatch(source, /Saving permanent copy/);
   });
 
   test("lets users drag the preview progress bar to seek", () => {
@@ -144,7 +145,10 @@ describe("MusicVideoEditorDrawer", () => {
       "utf8",
     );
 
-    assert.match(source, /const playerInputProps = useMemo\(\(\) => \(\{ timeline \}\), \[timeline\]\);/);
+    assert.match(source, /const playerInputProps = useMemo\(/);
+    assert.match(source, /mediaQuality:[\s\S]*timeline\.templateId === "wave-radio"[\s\S]*"preview"/);
+    assert.match(source, /timeline,/);
+    assert.match(source, /\[timeline\]/);
     assert.match(source, /inputProps=\{playerInputProps\}/);
     assert.doesNotMatch(source, /inputProps=\{\{ timeline \}\}/);
   });
@@ -230,6 +234,11 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /forceCenterPosition/);
     assert.match(source, /WAVE_RADIO_BACKGROUND_OPTIONS/);
     assert.match(source, /waveRadioBackgroundId/);
+    assert.match(source, /mediaQuality:[\s\S]*"preview"/);
+    assert.match(source, /WaveRadioBackgroundOptionCard/);
+    assert.match(source, /background\.previewSrc \?\? background\.src/);
+    assert.match(source, /background\.posterSrc/);
+    assert.match(source, /preload="none"/);
     assert.match(source, /MinimalVinylComposition/);
     assert.match(source, /buildMinimalVinylTimeline/);
     assert.match(source, /data-minimal-vinyl-editor/);
@@ -262,20 +271,87 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /const \[showPhotoSlideshowPoster, setShowPhotoSlideshowPoster\]/);
     assert.match(source, /timeline\.templateId === "photo-slideshow"/);
     assert.match(source, /aria-label="Photo slideshow cover poster"/);
+    assert.match(source, /const initialPosterTitleStyle =/);
+    assert.match(source, /: `clamp\(16px, \$\{Math\.round\(previewLyricsStyle\.fontSize \* 0\.58\)\}px, 34px\)`/);
+    assert.match(source, /absolute inset-0 flex items-center justify-center px-8/);
+    assert.match(source, /style=\{initialPosterTitleStyle \?\? undefined\}/);
     assert.match(source, /setShowPhotoSlideshowPoster\(false\);[\s\S]*player\.play\(\)/);
     assert.match(source, /setShowPhotoSlideshowPoster\(false\);[\s\S]*player\.seekTo\(targetFrame\)/);
   });
 
-  test("shows the minimal vinyl cover poster and song title before playback starts", () => {
+  test("keeps minimal vinyl on the record preview instead of a cover poster", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
       "utf8",
     );
 
     assert.match(source, /timeline\.templateId === "minimal-vinyl"/);
-    assert.match(source, /aria-label=\{[\s\S]*"Minimal vinyl cover poster"[\s\S]*\}/);
-    assert.match(source, /<div className="text-\[clamp\(24px,3vw,48px\)\] font-black tracking-\[-0\.03em\] text-white/);
+    assert.doesNotMatch(source, /Minimal vinyl cover poster/);
+    assert.match(
+      source,
+      /const shouldShowInitialPoster =\s*timeline\.templateId === "photo-slideshow"/,
+    );
+    assert.match(source, /const previewLyricsStyle = normalizeLyricsStyleConfig\(timeline\.lyricsStyle\);/);
+    assert.match(source, /const initialPosterTitleStyle =/);
+    assert.match(source, /fontFamily: previewLyricsStyle\.fontFamily/);
+    assert.match(source, /color: previewLyricsStyle\.color/);
+    assert.match(source, /WebkitTextStroke:/);
+    assert.match(source, /Math\.max\(1, Math\.round\(previewLyricsStyle\.strokeWidth \* 0\.55\)\)/);
+    assert.match(source, /absolute inset-0 flex items-center justify-center px-8/);
+    assert.doesNotMatch(source, /rgba\(255,246,232,0\.18\)/);
+    assert.doesNotMatch(source, /rgba\(246,226,198,0\.16\)_38%/);
+    assert.doesNotMatch(source, /rgba\(2,5,10,0\.82\)_62%/);
+    assert.match(source, /style=\{initialPosterTitleStyle \?\? undefined\}/);
     assert.match(source, /\{songTitle\}/);
+  });
+
+  test("keeps minimal vinyl upload controls compact", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /Full-screen background/);
+    assert.match(source, /group flex h-28 w-full cursor-pointer/);
+    assert.match(source, /Record center image/);
+    assert.match(source, /group mx-auto flex aspect-square w-full max-w-\[180px\] cursor-pointer/);
+    assert.doesNotMatch(source, /group flex aspect-video w-full cursor-pointer/);
+    assert.doesNotMatch(source, /group flex aspect-square w-full cursor-pointer/);
+  });
+
+  test("keeps minimal vinyl background and disc artwork state separated", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const minimalVinylCoverPhoto = minimalVinylDiscArtwork \?\? coverPhoto;/);
+    assert.match(source, /const minimalVinylPreviewBackgroundPhoto =[\s\S]*minimalVinylBackgroundArtwork \?\? coverPhoto;/);
+    assert.match(source, /backgroundImage=\{minimalVinylBackgroundArtwork\}/);
+    assert.match(source, /discArtwork=\{minimalVinylDiscArtwork\}/);
+    assert.match(source, /backgroundPhoto: minimalVinylPreviewBackgroundPhoto/);
+    assert.match(source, /coverPhoto: minimalVinylCoverPhoto/);
+    assert.doesNotMatch(source, /backgroundImage=\{minimalVinylPreviewBackgroundPhoto\}/);
+  });
+
+  test("confirms close and resets music video editor sessions", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const \[isStudioOpen, setIsStudioOpen\] = useState\(false\);/);
+    assert.match(source, /const \[showCloseConfirm, setShowCloseConfirm\] = useState\(false\);/);
+    assert.match(source, /const resetEditorSession = useCallback/);
+    assert.match(source, /setActiveTemplate\("photo-slideshow"\)/);
+    assert.match(source, /setLyricsStyle\(DEFAULT_LYRICS_STYLE\)/);
+    assert.match(source, /setWaveRadioBackgroundId\(DEFAULT_WAVE_RADIO_BACKGROUND\.id\)/);
+    assert.match(source, /setAtmosphereOverlay\(DEFAULT_ATMOSPHERE_OVERLAY\)/);
+    assert.match(source, /<Sheet open=\{isStudioOpen\} onOpenChange=\{handleStudioOpenChange\}>/);
+    assert.match(source, /onClose=\{requestCloseStudio\}/);
+    assert.match(source, /Discard music video edits\?/);
+    assert.match(source, /Close and discard/);
+    assert.match(source, /function confirmCloseStudio\(\)[\s\S]*setIsStudioOpen\(false\);[\s\S]*resetEditorSession\(fallbackSong\);/);
   });
 
   test("uses the generated wave radio image as the dynamic template demo", () => {

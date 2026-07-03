@@ -1,3 +1,9 @@
+export const DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR = 10;
+export const DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY = {
+  color: "#020408",
+  opacity: 0.58,
+};
+
 export type LyricCue = {
   id: string;
   start: number;
@@ -61,10 +67,17 @@ export type AtmosphereOverlayConfig = {
   overlayId: string | null;
 };
 
+export type MinimalVinylBackgroundOverlayConfig = {
+  color: string;
+  opacity: number;
+};
+
 export type WaveRadioBackgroundOption = {
   durationInFrames: number;
   id: string;
   label: string;
+  posterSrc?: string;
+  previewSrc?: string;
   src: string;
 };
 
@@ -99,6 +112,8 @@ export type LyricsStyleInput = Omit<Partial<LyricsStyleConfig>, "entrance"> & {
 };
 
 export type AtmosphereOverlayInput = Partial<AtmosphereOverlayConfig> | null;
+export type MinimalVinylBackgroundOverlayInput =
+  Partial<MinimalVinylBackgroundOverlayConfig> | null;
 
 export type MusicVideoTemplateId =
   | "photo-slideshow"
@@ -132,6 +147,7 @@ export type PhotoSlideshowTimeline = BaseMusicVideoTimeline & {
 
 export type MinimalVinylTimeline = BaseMusicVideoTimeline & {
   backgroundBlur?: number;
+  backgroundOverlay?: MinimalVinylBackgroundOverlayConfig;
   backgroundPhoto?: UploadedPhoto;
   templateId: "minimal-vinyl";
 };
@@ -203,167 +219,197 @@ export const WAVE_RADIO_BACKGROUND_OPTIONS: WaveRadioBackgroundOption[] = [
     durationInFrames: 299,
     id: "crimson-pulse-107256",
     label: "Crimson Pulse",
+    posterSrc: overlayCdnSrc("bg-video-poster/107256-678130118.jpg"),
     src: overlayCdnSrc("bg-video/107256-678130118.mp4"),
   },
   {
     durationInFrames: 993,
     id: "midnight-glow-11722",
     label: "Midnight Glow",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/11722-231759069.jpg"),
     src: overlayCdnSrc("bg-video/720p/11722-231759069.mp4"),
   },
   {
     durationInFrames: 1066,
     id: "aurora-119885",
     label: "Aurora Signal",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/119885-719283332.jpg"),
     src: overlayCdnSrc("bg-video/720p/119885-719283332.mp4"),
   },
   {
     durationInFrames: 299,
     id: "ember-veil-127216",
     label: "Ember Veil",
+    posterSrc: overlayCdnSrc("bg-video-poster/127216-738093640.jpg"),
     src: overlayCdnSrc("bg-video/127216-738093640.mp4"),
   },
   {
     durationInFrames: 203,
     id: "glass-shimmer-132427",
     label: "Glass Shimmer",
+    posterSrc: overlayCdnSrc("bg-video-poster/132427-753435588.jpg"),
     src: overlayCdnSrc("bg-video/132427-753435588.mp4"),
   },
   {
     durationInFrames: 543,
     id: "sunset-drift-147206",
     label: "Sunset Drift",
+    posterSrc: overlayCdnSrc("bg-video-poster/147206-791344441.jpg"),
     src: overlayCdnSrc("bg-video/147206-791344441.mp4"),
   },
   {
     durationInFrames: 376,
     id: "violet-field-148029",
     label: "Violet Field",
+    posterSrc: overlayCdnSrc("bg-video-poster/148029-793140704.jpg"),
+    previewSrc: overlayCdnSrc("bg-video-preview/148029-793140704.mp4"),
     src: overlayCdnSrc("bg-video/148029-793140704.mp4"),
   },
   {
     durationInFrames: 828,
     id: "starlight-rain-151469",
     label: "Starlight Rain",
+    posterSrc: overlayCdnSrc("bg-video-poster/151469-800921014.jpg"),
+    previewSrc: overlayCdnSrc("bg-video-preview/151469-800921014.mp4"),
     src: overlayCdnSrc("bg-video/151469-800921014.mp4"),
   },
   {
     durationInFrames: 677,
     id: "lilac-mist-152798",
     label: "Lilac Mist",
+    posterSrc: overlayCdnSrc("bg-video-poster/152798-803733100.jpg"),
+    previewSrc: overlayCdnSrc("bg-video-preview/152798-803733100.mp4"),
     src: overlayCdnSrc("bg-video/152798-803733100.mp4"),
   },
   {
     durationInFrames: 1441,
     id: "solar-spark-154006",
     label: "Solar Spark",
+    posterSrc: overlayCdnSrc("bg-video-poster/154006-806572051.jpg"),
     src: overlayCdnSrc("bg-video/154006-806572051.mp4"),
   },
   {
     durationInFrames: 301,
     id: "velvet-night-155630",
     label: "Velvet Night",
+    posterSrc: overlayCdnSrc("bg-video-poster/155630-810650602.jpg"),
     src: overlayCdnSrc("bg-video/155630-810650602.mp4"),
   },
   {
     durationInFrames: 505,
     id: "rose-orbit-175741",
     label: "Rose Orbit",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/175741-854057998.jpg"),
     src: overlayCdnSrc("bg-video/720p/175741-854057998.mp4"),
   },
   {
     durationInFrames: 240,
     id: "warm-bokeh-199558",
     label: "Warm Bokeh",
+    posterSrc: overlayCdnSrc("bg-video-poster/199558-910609536.jpg"),
     src: overlayCdnSrc("bg-video/199558-910609536.mp4"),
   },
   {
     durationInFrames: 476,
     id: "horizon-bloom-230851",
     label: "Horizon Bloom",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/230851.jpg"),
+    previewSrc: overlayCdnSrc("bg-video-preview/720p/230851.mp4"),
     src: overlayCdnSrc("bg-video/720p/230851.mp4"),
   },
   {
     durationInFrames: 762,
     id: "electric-haze-248842",
     label: "Electric Haze",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/248842.jpg"),
     src: overlayCdnSrc("bg-video/720p/248842.mp4"),
   },
   {
     durationInFrames: 255,
     id: "magma-fall-265607",
     label: "Magma Fall",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/265607.jpg"),
     src: overlayCdnSrc("bg-video/720p/265607.mp4"),
   },
   {
     durationInFrames: 252,
     id: "aqua-ray-265648",
     label: "Aqua Ray",
+    posterSrc: overlayCdnSrc("bg-video-poster/265648.jpg"),
     src: overlayCdnSrc("bg-video/265648.mp4"),
   },
   {
     durationInFrames: 912,
     id: "vertical-lights-266987",
     label: "Vertical Lights",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/266987.jpg"),
     src: overlayCdnSrc("bg-video/720p/266987.mp4"),
   },
   {
     durationInFrames: 1024,
     id: "blue-current-277316",
     label: "Blue Current",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/277316.jpg"),
     src: overlayCdnSrc("bg-video/720p/277316.mp4"),
   },
   {
     durationInFrames: 481,
     id: "flare-canopy-284542",
     label: "Flare Canopy",
+    posterSrc: overlayCdnSrc("bg-video-poster/284542.jpg"),
     src: overlayCdnSrc("bg-video/284542.mp4"),
   },
   {
     durationInFrames: 207,
     id: "neon-tunnel-302596",
     label: "Neon Tunnel",
+    posterSrc: overlayCdnSrc("bg-video-poster/302596.jpg"),
     src: overlayCdnSrc("bg-video/302596.mp4"),
   },
   {
     durationInFrames: 313,
     id: "vertical-aura-315351",
     label: "Vertical Aura",
+    posterSrc: overlayCdnSrc("bg-video-poster/315351.jpg"),
     src: overlayCdnSrc("bg-video/315351.mp4"),
   },
   {
     durationInFrames: 1782,
     id: "comet-stream-45316",
     label: "Comet Stream",
+    posterSrc: overlayCdnSrc("bg-video-poster/45316-442643130.jpg"),
     src: overlayCdnSrc("bg-video/45316-442643130.mp4"),
   },
   {
     durationInFrames: 324,
     id: "sunset-grain-58142",
     label: "Sunset Grain",
+    posterSrc: overlayCdnSrc("bg-video-poster/720p/58142-487508532.jpg"),
     src: overlayCdnSrc("bg-video/720p/58142-487508532.mp4"),
   },
   {
     durationInFrames: 450,
     id: "light-leak-62666",
     label: "Light Leak",
+    posterSrc: overlayCdnSrc("bg-video-poster/62666-504665647.jpg"),
     src: overlayCdnSrc("bg-video/62666-504665647.mp4"),
   },
   {
     durationInFrames: 141,
     id: "prism-bloom-6962",
     label: "Prism Bloom",
+    posterSrc: overlayCdnSrc("bg-video-poster/6962-197634410.jpg"),
     src: overlayCdnSrc("bg-video/6962-197634410.mp4"),
   },
   {
     durationInFrames: 444,
     id: "ember-cloud-84916",
     label: "Ember Cloud",
+    posterSrc: overlayCdnSrc("bg-video-poster/84916-587646675.jpg"),
     src: overlayCdnSrc("bg-video/84916-587646675.mp4"),
   },
 ];
-export const DEFAULT_WAVE_RADIO_BACKGROUND =
-  WAVE_RADIO_BACKGROUND_OPTIONS[0];
+export const DEFAULT_WAVE_RADIO_BACKGROUND = WAVE_RADIO_BACKGROUND_OPTIONS[0];
 export const DEFAULT_ATMOSPHERE_OVERLAY: AtmosphereOverlayConfig = {
   opacity: 0.36,
   overlayId: null,
@@ -398,7 +444,10 @@ function normalizeDuration(duration?: number | null) {
     : DEFAULT_DURATION;
 }
 
-function normalizeRenderDimension(value: number | null | undefined, fallback: number) {
+function normalizeRenderDimension(
+  value: number | null | undefined,
+  fallback: number,
+) {
   return Number.isFinite(value) && value && value > 0
     ? Math.max(1, Math.round(value))
     : fallback;
@@ -452,6 +501,29 @@ function normalizeOverlayOpacity(opacity?: number | null) {
   return typeof opacity === "number" && Number.isFinite(opacity)
     ? Math.min(Math.max(opacity, 0), 1)
     : DEFAULT_ATMOSPHERE_OVERLAY.opacity;
+}
+
+function normalizeHexColor(color: string | null | undefined, fallback: string) {
+  const normalized = color?.trim();
+
+  return normalized && /^#[0-9a-f]{6}$/i.test(normalized)
+    ? normalized
+    : fallback;
+}
+
+export function normalizeMinimalVinylBackgroundOverlayConfig(
+  overlay?: MinimalVinylBackgroundOverlayInput,
+): MinimalVinylBackgroundOverlayConfig {
+  return {
+    color: normalizeHexColor(
+      overlay?.color,
+      DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY.color,
+    ),
+    opacity:
+      typeof overlay?.opacity === "number" && Number.isFinite(overlay.opacity)
+        ? Math.min(Math.max(overlay.opacity, 0), 1)
+        : DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY.opacity,
+  };
 }
 
 export function normalizeAtmosphereOverlayConfig(
@@ -510,7 +582,10 @@ function cleanUntimedLines(lyrics: string) {
   return lyrics
     .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter((line) => line && !SECTION_LABEL.test(line) && !LYRIC_METADATA_LINE.test(line));
+    .filter(
+      (line) =>
+        line && !SECTION_LABEL.test(line) && !LYRIC_METADATA_LINE.test(line),
+    );
 }
 
 function normalizeLyricWords(text: string) {
@@ -521,7 +596,11 @@ function normalizeLyricWords(text: string) {
     .filter(Boolean);
 }
 
-function normalizeCueEnd(start: number, nextStart: number | undefined, duration: number) {
+function normalizeCueEnd(
+  start: number,
+  nextStart: number | undefined,
+  duration: number,
+) {
   if (typeof nextStart === "number" && nextStart > start) return nextStart;
   if (duration > start) return duration;
   return start + 4;
@@ -668,7 +747,11 @@ export function findActiveCue(cues: LyricCue[], time: number) {
 
   if (firstCue && currentTime < firstCue.start) return null;
 
-  return cues.find((cue) => currentTime >= cue.start && currentTime < cue.end) ?? cues[cues.length - 1] ?? null;
+  return (
+    cues.find((cue) => currentTime >= cue.start && currentTime < cue.end) ??
+    cues[cues.length - 1] ??
+    null
+  );
 }
 
 export function buildDefaultTransitions(
@@ -807,7 +890,7 @@ export function buildPhotoSlideshowTimeline({
     atmosphereOverlay: normalizeAtmosphereOverlayConfig(atmosphereOverlay),
     coverPhoto:
       photos.length === 0
-        ? createCoverPhoto(fallbackImageUrl) ?? undefined
+        ? (createCoverPhoto(fallbackImageUrl) ?? undefined)
         : undefined,
     lyricsStyle: normalizeLyricsStyleConfig(lyricsStyle),
     transitions: normalizeTransitions({ cues: lyricCues, transitions }),
@@ -818,6 +901,7 @@ export function buildMinimalVinylTimeline({
   songTitle,
   audioUrl,
   backgroundBlur,
+  backgroundOverlay,
   backgroundPhoto,
   duration,
   dimensions,
@@ -830,6 +914,7 @@ export function buildMinimalVinylTimeline({
   songTitle: string;
   audioUrl: string;
   backgroundBlur?: number | null;
+  backgroundOverlay?: MinimalVinylBackgroundOverlayInput;
   backgroundPhoto?: UploadedPhoto | null;
   duration?: number | null;
   dimensions?: Partial<MusicVideoRenderDimensions> | null;
@@ -862,7 +947,9 @@ export function buildMinimalVinylTimeline({
     backgroundBlur:
       typeof backgroundBlur === "number" && Number.isFinite(backgroundBlur)
         ? Math.min(Math.max(backgroundBlur, 0), 64)
-        : 42,
+        : DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR,
+    backgroundOverlay:
+      normalizeMinimalVinylBackgroundOverlayConfig(backgroundOverlay),
     backgroundPhoto: backgroundPhoto ?? undefined,
     coverPhoto: coverPhoto ?? createCoverPhoto(fallbackImageUrl) ?? undefined,
     lyricsStyle: normalizeLyricsStyleConfig(lyricsStyle),

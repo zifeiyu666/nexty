@@ -5,6 +5,13 @@ import { routing } from './i18n/routing';
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
+  const indexNowKey = process.env.INDEXNOW_KEY?.trim();
+
+  if (indexNowKey && request.nextUrl.pathname === `/${indexNowKey}.txt`) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/indexnow-key.txt";
+    return NextResponse.rewrite(url);
+  }
 
   const intlResponse = intlMiddleware(request);
 
@@ -19,6 +26,9 @@ export const config = {
     // Set a cookie to remember the previous locale for
     // all requests that have a locale prefix
     '/(en)/:path*',
+
+    // Expose the IndexNow key at the root-level path required by crawlers
+    '/:path*.txt',
 
     // Enable redirects that add missing locales
     // (e.g. `/pathnames` -> `/en/pathnames`)

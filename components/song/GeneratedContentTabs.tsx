@@ -91,13 +91,13 @@ export function GeneratedContentTabs({
                         year: "numeric",
                       }).format(video.createdAt)}
                     </p>
-                    {video.videoUrl ? (
+                    {video.videoUrl || video.temporaryVideoUrl ? (
                       <Button
                         asChild
                         className="mt-3 rounded-full"
                         size="sm"
                       >
-                        <a download href={video.videoUrl}>
+                        <a download href={`/api/musicvideos/${video.id}/download`}>
                           <Download className="size-4" />
                           Download MP4
                         </a>

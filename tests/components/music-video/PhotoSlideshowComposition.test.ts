@@ -89,6 +89,17 @@ describe("PhotoSlideshowComposition", () => {
     assert.match(source, /title=\{timeline\.songTitle\}/);
   });
 
+  test("redraws the radial visualizer after hidden artwork images load", () => {
+    const source = readFileSync(
+      join(process.cwd(), "remotion-src/RadialMusicVisualizer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const \[loadedImageVersion, setLoadedImageVersion\] = useState\(0\);/);
+    assert.match(source, /loadedImageVersion,/);
+    assert.match(source, /onLoad=\{\(\) => setLoadedImageVersion\(\(version\) => version \+ 1\)\}/);
+  });
+
   test("dispatches wave radio timelines to the wave radio composition", () => {
     const source = readFileSync(
       join(process.cwd(), "remotion-src/MusicVideoComposition.tsx"),
@@ -97,7 +108,7 @@ describe("PhotoSlideshowComposition", () => {
 
     assert.match(source, /WaveRadioComposition/);
     assert.match(source, /timeline\.templateId === "wave-radio"/);
-    assert.match(source, /<WaveRadioComposition timeline=\{timeline\} \/>/);
+    assert.match(source, /<WaveRadioComposition mediaQuality=\{mediaQuality\} timeline=\{timeline\} \/>/);
   });
 
   test("renders wave radio with a looped remote-capable video and one active lyric line", () => {
@@ -108,6 +119,9 @@ describe("PhotoSlideshowComposition", () => {
 
     assert.match(source, /WAVE_RADIO_BACKGROUND_OPTIONS/);
     assert.match(source, /Video/);
+    assert.match(source, /mediaQuality = "render"/);
+    assert.match(source, /background\.previewSrc \?\? background\.src/);
+    assert.match(source, /: background\.src/);
     assert.match(source, /resolveRemotionMediaSrc/);
     assert.match(source, /findActiveCue/);
     assert.match(source, /SingleLineLyric/);
@@ -159,6 +173,9 @@ describe("PhotoSlideshowComposition", () => {
     );
     assert.match(source, /drawLyricsPanel/);
     assert.match(source, /findActiveLyricCue/);
+    assert.match(source, /fallbackTitle = title\?\.trim\(\)/);
+    assert.match(source, /id: "song-title"/);
+    assert.match(source, /getVisibleLyricLines\(\{ activeCue, lyricCues, title \}\)/);
     assert.match(source, /context\.rect\(panelX \+ 30, panelY \+ 12/);
     assert.doesNotMatch(source, /context\.roundRect\(panelX, panelY/);
     assert.doesNotMatch(source, /panelGradient\.addColorStop/);

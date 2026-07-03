@@ -197,6 +197,10 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.doesNotMatch(source, /function GiftBoxCover/);
     assert.doesNotMatch(source, /clipPathUnits="objectBoundingBox"/);
     assert.match(source, /song-waveform-bar/);
+    assert.match(source, /function formatPlaybackTime\(seconds: number\)/);
+    assert.match(source, /return `\$\{minutes\}m \$\{remainingSeconds\}s`/);
+    assert.match(source, /font-medium text-muted-foreground/);
+    assert.doesNotMatch(source, /previewTime\.toFixed\(0\).*s \/.*Math\.ceil\(displayDuration\).*s/s);
     assert.match(source, /md:grid-cols-2/);
     assert.match(source, /before:bg-gradient-to-b/);
     assert.match(source, /Title: \{lyricTitle\}/);

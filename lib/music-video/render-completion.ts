@@ -72,6 +72,34 @@ export async function markMusicVideoTemporaryRenderOutput({
   });
 }
 
+export async function completeMusicVideoRenderWithTemporaryUrl({
+  markSucceeded = markMusicVideoSucceeded,
+  outputUrl,
+  video,
+}: {
+  markSucceeded?: MarkSucceeded;
+  outputUrl?: string | null;
+  video: RenderVideoRef;
+}) {
+  if (!outputUrl) {
+    throw new Error("Remotion render completed but is missing an output URL.");
+  }
+
+  const completed = await markSucceeded({
+    r2Key: null,
+    temporaryVideoUrl: outputUrl,
+    videoId: video.id,
+    videoUrl: null,
+  });
+
+  logger.info(
+    { videoId: video.id },
+    "Music video render completed with temporary output URL",
+  );
+
+  return completed;
+}
+
 export async function completeMusicVideoRender({
   fetchExternalUrlToR2 = defaultFetchExternalUrlToR2,
   markFailed = markMusicVideoFailed,

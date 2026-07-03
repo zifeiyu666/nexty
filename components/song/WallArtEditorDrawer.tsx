@@ -21,14 +21,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -63,7 +55,6 @@ import {
   clampImageCrop,
   extendImageLyricRowToWidth,
   scaleImageLyricMaskInput,
-  type ImageCropRotation,
   type ImageCropTransform,
   type ImageLyricMode,
 } from "@/lib/wall-art/image-lyrics";
@@ -575,16 +566,6 @@ function isEditableTextKey(value: ActiveTarget): value is EditableTextKey {
   return textTargets.includes(value as EditableTextKey);
 }
 
-function getImageCropPreviewTransform({
-  rotate,
-  flipX,
-  flipY,
-}: Pick<ImageCropTransform, "rotate" | "flipX" | "flipY">): string {
-  return `translate(-50%, -50%) rotate(${rotate}deg) scale(${flipX ? -1 : 1}, ${
-    flipY ? -1 : 1
-  })`;
-}
-
 function ControlRow({
   label,
   value,
@@ -979,27 +960,18 @@ export function WallArtEditorDrawer({
       : imageCropDraft?.printSizeId === "custom"
         ? (imageCropDraft?.customHeightCm ?? posterHeightCm)
         : (imageCropSelectedPrintSize?.heightCm ?? posterHeightCm);
+  const imageCropCanvasWidth = imageCropIsDisc
+    ? DISC_IMAGE_CROP_PREVIEW_WIDTH
+    : IMAGE_CROP_PREVIEW_WIDTH;
   const imageCropPreviewHeight = imageCropDraft
-    ? Math.round(IMAGE_CROP_PREVIEW_WIDTH / (imageCropWidthCm / imageCropHeightCm))
+    ? Math.round(imageCropCanvasWidth / (imageCropWidthCm / imageCropHeightCm))
     : 0;
-  const imageCropPreviewDisplayHeight = imageCropPreviewHeight
-    ? Math.min(imageCropPreviewHeight, IMAGE_CROP_PREVIEW_MAX_HEIGHT)
-    : 0;
-  const imageCropPreviewDisplayWidth =
-    imageCropPreviewHeight && imageCropPreviewDisplayHeight
-      ? Math.round(
-          IMAGE_CROP_PREVIEW_WIDTH *
-            (imageCropPreviewDisplayHeight / imageCropPreviewHeight),
-        )
-      : IMAGE_CROP_PREVIEW_WIDTH;
-  const imageCropPreviewDisplayScale =
-    imageCropPreviewDisplayWidth / IMAGE_CROP_PREVIEW_WIDTH;
+  const imageCropCanvasHeight = imageCropPreviewHeight || imageCropCanvasWidth;
   const imageCropMinScale = imageCropDraft
     ? imageCropDraft.crop.scale *
       Math.max(
-        IMAGE_CROP_PREVIEW_WIDTH / imageCropDraft.crop.renderedWidth,
-        (imageCropPreviewHeight || IMAGE_CROP_PREVIEW_WIDTH) /
-          imageCropDraft.crop.renderedHeight,
+        imageCropCanvasWidth / imageCropDraft.crop.renderedWidth,
+        imageCropCanvasHeight / imageCropDraft.crop.renderedHeight,
       )
     : 0;
   const printContentTransform = buildWallArtPrintTransform({
@@ -1606,14 +1578,18 @@ export function WallArtEditorDrawer({
       const source = String(reader.result || "");
       const image = new Image();
       image.onload = () => {
+        const canvasWidth =
+          target === "disc"
+            ? DISC_IMAGE_CROP_PREVIEW_WIDTH
+            : IMAGE_CROP_PREVIEW_WIDTH;
         const canvasHeight =
           target === "disc"
-            ? IMAGE_CROP_PREVIEW_WIDTH
+            ? DISC_IMAGE_CROP_PREVIEW_WIDTH
             : Math.round(IMAGE_CROP_PREVIEW_WIDTH / posterAspectRatio);
         const crop = buildInitialImageCrop({
           imageWidth: image.width,
           imageHeight: image.height,
-          canvasWidth: IMAGE_CROP_PREVIEW_WIDTH,
+          canvasWidth,
           canvasHeight,
         });
         setImageCropDraft({
@@ -1708,9 +1684,10 @@ export function WallArtEditorDrawer({
           {
             imageWidth: current.imageWidth,
             imageHeight: current.imageHeight,
-            canvasWidth: IMAGE_CROP_PREVIEW_WIDTH,
-            canvasHeight: imageCropPreviewHeight || IMAGE_CROP_PREVIEW_WIDTH,
+            canvasWidth: imageCropCanvasWidth,
+            canvasHeight: imageCropCanvasHeight,
             maxScale: Math.max(current.crop.scale * 3, current.crop.scale + 2),
+            overflowPadding: Math.round(imageCropCanvasWidth * 0.08),
           },
         ),
       };
@@ -1732,8 +1709,8 @@ export function WallArtEditorDrawer({
           crop: buildInitialImageCrop({
             imageWidth: current.imageWidth,
             imageHeight: current.imageHeight,
-            canvasWidth: IMAGE_CROP_PREVIEW_WIDTH,
-            canvasHeight: imageCropPreviewHeight || IMAGE_CROP_PREVIEW_WIDTH,
+            canvasWidth: imageCropCanvasWidth,
+            canvasHeight: imageCropCanvasHeight,
             rotate,
             flipX,
             flipY,
@@ -1785,7 +1762,7 @@ export function WallArtEditorDrawer({
           );
           context.clip();
         }
-        const scale = targetWidth / IMAGE_CROP_PREVIEW_WIDTH;
+        const scale = targetWidth / imageCropCanvasWidth;
         const renderedImageWidth = image.width * crop.scale * scale;
         const renderedImageHeight = image.height * crop.scale * scale;
         context.save();
@@ -2113,336 +2090,122 @@ export function WallArtEditorDrawer({
   return (
     <>
       {templatePresetPanel}
-      {imageCropIsDisc ? (
-        <DiscArtworkCropDialog
-          draft={
-            imageCropDraft
-              ? {
-                  crop: imageCropDraft.crop,
-                  imageHeight: imageCropDraft.imageHeight,
-                  imageWidth: imageCropDraft.imageWidth,
-                  source: imageCropDraft.source,
+      <DiscArtworkCropDialog
+        canvasHeight={imageCropCanvasHeight}
+        canvasWidth={imageCropCanvasWidth}
+        description={
+          imageCropIsDisc
+            ? "Move and scale the image inside the circular disc area."
+            : "Choose the poster ratio, then move and scale the image before it becomes lyric texture."
+        }
+        draft={
+          imageCropDraft
+            ? {
+                crop: imageCropDraft.crop,
+                imageHeight: imageCropDraft.imageHeight,
+                imageWidth: imageCropDraft.imageWidth,
+                source: imageCropDraft.source,
+              }
+            : null
+        }
+        dragStart={imageCropDragStart}
+        infoCardClassName={wallArtInfoCardClassName}
+        infoText={
+          imageCropIsDisc
+            ? "The circular crop is used inside the record label area."
+            : "The crop ratio matches the selected print canvas."
+        }
+        minScale={imageCropMinScale}
+        pillButtonActiveClassName={wallArtPillButtonActiveClassName}
+        pillButtonClassName={wallArtPillButtonClassName}
+        previewMaxHeight={imageCropIsDisc ? 440 : IMAGE_CROP_PREVIEW_MAX_HEIGHT}
+        previewRoundedClassName={imageCropIsDisc ? "rounded-full" : "rounded-[10px]"}
+        primaryButtonClassName={wallArtPrimaryButtonClassName}
+        secondaryButtonClassName={wallArtSecondaryButtonClassName}
+        sectionHeadingClassName={wallArtSectionHeadingClassName}
+        showGrid={!imageCropIsDisc}
+        subtlePanelClassName={wallArtSubtleGlassPanelClassName}
+        title={imageCropIsDisc ? "Crop disc artwork" : "Crop lyric portrait image"}
+        onApply={applyImageCrop}
+        onClose={() => {
+          setImageCropDraft(null);
+          setImageCropDragStart(null);
+        }}
+        onDragStartChange={setImageCropDragStart}
+        onOrientationChange={updateImageCropOrientation}
+        onTransformChange={updateImageCropTransform}
+      >
+        {!imageCropIsDisc && imageCropDraft ? (
+          <>
+            <div className="space-y-1.5">
+              <Label className={wallArtSectionHeadingClassName}>
+                Canvas size
+              </Label>
+              <Select
+                value={imageCropDraft.printSizeId}
+                onValueChange={(value) =>
+                  updateImageCropCanvasSize({ printSizeId: value })
                 }
-              : null
-          }
-          dragStart={imageCropDragStart}
-          infoCardClassName={wallArtInfoCardClassName}
-          minScale={imageCropMinScale}
-          pillButtonActiveClassName={wallArtPillButtonActiveClassName}
-          pillButtonClassName={wallArtPillButtonClassName}
-          primaryButtonClassName={wallArtPrimaryButtonClassName}
-          secondaryButtonClassName={wallArtSecondaryButtonClassName}
-          sectionHeadingClassName={wallArtSectionHeadingClassName}
-          subtlePanelClassName={wallArtSubtleGlassPanelClassName}
-          onApply={applyImageCrop}
-          onClose={() => {
-            setImageCropDraft(null);
-            setImageCropDragStart(null);
-          }}
-          onDragStartChange={setImageCropDragStart}
-          onOrientationChange={updateImageCropOrientation}
-          onTransformChange={updateImageCropTransform}
-        />
-      ) : (
-        <Dialog
-          open={Boolean(imageCropDraft)}
-          onOpenChange={(open) => {
-            if (!open) {
-              setImageCropDraft(null);
-              setImageCropDragStart(null);
-            }
-          }}
-        >
-          <DialogContent className="max-h-[92svh] overflow-y-auto rounded-[18px] border-none bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,239,231,0.78))] p-4 shadow-[0_28px_84px_rgba(49,37,28,0.2),0_1px_0_rgba(255,255,255,0.82)_inset,0_0_0_1px_rgba(255,255,255,0.12)_inset] backdrop-blur-2xl sm:max-w-4xl [&_[data-slot=dialog-close]]:top-3.5 [&_[data-slot=dialog-close]]:right-3.5 [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:border-none [&_[data-slot=dialog-close]]:bg-white/72 [&_[data-slot=dialog-close]]:p-1.5 [&_[data-slot=dialog-close]]:opacity-100 [&_[data-slot=dialog-close]]:shadow-[0_10px_22px_rgba(70,53,38,0.12)]">
-            <DialogHeader className="gap-2">
-              <DialogTitle className="text-[1.35rem] font-black tracking-[-0.02em] text-[#241b16]">
-                Crop lyric portrait image
-              </DialogTitle>
-              <DialogDescription className="max-w-2xl text-[12px] leading-5 text-[#706356]">
-                Choose the poster ratio, then move and scale the image before it becomes lyric texture.
-              </DialogDescription>
-            </DialogHeader>
-
-            {imageCropDraft && (
-              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_248px]">
-              <div className="min-w-0 rounded-[14px] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_38%),linear-gradient(180deg,#2e2925,#171412)] p-2.5 shadow-[0_20px_48px_rgba(31,24,19,0.28),0_1px_0_rgba(255,255,255,0.12)_inset]">
-                <div
+              >
+                <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent
                   className={cn(
-                    "mx-auto max-w-full overflow-hidden shadow-[0_24px_46px_rgba(0,0,0,0.32)]",
-                    imageCropIsDisc ? "rounded-full" : "rounded-[10px]",
+                    wallArtPopoverClassName,
+                    "[&_[data-slot=select-item]]:rounded-[8px] [&_[data-slot=select-item]]:py-1.5 [&_[data-slot=select-item]]:text-[11.5px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
                   )}
-                  style={{
-                    aspectRatio: `${imageCropWidthCm} / ${imageCropHeightCm}`,
-                    width: imageCropPreviewDisplayWidth,
-                    maxHeight: IMAGE_CROP_PREVIEW_MAX_HEIGHT,
-                  }}
                 >
-                <div
-                  className={cn(
-                    "relative origin-top-left touch-none overflow-hidden bg-black",
-                    imageCropIsDisc && "rounded-full",
-                  )}
-                  style={{
-                    height: imageCropPreviewHeight || IMAGE_CROP_PREVIEW_WIDTH,
-                    transform: `scale(${imageCropPreviewDisplayScale})`,
-                    width: IMAGE_CROP_PREVIEW_WIDTH,
-                  }}
-                  onPointerDown={(event) => {
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                    setImageCropDragStart({
-                      pointerX: event.clientX,
-                      pointerY: event.clientY,
-                      cropX: imageCropDraft.crop.x,
-                      cropY: imageCropDraft.crop.y,
-                    });
-                  }}
-                  onPointerMove={(event) => {
-                    if (!imageCropDragStart) return;
-                    updateImageCropTransform({
-                      x:
-                        imageCropDragStart.cropX +
-                        (event.clientX - imageCropDragStart.pointerX) /
-                          imageCropPreviewDisplayScale,
-                      y:
-                        imageCropDragStart.cropY +
-                        (event.clientY - imageCropDragStart.pointerY) /
-                          imageCropPreviewDisplayScale,
-                    });
-                  }}
-                  onPointerUp={() => setImageCropDragStart(null)}
-                  onPointerCancel={() => setImageCropDragStart(null)}
-                >
-                  <div
-                    className="absolute"
-                    style={{
-                      height: imageCropDraft.crop.renderedHeight,
-                      left: imageCropDraft.crop.x,
-                      top: imageCropDraft.crop.y,
-                      width: imageCropDraft.crop.renderedWidth,
-                    }}
-                  >
-                    <img
-                      alt="Crop preview"
-                      className="absolute left-1/2 top-1/2 max-w-none select-none"
-                      draggable={false}
-                      src={imageCropDraft.source}
-                      style={{
-                        height: imageCropDraft.imageHeight * imageCropDraft.crop.scale,
-                        transform: getImageCropPreviewTransform(imageCropDraft.crop),
-                        width: imageCropDraft.imageWidth * imageCropDraft.crop.scale,
-                      }}
-                    />
-                  </div>
-                  <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.36)]" />
-                  {!imageCropIsDisc && (
-                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,.18)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,.18)_1px,transparent_1px)] bg-[size:33.333%_33.333%]" />
-                  )}
-                  {imageCropIsDisc && (
-                    <div className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_0_2px_rgba(255,255,255,0.42),inset_0_0_34px_rgba(0,0,0,0.28)]" />
-                  )}
-                  <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_9999px_rgba(0,0,0,0.02)]" />
-                </div>
-                </div>
-              </div>
-
-              <div className={cn(wallArtSubtleGlassPanelClassName, "space-y-2.5 p-2.5")}>
-                  <>
-                    <div className="space-y-1.5">
-                      <Label className={wallArtSectionHeadingClassName}>
-                        Canvas size
-                      </Label>
-                      <Select
-                        value={imageCropDraft.printSizeId}
-                        onValueChange={(value) =>
-                          updateImageCropCanvasSize({ printSizeId: value })
-                        }
-                      >
-                        <SelectTrigger className={cn(wallArtFieldClassName, "w-full")}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent
-                          className={cn(
-                            wallArtPopoverClassName,
-                            "[&_[data-slot=select-item]]:rounded-[8px] [&_[data-slot=select-item]]:py-1.5 [&_[data-slot=select-item]]:text-[11.5px] [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
-                          )}
-                        >
-                          {printSizePresets.map((size) => (
-                            <SelectItem key={size.id} value={size.id}>
-                              {size.label}
-                            </SelectItem>
-                          ))}
-                          <SelectItem value="custom">Custom size</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {imageCropDraft.printSizeId === "custom" && (
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1.5">
-                          <Label className={wallArtSectionHeadingClassName}>Width cm</Label>
-                          <Input
-                            className={wallArtFieldClassName}
-                            min={5}
-                            step={0.1}
-                            type="number"
-                            value={imageCropDraft.customWidthCm}
-                            onChange={(event) =>
-                              updateImageCropCanvasSize({
-                                customWidthCm: Number(event.target.value) || 1,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label className={wallArtSectionHeadingClassName}>Height cm</Label>
-                          <Input
-                            className={wallArtFieldClassName}
-                            min={5}
-                            step={0.1}
-                            type="number"
-                            value={imageCropDraft.customHeightCm}
-                            onChange={(event) =>
-                              updateImageCropCanvasSize({
-                                customHeightCm: Number(event.target.value) || 1,
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  {printSizePresets.map((size) => (
+                    <SelectItem key={size.id} value={size.id}>
+                      {size.label}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="custom">Custom size</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {imageCropDraft.printSizeId === "custom" ? (
+              <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1.5">
                   <Label className={wallArtSectionHeadingClassName}>
-                    Transform
+                    Width cm
                   </Label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    <Button
-                      className={cn(
-                        imageCropDraft.crop.flipX
-                          ? wallArtPillButtonActiveClassName
-                          : wallArtPillButtonClassName,
-                        "h-8 px-2",
-                      )}
-                      type="button"
-                      variant={imageCropDraft.crop.flipX ? "default" : "ghost"}
-                      onClick={() =>
-                        updateImageCropOrientation({
-                          flipX: !imageCropDraft.crop.flipX,
-                        })
-                      }
-                    >
-                      Flip H
-                    </Button>
-                    <Button
-                      className={cn(
-                        imageCropDraft.crop.flipY
-                          ? wallArtPillButtonActiveClassName
-                          : wallArtPillButtonClassName,
-                        "h-8 px-2",
-                      )}
-                      type="button"
-                      variant={imageCropDraft.crop.flipY ? "default" : "ghost"}
-                      onClick={() =>
-                        updateImageCropOrientation({
-                          flipY: !imageCropDraft.crop.flipY,
-                        })
-                      }
-                    >
-                      Flip V
-                    </Button>
-                    <Button
-                      className={cn(wallArtPillButtonClassName, "h-8 px-2")}
-                      type="button"
-                      variant="ghost"
-                      onClick={() =>
-                        updateImageCropOrientation({
-                          rotate: (
-                            imageCropDraft.crop.rotate === 0
-                              ? 270
-                              : imageCropDraft.crop.rotate - 90
-                          ) as ImageCropRotation,
-                        })
-                      }
-                    >
-                      Rotate
-                    </Button>
-                    <Button
-                      className={cn(wallArtPillButtonClassName, "h-8 px-2")}
-                      type="button"
-                      variant="ghost"
-                      onClick={() =>
-                        updateImageCropOrientation({
-                          rotate: (
-                            imageCropDraft.crop.rotate === 270
-                              ? 0
-                              : imageCropDraft.crop.rotate + 90
-                          ) as ImageCropRotation,
-                        })
-                      }
-                    >
-                      {imageCropDraft.crop.rotate}°
-                    </Button>
-                  </div>
+                  <Input
+                    className={wallArtFieldClassName}
+                    min={5}
+                    step={0.1}
+                    type="number"
+                    value={imageCropDraft.customWidthCm}
+                    onChange={(event) =>
+                      updateImageCropCanvasSize({
+                        customWidthCm: Number(event.target.value) || 1,
+                      })
+                    }
+                  />
                 </div>
-                <ControlRow
-                  label="Zoom"
-                  max={Math.max(
-                    imageCropDraft.crop.scale * 3,
-                    imageCropDraft.crop.scale + 2,
-                  )}
-                  min={imageCropMinScale}
-                  step={0.01}
-                  value={Number(imageCropDraft.crop.scale.toFixed(2))}
-                  onChange={(scale) => updateImageCropTransform({ scale })}
-                />
-                <ControlRow
-                  label="Move X"
-                  max={0}
-                  min={Math.round(
-                    IMAGE_CROP_PREVIEW_WIDTH -
-                      imageCropDraft.crop.renderedWidth,
-                  )}
-                  step={1}
-                  value={Math.round(imageCropDraft.crop.x)}
-                  onChange={(x) => updateImageCropTransform({ x })}
-                />
-                <ControlRow
-                  label="Move Y"
-                  max={0}
-                  min={Math.round(
-                    imageCropPreviewHeight -
-                      imageCropDraft.crop.renderedHeight,
-                  )}
-                  step={1}
-                  value={Math.round(imageCropDraft.crop.y)}
-                  onChange={(y) => updateImageCropTransform({ y })}
-                />
-                <div className={cn(wallArtInfoCardClassName, "text-[10px] leading-4 text-[#7b6d62]")}>
-                  The crop ratio matches the selected print canvas. Drag the image directly for fine positioning.
+                <div className="space-y-1.5">
+                  <Label className={wallArtSectionHeadingClassName}>
+                    Height cm
+                  </Label>
+                  <Input
+                    className={wallArtFieldClassName}
+                    min={5}
+                    step={0.1}
+                    type="number"
+                    value={imageCropDraft.customHeightCm}
+                    onChange={(event) =>
+                      updateImageCropCanvasSize({
+                        customHeightCm: Number(event.target.value) || 1,
+                      })
+                    }
+                  />
                 </div>
               </div>
-            </div>
-            )}
-
-            <DialogFooter className="mt-2">
-              <Button
-                className={wallArtSecondaryButtonClassName}
-                type="button"
-                variant="ghost"
-                onClick={() => setImageCropDraft(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className={wallArtPrimaryButtonClassName}
-                type="button"
-                onClick={applyImageCrop}
-              >
-                Apply crop
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+            ) : null}
+          </>
+        ) : null}
+      </DiscArtworkCropDialog>
 
       <Sheet
         open={isStudioOpen}

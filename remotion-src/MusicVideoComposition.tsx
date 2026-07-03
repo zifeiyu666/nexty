@@ -7,13 +7,16 @@ import { WaveRadioComposition } from "./WaveRadioComposition";
 
 export type MusicVideoCompositionProps = PhotoSlideshowCompositionProps;
 
-export function MusicVideoComposition({ timeline }: MusicVideoCompositionProps) {
+export function MusicVideoComposition({
+  mediaQuality,
+  timeline,
+}: MusicVideoCompositionProps) {
   if (timeline.templateId === "minimal-vinyl") {
     return <MinimalVinylComposition timeline={timeline} />;
   }
 
   if (timeline.templateId === "wave-radio") {
-    return <WaveRadioComposition timeline={timeline} />;
+    return <WaveRadioComposition mediaQuality={mediaQuality} timeline={timeline} />;
   }
 
   return <PhotoSlideshowComposition timeline={timeline} />;

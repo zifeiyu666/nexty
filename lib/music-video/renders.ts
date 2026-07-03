@@ -301,22 +301,22 @@ export async function markMusicVideoSucceeded({
   videoUrl,
 }: {
   dbClient?: Pick<DbClient, "update">;
-  r2Key: string;
+  r2Key?: string | null;
   temporaryVideoUrl?: string | null;
   thumbnailUrl?: string | null;
   videoId: string;
-  videoUrl: string;
+  videoUrl?: string | null;
 }) {
   return updateMusicVideo({
     dbClient,
     values: {
       completedAt: new Date(),
       error: null,
-      r2Key,
+      r2Key: r2Key ?? null,
       status: "completed",
       temporaryVideoUrl: temporaryVideoUrl ?? null,
       thumbnailUrl,
-      videoUrl,
+      videoUrl: videoUrl ?? null,
     },
     videoId,
   });

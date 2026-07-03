@@ -42,12 +42,14 @@ const transitionSchema = z.object({
   toCueId: z.string(),
   type: z.enum(["cross-dissolve", "motion-blur", "light-leak", "zoom-push"]),
 });
-const lyricsEntranceSchema = z.union([
-  z.enum(["motion-blur-slip", "staggered-glow-reveal", "rolling-flow"]),
-  z.literal(""),
-]).transform((entrance) =>
-  entrance === "" ? DEFAULT_LYRICS_STYLE.entrance : entrance,
-);
+const lyricsEntranceSchema = z
+  .union([
+    z.enum(["motion-blur-slip", "staggered-glow-reveal", "rolling-flow"]),
+    z.literal(""),
+  ])
+  .transform((entrance) =>
+    entrance === "" ? DEFAULT_LYRICS_STYLE.entrance : entrance,
+  );
 const lyricsStyleSchema = z.object({
   color: z.string(),
   entrance: lyricsEntranceSchema,
@@ -61,12 +63,17 @@ const atmosphereOverlaySchema = z.object({
   opacity: z.number().min(0).max(1),
   overlayId: z.string().nullable(),
 });
+const minimalVinylBackgroundOverlaySchema = z.object({
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+  opacity: z.number().min(0).max(1),
+});
 
 const baseTimelineSchema = {
   assignments: z.array(assignmentSchema),
   atmosphereOverlay: atmosphereOverlaySchema.optional(),
   audioUrl: z.string().url(),
   backgroundBlur: z.number().min(0).max(64).optional(),
+  backgroundOverlay: minimalVinylBackgroundOverlaySchema.optional(),
   backgroundPhoto: photoSchema.optional(),
   coverPhoto: photoSchema.optional(),
   duration: z.number().positive(),
@@ -134,9 +141,7 @@ function summarizePhoto(
   };
 }
 
-function summarizeTimelineMedia(
-  timeline: MusicVideoTimeline,
-) {
+function summarizeTimelineMedia(timeline: MusicVideoTimeline) {
   const minimalVinylBackground =
     timeline.templateId === "minimal-vinyl"
       ? {
@@ -163,10 +168,7 @@ function summarizeTimelineMedia(
   };
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Params },
-) {
+export async function POST(request: Request, { params }: { params: Params }) {
   const session = await getSession();
   const user = session?.user;
   if (!user) return apiResponse.unauthorized();
@@ -177,7 +179,9 @@ export async function POST(
 
   const parsed = timelineSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return apiResponse.badRequest(parsed.error.errors[0]?.message ?? "Invalid MV timeline.");
+    return apiResponse.badRequest(
+      parsed.error.errors[0]?.message ?? "Invalid MV timeline.",
+    );
   }
 
   logger.info(

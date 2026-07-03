@@ -20,6 +20,7 @@ import {
 import { resolveRemotionMediaSrc } from "./media-src";
 
 export type WaveRadioCompositionProps = {
+  mediaQuality?: "preview" | "render";
   timeline: MusicVideoTimeline;
 };
 
@@ -121,7 +122,7 @@ function SingleLineLyric({
         lineHeight: 1.05,
         maxWidth: "86%",
         opacity,
-        overflow: "hidden",
+        overflow: "visible",
         paintOrder: "stroke fill",
         textAlign: "center",
         textOverflow: "ellipsis",
@@ -138,7 +139,10 @@ function SingleLineLyric({
   );
 }
 
-export function WaveRadioComposition({ timeline }: WaveRadioCompositionProps) {
+export function WaveRadioComposition({
+  mediaQuality = "render",
+  timeline,
+}: WaveRadioCompositionProps) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const currentTime = frame / fps;
@@ -153,6 +157,10 @@ export function WaveRadioComposition({ timeline }: WaveRadioCompositionProps) {
       ? timeline.waveRadioBackgroundId
       : undefined,
   );
+  const backgroundSrc =
+    mediaQuality === "preview"
+      ? background.previewSrc ?? background.src
+      : background.src;
   const pulse = (Math.sin((frame / fps) * Math.PI * 2 * 0.4) + 1) / 2;
 
   return (
@@ -162,7 +170,7 @@ export function WaveRadioComposition({ timeline }: WaveRadioCompositionProps) {
         loop
         muted
         name={`Wave Radio Background: ${background.label}`}
-        src={resolveRemotionMediaSrc(background.src)}
+        src={resolveRemotionMediaSrc(backgroundSrc)}
         style={{
           filter: "saturate(1.2) contrast(1.08)",
           height: "100%",

@@ -133,6 +133,19 @@ function createLyricBlocks(lyrics: string) {
   return columns;
 }
 
+function formatPlaybackTime(seconds: number) {
+  const safeSeconds = Math.max(0, Math.ceil(seconds));
+
+  if (safeSeconds < 60) {
+    return `${safeSeconds}s`;
+  }
+
+  const minutes = Math.floor(safeSeconds / 60);
+  const remainingSeconds = safeSeconds % 60;
+
+  return `${minutes}m ${remainingSeconds}s`;
+}
+
 function LyricBlockView({ block }: { block: LyricBlock }) {
   return (
     <section className="break-inside-avoid text-center">
@@ -754,9 +767,9 @@ export function SongResultView({
                       />
                     ))}
                   </div>
-                  <span className="text-xs font-bold text-muted-foreground">
-                    {isActiveVersion ? previewTime.toFixed(0) : "0"}s /{" "}
-                    {Math.ceil(displayDuration)}s
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {formatPlaybackTime(isActiveVersion ? previewTime : 0)} /{" "}
+                    {formatPlaybackTime(displayDuration)}
                   </span>
                 </div>
 

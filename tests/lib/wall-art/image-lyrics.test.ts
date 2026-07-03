@@ -175,6 +175,26 @@ describe("image lyric wall art helpers", () => {
     assert.ok(crop.y + crop.renderedHeight >= 1000);
   });
 
+  test("clampImageCrop can allow a small overflow drag margin", () => {
+    const crop = clampImageCrop(
+      {
+        x: 80,
+        y: -80,
+        scale: 1,
+      },
+      {
+        imageWidth: 1000,
+        imageHeight: 1000,
+        canvasWidth: 1000,
+        canvasHeight: 1000,
+        overflowPadding: 48,
+      },
+    );
+
+    assert.equal(crop.x, 48);
+    assert.equal(crop.y, -48);
+  });
+
   test("clampImageCrop uses rotated image dimensions for cover-fit bounds", () => {
     const crop = clampImageCrop(
       {

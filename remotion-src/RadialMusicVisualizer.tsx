@@ -9,16 +9,20 @@ import {
   useVideoConfig,
 } from "remotion";
 import { useAudioData, visualizeAudio } from "@remotion/media-utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY,
   DEFAULT_LYRICS_STYLE,
+  normalizeMinimalVinylBackgroundOverlayConfig,
   normalizeLyricsStyleConfig,
   type LyricsStyleConfig,
+  type MinimalVinylBackgroundOverlayConfig,
 } from "../lib/music-video/photo-slideshow";
 
 export type RadialVisualizerProps = {
   audioSrc: string;
   backgroundBlur?: number;
+  backgroundOverlay?: MinimalVinylBackgroundOverlayConfig;
   backgroundImageSrc?: string | null;
   baseRadius?: number;
   coverImageSrc?: string | null;
@@ -116,10 +120,34 @@ function findActiveLyricCue({
 function getVisibleLyricLines({
   activeCue,
   lyricCues,
+  title,
 }: {
   activeCue: ReturnType<typeof findActiveLyricCue>;
   lyricCues: NonNullable<RadialVisualizerProps["lyricCues"]>;
+  title?: string;
 }) {
+  const fallbackTitle = title?.trim();
+
+  if (!activeCue && fallbackTitle) {
+    const titleCue = {
+      end: Number.POSITIVE_INFINITY,
+      id: "song-title",
+      start: 0,
+      text: fallbackTitle,
+    };
+
+    return {
+      activeIndex: 0,
+      lines: [
+        {
+          cue: titleCue,
+          index: 0,
+        },
+      ],
+      start: 0,
+    };
+  }
+
   const activeIndex = activeCue
     ? Math.max(
         0,
@@ -229,6 +257,7 @@ function drawBackground(
   width: number,
   height: number,
   backgroundBlur = 42,
+  backgroundOverlay: MinimalVinylBackgroundOverlayConfig = DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY,
   backgroundImage?: HTMLImageElement | null,
 ) {
   if (backgroundImage?.complete && backgroundImage.naturalWidth > 0) {
@@ -278,9 +307,18 @@ function drawBackground(
   context.fillRect(0, 0, width, height);
 
   const shade = context.createLinearGradient(0, 0, 0, height);
-  shade.addColorStop(0, "rgba(2,4,8,0.24)");
-  shade.addColorStop(0.58, "rgba(2,4,8,0.18)");
-  shade.addColorStop(1, "rgba(2,4,8,0.76)");
+  shade.addColorStop(
+    0,
+    rgba(backgroundOverlay.color, backgroundOverlay.opacity * 0.41),
+  );
+  shade.addColorStop(
+    0.58,
+    rgba(backgroundOverlay.color, backgroundOverlay.opacity * 0.31),
+  );
+  shade.addColorStop(
+    1,
+    rgba(backgroundOverlay.color, backgroundOverlay.opacity),
+  );
   context.fillStyle = shade;
   context.fillRect(0, 0, width, height);
 }
@@ -348,6 +386,7 @@ function drawLyricsPanel({
     const y = scrollY + (index - start) * lineHeight;
     const cueStartFrame = cue.start * fps;
     const cueEndFrame = cue.end * fps;
+    const hasFiniteEndFrame = Number.isFinite(cueEndFrame);
     const inProgress = interpolate(
       frame,
       [cueStartFrame, cueStartFrame + fps * 0.34],
@@ -358,16 +397,13 @@ function drawLyricsPanel({
         extrapolateRight: "clamp",
       },
     );
-    const outProgress = interpolate(
-      frame,
-      [cueEndFrame - fps * 0.28, cueEndFrame],
-      [0, 1],
-      {
-        easing: Easing.bezier(0.7, 0, 0.84, 0),
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-      },
-    );
+    const outProgress = hasFiniteEndFrame
+      ? interpolate(frame, [cueEndFrame - fps * 0.28, cueEndFrame], [0, 1], {
+          easing: Easing.bezier(0.7, 0, 0.84, 0),
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        })
+      : 0;
     const activeOpacity = clamp(inProgress * (1 - outProgress));
     const entranceOffset =
       lyricsStyle.entrance === "staggered-glow-reveal"
@@ -389,10 +425,7 @@ function drawLyricsPanel({
     context.fillStyle = isActive ? lyricsStyle.color : "rgba(221,241,248,0.78)";
     context.font = `${isActive ? 900 : 800} ${Math.max(
       22,
-      Math.min(
-        lyricsStyle.fontSize,
-        panelHeight * (isActive ? 0.2 : 0.14),
-      ),
+      Math.min(lyricsStyle.fontSize, panelHeight * (isActive ? 0.2 : 0.14)),
     )}px ${lyricsStyle.fontFamily}`;
     context.shadowBlur = isActive ? 18 : 0;
     context.shadowColor = "rgba(94,231,255,0.44)";
@@ -401,10 +434,20 @@ function drawLyricsPanel({
     if (isActive && lyricsStyle.strokeWidth > 0) {
       context.lineWidth = lyricsStyle.strokeWidth * 2;
       context.strokeStyle = lyricsStyle.strokeColor;
-      context.strokeText(cue.text, panelX + 34, y + entranceOffset, panelWidth - 68);
+      context.strokeText(
+        cue.text,
+        panelX + 34,
+        y + entranceOffset,
+        panelWidth - 68,
+      );
     }
 
-    context.fillText(cue.text, panelX + 34, y + entranceOffset, panelWidth - 68);
+    context.fillText(
+      cue.text,
+      panelX + 34,
+      y + entranceOffset,
+      panelWidth - 68,
+    );
     context.globalAlpha = 1;
     context.filter = "none";
   });
@@ -533,30 +576,11 @@ function drawRecord({
     context.stroke();
   }
 
-  context.beginPath();
-  context.arc(0, 0, radius * COVER_LABEL_RADIUS_RATIO, 0, Math.PI * 2);
-  const labelGradient = context.createLinearGradient(
-    -radius * COVER_LABEL_RADIUS_RATIO,
-    -radius * COVER_LABEL_RADIUS_RATIO,
-    radius * COVER_LABEL_RADIUS_RATIO,
-    radius * COVER_LABEL_RADIUS_RATIO,
-  );
-  labelGradient.addColorStop(0, "#65e8ce");
-  labelGradient.addColorStop(1, "#39a8f2");
-  context.fillStyle = labelGradient;
-  context.fill();
-
   if (coverImage?.complete && coverImage.naturalWidth > 0) {
     context.save();
     try {
       context.beginPath();
-      context.arc(
-        0,
-        0,
-        radius * (COVER_LABEL_RADIUS_RATIO - 0.03),
-        0,
-        Math.PI * 2,
-      );
+      context.arc(0, 0, radius * COVER_LABEL_RADIUS_RATIO, 0, Math.PI * 2);
       context.clip();
       context.drawImage(
         coverImage,
@@ -566,11 +590,13 @@ function drawRecord({
         radius * COVER_LABEL_RADIUS_RATIO * 2,
       );
     } catch {
+      drawDefaultRecordLabel({ context, radius });
       drawLabelText({ context, labelLines, radius });
     } finally {
       context.restore();
     }
   } else {
+    drawDefaultRecordLabel({ context, radius });
     drawLabelText({ context, labelLines, radius });
   }
 
@@ -583,9 +609,31 @@ function drawRecord({
   context.restore();
 }
 
+function drawDefaultRecordLabel({
+  context,
+  radius,
+}: {
+  context: CanvasRenderingContext2D;
+  radius: number;
+}) {
+  context.beginPath();
+  context.arc(0, 0, radius * COVER_LABEL_RADIUS_RATIO, 0, Math.PI * 2);
+  const labelGradient = context.createLinearGradient(
+    -radius * COVER_LABEL_RADIUS_RATIO,
+    -radius * COVER_LABEL_RADIUS_RATIO,
+    radius * COVER_LABEL_RADIUS_RATIO,
+    radius * COVER_LABEL_RADIUS_RATIO,
+  );
+  labelGradient.addColorStop(0, "#65e8ce");
+  labelGradient.addColorStop(1, "#39a8f2");
+  context.fillStyle = labelGradient;
+  context.fill();
+}
+
 function drawLoadingState({
   backgroundBlur = 42,
   backgroundImage,
+  backgroundOverlay,
   centerX,
   centerY,
   context,
@@ -598,6 +646,7 @@ function drawLoadingState({
 }: {
   backgroundBlur?: number;
   backgroundImage?: HTMLImageElement | null;
+  backgroundOverlay?: MinimalVinylBackgroundOverlayConfig;
   centerX: number;
   centerY: number;
   context: CanvasRenderingContext2D;
@@ -613,6 +662,7 @@ function drawLoadingState({
     width,
     height,
     backgroundBlur,
+    backgroundOverlay,
     backgroundImage ?? coverImage,
   );
   drawRecord({
@@ -635,6 +685,7 @@ function drawLoadingState({
 export function RadialVisualizer({
   audioSrc,
   backgroundBlur = 42,
+  backgroundOverlay = DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY,
   backgroundImageSrc = null,
   baseRadius = DEFAULT_BASE_RADIUS,
   coverImageSrc = null,
@@ -648,11 +699,14 @@ export function RadialVisualizer({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundImageRef = useRef<HTMLImageElement>(null);
   const coverImageRef = useRef<HTMLImageElement>(null);
+  const [loadedImageVersion, setLoadedImageVersion] = useState(0);
   const frame = useCurrentFrame();
   const { fps, height, width } = useVideoConfig();
   const audioData = useAudioData(audioSrc);
   const safeDensity = normalizeDensity(density);
   const normalizedLyricsStyle = normalizeLyricsStyleConfig(lyricsStyle);
+  const normalizedBackgroundOverlay =
+    normalizeMinimalVinylBackgroundOverlayConfig(backgroundOverlay);
   const shortSide = Math.min(width, height);
   const fitted = fitVisualizerToFrame({
     baseRadius,
@@ -674,7 +728,7 @@ export function RadialVisualizer({
       frame * RECORD_ROTATION_DEGREES_PER_FRAME * (Math.PI / 180);
     const currentTime = frame / fps;
     const activeCue = findActiveLyricCue({ currentTime, lyricCues });
-    const visibleLyrics = getVisibleLyricLines({ activeCue, lyricCues });
+    const visibleLyrics = getVisibleLyricLines({ activeCue, lyricCues, title });
 
     if (!audioData) {
       drawLoadingState({
@@ -683,6 +737,7 @@ export function RadialVisualizer({
         context,
         backgroundBlur,
         backgroundImage: backgroundImageRef.current ?? coverImageRef.current,
+        backgroundOverlay: normalizedBackgroundOverlay,
         frame,
         height,
         radius: fitted.radius,
@@ -726,6 +781,7 @@ export function RadialVisualizer({
       width,
       height,
       backgroundBlur,
+      normalizedBackgroundOverlay,
       backgroundImageRef.current ?? coverImageRef.current,
     );
     drawVisualizerBars({
@@ -773,6 +829,8 @@ export function RadialVisualizer({
     title,
     width,
     backgroundBlur,
+    normalizedBackgroundOverlay,
+    loadedImageVersion,
   ]);
 
   return (
@@ -784,6 +842,7 @@ export function RadialVisualizer({
           alt=""
           src={backgroundImageSrc}
           style={{ display: "none" }}
+          onLoad={() => setLoadedImageVersion((version) => version + 1)}
         />
       ) : null}
       {coverImageSrc ? (
@@ -793,6 +852,7 @@ export function RadialVisualizer({
           crossOrigin="anonymous"
           src={coverImageSrc}
           style={{ display: "none" }}
+          onLoad={() => setLoadedImageVersion((version) => version + 1)}
         />
       ) : null}
       <canvas

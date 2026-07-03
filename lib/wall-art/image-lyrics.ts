@@ -135,6 +135,7 @@ export type ImageCropTransform = {
 export type ClampImageCropInput = ImageCropInput & {
   minScale?: number;
   maxScale?: number;
+  overflowPadding?: number;
 };
 
 export type ImageCropRotation = 0 | 90 | 180 | 270;
@@ -258,6 +259,7 @@ export function clampImageCrop(
     canvasHeight,
     minScale = 0.1,
     maxScale = 6,
+    overflowPadding = 0,
   }: ClampImageCropInput,
 ): ImageCropTransform {
   const rotate = crop.rotate ?? 0;
@@ -279,10 +281,13 @@ export function clampImageCrop(
   );
   const renderedWidth = orientedImageSize.width * safeScale;
   const renderedHeight = orientedImageSize.height * safeScale;
-  const minX = safeCanvasWidth - renderedWidth;
-  const minY = safeCanvasHeight - renderedHeight;
-  const x = renderedWidth <= safeCanvasWidth ? 0 : clamp(crop.x, minX, 0);
-  const y = renderedHeight <= safeCanvasHeight ? 0 : clamp(crop.y, minY, 0);
+  const safeOverflowPadding = Math.max(0, overflowPadding);
+  const minX = safeCanvasWidth - renderedWidth - safeOverflowPadding;
+  const maxX = safeOverflowPadding;
+  const minY = safeCanvasHeight - renderedHeight - safeOverflowPadding;
+  const maxY = safeOverflowPadding;
+  const x = clamp(crop.x, minX, maxX);
+  const y = clamp(crop.y, minY, maxY);
 
   return {
     x: roundCropValue(x),

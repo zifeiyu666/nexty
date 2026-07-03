@@ -30,6 +30,7 @@ export type MusicVideoListItem = {
   songId: string;
   songTitle: string;
   status: MusicVideoStatus;
+  temporaryVideoUrl: string | null;
   title: string;
   videoUrl: string | null;
 };
@@ -137,9 +138,9 @@ function MusicVideoCard({
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          {item.videoUrl ? (
+          {item.videoUrl || item.temporaryVideoUrl ? (
             <Button asChild className="h-10 rounded-full px-4" size="sm">
-              <a download href={item.videoUrl}>
+              <a download href={`/api/musicvideos/${item.id}/download`}>
                 <Download className="size-4" />
                 Download
               </a>

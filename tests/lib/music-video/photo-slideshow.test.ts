@@ -570,6 +570,30 @@ describe("photo slideshow music video helpers", () => {
     );
   });
 
+  test("provides low-bandwidth wave radio preview assets without replacing render sources", () => {
+    const largePreview = WAVE_RADIO_BACKGROUND_OPTIONS.find(
+      (option) => option.id === "violet-field-148029",
+    );
+    const smallFallback = WAVE_RADIO_BACKGROUND_OPTIONS.find(
+      (option) => option.id === "blue-current-277316",
+    );
+
+    assert.match(largePreview?.src ?? "", /\/overlay\/bg-video\/148029-793140704\.mp4$/);
+    assert.match(
+      largePreview?.previewSrc ?? "",
+      /\/overlay\/bg-video-preview\/148029-793140704\.mp4$/,
+    );
+    assert.match(
+      largePreview?.posterSrc ?? "",
+      /\/overlay\/bg-video-poster\/148029-793140704\.jpg$/,
+    );
+    assert.equal(smallFallback?.previewSrc, undefined);
+    assert.match(
+      smallFallback?.posterSrc ?? "",
+      /\/overlay\/bg-video-poster\/720p\/277316\.jpg$/,
+    );
+  });
+
   test("builds a wave radio timeline with centered single-line lyrics", () => {
     const timeline = buildWaveRadioTimeline({
       songTitle: "Our Song",

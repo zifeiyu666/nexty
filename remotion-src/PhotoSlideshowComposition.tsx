@@ -29,6 +29,7 @@ import { useMemo, type CSSProperties } from "react";
 import { AtmosphereOverlay } from "./AtmosphereOverlay";
 
 export type PhotoSlideshowCompositionProps = {
+  mediaQuality?: "preview" | "render";
   timeline: MusicVideoTimeline;
 };
 

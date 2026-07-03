@@ -1,5 +1,7 @@
 import { useVideoConfig } from "remotion";
 import {
+  DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR,
+  normalizeMinimalVinylBackgroundOverlayConfig,
   normalizeLyricsStyleConfig,
   type MusicVideoTimeline,
 } from "../lib/music-video/photo-slideshow";
@@ -19,25 +21,32 @@ export function MinimalVinylComposition({
   const { height, width } = useVideoConfig();
   const audioSrc = hasMediaSrc(timeline.audioUrl) ? timeline.audioUrl : "";
   const coverImageSrc =
-    timeline.coverPhoto?.url ?? timeline.coverPhoto?.objectUrl ?? null;
+    timeline.coverPhoto?.objectUrl ?? timeline.coverPhoto?.url ?? null;
   const backgroundImageSrc =
     timeline.templateId === "minimal-vinyl"
-      ? timeline.backgroundPhoto?.url ??
+      ? (timeline.backgroundPhoto?.url ??
         timeline.backgroundPhoto?.objectUrl ??
-        coverImageSrc
+        coverImageSrc)
       : coverImageSrc;
   const shortSide = Math.min(width, height);
   const lyricsStyle = normalizeLyricsStyleConfig(timeline.lyricsStyle);
+  const backgroundOverlay =
+    timeline.templateId === "minimal-vinyl"
+      ? normalizeMinimalVinylBackgroundOverlayConfig(timeline.backgroundOverlay)
+      : undefined;
 
   return (
     <RadialVisualizer
       audioSrc={audioSrc}
       backgroundBlur={
         timeline.templateId === "minimal-vinyl"
-          ? timeline.backgroundBlur ?? 42
-          : 42
+          ? (timeline.backgroundBlur ?? DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR)
+          : DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR
       }
-      backgroundImageSrc={hasMediaSrc(backgroundImageSrc) ? backgroundImageSrc : null}
+      backgroundOverlay={backgroundOverlay}
+      backgroundImageSrc={
+        hasMediaSrc(backgroundImageSrc) ? backgroundImageSrc : null
+      }
       baseRadius={shortSide * 0.22}
       coverImageSrc={hasMediaSrc(coverImageSrc) ? coverImageSrc : null}
       density={128}

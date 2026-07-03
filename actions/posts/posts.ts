@@ -7,6 +7,7 @@ import { getSession, isAdmin } from '@/lib/auth/server'
 import { db } from '@/lib/db'
 import { posts as postsSchema, PostStatus, postTags as postTagsSchema, PostType, subscriptions as subscriptionsSchema, tags as tagsSchema } from '@/lib/db/schema'
 import { getErrorMessage } from '@/lib/error-utils'
+import { buildPublicPostUrl, submitIndexNowUrls, submitPostToIndexNow } from '@/lib/indexnow'
 import { PostWithTags, PublicPost, PublicPostWithContent } from '@/types/cms'
 import { and, count, desc, eq, getTableColumns, ilike, inArray, or, sql } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
@@ -274,6 +275,18 @@ export async function createPostAction({
     if (postData.status === 'published') {
       revalidatePath(`${postData.language === DEFAULT_LOCALE ? '' : '/' + postData.language}/${postType}`)
       revalidatePath(`${postData.language === DEFAULT_LOCALE ? '' : '/' + postData.language}/${postType}/${postData.slug}`)
+
+      if (postData.visibility === 'public') {
+        try {
+          await submitPostToIndexNow({
+            locale: postData.language,
+            postType,
+            slug: postData.slug,
+          })
+        } catch (indexNowError) {
+          console.error('IndexNow submission failed after post creation:', indexNowError)
+        }
+      }
     }
 
     return actionResponse.success({ postId: postId })
@@ -329,6 +342,7 @@ export async function updatePostAction({
         language: postsSchema.language,
         status: postsSchema.status,
         postType: postsSchema.postType,
+        visibility: postsSchema.visibility,
       })
       .from(postsSchema)
       .where(eq(postsSchema.id, postId))
@@ -341,6 +355,9 @@ export async function updatePostAction({
 
     // Use provided postType or keep existing one
     const finalPostType = currentPost.postType
+    if (!finalPostType) {
+      return actionResponse.badRequest('Post type is missing for this post.')
+    }
 
     await db
       .update(postsSchema)
@@ -371,6 +388,37 @@ export async function updatePostAction({
       revalidatePath(
         `${postUpdateData.language === DEFAULT_LOCALE ? '' : '/' + postUpdateData.language}/${finalPostType}/${postUpdateData.slug}`
       )
+
+      if (postUpdateData.visibility === 'public') {
+        const indexNowUrls = [
+          buildPublicPostUrl({
+            locale: postUpdateData.language,
+            postType: finalPostType,
+            slug: postUpdateData.slug,
+          }),
+        ]
+
+        if (
+          currentPost.status === 'published' &&
+          currentPost.visibility === 'public' &&
+          (currentPost.slug !== postUpdateData.slug ||
+            currentPost.language !== postUpdateData.language)
+        ) {
+          indexNowUrls.push(
+            buildPublicPostUrl({
+              locale: currentPost.language,
+              postType: finalPostType,
+              slug: currentPost.slug,
+            })
+          )
+        }
+
+        try {
+          await submitIndexNowUrls(indexNowUrls)
+        } catch (indexNowError) {
+          console.error('IndexNow submission failed after post update:', indexNowError)
+        }
+      }
     }
 
     return actionResponse.success({ postId: postId })
@@ -407,6 +455,8 @@ export async function deletePostAction({
         slug: postsSchema.slug,
         language: postsSchema.language,
         postType: postsSchema.postType,
+        status: postsSchema.status,
+        visibility: postsSchema.visibility,
       })
       .from(postsSchema)
       .where(eq(postsSchema.id, postId))
@@ -422,6 +472,18 @@ export async function deletePostAction({
     if (postDetails?.slug && postDetails?.language) {
       revalidatePath(`${postDetails?.language === DEFAULT_LOCALE ? '' : '/' + postDetails?.language}/${postDetails.postType}`)
       revalidatePath(`${postDetails?.language === DEFAULT_LOCALE ? '' : '/' + postDetails?.language}/${postDetails.postType}/${postDetails.slug}`)
+
+      if (postDetails.postType && postDetails.status === 'published' && postDetails.visibility === 'public') {
+        try {
+          await submitPostToIndexNow({
+            locale: postDetails.language,
+            postType: postDetails.postType,
+            slug: postDetails.slug,
+          })
+        } catch (indexNowError) {
+          console.error('IndexNow submission failed after post deletion:', indexNowError)
+        }
+      }
     }
 
     return actionResponse.success({ postId: postId })

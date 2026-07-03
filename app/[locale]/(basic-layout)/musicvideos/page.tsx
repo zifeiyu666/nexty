@@ -98,6 +98,7 @@ export default async function MusicVideosPage({ params }: { params: Params }) {
           songId: song.id,
           songTitle: song.title,
           status: musicVideo.status,
+          temporaryVideoUrl: musicVideo.temporaryVideoUrl,
           title: musicVideo.title,
           videoUrl: musicVideo.videoUrl,
         }))}

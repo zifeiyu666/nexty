@@ -119,17 +119,17 @@ function GiftStoryPrompt({
   return (
     <>
       <div className="mx-auto inline-flex max-w-full items-center justify-center gap-2 text-white">
-        <span className="inline-flex h-7 min-w-0 items-center rounded-full border border-white/12 bg-black/16 px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/62 shadow-[0_8px_24px_rgba(0,0,0,0.16)] backdrop-blur-xl sm:h-7 sm:text-[11px]">
+        <span className="inline-flex h-7 min-w-0 items-center rounded-full bg-white/[0.08] px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/66 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_12px_30px_rgba(0,0,0,0.18)] backdrop-blur-2xl sm:h-7 sm:text-[11px]">
           <span className="min-w-0 truncate">Gift for {recipientLabel}</span>
         </span>
         <button
           aria-expanded={isOpen}
           aria-label="Open gift note"
-          className="group relative flex size-8 shrink-0 rotate-[-4deg] items-center justify-center rounded-[0.65rem] border border-[#f7d7b5]/70 bg-[#fff4dc] text-[#8b4b34] shadow-[0_8px_18px_rgba(0,0,0,0.18)] transition hover:rotate-0 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          className="group relative flex size-8 shrink-0 rotate-[-4deg] items-center justify-center rounded-[0.65rem] bg-[#fff4dc]/86 text-[#8b4b34] shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_10px_24px_rgba(0,0,0,0.2)] backdrop-blur-xl transition hover:rotate-0 hover:scale-105 hover:bg-[#fff8e8]/92 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_14px_32px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
           type="button"
           onClick={onOpen}
         >
-          <span className="absolute inset-1 rounded-[0.45rem] border border-[#ce8863]/30" />
+          <span className="absolute inset-1 rounded-[0.45rem] bg-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.36)]" />
           <NotebookPen className="relative size-3.5 stroke-[1.7] transition group-hover:-translate-y-0.5" />
         </button>
       </div>
@@ -291,7 +291,7 @@ function BrandHomeLink() {
   return (
     <I18nLink
       aria-label={`${siteConfig.name} home`}
-      className="group inline-flex min-w-0 items-center gap-2 rounded-full border border-white/18 bg-black/24 px-3 py-2 text-white shadow-[0_14px_36px_rgba(0,0,0,0.24)] outline-none backdrop-blur-2xl transition hover:border-white/28 hover:bg-white/12 focus-visible:ring-2 focus-visible:ring-white/70"
+      className="group inline-flex min-w-0 items-center gap-2 rounded-full bg-white/[0.08] px-3 py-2 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-18px_34px_rgba(255,255,255,0.04),0_16px_42px_rgba(0,0,0,0.26)] outline-none backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.13] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-18px_34px_rgba(255,255,255,0.06),0_24px_56px_rgba(0,0,0,0.32)] focus-visible:ring-2 focus-visible:ring-white/70"
       href="/"
     >
       <span className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_0_26px_rgba(255,255,255,0.2)]">
@@ -326,7 +326,7 @@ function ArtworkPlate({
     <div className="hidden items-center gap-3 md:flex">
       <div
         className={cn(
-          "relative size-14 shrink-0 overflow-hidden rounded-full border border-white/22 bg-black/34 shadow-[0_12px_36px_rgba(0,0,0,0.36)]",
+          "relative size-14 shrink-0 overflow-hidden rounded-full bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_12px_36px_rgba(0,0,0,0.36)] backdrop-blur-xl",
           isPlaying && "animate-[spin_18s_linear_infinite]",
         )}
       >
@@ -378,7 +378,7 @@ function PlaybackController({
     : 0;
 
   return (
-    <div className="pointer-events-auto mx-auto w-full max-w-6xl rounded-[1.65rem] border border-white/18 bg-black/34 p-3 text-white shadow-[0_26px_80px_rgba(0,0,0,0.44)] backdrop-blur-2xl sm:p-4">
+    <div className="pointer-events-auto mx-auto w-full max-w-6xl rounded-[1.65rem] bg-white/[0.075] p-3 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),inset_0_-32px_70px_rgba(255,255,255,0.035),0_28px_90px_rgba(0,0,0,0.46)] backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.095] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-32px_70px_rgba(255,255,255,0.05),0_34px_105px_rgba(0,0,0,0.52)] sm:p-4">
       <div className="flex items-center gap-3 sm:gap-4">
         <ArtworkPlate
           imageUrl={data.imageUrl}
@@ -430,7 +430,7 @@ function PlaybackController({
               />
             </div>
             <div
-              className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/70 bg-white shadow-[0_0_22px_rgba(255,255,255,0.7)]"
+              className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_0_22px_rgba(255,255,255,0.7)]"
               style={{ left: `${progress}%` }}
             />
           </div>
@@ -600,7 +600,7 @@ export function SharedSongFullscreenPlayer({
 
       <button
         aria-label="Previous lyric"
-        className="fixed left-4 top-1/2 z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/12 bg-black/20 text-white/58 backdrop-blur-xl transition hover:bg-white/10 hover:text-white lg:flex"
+        className="fixed left-4 top-1/2 z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/[0.075] text-white/62 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_14px_34px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition duration-300 hover:scale-105 hover:bg-white/[0.13] hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_20px_44px_rgba(0,0,0,0.34)] lg:flex"
         type="button"
         onClick={() => {
           const nextCue = cues[Math.max(activeIndex - 1, 0)];
@@ -611,7 +611,7 @@ export function SharedSongFullscreenPlayer({
       </button>
       <button
         aria-label="Next lyric"
-        className="fixed right-4 top-1/2 z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/12 bg-black/20 text-white/58 backdrop-blur-xl transition hover:bg-white/10 hover:text-white lg:flex"
+        className="fixed right-4 top-1/2 z-20 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/[0.075] text-white/62 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_14px_34px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition duration-300 hover:scale-105 hover:bg-white/[0.13] hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_20px_44px_rgba(0,0,0,0.34)] lg:flex"
         type="button"
         onClick={() => {
           const nextCue = cues[Math.min(activeIndex + 1, cues.length - 1)];

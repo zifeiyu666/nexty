@@ -1,11 +1,10 @@
 import { apiResponse } from "@/lib/api-response";
 import { getSession } from "@/lib/auth/server";
-import { after } from "next/server";
 import {
   getMusicVideoForOwner,
 } from "@/lib/music-video/renders";
 import {
-  completeMusicVideoRender,
+  completeMusicVideoRenderWithTemporaryUrl,
   failMusicVideoRender,
   markMusicVideoTemporaryRenderOutput,
 } from "@/lib/music-video/render-completion";
@@ -58,18 +57,12 @@ export async function POST(_request: Request, { params }: { params: Params }) {
       return apiResponse.success({ progress: progress.progress, video });
     }
 
-    after(async () => {
-      try {
-        await completeMusicVideoRender({
-          outputUrl: progress.outputFile,
-          video,
-        });
-      } catch (error) {
-        console.error("[music-video-refresh] Failed to persist Remotion output", error);
-      }
+    const completed = await completeMusicVideoRenderWithTemporaryUrl({
+      outputUrl: progress.outputFile,
+      video,
     });
 
-    return apiResponse.success({ progress: 1, video });
+    return apiResponse.success({ progress: 1, video: completed ?? video });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to refresh MV render.";

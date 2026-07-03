@@ -1,13 +1,11 @@
 import { getLogger } from "@/lib/logger";
-import { after } from "next/server";
 import {
   getMusicVideoById,
   type MusicVideoRender,
 } from "@/lib/music-video/renders";
 import {
-  completeMusicVideoRender,
+  completeMusicVideoRenderWithTemporaryUrl,
   failMusicVideoRender,
-  markMusicVideoTemporaryRenderOutput,
 } from "@/lib/music-video/render-completion";
 import {
   appRouterWebhook,
@@ -71,23 +69,9 @@ async function handleSuccess(payload: WebhookSuccessPayload) {
     "Received Remotion music video success webhook",
   );
 
-  await markMusicVideoTemporaryRenderOutput({
+  await completeMusicVideoRenderWithTemporaryUrl({
     outputUrl: payload.outputUrl ?? payload.outputFile,
     video,
-  });
-
-  after(async () => {
-    try {
-      await completeMusicVideoRender({
-        outputUrl: payload.outputUrl ?? payload.outputFile,
-        video,
-      });
-    } catch (error) {
-      logger.error(
-        { err: error, renderId: payload.renderId, videoId: video.id },
-        "Failed to persist Remotion webhook output in background",
-      );
-    }
   });
 }
 

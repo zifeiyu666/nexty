@@ -3,6 +3,7 @@ import { describe, test } from "node:test";
 
 import {
   completeMusicVideoRender,
+  completeMusicVideoRenderWithTemporaryUrl,
   failMusicVideoRender,
   markMusicVideoTemporaryRenderOutput,
 } from "@/lib/music-video/render-completion";
@@ -57,6 +58,35 @@ describe("music video render completion", () => {
       },
     ]);
     assert.equal(completed?.status, "completed");
+  });
+
+  test("can complete with the temporary Remotion output without uploading to R2", async () => {
+    const calls: unknown[] = [];
+    const completed = await completeMusicVideoRenderWithTemporaryUrl({
+      markSucceeded: async (input) => {
+        calls.push(input);
+        return {
+          id: input.videoId,
+          status: "completed",
+          temporaryVideoUrl: input.temporaryVideoUrl,
+          videoUrl: input.videoUrl,
+        };
+      },
+      outputUrl: "https://remotion.example.com/out.mp4",
+      video,
+    });
+
+    assert.deepEqual(calls, [
+      {
+        r2Key: null,
+        temporaryVideoUrl: "https://remotion.example.com/out.mp4",
+        videoId: "mv-1",
+        videoUrl: null,
+      },
+    ]);
+    assert.equal(completed?.status, "completed");
+    assert.equal(completed?.temporaryVideoUrl, "https://remotion.example.com/out.mp4");
+    assert.equal(completed?.videoUrl, null);
   });
 
   test("fails the video when Remotion success payload has no output URL", async () => {

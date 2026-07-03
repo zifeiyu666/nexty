@@ -1,4 +1,9 @@
-import { SheetClose, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  SheetClose,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { X, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
@@ -46,14 +51,11 @@ export const studioGlassStyles = {
     "overflow-hidden rounded-[8px] bg-white/74 shadow-[0_8px_17px_rgba(64,48,34,0.075),0_1px_0_rgba(255,255,255,0.76)_inset,0_0_0_1px_rgba(255,255,255,0.1)_inset] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_22px_rgba(64,48,34,0.11)]",
   scrollArea:
     "min-h-0 [&>[data-slot=scroll-area-scrollbar][data-orientation=vertical]]:w-1.5 [&>[data-slot=scroll-area-scrollbar][data-orientation=vertical]]:border-l-0 [&>[data-slot=scroll-area-scrollbar][data-orientation=vertical]]:p-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:opacity-100 [&>[data-slot=scroll-area-scrollbar]]:transition-opacity [&>[data-slot=scroll-area-scrollbar]:hover>[data-slot=scroll-area-thumb]]:bg-[#ad8a57]/80 [&>[data-slot=scroll-area-thumb]]:rounded-full [&>[data-slot=scroll-area-thumb]]:bg-[linear-gradient(180deg,rgba(210,189,158,0.92),rgba(162,137,101,0.88))] [&>[data-slot=scroll-area-thumb]]:shadow-[0_0_0_1px_rgba(255,248,236,0.72)_inset]",
-  scrollAreaViewport:
-    "[&>[data-slot=scroll-area-viewport]]:rounded-[inherit]",
+  scrollAreaViewport: "[&>[data-slot=scroll-area-viewport]]:rounded-[inherit]",
   sectionHeading:
     "text-[9px] font-black uppercase tracking-[0.15em] text-[#8f7f72]",
-  controlTitle:
-    "text-[11.5px] font-black tracking-[-0.01em] text-[#241b16]",
-  controlDescription:
-    "mt-0.5 text-[10px] leading-3.5 text-[#76695d]",
+  controlTitle: "text-[11.5px] font-black tracking-[-0.01em] text-[#241b16]",
+  controlDescription: "mt-0.5 text-[10px] leading-3.5 text-[#76695d]",
   microButton:
     "rounded-full border-none bg-white/72 text-[11px] font-bold text-[#322821] shadow-[0_6px_14px_rgba(70,53,38,0.075),0_1px_0_rgba(255,255,255,0.78)_inset,0_0_0_1px_rgba(255,255,255,0.1)_inset] backdrop-blur-xl transition hover:bg-white",
   floatingAction:
@@ -61,7 +63,7 @@ export const studioGlassStyles = {
   selectContentItems:
     "[&_[data-slot=select-item]]:rounded-[8px] [&_[data-slot=select-item]]:py-1.5 [&_[data-slot=select-item]]:pl-3.5 [&_[data-slot=select-item]]:pr-11 [&_[data-slot=select-item]]:text-[11.5px] [&_[data-slot=select-item]>span:first-child]:right-4 [&_[data-slot=select-item][data-state=checked]]:bg-[#2d2622] [&_[data-slot=select-item][data-state=checked]]:text-[#f7f0e6]",
   slider:
-    "[&_[data-slot=slider-range]]:bg-[#362e28] [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-none [&_[data-slot=slider-thumb]]:bg-[#fff8f1] [&_[data-slot=slider-thumb]]:shadow-[0_6px_12px_rgba(53,40,30,0.18),0_0_0_1px_rgba(255,255,255,0.72)_inset] [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/65",
+    "[&_[data-slot=slider-range]]:bg-[linear-gradient(90deg,#241b16,#7a5541)] [&_[data-slot=slider-range]]:shadow-[0_0_0_1px_rgba(36,27,22,0.08)_inset,0_2px_5px_rgba(36,27,22,0.18)] [&_[data-slot=slider-thumb]]:size-3.5 [&_[data-slot=slider-thumb]]:border-[1.5px] [&_[data-slot=slider-thumb]]:border-white [&_[data-slot=slider-thumb]]:bg-[#fff8f1] [&_[data-slot=slider-thumb]]:shadow-[0_5px_10px_rgba(53,40,30,0.2),0_0_0_1px_rgba(36,27,22,0.2),0_0_0_3px_rgba(255,255,255,0.52)] [&_[data-slot=slider-track]]:h-2 [&_[data-slot=slider-track]]:bg-[linear-gradient(180deg,rgba(104,84,68,0.22),rgba(255,255,255,0.74))] [&_[data-slot=slider-track]]:shadow-[inset_0_1px_1px_rgba(47,37,30,0.22),0_1px_0_rgba(255,255,255,0.72)]",
 } as const;
 
 export function getStudioTemplateCardClassName(active: boolean) {
@@ -88,11 +90,7 @@ export function getStudioPillButtonClassName(active = false) {
     : studioGlassStyles.pillButton;
 }
 
-export function StudioBlurBackdrop({
-  imageUrl,
-}: {
-  imageUrl?: string | null;
-}) {
+export function StudioBlurBackdrop({ imageUrl }: { imageUrl?: string | null }) {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
       {imageUrl ? (
@@ -113,20 +111,25 @@ export function StudioBlurBackdrop({
 
 export function StudioCloseButton({
   label,
+  onClose,
 }: {
   label: string;
+  onClose?: () => void;
 }) {
-  return (
-    <SheetClose asChild>
-      <button
-        aria-label={label}
-        className="group flex size-9 shrink-0 items-center justify-center rounded-full border-none bg-[linear-gradient(180deg,rgba(255,255,255,0.44),rgba(245,238,230,0.22))] text-[#5c4e43] shadow-[0_9px_18px_rgba(66,51,37,0.08),0_1px_0_rgba(255,255,255,0.5)_inset,0_0_0_1px_rgba(255,255,255,0.1)_inset] backdrop-blur-2xl transition duration-200 hover:-translate-y-0.5 hover:scale-[1.03] hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.58),rgba(249,242,234,0.3))] hover:text-[#2f2520] hover:shadow-[0_14px_24px_rgba(66,51,37,0.13),0_1px_0_rgba(255,255,255,0.58)_inset] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
-        type="button"
-      >
-        <X className="size-4 transition duration-200 group-hover:rotate-90 group-hover:scale-110" />
-      </button>
-    </SheetClose>
+  const button = (
+    <button
+      aria-label={label}
+      className="group flex size-9 shrink-0 items-center justify-center rounded-full border-none bg-[linear-gradient(180deg,rgba(255,255,255,0.44),rgba(245,238,230,0.22))] text-[#5c4e43] shadow-[0_9px_18px_rgba(66,51,37,0.08),0_1px_0_rgba(255,255,255,0.5)_inset,0_0_0_1px_rgba(255,255,255,0.1)_inset] backdrop-blur-2xl transition duration-200 hover:-translate-y-0.5 hover:scale-[1.03] hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.58),rgba(249,242,234,0.3))] hover:text-[#2f2520] hover:shadow-[0_14px_24px_rgba(66,51,37,0.13),0_1px_0_rgba(255,255,255,0.58)_inset] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45"
+      type="button"
+      onClick={onClose}
+    >
+      <X className="size-4 transition duration-200 group-hover:rotate-90 group-hover:scale-110" />
+    </button>
   );
+
+  if (onClose) return button;
+
+  return <SheetClose asChild>{button}</SheetClose>;
 }
 
 export function StudioHeader({
@@ -134,12 +137,14 @@ export function StudioHeader({
   closeLabel,
   description,
   icon: Icon,
+  onClose,
   title,
 }: {
   action?: ReactNode;
   closeLabel: string;
   description: string;
   icon: LucideIcon;
+  onClose?: () => void;
   title: string;
 }) {
   return (
@@ -161,7 +166,7 @@ export function StudioHeader({
           </div>
           {action}
         </div>
-        <StudioCloseButton label={closeLabel} />
+        <StudioCloseButton label={closeLabel} onClose={onClose} />
       </div>
     </SheetHeader>
   );
