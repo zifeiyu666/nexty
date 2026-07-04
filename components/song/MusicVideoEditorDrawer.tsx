@@ -124,6 +124,7 @@ import {
   UploadCloud,
   Video,
   Wand2,
+  XCircle,
   Waves,
   Wind,
   ZoomIn,
@@ -294,6 +295,12 @@ const musicVideoControlDescriptionClassName =
 const musicVideoPrimaryButtonClassName = studioGlassStyles.primaryButton;
 const musicVideoSecondaryButtonClassName = studioGlassStyles.secondaryButton;
 const musicVideoMicroButtonClassName = studioGlassStyles.microButton;
+const musicVideoCloseConfirmDialogClassName =
+  "w-[min(calc(100vw-32px),440px)] gap-0 rounded-[20px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,253,249,0.98),rgba(247,240,231,0.96))] p-0 text-[#251b16] shadow-[0_30px_80px_rgba(24,14,9,0.34),0_1px_0_rgba(255,255,255,0.9)_inset] backdrop-blur-2xl sm:max-w-none";
+const musicVideoCloseConfirmCancelClassName =
+  "h-10 rounded-full border-none bg-white px-5 text-[13px] font-black text-[#2b211c] shadow-[0_10px_22px_rgba(76,56,39,0.12),0_1px_0_rgba(255,255,255,0.88)_inset,0_0_0_1px_rgba(82,62,45,0.06)_inset] transition hover:-translate-y-0.5 hover:bg-white hover:text-[#17100d] hover:shadow-[0_14px_28px_rgba(76,56,39,0.16)] focus-visible:ring-[#ff8fad]/45";
+const musicVideoCloseConfirmActionClassName =
+  "h-10 rounded-full border-none bg-[#2e2520] px-5 text-[13px] font-black text-[#fff8ef] shadow-[0_14px_28px_rgba(46,37,32,0.28)] transition hover:-translate-y-0.5 hover:bg-[#211a16] hover:text-white hover:shadow-[0_18px_34px_rgba(46,37,32,0.34)] focus-visible:ring-[#2e2520]/35";
 const musicVideoPillButtonClassName = getStudioPillButtonClassName(false);
 const musicVideoPillButtonActiveClassName = getStudioPillButtonClassName(true);
 const musicVideoEditorTabsListClassName =
@@ -3920,19 +3927,30 @@ export function MusicVideoEditorDrawer({
         </SheetContent>
       </Sheet>
       <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-        <AlertDialogContent className={musicVideoPopoverClassName}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Discard music video edits?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Closing the music video studio will discard the edits from this
-              session. Template selections, uploaded media, and render progress
-              will start fresh the next time you open it.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+        <AlertDialogContent className={musicVideoCloseConfirmDialogClassName}>
+          <div className="flex gap-3.5 px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
+            <div className="mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(180deg,#fff5f8,#ffe3ec)] text-[#d23d6a] shadow-[0_12px_24px_rgba(210,61,106,0.16),0_1px_0_rgba(255,255,255,0.9)_inset,0_0_0_1px_rgba(255,123,163,0.18)_inset]">
+              <XCircle className="size-5" />
+            </div>
+            <AlertDialogHeader className="min-w-0 gap-2 text-left">
+              <AlertDialogTitle className="text-[22px] font-black leading-[1.08] tracking-normal text-[#211813]">
+                Discard music video edits?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="max-w-[34rem] text-[13.5px] leading-6 text-[#7a6d62]">
+                Closing the music video studio will discard the edits from this
+                session. Template selections, uploaded media, and render
+                progress will start fresh the next time you open it.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          </div>
+          <AlertDialogFooter className="flex-col gap-2.5 border-t border-[#eadfd3]/75 bg-white/42 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+            <AlertDialogCancel
+              className={musicVideoCloseConfirmCancelClassName}
+            >
+              Keep editing
+            </AlertDialogCancel>
             <AlertDialogAction
-              className={musicVideoPrimaryButtonClassName}
+              className={musicVideoCloseConfirmActionClassName}
               onClick={confirmCloseStudio}
             >
               Close and discard

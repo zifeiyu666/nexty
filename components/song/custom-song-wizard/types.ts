@@ -27,8 +27,6 @@ export type LyricsVersionComparison = {
 
 export type CaptureLeadResponse = {
   userId: string;
-  email: string;
-  isNewGuest: boolean;
   songId: string;
   previewAudioUrl: string;
   previewLimitSeconds?: number | null;
@@ -55,7 +53,6 @@ export type RecipientInput = {
 };
 
 export type StoredDraft = {
-  email?: string;
   generatedLyrics?: string;
   genre?: string;
   language?: string;

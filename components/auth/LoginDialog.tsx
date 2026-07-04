@@ -8,14 +8,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTranslations } from "next-intl";
+import { Suspense } from "react";
 import LoginForm from "./LoginForm";
 
 interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  callbackPath?: string;
 }
 
-export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
+export default function LoginDialog({
+  open,
+  onOpenChange,
+  callbackPath,
+}: LoginDialogProps) {
   const t = useTranslations("Login");
 
   return (
@@ -26,7 +32,9 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm callbackPath={callbackPath} />
+        </Suspense>
       </DialogContent>
     </Dialog>
   );

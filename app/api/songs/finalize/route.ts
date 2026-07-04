@@ -44,7 +44,6 @@ export async function POST(req: Request) {
     userId: session.user.id,
     userEmail: session.user.email,
     sampleUserId: sample.userId,
-    sampleEmail: sample.email,
     isExpired: sample.isExpired,
     previewLimitSeconds: sample.previewLimitSeconds,
     accessExpiresAt: sample.accessExpiresAt,

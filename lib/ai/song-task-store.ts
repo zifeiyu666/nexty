@@ -22,7 +22,6 @@ export type SongGenerationTask = {
   externalId: string;
   status: SongTaskStatus;
   userId?: string;
-  email?: string;
   isSubscriber: boolean;
   title: string;
   lyrics: string;

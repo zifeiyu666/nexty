@@ -8,10 +8,8 @@ import "server-only";
 
 export async function deleteSongSampleAction(input: {
   songId: string;
-  email?: string;
 }) {
   const songId = input.songId.trim();
-  const guestEmail = input.email?.trim().toLowerCase();
 
   if (!songId) {
     return actionResponse.badRequest("Sample ID is required.");
@@ -25,17 +23,9 @@ export async function deleteSongSampleAction(input: {
       return actionResponse.notFound("Sample not found.");
     }
 
-    const userCanDelete =
-      Boolean(session?.user?.id && sample.userId === session.user.id) ||
-      Boolean(
-        session?.user?.email &&
-          sample.email?.toLowerCase() === session.user.email.toLowerCase()
-      ) ||
-      Boolean(
-        !session?.user?.id &&
-          guestEmail &&
-          sample.email?.toLowerCase() === guestEmail
-      );
+    const userCanDelete = Boolean(
+      session?.user?.id && sample.userId === session.user.id
+    );
 
     if (!userCanDelete) {
       return actionResponse.forbidden("You do not have permission to delete this sample.");

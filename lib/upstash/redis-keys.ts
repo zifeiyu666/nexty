@@ -42,8 +42,6 @@ export const REDIS_KEYS_CONFIGS = {
     sampleReadyEmailSent: (songId: string) => `${LOWER_CASE_SITE_NAME}:ssample:email-sent:${songId}`,
     /** @example wenext:ssamples:user:{userId} */
     samplesByUser: (userId: string) => `${LOWER_CASE_SITE_NAME}:ssamples:user:${userId}`,
-    /** @example wenext:ssamples:email:{email} */
-    samplesByEmail: (email: string) => `${LOWER_CASE_SITE_NAME}:ssamples:email:${email.toLowerCase()}`,
   },
 
   // Add other modules here as needed

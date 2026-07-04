@@ -23,7 +23,6 @@ import { toast } from "sonner";
 
 type SamplesGridProps = {
   samples: SongSampleView[];
-  email?: string;
 };
 
 function artworkName(names: string[]): string {
@@ -34,7 +33,7 @@ function coverImageUrl(sample: SongSampleView): string | undefined {
   return sample.versions.find((version) => version.imageUrl)?.imageUrl;
 }
 
-export function SamplesGrid({ samples, email = "" }: SamplesGridProps) {
+export function SamplesGrid({ samples }: SamplesGridProps) {
   const [visibleSamples, setVisibleSamples] = useState(samples);
 
   useEffect(() => {
@@ -48,7 +47,6 @@ export function SamplesGrid({ samples, email = "" }: SamplesGridProps) {
       {visibleSamples.map((sample) => (
         <SampleCard
           key={sample.songId}
-          email={email}
           onDeleted={(songId) =>
             setVisibleSamples((current) =>
               current.filter((item) => item.songId !== songId),
@@ -62,11 +60,9 @@ export function SamplesGrid({ samples, email = "" }: SamplesGridProps) {
 }
 
 function SampleCard({
-  email,
   onDeleted,
   sample,
 }: {
-  email: string;
   onDeleted: (songId: string) => void;
   sample: SongSampleView;
 }) {
@@ -82,7 +78,6 @@ function SampleCard({
     startTransition(async () => {
       const result = await deleteSongSampleAction({
         songId: sample.songId,
-        email,
       });
 
       if (!result.success) {

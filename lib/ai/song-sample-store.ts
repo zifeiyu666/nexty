@@ -10,7 +10,6 @@ export type SongSample = {
   songId: string;
   externalId: string;
   userId?: string;
-  email?: string;
   title: string;
   lyrics: string;
   genre: string;
@@ -98,7 +97,6 @@ export function createSongSampleFromTask(
     songId: task.songId,
     externalId: task.externalId,
     userId: task.userId,
-    email: task.email,
     title: task.title,
     lyrics: task.lyrics,
     genre: task.genre,
@@ -124,12 +122,6 @@ export const songSampleStore = {
       const ids = unique([sample.songId, ...((await getJson<string[]>(indexKey)) || [])]);
       await setJson(indexKey, ids);
     }
-
-    if (sample.email && redis) {
-      const indexKey = keys.samplesByEmail(sample.email);
-      const ids = unique([sample.songId, ...((await getJson<string[]>(indexKey)) || [])]);
-      await setJson(indexKey, ids);
-    }
   },
 
   async get(
@@ -142,16 +134,14 @@ export const songSampleStore = {
 
   async list(input: {
     userId?: string;
-    email?: string;
     limit?: number;
     hasActiveSubscription?: boolean;
   }): Promise<SongSampleView[]> {
     if (!redis) return [];
 
-    const ids = unique([
-      ...((input.userId ? await getJson<string[]>(keys.samplesByUser(input.userId)) : null) || []),
-      ...((input.email ? await getJson<string[]>(keys.samplesByEmail(input.email)) : null) || []),
-    ]);
+    const ids = unique(
+      (input.userId ? await getJson<string[]>(keys.samplesByUser(input.userId)) : null) || []
+    );
 
     const samples = await Promise.all(
       ids.map((songId) =>
@@ -184,16 +174,6 @@ export const songSampleStore = {
         )
       );
     }
-
-    if (sample.email) {
-      const indexKey = keys.samplesByEmail(sample.email);
-      operations.push(
-        getJson<string[]>(indexKey).then((ids) =>
-          setJson(indexKey, removeValue(ids, songId))
-        )
-      );
-    }
-
     await Promise.all(operations);
     return sample;
   },

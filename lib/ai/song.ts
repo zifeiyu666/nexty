@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import {
   subscriptions as subscriptionsSchema,
-  user as userSchema,
 } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { getMockKieSunoMusicResult, submitMusicTask } from "./adapters/kie-suno";
@@ -41,12 +40,11 @@ export type SongInputContext = {
 export type SongGenerationInput = SongInputContext & {
   title: string;
   lyrics: string;
-  email?: string;
-  sessionUser?: {
+  sessionUser: {
     id: string;
     email: string;
     isAnonymous?: boolean;
-  } | null;
+  };
 };
 
 export type SongLyricsRewriteInput = Pick<
@@ -261,59 +259,6 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
   return true;
 }
 
-export async function findOrCreateSongGuest(email: string): Promise<{
-  id: string;
-  email: string;
-  isAnonymous: boolean;
-}> {
-  const [existingUser] = await db
-    .select({
-      id: userSchema.id,
-      email: userSchema.email,
-      isAnonymous: userSchema.isAnonymous,
-    })
-    .from(userSchema)
-    .where(eq(userSchema.email, email))
-    .limit(1);
-
-  if (existingUser) return existingUser;
-
-  const [insertedUser] = await db
-    .insert(userSchema)
-    .values({
-      email,
-      emailVerified: false,
-      isAnonymous: true,
-      name: "Song Preview Guest",
-    })
-    .onConflictDoNothing({
-      target: userSchema.email,
-    })
-    .returning({
-      id: userSchema.id,
-      email: userSchema.email,
-      isAnonymous: userSchema.isAnonymous,
-    });
-
-  if (insertedUser) return insertedUser;
-
-  const [racedUser] = await db
-    .select({
-      id: userSchema.id,
-      email: userSchema.email,
-      isAnonymous: userSchema.isAnonymous,
-    })
-    .from(userSchema)
-    .where(eq(userSchema.email, email))
-    .limit(1);
-
-  if (!racedUser) {
-    throw new Error("Unable to create or find the song guest user.");
-  }
-
-  return racedUser;
-}
-
 export async function createLyricsGeneration(input: SongInputContext): Promise<SongLyricsTask> {
   assertSongTaskStoreConfigured();
   const now = Date.now();
@@ -434,16 +379,12 @@ export async function rewriteSongLyricsLines(
 
 export async function createSongGeneration(input: SongGenerationInput): Promise<SongGenerationTask> {
   assertSongTaskStoreConfigured();
-  const user = input.sessionUser
-    ? input.sessionUser
-    : input.email
-      ? await findOrCreateSongGuest(input.email)
-      : null;
+  const user = input.sessionUser;
   const isSubscriber =
     user && !user.isAnonymous ? await hasActiveSubscription(user.id) : false;
   console.log("[songs/generate] Subscription check", {
     userId: user?.id,
-    email: user?.email || input.email,
+    email: user?.email,
     isAnonymous: user?.isAnonymous,
     isSubscriber: Boolean(isSubscriber),
   });
@@ -454,7 +395,6 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
     externalId,
     status: "processing",
     userId: user?.id,
-    email: user?.email || input.email,
     isSubscriber: Boolean(isSubscriber),
     title: input.title,
     lyrics: input.lyrics,
@@ -474,7 +414,6 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
     songId: task.songId,
     externalId: task.externalId,
     userId: task.userId,
-    email: task.email,
     isSubscriber: task.isSubscriber,
     title: task.title,
   });

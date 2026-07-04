@@ -17,11 +17,15 @@ import { toast } from "sonner";
 
 interface LoginFormProps {
   className?: string;
+  callbackPath?: string;
 }
 
 type LoginMode = "otp" | "magic-link";
 
-export default function LoginForm({ className = "" }: LoginFormProps) {
+export default function LoginForm({
+  className = "",
+  callbackPath,
+}: LoginFormProps) {
   const t = useTranslations("Login");
   const locale = useLocale();
 
@@ -43,6 +47,7 @@ export default function LoginForm({ className = "" }: LoginFormProps) {
 
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
+  const callbackTarget = callbackPath || next;
 
   useEffect(() => {
     setLastMethod(authClient.getLastUsedLoginMethod());
@@ -62,7 +67,7 @@ export default function LoginForm({ className = "" }: LoginFormProps) {
 
   const getCallbackUrl = () => {
     return new URL(
-      next || locale === DEFAULT_LOCALE ? "" : `/${locale}`,
+      callbackTarget || (locale === DEFAULT_LOCALE ? "" : `/${locale}`),
       window.location.origin
     ).toString();
   };
@@ -205,7 +210,7 @@ export default function LoginForm({ className = "" }: LoginFormProps) {
 
   const signInSocial = async (provider: string) => {
     const callback = new URL(
-      next || locale === DEFAULT_LOCALE ? "" : `/${locale}`,
+      callbackTarget || (locale === DEFAULT_LOCALE ? "" : `/${locale}`),
       window.location.origin
     );
 

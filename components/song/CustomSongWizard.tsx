@@ -4,7 +4,6 @@ import { AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
-  FormEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -13,6 +12,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 
+import LoginDialog from "@/components/auth/LoginDialog";
 import { Button } from "@/components/ui/button";
 import {
   applyLyricsLineRewrite,
@@ -24,7 +24,6 @@ import {
 import { authClient } from "@/lib/auth/auth-client";
 import {
   GenreWarningDialog,
-  LeadEmailModal,
   LyricsVersionComparisonDialog,
   NewLyricsVersionDialog,
 } from "@/components/song/custom-song-wizard/components/dialogs";
@@ -92,6 +91,9 @@ import type {
   StoredDraft,
   WizardStep,
 } from "@/components/song/custom-song-wizard/types";
+
+const CREATE_SONG_LYRICS_PATH = "/create-song?step=lyrics";
+
 export function CustomSongWizard() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
@@ -142,10 +144,6 @@ export function CustomSongWizard() {
   const [songError, setSongError] = useState("");
   const [progress, setProgress] = useState(0);
   const [loadingCopyIndex, setLoadingCopyIndex] = useState(0);
-  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
   const [leadData, setLeadData] = useState<CaptureLeadResponse | null>(null);
   const [personalNote, setPersonalNote] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
@@ -157,6 +155,7 @@ export function CustomSongWizard() {
   const [audioDuration, setAudioDuration] = useState(60);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [finalizingVersion, setFinalizingVersion] = useState<string | null>(
     null,
   );
@@ -323,7 +322,6 @@ export function CustomSongWizard() {
           setLyricsInputKey(restoredLyricsInputKey);
           setLyricsStage("editor");
         }
-        if (draft.email !== undefined) setEmail(draft.email);
         if (draft.songStage) setSongStage(draft.songStage);
       }
     } catch (error) {
@@ -393,7 +391,6 @@ export function CustomSongWizard() {
     if (!isHydrated) return;
 
     const draft: StoredDraft = {
-      email,
       generatedLyrics,
       genre,
       language,
@@ -411,7 +408,6 @@ export function CustomSongWizard() {
 
     window.localStorage.setItem(draftStorageKey, JSON.stringify(draft));
   }, [
-    email,
     generatedLyrics,
     genre,
     isHydrated,
@@ -437,12 +433,6 @@ export function CustomSongWizard() {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
-
-  useEffect(() => {
-    if (!email && session?.user?.email) {
-      setEmail(session.user.email);
-    }
-  }, [email, session?.user?.email]);
 
   const resetCoverGeneration = useCallback(() => {
     setCoverImageUrl("");
@@ -663,12 +653,11 @@ export function CustomSongWizard() {
 
   const requestSongGeneration = useCallback(async () => {
     if (!occasion || !songTitle.trim() || !generatedLyrics.trim()) return;
-    if (!session?.user && !email.trim()) {
-      setIsLeadModalOpen(true);
+    if (!session?.user) {
+      setIsLoginDialogOpen(true);
       return;
     }
 
-    setIsLeadModalOpen(false);
     setSongTaskId("");
     setSongError("");
     setLeadData(null);
@@ -679,7 +668,6 @@ export function CustomSongWizard() {
 
     try {
       const data = await startSongGeneration({
-        email: session?.user ? undefined : email.trim(),
         occasion,
         genre,
         language,
@@ -701,7 +689,6 @@ export function CustomSongWizard() {
       );
     }
   }, [
-    email,
     generatedLyrics,
     genre,
     language,
@@ -736,9 +723,7 @@ export function CustomSongWizard() {
           const versions = data.versions || [];
 
           setLeadData({
-            userId: session?.user?.id || "guest",
-            email: session?.user?.email || email,
-            isNewGuest: !session?.user,
+            userId: session?.user?.id || "",
             songId: data.songId,
             previewAudioUrl: versions[0]?.audioUrl || "",
             previewLimitSeconds: data.previewLimitSeconds,
@@ -773,7 +758,7 @@ export function CustomSongWizard() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [email, router, session?.user, songStage, songTaskId]);
+  }, [router, session?.user, songStage, songTaskId]);
 
   useAudioPreview({
     audioRef,
@@ -1309,9 +1294,8 @@ export function CustomSongWizard() {
   function goForward() {
     if (!canContinue) return;
     if (step === 4) {
-      if (!isLoggedIn && !email.trim()) {
-        setEmailError("");
-        setIsLeadModalOpen(true);
+      if (!isLoggedIn) {
+        setIsLoginDialogOpen(true);
         return;
       }
       setSongStage("loading");
@@ -1337,34 +1321,6 @@ export function CustomSongWizard() {
     resetCoverGeneration();
   }
 
-  async function submitLead(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setEmailError("");
-
-    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
-      setEmailError("Please enter a valid email to unlock your preview.");
-      return;
-    }
-
-    if (!occasion || !genre || story.trim().length < 10) {
-      setEmailError(
-        "Please complete your song details before capturing a lead.",
-      );
-      return;
-    }
-
-    setIsSubmittingLead(true);
-    setLeadData(null);
-    setSongTaskId("");
-    setSongError("");
-    resetCoverGeneration();
-    setIsLeadModalOpen(false);
-    setSongStage("loading");
-    setWizardStep(5);
-    toast.success("Your email is saved.");
-    setIsSubmittingLead(false);
-  }
-
   async function unlockFullSong() {
     const stripePriceId = process.env.NEXT_PUBLIC_SONG_STRIPE_PRICE_ID;
 
@@ -1382,13 +1338,11 @@ export function CustomSongWizard() {
       const checkout = await createCheckoutSession({
         stripePriceId,
         songId: leadData?.songId,
-        leadEmail: leadData?.email || email.trim(),
       });
 
       if (checkout.unauthorized) {
-        toast.info("Guest checkout needs the next backend step.", {
-          description:
-            "The current checkout route requires a signed-in session; your preview and email are captured.",
+        toast.info("Please sign in to continue checkout.", {
+          description: "Your song preview is saved to your account.",
         });
         return;
       }
@@ -1457,6 +1411,11 @@ export function CustomSongWizard() {
       sessionUserId: session?.user?.id,
       versionIds: songVersions.map((item) => item.id),
     });
+
+    if (!isLoggedIn) {
+      setIsLoginDialogOpen(true);
+      return;
+    }
 
     if (!leadData?.songId || !songVersion?.audioUrl) {
       console.warn("[CustomSongWizard] Missing song data for finalize", {
@@ -1752,17 +1711,6 @@ export function CustomSongWizard() {
       />
 
       <AnimatePresence>
-        <LeadEmailModal
-          email={email}
-          emailError={emailError}
-          isSubmitting={isSubmittingLead}
-          open={isLeadModalOpen}
-          onEmailChange={setEmail}
-          onSubmit={submitLead}
-        />
-      </AnimatePresence>
-
-      <AnimatePresence>
         {isPaywallOpen && (
           <PaywallModal
             isLoading={isCheckoutLoading}
@@ -1793,6 +1741,12 @@ export function CustomSongWizard() {
           />
         )}
       </AnimatePresence>
+
+      <LoginDialog
+        callbackPath={CREATE_SONG_LYRICS_PATH}
+        open={isLoginDialogOpen}
+        onOpenChange={setIsLoginDialogOpen}
+      />
     </section>
   );
 }

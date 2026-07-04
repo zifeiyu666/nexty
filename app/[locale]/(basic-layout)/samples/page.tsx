@@ -12,7 +12,7 @@ import { Library, Search } from "lucide-react";
 import { Metadata } from "next";
 
 type Params = Promise<{ locale: string }>;
-type SearchParams = Promise<{ email?: string; q?: string; occasion?: string }>;
+type SearchParams = Promise<{ q?: string; occasion?: string }>;
 
 export async function generateMetadata({
   params,
@@ -44,7 +44,7 @@ export default async function SamplesPage({
   searchParams: SearchParams;
 }) {
   const session = await getSession();
-  const { email = "", q = "", occasion = "all" } = await searchParams;
+  const { q = "", occasion = "all" } = await searchParams;
   const benefits = session?.user?.id
     ? await getUserBenefits(session.user.id)
     : null;
@@ -53,7 +53,6 @@ export default async function SamplesPage({
     benefits?.subscriptionStatus === "trialing";
   const samples = await songSampleStore.list({
     userId: session?.user?.id,
-    email: session?.user?.email || email,
     hasActiveSubscription,
   });
   const sampleOccasions = Array.from(
@@ -112,7 +111,7 @@ export default async function SamplesPage({
                     ? "bg-stone-950 text-white"
                     : "bg-white text-muted-foreground shadow-sm hover:text-foreground",
                 )}
-                href={`/samples?occasion=${value}${email ? `&email=${encodeURIComponent(email)}` : ""}`}
+                href={`/samples?occasion=${value}`}
               >
                 {value === "all" ? "All samples" : labelize(value)}
               </Link>
@@ -120,7 +119,6 @@ export default async function SamplesPage({
           </div>
 
           <form action="/samples" className="relative w-full max-w-xs sm:w-80">
-            {email && <input name="email" type="hidden" value={email} />}
             {occasion !== "all" && (
               <input name="occasion" type="hidden" value={occasion} />
             )}
@@ -134,26 +132,7 @@ export default async function SamplesPage({
           </form>
         </div>
 
-        {!session?.user && !email && (
-          <form className="mt-8 max-w-xl rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <p className="text-sm font-bold text-foreground">
-              Find guest samples by email
-            </p>
-            <div className="mt-3 flex gap-2">
-              <Input
-                className="h-11 rounded-full"
-                name="email"
-                placeholder="you@example.com"
-                type="email"
-              />
-              <Button className="h-11 rounded-full px-5" type="submit">
-                Search
-              </Button>
-            </div>
-          </form>
-        )}
-
-        <SamplesGrid email={email} samples={filteredSamples} />
+        <SamplesGrid samples={filteredSamples} />
 
         {!filteredSamples.length && (
           <div className="mt-10 rounded-2xl border border-dashed border-border bg-card p-8 text-center">

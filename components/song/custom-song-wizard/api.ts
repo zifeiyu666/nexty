@@ -16,7 +16,6 @@ type LyricsGenerationInput = SongWizardInput & {
 };
 
 type SongGenerationInput = SongWizardInput & {
-  email?: string;
   lyrics: string;
   title: string;
 };
@@ -159,11 +158,9 @@ export async function generateSongCover(input: SongCoverGenerationInput) {
 }
 
 export async function createCheckoutSession({
-  leadEmail,
   songId,
   stripePriceId,
 }: {
-  leadEmail: string;
   songId?: string;
   stripePriceId: string;
 }) {
@@ -176,7 +173,6 @@ export async function createCheckoutSession({
       provider: "stripe",
       stripePriceId,
       songId,
-      leadEmail,
     }),
   });
   const result = await response.json();

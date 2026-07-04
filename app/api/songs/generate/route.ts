@@ -4,7 +4,6 @@ import { getSession } from "@/lib/auth/server";
 import { z } from "zod";
 
 const generateSchema = z.object({
-  email: z.string().trim().email().optional(),
   occasion: z.string().trim().min(1).max(120),
   genre: z.string().trim().min(1).max(120),
   language: z.string().trim().min(1).max(80),
@@ -42,20 +41,18 @@ export async function POST(req: Request) {
   }
 
   const session = await getSession();
-  if (!session?.user && !input.email) {
-    return apiResponse.badRequest("Email is required for guest song generation.");
+  if (!session?.user) {
+    return apiResponse.unauthorized("Please sign in to generate a song.");
   }
 
   try {
     const task = await createSongGeneration({
       ...input,
-      sessionUser: session?.user
-        ? {
-            id: session.user.id,
-            email: session.user.email,
-            isAnonymous: (session.user as any).isAnonymous,
-          }
-        : null,
+      sessionUser: {
+        id: session.user.id,
+        email: session.user.email,
+        isAnonymous: (session.user as any).isAnonymous,
+      },
     });
 
     console.log("[songs/generate] Task submitted", {

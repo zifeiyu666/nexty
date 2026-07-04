@@ -15,9 +15,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (session?.user) {
-      router.replace("/");
+      const next = new URLSearchParams(window.location.search).get("next");
+      router.replace(next || "/");
     }
-  }, [session?.user]);
+  }, [router, session?.user]);
 
   if (session?.user) {
     return (

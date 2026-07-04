@@ -1,16 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
   Check,
   Edit3,
-  Loader2,
-  Mail,
-  Music2,
   RefreshCw,
   Sparkles,
 } from "lucide-react";
-import type { FormEvent } from "react";
 
 import {
   AlertDialog,
@@ -31,7 +26,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 import type { GenreOption, LyricsVersionComparison } from "../types";
@@ -202,78 +196,5 @@ export function LyricsVersionComparisonDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-export function LeadEmailModal({
-  email,
-  emailError,
-  isSubmitting,
-  open,
-  onEmailChange,
-  onSubmit,
-}: {
-  email: string;
-  emailError: string;
-  isSubmitting: boolean;
-  open: boolean;
-  onEmailChange: (value: string) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}) {
-  if (!open) return null;
-
-  return (
-    <motion.div
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 px-4 py-8 backdrop-blur-xl"
-      exit={{ opacity: 0 }}
-      initial={{ opacity: 0 }}
-    >
-      <motion.div
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-md rounded-[2rem] border border-border bg-background/90 p-6 text-foreground shadow-2xl shadow-foreground/20 backdrop-blur-2xl sm:p-8"
-        exit={{ opacity: 0, scale: 0.96, y: 12 }}
-        initial={{ opacity: 0, scale: 0.96, y: 12 }}
-        transition={{ duration: 0.25 }}
-      >
-        <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-3xl">
-          🎉
-        </div>
-        <h2 className="text-2xl font-bold">Where should we send your song?</h2>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          This generated song will be linked to the email below. We will send
-          the finished music to this inbox when recording is done.
-        </p>
-
-        <form className="mt-6 space-y-3" onSubmit={onSubmit}>
-          <div className="relative">
-            <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="h-12 rounded-full border-border bg-card pl-11 text-foreground placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
-              placeholder="you@example.com"
-              type="email"
-              value={email}
-              onChange={(event) => onEmailChange(event.target.value)}
-            />
-          </div>
-          {emailError && <p className="text-sm text-primary">{emailError}</p>}
-          <Button
-            className="h-12 w-full rounded-full bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90"
-            disabled={isSubmitting}
-            type="submit"
-          >
-            {isSubmitting ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Music2 className="size-4" />
-            )}
-            Continue
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            No credit card required · Takes 2 mins
-          </p>
-        </form>
-      </motion.div>
-    </motion.div>
   );
 }
