@@ -368,7 +368,7 @@ export default function OccasionShowcase() {
     <section
       ref={sectionRef}
       id="occasions"
-      className="home-section-deep home-warm-ambient relative isolate overflow-hidden"
+      className="home-section-deep home-warm-ambient relative isolate overflow-hidden py-16 md:py-20"
       aria-labelledby="occasion-showcase-heading"
     >
       <div
@@ -392,7 +392,7 @@ export default function OccasionShowcase() {
 
       <div
         ref={viewportRef}
-        className="mx-auto max-w-[1560px] overflow-hidden px-4 pb-6 pt-7 sm:px-6 lg:px-8"
+        className="mx-auto max-w-[1420px] overflow-hidden px-4 pb-3 pt-2 sm:px-6 lg:px-8"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -401,7 +401,7 @@ export default function OccasionShowcase() {
       >
         <div
           ref={trackRef}
-          className="flex cursor-grab gap-4 pb-12 pl-8 pt-3 will-change-transform active:cursor-grabbing sm:gap-5 sm:pl-10 lg:gap-6"
+          className="flex cursor-grab gap-4 pb-8 pl-8 pt-3 will-change-transform active:cursor-grabbing sm:gap-5 sm:pl-10 lg:gap-5"
         >
           {occasionCards.map((occasion, index) => (
             <OccasionPhotoCard
@@ -473,7 +473,7 @@ function OccasionPhotoCard({
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
       className={cn(
-        "group relative flex h-[24rem] w-[min(72vw,17.25rem)] shrink-0 select-none flex-col rounded-[3px] border border-[#efe3d3] bg-white p-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)] will-change-transform sm:h-[24.5rem] sm:w-[18rem] lg:w-[18.75rem]",
+        "group relative flex h-[22rem] w-[min(68vw,16rem)] shrink-0 select-none flex-col rounded-2xl border border-[#efe3d3] bg-white p-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)] will-change-transform sm:h-[22.75rem] sm:w-[16.75rem] lg:w-[17.25rem]",
         isActive && "z-10",
       )}
       style={
@@ -483,13 +483,13 @@ function OccasionPhotoCard({
         } as CSSProperties
       }
     >
-      <div className="pointer-events-none absolute inset-0 rounded-[3px] bg-[linear-gradient(115deg,rgba(255,255,255,0.55),transparent_36%,rgba(92,55,27,0.06))]" />
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[2px] bg-[#e6d2bd]">
+      <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[linear-gradient(115deg,rgba(255,255,255,0.55),transparent_36%,rgba(92,55,27,0.06))]" />
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#e6d2bd]">
         <Image
           src={occasion.image}
           alt={`${occasion.title} custom song occasion`}
           fill
-          sizes="(min-width: 1024px) 22rem, (min-width: 640px) 21rem, 80vw"
+          sizes="(min-width: 1024px) 18rem, (min-width: 640px) 18rem, 72vw"
           className="object-cover saturate-[0.96] transition-transform duration-700 ease-out group-hover:scale-[1.07] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/46 to-transparent" />
@@ -498,14 +498,14 @@ function OccasionPhotoCard({
         </span> */}
       </div>
 
-      <div className="relative flex flex-1 flex-col px-1 pb-1 pt-5">
+      <div className="relative flex flex-1 flex-col px-1 pb-1 pt-4">
         <p className="text-xs font-bold uppercase text-primary">
           {occasion.title}
         </p>
-        <h3 className="mt-2 text-[1.32rem] font-semibold leading-[1.05] text-[#251913]">
+        <h3 className="mt-2 text-[1.22rem] font-semibold leading-[1.05] text-[#251913]">
           {occasion.tagline}
         </h3>
-        <p className="mt-3 min-h-14 text-[12.5px] leading-5 text-[#655245]">
+        <p className="mt-3 min-h-12 text-[12px] leading-5 text-[#655245]">
           {occasion.description}
         </p>
       </div>

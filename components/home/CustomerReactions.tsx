@@ -117,7 +117,7 @@ export default function CustomerReactions({
 
         <div
           className={cn(
-            "mx-auto grid max-w-6xl grid-cols-1 gap-3 [perspective:1200px] sm:grid-cols-2 sm:gap-4 lg:grid-cols-5 lg:gap-4",
+            "mx-auto grid max-w-5xl grid-cols-1 gap-3 [perspective:1200px] sm:grid-cols-2 sm:gap-4 lg:grid-cols-5 lg:gap-5",
             activeIndex !== null &&
               "[&_.reaction-card:not(.is-active)]:lg:[--reaction-card-scale:0.97]",
           )}
@@ -162,7 +162,7 @@ export default function CustomerReactions({
                   "reaction-card group relative aspect-[9/14] min-h-64 cursor-pointer rounded-2xl bg-[#f8f2ee] text-left shadow-[0_18px_52px_rgba(54,38,27,0.1),inset_0_0_0_1px_rgba(255,255,255,0.48)] outline-none [--reaction-card-rotate:0deg] [--reaction-card-scale:1] [--reaction-card-y:0px] [--reaction-magnet-x:0px] [--reaction-magnet-y:0px] [--reaction-tilt-x:0deg] [--reaction-tilt-y:0deg] [transform:perspective(900px)_translate3d(var(--reaction-magnet-x),calc(var(--reaction-card-y)_+_var(--reaction-magnet-y)),0)_rotate(var(--reaction-card-rotate))_rotateX(var(--reaction-tilt-x))_rotateY(var(--reaction-tilt-y))_scale(var(--reaction-card-scale))] [transform-style:preserve-3d] transition-[transform,box-shadow] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:[transform:none] sm:min-h-72 lg:min-h-0 lg:[--reaction-card-rotate:var(--reaction-base-rotate)] lg:[--reaction-card-y:var(--reaction-base-y)]",
                   "hover:z-20 hover:shadow-[0_38px_110px_rgba(54,38,27,0.36),0_16px_42px_rgba(224,65,50,0.16)] hover:lg:[--reaction-card-rotate:0deg] hover:lg:[--reaction-card-y:-8px] hover:lg:[--reaction-tilt-x:0deg] hover:lg:[--reaction-tilt-y:0deg] focus-visible:lg:[--reaction-card-rotate:0deg] focus-visible:lg:[--reaction-card-y:-8px]",
                   isActive &&
-                    "is-active z-20 lg:[--reaction-card-rotate:0deg] lg:[--reaction-card-scale:1.08] lg:[--reaction-card-y:-10px]",
+                    "is-active z-20 lg:[--reaction-card-rotate:0deg] lg:[--reaction-card-scale:1.12] lg:[--reaction-card-y:-12px]",
                 )}
                 aria-pressed={isAudible}
                 aria-label={

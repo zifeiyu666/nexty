@@ -387,7 +387,7 @@ export default function LoginForm({
             }}
             options={{
               size: "flexible",
-              theme: "auto",
+              theme: "light",
               language: locale,
             }}
           />

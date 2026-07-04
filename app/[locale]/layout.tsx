@@ -80,7 +80,12 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale || DEFAULT_LOCALE} suppressHydrationWarning>
+    <html
+      lang={locale || DEFAULT_LOCALE}
+      data-theme="light"
+      style={{ colorScheme: "light" }}
+      suppressHydrationWarning
+    >
       <head>
         <ToltScript />
       </head>
