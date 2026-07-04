@@ -45,7 +45,6 @@ describe("KIE Suno song completion", () => {
         externalId: "mock-task",
         status: "processing",
         userId: "user-1",
-        email: "user@example.com",
         isSubscriber: true,
         title: "Mock Song",
         lyrics: "[Verse]\nHello",

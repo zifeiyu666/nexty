@@ -9,9 +9,16 @@
     "titleLine": "Gift A Custom Song They’ll",
     "titleAccent": "Cherish Forever",
     "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI instantly transforms your memories into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.</p>",
+    "trustBadge": "AI custom song gift maker · Free preview first",
+    "trustItems": [
+      "Free preview",
+      "Ready in minutes",
+      "No credit card needed"
+    ],
     "getStarted": "Start Crafting Free",
     "getStartedLink": "/create-song",
     "howItWorksCta": "How It Works",
+    "watchReactionsCta": "Watch Reactions",
     "viewDocs": "Read the Blog",
     "viewDocsLink": "/blog"
   },

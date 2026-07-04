@@ -14,7 +14,6 @@ function createTask(
     externalId: "kie-task",
     status: "processing",
     userId: "user-1",
-    email: "user@example.com",
     isSubscriber: true,
     title: "Webhook Song",
     lyrics: "[Verse]\nHello",

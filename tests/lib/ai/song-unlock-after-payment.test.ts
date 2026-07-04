@@ -19,7 +19,6 @@ function createSample(overrides: Partial<SongSampleView> = {}): SongSampleView {
     songId: "sample-1",
     externalId: "kie-1",
     userId: "user-1",
-    email: "user@example.com",
     title: "Birthday Melody",
     lyrics: "[Verse 1]\nHello",
     genre: "Pop",

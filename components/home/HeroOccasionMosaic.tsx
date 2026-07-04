@@ -106,7 +106,7 @@ function HeroOccasionColumnView({ column }: { column: HeroOccasionColumn }) {
               fill
               priority={index < 2}
               sizes="(min-width: 1536px) 14rem, (min-width: 1024px) 12rem, (min-width: 640px) 9rem, 7rem"
-              className="object-cover brightness-[0.58] saturate-[0.82]"
+              className="object-cover brightness-[0.72] saturate-[0.94]"
             />
           </div>
         ))}
