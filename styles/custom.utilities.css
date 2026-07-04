@@ -127,6 +127,135 @@
   @apply mt-3 text-balance font-sans text-3xl font-black leading-tight text-[#261712] sm:text-4xl md:text-5xl
 }
 
+@utility home-section {
+  @apply bg-[#fffdf9] py-20 text-[#2b1710] md:py-24;
+}
+
+@utility home-section-muted {
+  @apply bg-[#f8f2ee] py-20 text-[#2b1710] md:py-24;
+}
+
+@utility home-section-deep {
+  @apply bg-[#231713] py-20 text-white md:py-24;
+}
+
+@utility home-warm-ambient {
+  background:
+    radial-gradient(
+      circle at 16% 10%,
+      rgba(255, 167, 64, 0.24),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 82% 18%,
+      rgba(224, 65, 50, 0.2),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 54% 84%,
+      rgba(255, 205, 112, 0.12),
+      transparent 26rem
+    ),
+    linear-gradient(135deg, #2a1710 0%, #231713 45%, #120b09 100%);
+}
+
+@utility home-warm-ambient-soft {
+  background:
+    radial-gradient(
+      circle at 20% 0%,
+      rgba(255, 167, 64, 0.2),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 86% 18%,
+      rgba(224, 65, 50, 0.16),
+      transparent 22rem
+    ),
+    linear-gradient(145deg, #2a1710 0%, #231713 50%, #120b09 100%);
+}
+
+@utility home-cta-animated-gradient {
+  background-color: #231713;
+  background-image:
+    radial-gradient(
+      circle at var(--c5-x1) var(--c5-y1),
+      rgba(255, 171, 74, 0.95) 0px,
+      transparent var(--c5-s1)
+    ),
+    radial-gradient(
+      circle at var(--c5-x2) var(--c5-y2),
+      rgba(224, 65, 50, 0.92) 0px,
+      transparent var(--c5-s2)
+    ),
+    radial-gradient(
+      circle at var(--c5-x3) var(--c5-y3),
+      rgba(255, 213, 128, 0.5) 0px,
+      transparent var(--c5-s3)
+    ),
+    radial-gradient(
+      circle at var(--c5-x4) var(--c5-y4),
+      rgba(117, 28, 20, 0.7) 0px,
+      transparent var(--c5-s4)
+    ),
+    radial-gradient(
+      circle at var(--c5-x5) var(--c5-y5),
+      rgba(35, 23, 19, 0.94) 0px,
+      transparent var(--c5-s5)
+    ),
+    linear-gradient(135deg, #32160f 0%, #231713 48%, #120b09 100%);
+  animation:
+    c5-blob1 8s ease-in-out infinite,
+    c5-blob2 9s ease-in-out infinite,
+    c5-blob3 8.5s ease-in-out infinite,
+    c5-blob4 10s ease-in-out infinite,
+    c5-blob5 7.5s ease-in-out infinite,
+    c5-size1 6.5s ease-in-out infinite,
+    c5-size2 7s ease-in-out infinite,
+    c5-size3 6.8s ease-in-out infinite,
+    c5-size4 7.4s ease-in-out infinite,
+    c5-size5 6s ease-in-out infinite;
+}
+
+@utility home-container {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+@utility home-section-header {
+  @apply mx-auto mb-12 max-w-4xl text-center md:mb-14;
+}
+
+@utility home-eyebrow {
+  @apply text-xs font-bold uppercase tracking-[0.22em] text-primary;
+}
+
+@utility home-title {
+  @apply mt-3 text-balance bg-gradient-to-br from-[#2b1710] via-[#351a12] to-[#5a2a18] bg-clip-text font-sans text-3xl font-black leading-tight tracking-normal text-transparent sm:text-4xl md:text-5xl;
+}
+
+@utility home-title-on-deep {
+  @apply mt-3 text-balance bg-gradient-to-br from-white via-[#f5e8dc] to-[#d9b9a2] bg-clip-text font-sans text-3xl font-black leading-tight tracking-normal text-transparent sm:text-4xl md:text-5xl;
+}
+
+@utility hero-title-warm {
+  @apply bg-gradient-to-br from-white via-[#fff8f0] to-[#eee2d7] bg-clip-text text-transparent;
+}
+
+@utility home-description {
+  @apply mx-auto mt-5 max-w-3xl text-base leading-7 text-[#6f625c] md:text-lg;
+}
+
+@utility home-description-on-deep {
+  @apply mx-auto mt-5 max-w-3xl text-base leading-7 text-white/70 md:text-lg;
+}
+
+@utility home-card {
+  @apply rounded-2xl border border-[#eadbd3] bg-white shadow-[0_18px_52px_rgba(54,38,27,0.08)];
+}
+
+@utility home-card-hover {
+  @apply transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_28px_70px_rgba(54,38,27,0.14)];
+}
+
 @utility title-gradient {
   @apply text-foreground/90;
 

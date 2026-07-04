@@ -61,8 +61,8 @@ export function Newsletter() {
   };
   return (
     <div className="">
-      <div className="mb-3 font-semibold">{t("title")}</div>
-      <p className="text-sm mb-3">{t("description")}</p>
+      <div className="mb-3 font-semibold text-white">{t("title")}</div>
+      <p className="mb-3 text-sm text-white/62">{t("description")}</p>
       <form onSubmit={handleSubscribe} className="flex flex-col gap-2 max-w-64">
         <div className="flex">
           <input
@@ -71,14 +71,14 @@ export function Newsletter() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
             required
-            className="bg-gray-800 text-white px-4 py-2 rounded-l-lg w-full focus:outline-hidden focus:ring-1 focus:ring-primary"
+            className="w-full rounded-l-lg border border-white/10 bg-white/8 px-4 py-2 text-white placeholder:text-white/34 focus:outline-hidden focus:ring-1 focus:ring-primary"
             disabled={subscribeStatus === "loading"}
           />
           <button
             type="submit"
             disabled={subscribeStatus === "loading"}
             className={cn(
-              "bg-primary px-4 py-2 rounded-r-lg hover:bg-primary/90",
+              "rounded-r-lg bg-primary px-4 py-2 transition hover:bg-primary/90",
               subscribeStatus === "loading"
             )}
             aria-label="Subscribe to newsletter"
@@ -87,12 +87,12 @@ export function Newsletter() {
           </button>
         </div>
         {subscribeStatus === "success" && (
-          <p className="text-xs text-green-600 mt-1">
+          <p className="mt-1 text-xs text-white/70">
             {t("subscribe.successMessage")}
           </p>
         )}
         {subscribeStatus === "error" && (
-          <p className="text-xs text-red-600 mt-1">{errorMessage}</p>
+          <p className="mt-1 text-xs text-primary">{errorMessage}</p>
         )}
       </form>
     </div>

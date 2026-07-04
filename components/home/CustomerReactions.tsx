@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Gift, PencilLine, Volume2, VolumeX } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRef, useState, type MouseEvent } from "react";
+import { useRef, useState, type CSSProperties, type MouseEvent } from "react";
 
 type ReactionVideo = {
   src: string;
@@ -12,6 +12,8 @@ type ReactionVideo = {
 };
 
 const trustIcons = [Gift, CheckCircle2, PencilLine];
+const reactionCardRotations = ["-4.2deg", "2.8deg", "-2.6deg", "3.8deg", "-3.2deg"];
+const reactionCardOffsets = ["6px", "-10px", "12px", "-6px", "8px"];
 
 type CustomerReactionsProps = {
   sectionId?: string;
@@ -29,6 +31,10 @@ export default function CustomerReactions({
 
   const setVideoRef = (index: number) => (node: HTMLVideoElement | null) => {
     if (node) {
+      const isAudible = audibleIndex === index;
+
+      node.muted = !isAudible;
+      node.volume = isAudible ? 0.85 : 0;
       videoRefs.current.set(index, node);
     } else {
       videoRefs.current.delete(index);
@@ -90,59 +96,22 @@ export default function CustomerReactions({
   return (
     <section
       id={sectionId}
-      className="bg-white py-12 md:py-18 dark:border-[#4a2a32] dark:bg-[#24171b]"
+      className="home-section"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 text-center md:mb-12">
+      <div className="home-container">
+        <div className="home-section-header">
           {/* <FeatureBadge
             label={t("badge.label")}
             text={t("badge.text")}
             className="mb-6"
           /> */}
-          <h2 className="preset-title">
-            <span className="title-gradient">{t("title")}</span>
-          </h2>
-          <div className="handwritten-subtitle relative mx-auto mt-4 max-w-2xl">
+          <p className="home-eyebrow">{t("badge.label")}</p>
+          <h2 className="home-title">{t("title")}</h2>
+          <div className="home-description [&_p]:m-0 [&_strong]:font-semibold [&_strong]:text-[#2b1710]">
             {t.rich("description", {
               p: (chunks) => <p>{chunks}</p>,
               strong: (chunks) => <strong>{chunks}</strong>,
             })}
-            <svg
-              className="pointer-events-none absolute -right-12 top-1/2 h-10 w-10 -translate-y-[36%] rotate-[-8deg] text-[color:color-mix(in_srgb,var(--color-primary)_78%,white_22%)] sm:-right-16 sm:h-12 sm:w-12 md:-right-20 md:h-14 md:w-14"
-              viewBox="0 0 72 72"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M19 7C29 24 27 44 14 61"
-                stroke="currentColor"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M23 8C33 27 29 45 16 61"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity="0.45"
-              />
-              <path
-                d="M15 61C23 56 30 51 37 44"
-                stroke="currentColor"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M15 61C16 51 17 43 20 35"
-                stroke="currentColor"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </div>
         </div>
 
@@ -158,6 +127,10 @@ export default function CustomerReactions({
             const isActive = activeIndex === index;
             const isAudible = audibleIndex === index;
             const posterSrc = video.src.replace(/\.mp4$/, ".jpg");
+            const baseRotate =
+              reactionCardRotations[index % reactionCardRotations.length];
+            const baseY =
+              reactionCardOffsets[index % reactionCardOffsets.length];
 
             return (
               <button
@@ -179,10 +152,17 @@ export default function CustomerReactions({
                   resetCardMagnet(event.currentTarget);
                   setActiveIndex(null);
                 }}
+                style={
+                  {
+                    "--reaction-base-rotate": baseRotate,
+                    "--reaction-base-y": baseY,
+                  } as CSSProperties
+                }
                 className={cn(
-                  "reaction-card group relative aspect-[9/14] min-h-64 cursor-pointer overflow-hidden rounded-2xl border border-white/70 bg-muted text-left shadow-sm outline-none [--reaction-card-scale:1] [--reaction-magnet-x:0px] [--reaction-magnet-y:0px] [--reaction-tilt-x:0deg] [--reaction-tilt-y:0deg] [clip-path:inset(0_round_1rem)] [transform:perspective(900px)_translate3d(var(--reaction-magnet-x),var(--reaction-magnet-y),0)_rotateX(var(--reaction-tilt-x))_rotateY(var(--reaction-tilt-y))_scale(var(--reaction-card-scale))] [transform-style:preserve-3d] transition-[transform,box-shadow,border-color] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:[transform:none] sm:min-h-72 lg:min-h-0",
-                  "hover:z-20 hover:shadow-[0_26px_70px_rgba(15,23,42,0.28)] hover:shadow-primary/25",
-                  isActive && "is-active z-20 lg:[--reaction-card-scale:1.035]",
+                  "reaction-card group relative aspect-[9/14] min-h-64 cursor-pointer rounded-2xl bg-[#f8f2ee] text-left shadow-[0_18px_52px_rgba(54,38,27,0.1),inset_0_0_0_1px_rgba(255,255,255,0.48)] outline-none [--reaction-card-rotate:0deg] [--reaction-card-scale:1] [--reaction-card-y:0px] [--reaction-magnet-x:0px] [--reaction-magnet-y:0px] [--reaction-tilt-x:0deg] [--reaction-tilt-y:0deg] [transform:perspective(900px)_translate3d(var(--reaction-magnet-x),calc(var(--reaction-card-y)_+_var(--reaction-magnet-y)),0)_rotate(var(--reaction-card-rotate))_rotateX(var(--reaction-tilt-x))_rotateY(var(--reaction-tilt-y))_scale(var(--reaction-card-scale))] [transform-style:preserve-3d] transition-[transform,box-shadow] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:[transform:none] sm:min-h-72 lg:min-h-0 lg:[--reaction-card-rotate:var(--reaction-base-rotate)] lg:[--reaction-card-y:var(--reaction-base-y)]",
+                  "hover:z-20 hover:shadow-[0_38px_110px_rgba(54,38,27,0.36),0_16px_42px_rgba(224,65,50,0.16)] hover:lg:[--reaction-card-rotate:0deg] hover:lg:[--reaction-card-y:-8px] hover:lg:[--reaction-tilt-x:0deg] hover:lg:[--reaction-tilt-y:0deg] focus-visible:lg:[--reaction-card-rotate:0deg] focus-visible:lg:[--reaction-card-y:-8px]",
+                  isActive &&
+                    "is-active z-20 lg:[--reaction-card-rotate:0deg] lg:[--reaction-card-scale:1.08] lg:[--reaction-card-y:-10px]",
                 )}
                 aria-pressed={isAudible}
                 aria-label={
@@ -199,7 +179,7 @@ export default function CustomerReactions({
                     className="h-full w-full bg-transparent object-cover object-center"
                     preload="metadata"
                     autoPlay
-                    muted
+                    muted={!isAudible}
                     playsInline
                     loop
                     onLoadedData={() => playWhenReady(index)}
@@ -235,7 +215,7 @@ export default function CustomerReactions({
           })}
         </div>
 
-        <div className="mx-auto mt-5 grid max-w-2xl grid-cols-1 gap-2 text-sm font-medium text-muted-foreground sm:grid-cols-3 sm:gap-4">
+        <div className="mx-auto mt-6 grid max-w-2xl grid-cols-1 gap-2 text-sm font-medium text-[#6f625c] sm:grid-cols-3 sm:gap-4">
           {trustItems.map((item, index) => {
             const Icon = trustIcons[index] ?? CheckCircle2;
 

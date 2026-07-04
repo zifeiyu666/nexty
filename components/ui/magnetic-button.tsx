@@ -13,9 +13,9 @@ const magneticButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          "border-2 border-[#ef3e35] bg-[#ef3e35] text-white shadow-[0_18px_42px_rgba(239,62,53,0.34)] hover:bg-[#f2473e] hover:shadow-[0_22px_46px_rgba(239,62,53,0.42)]",
+          "border-2 border-primary bg-primary text-primary-foreground shadow-[0_18px_42px_rgba(224,65,50,0.32)] hover:bg-primary/90 hover:shadow-[0_22px_46px_rgba(224,65,50,0.4)]",
         light:
-          "border-2 border-white bg-white text-[#6262ff] shadow-[0_18px_42px_rgba(0,0,0,0.24)] hover:bg-white hover:text-[#5757f8] hover:shadow-[0_22px_46px_rgba(0,0,0,0.28)]",
+          "border-2 border-white/85 bg-white/88 text-[#2b1710] shadow-[0_18px_42px_rgba(35,23,19,0.2)] backdrop-blur hover:border-white hover:bg-white/96 hover:text-[#2b1710] hover:shadow-[0_22px_46px_rgba(35,23,19,0.26)]",
       },
       size: {
         default: "h-12 px-7 text-base sm:h-[3.25rem] sm:px-9 sm:text-lg",

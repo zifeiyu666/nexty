@@ -30,14 +30,18 @@ export default async function Footer() {
   );
 
   return (
-    <div className="bg-gray-900 text-gray-300 border-t border-gray-700">
-      <footer className="py-2 container max-w-8xl mx-auto">
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="home-warm-ambient-soft relative overflow-hidden border-t border-white/10 text-white/68">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(18,11,9,0.08),rgba(18,11,9,0.42))]"
+      />
+      <footer className="container relative mx-auto max-w-8xl py-2">
+        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-12 lg:grid-cols-7">
             <div className="w-full flex flex-col sm:flex-row lg:flex-col gap-4 col-span-full md:col-span-2">
               <div className="space-y-4 flex-1">
                 <div className="items-center space-x-2 flex">
-                  <div className="text-gray-50 text-xl font-medium flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-xl font-medium text-white">
                     <Image
                       src="/logo.png"
                       alt={t("title")}
@@ -51,7 +55,7 @@ export default async function Footer() {
                 <p className="text-sm p4-4 md:pr-12">
                   {t.rich("tagLine", {
                     strong: (chunks: ReactNode) => (
-                      <strong className="font-semibold text-gray-50">
+                      <strong className="font-semibold text-white">
                         {chunks}
                       </strong>
                     ),
@@ -68,7 +72,7 @@ export default async function Footer() {
                       rel="noreferrer nofollow noopener"
                       aria-label="GitHub"
                       title="View on GitHub"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/62 transition-colors hover:bg-white/8 hover:text-white"
                     >
                       <GithubIcon className="size-4" aria-hidden="true" />
                     </Link>
@@ -81,7 +85,7 @@ export default async function Footer() {
                       rel="noreferrer nofollow noopener"
                       aria-label="Twitter"
                       title="View on Twitter"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/62 transition-colors hover:bg-white/8 hover:text-white"
                     >
                       <TwitterX className="w-4 h-4" aria-hidden="true" />
                     </Link>
@@ -94,7 +98,7 @@ export default async function Footer() {
                       rel="noreferrer nofollow noopener"
                       aria-label="YouTube"
                       title="View on YouTube"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/62 transition-colors hover:bg-white/8 hover:text-white"
                     >
                       <Youtube className="w-4 h-4" aria-hidden="true" />
                     </Link>
@@ -107,7 +111,7 @@ export default async function Footer() {
                       rel="noreferrer nofollow noopener"
                       aria-label="Instagram"
                       title="View on Instagram"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/62 transition-colors hover:bg-white/8 hover:text-white"
                     >
                       <InstagramIcon className="w-4 h-4" aria-hidden="true" />
                     </Link>
@@ -120,7 +124,7 @@ export default async function Footer() {
                       rel="noreferrer nofollow noopener"
                       aria-label="TikTok"
                       title="View on TikTok"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/62 transition-colors hover:bg-white/8 hover:text-white"
                     >
                       <SiTiktok className="w-4 h-4" aria-hidden="true" />
                     </Link>
@@ -133,7 +137,7 @@ export default async function Footer() {
                       rel="noreferrer nofollow noopener"
                       aria-label="Discord"
                       title="Join Discord"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/62 transition-colors hover:bg-white/8 hover:text-white"
                     >
                       <SiDiscord className="w-4 h-4" aria-hidden="true" />
                     </Link>
@@ -146,7 +150,7 @@ export default async function Footer() {
                       rel="noreferrer nofollow noopener"
                       aria-label="Email"
                       title="Email"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/62 transition-colors hover:bg-white/8 hover:text-white"
                     >
                       <MailIcon className="w-4 h-4" />
                     </Link>
@@ -159,7 +163,7 @@ export default async function Footer() {
             {footerLinks.map((section) => {
               const isArticlesSection = section.title === "Articles";
               const linkClassName = cn(
-                "hover:text-white transition-colors",
+                "text-white/62 transition-colors hover:text-white",
                 isArticlesSection && "block max-w-sm line-clamp-2 leading-5"
               );
 
@@ -168,7 +172,7 @@ export default async function Footer() {
                   key={section.title}
                   className={cn("flex-1", isArticlesSection && "lg:col-span-2")}
                 >
-                  <div className="text-white text-lg font-semibold mb-4">
+                  <div className="mb-4 text-lg font-semibold text-white">
                     {section.title}
                   </div>
                   <ul className="space-y-2 text-sm">
@@ -211,19 +215,19 @@ export default async function Footer() {
             )}
           </div>
 
-          <div className="border-t border-gray-800 py-6 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
+          <div className="flex flex-col items-center justify-between border-t border-white/10 py-6 md:flex-row">
+            <p className="text-sm text-white/52">
               {tFooter("Copyright", {
                 year: new Date().getFullYear(),
                 name: siteConfig.name,
               })}
             </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
+            <div className="mt-4 flex space-x-6 md:mt-0">
               <I18nLink
                 href="/about"
                 title={tFooter("About")}
                 prefetch={false}
-                className="text-gray-400 hover:text-white text-sm"
+                className="text-sm text-white/52 transition-colors hover:text-white"
               >
                 {tFooter("About")}
               </I18nLink>
@@ -231,7 +235,7 @@ export default async function Footer() {
                 href="/privacy-policy"
                 title={tFooter("PrivacyPolicy")}
                 prefetch={false}
-                className="text-gray-400 hover:text-white text-sm"
+                className="text-sm text-white/52 transition-colors hover:text-white"
               >
                 {tFooter("PrivacyPolicy")}
               </Link>
@@ -239,7 +243,7 @@ export default async function Footer() {
                 href="/terms-of-service"
                 title={tFooter("TermsOfService")}
                 prefetch={false}
-                className="text-gray-400 hover:text-white text-sm"
+                className="text-sm text-white/52 transition-colors hover:text-white"
               >
                 {tFooter("TermsOfService")}
               </Link>
@@ -247,7 +251,7 @@ export default async function Footer() {
                 href="/refund-policy"
                 title={tFooter("RefundPolicy")}
                 prefetch={false}
-                className="text-gray-400 hover:text-white text-sm"
+                className="text-sm text-white/52 transition-colors hover:text-white"
               >
                 {tFooter("RefundPolicy")}
               </Link>

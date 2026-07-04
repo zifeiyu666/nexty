@@ -20,7 +20,7 @@ export default function Hero() {
       <div className="container mx-auto">
         <div className="flex h-dvh min-h-[600px] -translate-y-1 flex-col items-center justify-center gap-5 pb-12 pt-24 text-center sm:min-h-[640px] sm:-translate-y-3 sm:gap-7 sm:pb-16 sm:pt-28 lg:-translate-y-4 lg:gap-8 lg:pb-24 lg:pt-36 2xl:-translate-y-6 2xl:pb-32 2xl:pt-44">
           <div className="inline-flex max-w-[92vw] items-center gap-2 rounded-full border border-white/18 bg-black/28 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white/84 shadow-[0_12px_34px_rgba(0,0,0,0.26)] backdrop-blur-md sm:px-4 sm:text-sm">
-            <span className="size-1.5 rounded-full bg-[#f6c157] shadow-[0_0_18px_rgba(246,193,87,0.8)]" />
+            <span className="size-1.5 rounded-full bg-primary shadow-[0_0_18px_rgba(224,65,50,0.78)]" />
             <span className="truncate">{t("trustBadge")}</span>
           </div>
 
@@ -29,16 +29,16 @@ export default function Hero() {
               aria-label={t("title")}
               className="z-10 text-center font-sans text-[2rem] font-black leading-[1.03] tracking-normal text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.62)] min-[390px]:text-[2.22rem] min-[430px]:text-[2.45rem] sm:text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl"
             >
-              <span className="title-gradient block text-balance !text-white 2xl:whitespace-nowrap">
+              <span className="hero-title-warm block text-balance 2xl:whitespace-nowrap">
                 {titleLine}
               </span>
-              <span className="title-gradient relative mt-1.5 inline-block pb-3 !text-white sm:mt-2 sm:pb-4">
+              <span className="hero-title-warm relative mt-1.5 inline-block pb-3 sm:mt-2 sm:pb-4">
                 {/* <SquigglyText stepDuration={70} scale={[6, 9]}>
                   {titleAccent}
                 </SquigglyText> */}
                 {titleAccent}
                 <svg
-                  className="pointer-events-none absolute -bottom-1 left-1/2 h-5 w-[108%] -translate-x-1/2 text-[#f6c157] sm:h-6 md:h-8"
+                  className="pointer-events-none absolute -bottom-1 left-1/2 h-5 w-[108%] -translate-x-1/2 text-primary sm:h-6 md:h-8"
                   viewBox="0 0 420 42"
                   fill="none"
                   aria-hidden="true"
@@ -87,16 +87,16 @@ export default function Hero() {
                 prefetch={false}
                 variant="light"
                 size="default"
-                className="w-full min-w-[210px] text-[1rem] font-semibold text-black hover:text-black sm:w-auto sm:min-w-[230px] sm:text-[1.16rem]"
+                className="w-full min-w-[210px] text-[1rem] font-semibold sm:w-auto sm:min-w-[230px] sm:text-[1.16rem]"
               >
-                <PlayCircle className="size-[1.1rem] text-black sm:size-5" />
+                <PlayCircle className="size-[1.1rem] sm:size-5" />
                 <span>{t("watchReactionsCta")}</span>
               </MagneticButton>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs font-medium text-white/76 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:hidden">
               {trustItems.map((item) => (
                 <span key={item} className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="size-3.5 text-[#f6c157]" />
+                  <CheckCircle2 className="size-3.5 text-primary" />
                   {item}
                 </span>
               ))}
@@ -105,7 +105,7 @@ export default function Hero() {
           <div className="hidden flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium text-white/76 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:flex">
             {trustItems.map((item) => (
               <span key={item} className="inline-flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-[#f6c157]" />
+                <CheckCircle2 className="size-4 text-primary" />
                 {item}
               </span>
             ))}

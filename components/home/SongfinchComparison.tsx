@@ -37,47 +37,42 @@ export default function SongfinchComparison() {
   return (
     <section
       id="songfinch-comparison"
-      className="bg-[#fff6f8] py-12 dark:bg-[#24171b] md:py-18"
+      className="home-section-muted"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 text-center md:mb-12">
+      <div className="home-container">
+        <div className="home-section-header">
           {/* <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/80 px-4 py-2 text-sm font-medium text-muted-foreground shadow-sm">
             <Sparkles className="h-4 w-4" />
             {t("eyebrow")}
           </div> */}
-          <h2 className="mx-auto max-w-5xl text-center font-sans text-3xl font-extrabold leading-tight tracking-normal sm:text-4xl md:text-5xl">
+          <p className="home-eyebrow">{t("eyebrow")}</p>
+          <h2 className="home-title mx-auto max-w-5xl">
             {t.rich("title", {
               us: (chunks) => (
-                <span className="text-primary dark:text-[#ff8d7f]">
-                  {chunks}
-                </span>
+                <span className="text-primary">{chunks}</span>
               ),
               vs: (chunks) => (
-                <span className="mx-2 inline-block text-[#c8beb8] dark:text-[#8c7771] sm:mx-3">
+                <span className="mx-2 inline-block text-[#c8beb8] sm:mx-3">
                   {chunks}
                 </span>
               ),
               songfinch: (chunks) => (
-                <span className="text-[#1d1d1d] dark:text-foreground">
-                  {chunks}
-                </span>
+                <span className="text-inherit">{chunks}</span>
               ),
             })}
           </h2>
-          <div className="mx-auto mt-4 max-w-2xl font-['Bradley_Hand','Comic_Sans_MS',cursive] text-base leading-7 text-muted-foreground md:text-lg [&_strong]:font-normal [&_strong]:text-inherit">
+          <div className="home-description [&_strong]:font-semibold [&_strong]:text-[#2b1710]">
             {t.rich("subtitle", {
               strong: (chunks) => <strong>{chunks}</strong>,
               price: (chunks) => (
-                <span className="font-semibold text-primary dark:text-[#ff8d7f]">
-                  {chunks}
-                </span>
+                <span className="font-semibold text-primary">{chunks}</span>
               ),
               underline: (chunks) => (
-                <span className="relative inline-block whitespace-nowrap text-foreground">
+                <span className="relative inline-block whitespace-nowrap text-[#5a2117]">
                   {chunks}
                   <span
                     aria-hidden="true"
-                    className="absolute -bottom-1 left-0 h-2 w-full rounded-[50%] border-b-[3px] border-primary/80 [transform:rotate(-1.4deg)] dark:border-[#ff8d7f]/85"
+                    className="absolute -bottom-1 left-0 h-2 w-full rounded-[50%] border-b-[3px] border-primary/70 [transform:rotate(-1.4deg)]"
                   />
                 </span>
               ),
@@ -85,8 +80,8 @@ export default function SongfinchComparison() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-white/70 bg-background shadow-sm dark:border-[#4a2a32]">
-          <div className="grid grid-cols-[1.1fr_1fr_1fr] bg-[#2b1b17] text-sm font-semibold text-white dark:bg-[#321f21]">
+        <div className="home-card overflow-hidden">
+          <div className="grid grid-cols-[1.1fr_1fr_1fr] bg-[#2a1710] text-sm font-semibold text-white">
             <div className="px-3 py-4 sm:px-5 md:text-base">
               {t("tableHeaders.feature")}
             </div>
@@ -98,24 +93,24 @@ export default function SongfinchComparison() {
             </div>
           </div>
 
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-[#eadbd3]">
             {rows.map((row, index) => (
               <div
                 key={row.feature}
                 className="grid grid-cols-[1.1fr_1fr_1fr] text-sm md:text-base"
               >
-                <div className="flex items-center px-3 py-4 font-semibold text-foreground sm:px-5">
+                <div className="flex items-center px-3 py-4 font-semibold text-[#2b1710] sm:px-5">
                   {row.feature}
                 </div>
-                <div className="flex items-center gap-2 border-l border-primary/15 bg-primary/5 px-3 py-4 font-semibold text-foreground sm:px-5">
+                <div className="flex items-center gap-2 border-l border-primary/15 bg-primary/5 px-3 py-4 font-semibold text-[#2b1710] sm:px-5">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
                   <span>{row.us}</span>
                 </div>
-                <div className="flex items-center gap-2 border-l border-border px-3 py-4 text-muted-foreground sm:px-5">
+                <div className="flex items-center gap-2 border-l border-[#eadbd3] px-3 py-4 text-[#6f625c] sm:px-5">
                   {index > 3 ? (
-                    <XCircle className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+                    <XCircle className="h-4 w-4 shrink-0 text-[#9b8c84]" />
                   ) : (
-                    <Clock3 className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+                    <Clock3 className="h-4 w-4 shrink-0 text-[#9b8c84]" />
                   )}
                   <span>{row.songfinch}</span>
                 </div>
@@ -133,15 +128,15 @@ export default function SongfinchComparison() {
             return (
               <article
                 key={item.title}
-                className="rounded-2xl border border-white/70 bg-background p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 dark:border-[#4a2a32]"
+                className="home-card home-card-hover p-5"
               >
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-base font-semibold leading-snug text-foreground md:text-lg">
+                <h3 className="text-base font-semibold leading-snug text-[#2b1710] md:text-lg">
                   {item.title}
                 </h3>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                <p className="mt-3 text-sm leading-6 text-[#6f625c]">
                   {item.description}
                 </p>
               </article>

@@ -20,7 +20,7 @@ const testimonials: TestimonialItem[] = [
       "I was skeptical about AI, but wow! Crafted a custom song for my husband and he loved it. The vocals felt warm, not robotic, and the whole thing sounded studio-quality.",
     author: "Sarah M. 🇺🇸",
     avatar: "/avatar/avatar1.jpg",
-    cardClassName: "bg-[#f7f3f1] dark:bg-[#2d2421]",
+    cardClassName: "bg-white",
   },
   {
     badge: "🎂 Mom's 50th",
@@ -28,7 +28,7 @@ const testimonials: TestimonialItem[] = [
       "So much better than a generic greeting card. Took less than 2 mins and brought my mom to tears of joy!",
     author: "David K. 🇬🇧",
     avatar: "/avatar/avatar2.jpg",
-    cardClassName: "bg-[#fff0f4] dark:bg-[#3d252a]",
+    cardClassName: "bg-white",
   },
   {
     badge: "✨ Wedding First Dance",
@@ -36,7 +36,7 @@ const testimonials: TestimonialItem[] = [
       "We used this for our first dance. It captured our specific inside jokes perfectly. Pure magic!",
     author: "Emma & James 🇨🇦",
     avatar: "/avatar/avatar3.jpg",
-    cardClassName: "bg-[#f5f5f6] dark:bg-[#292524]",
+    cardClassName: "bg-white",
   },
   {
     badge: "✈️ Long-Distance",
@@ -44,7 +44,7 @@ const testimonials: TestimonialItem[] = [
       "The perfect way to send a song when you're 3,000 miles apart. I added tiny details from our calls and favorite trips, and she played it on repeat all night.",
     author: "Liam T. 🇨🇦",
     avatar: "/avatar/avatar4.jpg",
-    cardClassName: "bg-[#f8f1ee] dark:bg-[#2d2421]",
+    cardClassName: "bg-white",
   },
   {
     badge: "👴 Father's Day",
@@ -52,7 +52,7 @@ const testimonials: TestimonialItem[] = [
       "My kids generated a personalized song for me. Not cheesy at all—actually beautiful. Will cherish forever.",
     author: "Robert H. 🇦🇺",
     avatar: "/avatar/avatar5.jpg",
-    cardClassName: "bg-[#fff3f6] dark:bg-[#3d252a]",
+    cardClassName: "bg-white",
   },
   {
     badge: "🚀 Last-Minute Gift",
@@ -60,7 +60,7 @@ const testimonials: TestimonialItem[] = [
       "Total lifesaver! Realized I forgot a gift the night before. This music gift literally saved the party.",
     author: "Chloe B. 🇬🇧",
     avatar: "/avatar/avatar6.jpg",
-    cardClassName: "bg-[#f6f2ef] dark:bg-[#2d2421]",
+    cardClassName: "bg-white",
   },
   {
     badge: "🎸 Boyfriend's Bday",
@@ -68,7 +68,7 @@ const testimonials: TestimonialItem[] = [
       "It actually nailed the 90s indie rock vibe my boyfriend loves. I mentioned his favorite bands, our coffee shop date, and the song came back sounding like a real studio recording.",
     author: "Sofia R. 🇪🇸",
     avatar: "/avatar/avatar7.jpg",
-    cardClassName: "bg-[#f4f5f7] dark:bg-[#292524]",
+    cardClassName: "bg-white",
   },
   {
     badge: "🤵 Groom's Surprise",
@@ -76,7 +76,7 @@ const testimonials: TestimonialItem[] = [
       "Surprised my bride during the reception. The look on her face was priceless. Easiest custom song ever.",
     author: "Marcus V. 🇺🇸",
     avatar: "/avatar/avatar8.jpg",
-    cardClassName: "bg-[#fff0f4] dark:bg-[#3d252a]",
+    cardClassName: "bg-white",
   },
 ];
 
@@ -86,7 +86,7 @@ const IDLE_SCROLL_DELAY = 160;
 
 const RatingStars = () => {
   return (
-    <div className="flex shrink-0 items-center gap-0.5 text-yellow-400">
+    <div className="flex shrink-0 items-center gap-0.5 text-primary">
       {[...Array(5)].map((_, i) => (
         <Star key={i} className="h-3.5 w-3.5 fill-current" />
       ))}
@@ -98,16 +98,16 @@ const TestimonialCard = ({ testimonial }: { testimonial: TestimonialItem }) => {
   return (
     <li className="w-[260px] shrink-0 list-none sm:w-[300px] lg:w-[340px]">
       <figure
-        className={`flex h-full transform-gpu flex-col rounded-2xl p-5 shadow-sm transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.015] hover:shadow-xl sm:p-6 ${testimonial.cardClassName ?? "bg-[#f7f3f1] dark:bg-[#2d2421]"}`}
+        className={`home-card home-card-hover flex h-full transform-gpu flex-col p-5 sm:p-6 ${testimonial.cardClassName ?? "bg-white"}`}
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2">
             <RatingStars />
-            <span className="shrink-0 whitespace-nowrap rounded-full bg-background/70 px-2.5 py-1 text-[11px] font-medium leading-none text-muted-foreground">
+            <span className="shrink-0 whitespace-nowrap rounded-full bg-[#f8f2ee] px-2.5 py-1 text-[11px] font-medium leading-none text-[#6f625c]">
               {testimonial.badge}
             </span>
           </div>
-          <blockquote className="text-sm font-medium leading-6 text-foreground/85 sm:text-[15px]">
+          <blockquote className="text-sm font-medium leading-6 text-[#3f332c] sm:text-[15px]">
             “{testimonial.quote}”
           </blockquote>
         </div>
@@ -118,7 +118,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: TestimonialItem }) => {
               alt={testimonial.author}
               width={40}
               height={40}
-              className="h-10 w-10 rounded-full object-cover"
+              className="h-10 w-10 rounded-full object-cover ring-2 ring-[#f8f2ee]"
             />
           ) : (
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-black text-primary-foreground">
@@ -126,10 +126,10 @@ const TestimonialCard = ({ testimonial }: { testimonial: TestimonialItem }) => {
             </div>
           )}
           <div>
-            <p className="text-sm font-semibold text-foreground">
+            <p className="text-sm font-semibold text-[#2b1710]">
               {testimonial.author}
             </p>
-            <p className="text-xs text-muted-foreground">{testimonial.badge}</p>
+            <p className="text-xs text-[#6f625c]">{testimonial.badge}</p>
           </div>
         </figcaption>
       </figure>
@@ -260,16 +260,15 @@ export default function Testimonials({
   };
 
   return (
-    <section id="testimonials" className="overflow-hidden py-12 md:py-18">
+    <section id="testimonials" className="home-section overflow-hidden">
       <div
         className={`mx-auto ${contentWidthClassName} px-4 sm:px-6 lg:px-8`}
       >
-        <div className="mb-10 text-center md:mb-12">
+        <div className="home-section-header">
           {/* <FeatureBadge label={t("badge.label")} className="mb-6" /> */}
-          <h2 className="preset-title">
-            <span className="title-gradient">{title ?? t("title")}</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl font-['Bradley_Hand','Comic_Sans_MS',cursive] text-base leading-7 text-muted-foreground md:text-lg">
+          <p className="home-eyebrow">{t("badge.label")}</p>
+          <h2 className="home-title">{title ?? t("title")}</h2>
+          <p className="home-description">
             {description ?? t("description")}
           </p>
         </div>
@@ -279,8 +278,8 @@ export default function Testimonials({
         onMouseEnter={handleMarqueeMouseEnter}
         onMouseLeave={handleMarqueeMouseLeave}
       >
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-background to-transparent sm:w-32" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-background to-transparent sm:w-32" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-[#fffdf9] to-transparent sm:w-32" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-[#fffdf9] to-transparent sm:w-32" />
         <ul ref={marqueeRef} className="flex w-max items-start gap-4 sm:gap-5">
           {marqueeTestimonials.map((testimonial, index) => (
             <TestimonialCard

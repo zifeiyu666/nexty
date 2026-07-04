@@ -16,6 +16,7 @@ type HowItWorksSectionProps = {
   sectionClassName?: string;
   containerClassName?: string;
   headerClassName?: string;
+  eyebrowClassName?: string;
   titleClassName?: string;
   descriptionClassName?: string;
   gridClassName?: string;
@@ -35,6 +36,7 @@ export default function HowItWorksSection({
   sectionClassName,
   containerClassName,
   headerClassName,
+  eyebrowClassName,
   titleClassName,
   descriptionClassName,
   gridClassName,
@@ -55,14 +57,19 @@ export default function HowItWorksSection({
       {backgroundSlot}
 
       <div className={cn("relative mx-auto max-w-6xl", containerClassName)}>
-        <div className={cn("mx-auto max-w-3xl text-center", headerClassName)}>
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#c33f32]">
+        <div className={cn("mx-auto max-w-4xl text-center", headerClassName)}>
+          <p
+            className={cn(
+              "text-xs font-bold uppercase tracking-[0.24em] text-[#c33f32]",
+              eyebrowClassName,
+            )}
+          >
             {eyebrow}
           </p>
           <h2
             className={cn(
-              "mt-3 text-balance font-sans text-3xl font-black leading-tight text-[#261712] sm:text-4xl md:text-5xl",
-              titleClassName,
+              titleClassName ??
+                "mt-3 text-balance font-sans text-3xl font-black leading-tight text-[#261712] sm:text-4xl md:text-5xl",
             )}
           >
             {title}
@@ -83,7 +90,7 @@ export default function HowItWorksSection({
               key={step.kicker}
               data-how-it-works-card
               className={cn(
-                "rounded-lg bg-white p-6 shadow-sm ring-1 ring-[#eadbd3]",
+                "home-card home-card-hover p-6",
                 cardClassName,
               )}
             >

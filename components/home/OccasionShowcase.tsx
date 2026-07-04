@@ -11,7 +11,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import {
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -20,11 +19,6 @@ import {
 } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const SCROLL_FOLLOW_MULTIPLIER = 1.05;
-const SCROLL_ACTIVATION_PADDING = 120;
-const SCROLL_SMOOTHING = 0.18;
-const SCROLL_SETTLE_EPSILON = 0.35;
 
 const copy = {
   eyebrow: "Occasions",
@@ -52,14 +46,10 @@ export default function OccasionShowcase() {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef(new Map<number, HTMLElement>());
   const dragStateRef = useRef<DragState | null>(null);
-  const lastScrollYRef = useRef(0);
   const maxScrollRef = useRef(0);
   const cardOffsetsRef = useRef<number[]>([]);
   const translateRef = useRef(0);
-  const targetTranslateRef = useRef(0);
   const activeIndexRef = useRef(0);
-  const isSectionNearViewportRef = useRef(false);
-  const isScrollSmoothingRef = useRef(false);
   const reducedMotionRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -71,7 +61,7 @@ export default function OccasionShowcase() {
     }
   };
 
-  const updateTrackMetrics = useCallback(() => {
+  const updateTrackMetrics = () => {
     const viewport = viewportRef.current;
     const track = trackRef.current;
 
@@ -85,61 +75,51 @@ export default function OccasionShowcase() {
     });
 
     return maxScroll;
-  }, []);
+  };
 
-  const getTargetTranslate = useCallback(
-    (index: number) => {
-      const maxScroll = updateTrackMetrics();
-      const cardOffset =
-        cardOffsetsRef.current[index] ??
-        cardRefs.current.get(index)?.offsetLeft;
-      const leadingInset = 32;
+  const getTargetTranslate = (index: number) => {
+    const maxScroll = updateTrackMetrics();
+    const cardOffset =
+      cardOffsetsRef.current[index] ?? cardRefs.current.get(index)?.offsetLeft;
+    const leadingInset = 32;
 
-      if (cardOffset === undefined) return -Math.min(index * 320, maxScroll);
+    if (cardOffset === undefined) return -Math.min(index * 320, maxScroll);
 
-      return -Math.min(Math.max(0, cardOffset - leadingInset), maxScroll);
-    },
-    [updateTrackMetrics],
-  );
+    return -Math.min(Math.max(0, cardOffset - leadingInset), maxScroll);
+  };
 
-  const moveToIndex = useCallback(
-    (index: number, animate = true) => {
-      const track = trackRef.current;
+  const moveToIndex = (index: number, animate = true) => {
+    const track = trackRef.current;
 
-      if (!track) return;
+    if (!track) return;
 
-      const nextIndex = clamp(index, 0, occasionCards.length - 1);
-      const targetTranslate = getTargetTranslate(nextIndex);
+    const nextIndex = clamp(index, 0, occasionCards.length - 1);
+    const targetTranslate = getTargetTranslate(nextIndex);
 
-      gsap.killTweensOf(track);
-      isScrollSmoothingRef.current = false;
-      targetTranslateRef.current = targetTranslate;
-      activeIndexRef.current = nextIndex;
-      setActiveIndex(nextIndex);
+    gsap.killTweensOf(track);
+    activeIndexRef.current = nextIndex;
+    setActiveIndex(nextIndex);
 
-      if (!animate || reducedMotionRef.current) {
+    if (!animate || reducedMotionRef.current) {
+      translateRef.current = targetTranslate;
+      gsap.set(track, { x: targetTranslate });
+      return;
+    }
+
+    gsap.to(track, {
+      x: targetTranslate,
+      duration: 0.72,
+      ease: "power3.out",
+      onUpdate: () => {
+        translateRef.current = Number(gsap.getProperty(track, "x"));
+      },
+      onComplete: () => {
         translateRef.current = targetTranslate;
-        gsap.set(track, { x: targetTranslate });
-        return;
-      }
+      },
+    });
+  };
 
-      gsap.to(track, {
-        x: targetTranslate,
-        duration: 0.72,
-        ease: "power3.out",
-        onUpdate: () => {
-          translateRef.current = Number(gsap.getProperty(track, "x"));
-        },
-        onComplete: () => {
-          translateRef.current = targetTranslate;
-          targetTranslateRef.current = targetTranslate;
-        },
-      });
-    },
-    [getTargetTranslate],
-  );
-
-  const getClosestIndexForTranslate = useCallback((translate: number) => {
+  const getClosestIndexForTranslate = (translate: number) => {
     const currentOffset = -translate;
     const cardOffsets = cardOffsetsRef.current;
     let closestIndex = 0;
@@ -155,23 +135,20 @@ export default function OccasionShowcase() {
     });
 
     return closestIndex;
-  }, []);
+  };
 
-  const updateActiveIndexForTranslate = useCallback(
-    (translate: number) => {
-      const nextIndex = getClosestIndexForTranslate(translate);
+  const updateActiveIndexForTranslate = (translate: number) => {
+    const nextIndex = getClosestIndexForTranslate(translate);
 
-      if (nextIndex === activeIndexRef.current) return;
+    if (nextIndex === activeIndexRef.current) return;
 
-      activeIndexRef.current = nextIndex;
-      setActiveIndex(nextIndex);
-    },
-    [getClosestIndexForTranslate],
-  );
+    activeIndexRef.current = nextIndex;
+    setActiveIndex(nextIndex);
+  };
 
-  const settleNearestCard = useCallback(() => {
+  const settleNearestCard = () => {
     moveToIndex(getClosestIndexForTranslate(translateRef.current));
-  }, [getClosestIndexForTranslate, moveToIndex]);
+  };
 
   useEffect(() => {
     reducedMotionRef.current = window.matchMedia(
@@ -221,7 +198,9 @@ export default function OccasionShowcase() {
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [moveToIndex]);
+    // The carousel is driven by refs and GSAP listeners; resize should bind once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -236,84 +215,36 @@ export default function OccasionShowcase() {
     if (reducedMotion) return;
 
     updateTrackMetrics();
-    lastScrollYRef.current = window.scrollY;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isSectionNearViewportRef.current = Boolean(entry?.isIntersecting);
-      },
-      { rootMargin: `${SCROLL_ACTIVATION_PADDING}px 0px` },
-    );
-
-    observer.observe(section);
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const scrollDelta = scrollY - lastScrollYRef.current;
-
-      lastScrollYRef.current = scrollY;
-
-      if (scrollDelta === 0 || dragStateRef.current) return;
-      if (!isSectionNearViewportRef.current) return;
-
-      const maxScroll = maxScrollRef.current;
-
-      if (maxScroll <= 0) return;
-
-      const baseTranslate = isScrollSmoothingRef.current
-        ? targetTranslateRef.current
-        : translateRef.current;
-      const nextTranslate = clamp(
-        baseTranslate - scrollDelta * SCROLL_FOLLOW_MULTIPLIER,
-        -maxScroll,
-        0,
-      );
-
-      if (nextTranslate === targetTranslateRef.current) return;
-
-      if (!isScrollSmoothingRef.current) {
-        gsap.killTweensOf(track);
-      }
-
-      targetTranslateRef.current = nextTranslate;
-      isScrollSmoothingRef.current = true;
-    };
 
     const setX = gsap.quickSetter(track, "x", "px");
+    const scrollTrigger = ScrollTrigger.create({
+      trigger: section,
+      start: "top 72%",
+      end: "bottom 20%",
+      invalidateOnRefresh: true,
+      onRefresh: (self) => {
+        const maxScroll = updateTrackMetrics();
+        const nextTranslate = -maxScroll * self.progress;
 
-    const tick = (_time: number, deltaTime: number) => {
-      if (!isScrollSmoothingRef.current || dragStateRef.current) return;
+        translateRef.current = nextTranslate;
+        setX(nextTranslate);
+        updateActiveIndexForTranslate(nextTranslate);
+      },
+      onUpdate: (self) => {
+        if (dragStateRef.current) return;
 
-      const currentTranslate = translateRef.current;
-      const targetTranslate = targetTranslateRef.current;
-      const diff = targetTranslate - currentTranslate;
+        const nextTranslate = -maxScrollRef.current * self.progress;
 
-      if (Math.abs(diff) <= SCROLL_SETTLE_EPSILON) {
-        translateRef.current = targetTranslate;
-        setX(targetTranslate);
-        updateActiveIndexForTranslate(targetTranslate);
-        isScrollSmoothingRef.current = false;
-        return;
-      }
+        translateRef.current = nextTranslate;
+        setX(nextTranslate);
+        updateActiveIndexForTranslate(nextTranslate);
+      },
+    });
 
-      const smoothing =
-        1 - Math.pow(1 - SCROLL_SMOOTHING, Math.max(deltaTime, 16.67) / 16.67);
-      const nextTranslate = currentTranslate + diff * smoothing;
-
-      translateRef.current = nextTranslate;
-      setX(nextTranslate);
-      updateActiveIndexForTranslate(nextTranslate);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    gsap.ticker.add(tick);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", handleScroll);
-      gsap.ticker.remove(tick);
-    };
-  }, [updateTrackMetrics, updateActiveIndexForTranslate]);
+    return () => scrollTrigger.kill();
+    // ScrollTrigger owns the card-track transform; the heading remains outside it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -323,9 +254,6 @@ export default function OccasionShowcase() {
     if (track) {
       gsap.killTweensOf(track);
     }
-
-    isScrollSmoothingRef.current = false;
-    targetTranslateRef.current = translateRef.current;
 
     dragStateRef.current = {
       pointerId: event.pointerId,
@@ -357,8 +285,6 @@ export default function OccasionShowcase() {
     );
 
     translateRef.current = nextTranslate;
-    targetTranslateRef.current = nextTranslate;
-    isScrollSmoothingRef.current = false;
     gsap.killTweensOf(track);
     gsap.set(track, { x: nextTranslate });
     updateActiveIndexForTranslate(nextTranslate);
@@ -442,21 +368,23 @@ export default function OccasionShowcase() {
     <section
       ref={sectionRef}
       id="occasions"
-      className="dark relative isolate overflow-hidden bg-[#232321] py-16 text-[#f5ede7] sm:py-24 lg:py-28"
+      className="home-section-deep home-warm-ambient relative isolate overflow-hidden"
       aria-labelledby="occasion-showcase-heading"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-12 max-w-4xl text-center">
-          {/* <p className="mb-3 text-sm font-semibold uppercase text-primary">
-            {copy.eyebrow}
-          </p> */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(18,11,9,0.42)_72%,rgba(18,11,9,0.72)_100%)]"
+      />
+      <div className="home-container relative">
+        <div className="home-section-header">
+          <p className="home-eyebrow">{copy.eyebrow}</p>
           <h2
             id="occasion-showcase-heading"
-            className="mx-auto max-w-3xl text-balance text-5xl font-black leading-tight "
+            className="home-title hero-title-warm"
           >
-            <span className="title-gradient">{copy.title}</span>
+            {copy.title}
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl font-['Bradley_Hand','Comic_Sans_MS',cursive] text-base leading-7 text-[#d8cec7] sm:text-lg">
+          <p className="home-description text-white/70">
             {copy.description}
           </p>
         </div>
@@ -496,12 +424,12 @@ export default function OccasionShowcase() {
           size="icon-lg"
           onClick={() => moveToIndex(activeIndex - 1)}
           disabled={activeIndex === 0}
-          className="rounded-full border-[#54534e] bg-[#2c2b28]/86 text-[#f5ede7] shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-[#ff9fbd]/50 hover:bg-[#35332f] disabled:opacity-40"
+          className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
           aria-label={copy.previous}
         >
           <ArrowLeft className="size-5" />
         </Button>
-        <div className="min-w-24 rounded-full border border-[#54534e] bg-[#2c2b28]/80 px-4 py-2 text-center text-sm font-semibold text-white shadow-[0_12px_35px_rgba(0,0,0,0.26)] backdrop-blur">
+        <div className="min-w-24 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-center text-sm font-semibold text-white shadow-[0_12px_35px_rgba(0,0,0,0.26)] backdrop-blur">
           {occasionCards[activeIndex]?.index ?? "01"} / {occasionCards.length}
         </div>
         <Button
@@ -510,7 +438,7 @@ export default function OccasionShowcase() {
           size="icon-lg"
           onClick={() => moveToIndex(activeIndex + 1)}
           disabled={activeIndex === occasionCards.length - 1}
-          className="rounded-full border-[#54534e] bg-[#2c2b28]/86 text-[#f5ede7] shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-[#ff9fbd]/50 hover:bg-[#35332f] disabled:opacity-40"
+          className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
           aria-label={copy.next}
         >
           <ArrowRight className="size-5" />
