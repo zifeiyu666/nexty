@@ -342,7 +342,7 @@ export default function BirthdaySongsPage({
             </div>
 
             <h1 className="mt-5 max-w-[11ch] text-balance font-sans text-[2.5rem] font-black leading-[0.98] tracking-normal text-[#250f0b] min-[420px]:text-[2.9rem] sm:text-[3.7rem] lg:text-[4.45rem]">
-              Personalized Happy Birthday Song
+              Custom Happy Birthday Song
             </h1>
 
             <p className="mt-5 max-w-lg text-base leading-7 text-[#6c5f59] sm:text-lg">

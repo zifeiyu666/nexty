@@ -117,7 +117,7 @@ export default function CustomerReactions({
 
         <div
           className={cn(
-            "mx-auto grid max-w-5xl grid-cols-1 gap-3 [perspective:1200px] sm:grid-cols-2 sm:gap-4 lg:grid-cols-5 lg:gap-5",
+            "mx-auto grid max-w-5xl grid-cols-1 gap-4 [perspective:1200px] sm:grid-cols-2 sm:gap-6 lg:grid-cols-5 lg:gap-7",
             activeIndex !== null &&
               "[&_.reaction-card:not(.is-active)]:lg:[--reaction-card-scale:0.97]",
           )}
