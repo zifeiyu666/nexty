@@ -14,6 +14,16 @@ const nextConfig = {
       destination: "/dashboard/settings",
       permanent: true,
     },
+    {
+      source: "/blog/personalized-happy-birthday-song",
+      destination: "/blog/custom-happy-birthday-song",
+      permanent: true,
+    },
+    {
+      source: "/:locale/blog/personalized-happy-birthday-song",
+      destination: "/:locale/blog/custom-happy-birthday-song",
+      permanent: true,
+    },
   ],
   images: {
     unoptimized:

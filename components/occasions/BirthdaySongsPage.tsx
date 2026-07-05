@@ -45,7 +45,7 @@ const benefits: IconBlock[] = [
   {
     title: "Their name in the chorus",
     description:
-      "Add the birthday person, inside jokes, favorite memories, and the message you want them to hear.",
+      "Add the birthday person's name, inside jokes, favorite memories, and the message you want them to hear in a custom happy birthday song.",
     icon: <MessageCircleHeart className="size-6" />,
   },
   {
@@ -57,7 +57,7 @@ const benefits: IconBlock[] = [
   {
     title: "Free preview in minutes",
     description:
-      "Use the AI birthday song generator to hear a custom sample first, then adjust lyrics or style before unlocking the full track.",
+      "Use the AI birthday song generator to hear a personalized happy birthday song sample first, then adjust lyrics or style before unlocking the full track.",
     icon: <Clock3 className="size-6" />,
   },
   {
@@ -73,7 +73,7 @@ const steps = [
     kicker: "01",
     title: "Share the birthday story",
     description:
-      "Tell us their name, relationship, age or milestone, and a few memories that feel unmistakably them.",
+      "Tell us their name, relationship, age or milestone, and a few memories for a custom happy birthday song that feels unmistakably them.",
   },
   {
     kicker: "02",
@@ -85,7 +85,7 @@ const steps = [
     kicker: "03",
     title: "Preview and refine",
     description:
-      "Listen to your sample, polish the lyrics, change the genre, and keep shaping it until it feels right.",
+      "Listen to your personalized happy birthday song sample, polish the lyrics, change the genre, and keep shaping it until it feels right.",
   },
   {
     kicker: "04",
@@ -99,7 +99,7 @@ const useCases: IconBlock[] = [
   {
     title: "For Mom or Dad",
     description:
-      "Celebrate the stories, advice, recipes, road trips, and little rituals that made home feel like home.",
+      "Create a custom happy birthday song around the stories, advice, recipes, road trips, and rituals that made home feel like home.",
     icon: <Heart className="size-5" />,
   },
   {
@@ -117,7 +117,7 @@ const useCases: IconBlock[] = [
   {
     title: "For a best friend",
     description:
-      "Turn legendary jokes, chaotic trips, voice notes, and college memories into a song made for one person.",
+      "Turn legendary jokes, chaotic trips, voice notes, and college memories into a personalized happy birthday song made for one person.",
     icon: <Sparkles className="size-5" />,
   },
   {
@@ -138,7 +138,7 @@ const specificPeopleSpotlights: SpecificPeopleSpotlight[] = [
   {
     title: "Birthday song for dad",
     description:
-      "Cover the biggest dad-focused searches with a song that sounds warm, grateful, funny, or proud. This works well for milestone birthdays, surprise party reveals, and messages that sound more personal than a card.",
+      "Cover the biggest dad-focused searches with a custom happy birthday song that sounds warm, grateful, funny, or proud. This works well for milestone birthdays, surprise party reveals, and messages that sound more personal than a card.",
     searchTerms: ["birthday song dad", "happy birthday daddy"],
     promptHint:
       "Mention his nickname, the life lesson everyone repeats, his signature joke, and the memory that instantly feels like him.",
@@ -149,7 +149,7 @@ const specificPeopleSpotlights: SpecificPeopleSpotlight[] = [
   {
     title: "Birthday song for mom",
     description:
-      "Use this angle when you want the lyrics to feel loving, thankful, and replayable. It fits family celebrations, tribute-style messages, and softer songs that center comfort and care.",
+      "Use this angle when you want personalized happy birthday song lyrics to feel loving, thankful, and replayable. It fits family celebrations, tribute-style messages, and softer songs that center comfort and care.",
     searchTerms: ["songs for mom", "happy birthday for mom song"],
     promptHint:
       "Add her name, the way she shows love, a family ritual, and one detail that only your family would recognize.",
@@ -158,7 +158,7 @@ const specificPeopleSpotlights: SpecificPeopleSpotlight[] = [
   {
     title: "Birthday song for husband",
     description:
-      "Blend birthday wishes with romance, shared memories, and private language that makes the song feel like it belongs inside the relationship instead of on a generic playlist.",
+      "Blend birthday wishes with romance, shared memories, and private language so the custom happy birthday song feels like it belongs inside the relationship instead of on a generic playlist.",
     searchTerms: ["birthday song for husband", "songs for husband"],
     promptHint:
       "Include your favorite trip, the nickname you use in private, how he makes ordinary days better, and the mood you want for the reveal.",
@@ -240,19 +240,19 @@ const testimonials: TestimonialItem[] = [
 
 const faqs = [
   {
-    question: "Can I create a happy birthday song with their name?",
+    question: "Can I create a custom happy birthday song with their name?",
     answer:
-      "Yes. Add the recipient's name, nickname, relationship, memories, and message. The song can naturally include those details in the verses or chorus.",
+      "Yes. Add the recipient's name, nickname, relationship, memories, and message. Your custom happy birthday song can naturally include those details in the verses or chorus.",
   },
   {
-    question: "How fast can I preview a birthday song?",
+    question: "How fast can I preview a personalized happy birthday song?",
     answer:
-      "You can create a preview in minutes after sharing the story and style. Listen first, then decide whether to refine or unlock the full song.",
+      "You can create a personalized happy birthday song preview in minutes after sharing the story and style. Listen first, then decide whether to refine or unlock the full song.",
   },
   {
     question: "Is this an AI birthday song generator?",
     answer:
-      "Yes. The page works as an AI birthday song generator that turns your details into lyrics, vocals, and music for one specific person. You bring the memories and message, then the generator builds a birthday song you can preview and refine.",
+      "Yes. The page works as an AI birthday song generator that turns your details into lyrics, vocals, and music for one specific person. You bring the memories and message, then the generator builds a custom happy birthday song you can preview and refine.",
   },
   {
     question: "Can the song be funny instead of emotional?",
@@ -262,7 +262,7 @@ const faqs = [
   {
     question: "Do I need to know music or songwriting?",
     answer:
-      "No. You only need a few real details. The song maker handles lyric structure, genre, vocals, and production.",
+      "No. You only need a few real details. The song maker handles lyric structure, genre, vocals, and production for your personalized happy birthday song.",
   },
   {
     question: "Can I edit the lyrics or change the genre?",
@@ -338,7 +338,7 @@ export default function BirthdaySongsPage({
               <Stars />
               <span className="font-bold text-[#261712]">Excellent</span>
               <span className="text-[#d8c6bd]">/</span>
-              <span>Birthday song gifts</span>
+              <span>Custom happy birthday song gifts</span>
             </div>
 
             <h1 className="mt-5 max-w-[11ch] text-balance font-sans text-[2.5rem] font-black leading-[0.98] tracking-normal text-[#250f0b] min-[420px]:text-[2.9rem] sm:text-[3.7rem] lg:text-[4.45rem]">
@@ -347,10 +347,10 @@ export default function BirthdaySongsPage({
 
             <p className="mt-5 max-w-lg text-base leading-7 text-[#6c5f59] sm:text-lg">
               Turn their name, favorite memories, and birthday message into a
-              studio-quality custom song with an AI birthday song generator.
-              Create a free preview, refine the lyrics, then send a
-              personalized music gift they can replay long after the candles
-              are gone.
+              studio-quality custom happy birthday song with an AI birthday
+              song generator. Create a free preview, refine the lyrics, then
+              send a personalized happy birthday song they can replay long
+              after the candles are gone.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -360,7 +360,7 @@ export default function BirthdaySongsPage({
                 trailingArrow
                 className="border-[#e04132] bg-[#e04132] px-6 font-bold text-white shadow-[0_18px_38px_rgba(224,65,50,0.28)] hover:border-[#c93629] hover:bg-[#c93629] hover:text-white"
               >
-                Create Your Birthday Song
+                Create Custom Birthday Song
               </MagneticButton>
               <MagneticButton
                 href="#birthday-examples"
@@ -403,8 +403,8 @@ export default function BirthdaySongsPage({
         <div className="mx-auto max-w-6xl">
           <SectionHeader
             eyebrow="Why it works"
-            title="More personal than another birthday card"
-            description="A custom birthday song carries the details only you know, then wraps them in music, vocals, and a chorus made for one person."
+            title="A custom happy birthday song feels personal"
+            description="A custom happy birthday song carries the details only you know, then wraps them in music, vocals, and a chorus made for one person."
           />
 
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -430,8 +430,8 @@ export default function BirthdaySongsPage({
 
       <HowItWorksSection
         eyebrow="How it works"
-        title="From birthday memory to singable surprise"
-        description="You bring the real details. The AI birthday song generator turns them into lyrics, music, vocals, and a gift that feels impossible to buy off a shelf."
+        title="From birthday memory to custom happy birthday song"
+        description="You bring the real details. The AI birthday song generator turns them into lyrics, music, vocals, and a personalized happy birthday song that feels impossible to buy off a shelf."
         steps={steps}
       />
 
@@ -439,8 +439,8 @@ export default function BirthdaySongsPage({
         <div className="mx-auto max-w-6xl">
           <SectionHeader
             eyebrow="Birthday moments"
-            title="A song for every kind of birthday person"
-            description="Use the same custom song flow for family, romance, friendship, kids, and last-minute party saves."
+            title="Personalized happy birthday songs for every person"
+            description="Use the same custom happy birthday song flow for family, romance, friendship, kids, and last-minute party saves."
           />
 
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -469,15 +469,15 @@ export default function BirthdaySongsPage({
           <SectionHeader
             eyebrow="Specific people"
             title="Birthday songs for the people you know by heart"
-            description="This section covers the birthday song searches people make most often: dad, mom, husband, brother, sister, and parent-to-child birthday tributes."
+            description="This section covers the personalized happy birthday song searches people make most often: dad, mom, husband, brother, sister, and parent-to-child birthday tributes."
           />
 
           <p className="mx-auto mt-6 max-w-4xl text-center text-sm leading-7 text-[#7a6961] md:text-base">
             If someone is searching for a birthday song for a specific person,
             they usually want more than a generic happy birthday track. These
             topic clusters help the page speak directly to family, partner, and
-            sibling gift intent while still guiding people into one custom-song
-            flow.
+            sibling gift intent while still guiding people into one custom
+            happy birthday song flow.
           </p>
 
           <div className="mt-12 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -530,7 +530,7 @@ export default function BirthdaySongsPage({
                   className="mt-5 h-auto px-0 text-sm font-black text-[#9a2f25] hover:bg-transparent hover:text-[#7d221a]"
                 >
                   <I18nLink href={createBirthdaySongHref}>
-                    Create this birthday song
+                    Create this custom song
                     <ArrowRight className="size-4" />
                   </I18nLink>
                 </Button>
@@ -551,12 +551,12 @@ export default function BirthdaySongsPage({
                 Example briefs
               </p>
               <h2 className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
-                Start with a few real details
+                Start your custom happy birthday song with real details
               </h2>
               <p className="mt-4 text-base leading-7 text-white/70 md:text-lg">
                 You do not need polished writing. A name, a relationship, a
-                memory, and a mood are enough to create a birthday song that
-                sounds specific.
+                memory, and a mood are enough to create a personalized happy
+                birthday song that sounds specific.
               </p>
               <Button
                 asChild
@@ -600,18 +600,18 @@ export default function BirthdaySongsPage({
       />
 
       <Testimonials
-        title="Birthday songs that land"
+        title="Custom happy birthday songs that land"
         description="When the song includes their actual life, the reaction feels different from any ordinary gift."
         items={testimonials}
         contentWidthClassName="max-w-6xl"
       />
 
       <FAQ
-        title="Common birthday song questions"
-        description="A few details are enough to start, and you can refine before the final birthday surprise."
+        title="Custom happy birthday song questions"
+        description="A few details are enough to start, and you can refine before the final personalized birthday surprise."
         items={faqs}
         ctaTitle="Ready for their birthday?"
-        ctaDescription="Add the name, the memories, and the feeling. Get a free preview and turn it into a personalized music gift today."
+        ctaDescription="Add the name, the memories, and the feeling. Get a free preview and turn it into a personalized happy birthday song today."
         ctaButtonLabel="Create Your Song"
         ctaHref={createBirthdaySongHref}
       />

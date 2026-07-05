@@ -58,7 +58,7 @@ describe("homepage how it works section", () => {
     assert.match(sharedComponentSource, /rounded-full bg-\[#25130e\] px-3 py-1 text-xs font-black text-white/);
 
     assert.match(birthdayPageSource, /<HowItWorksSection/);
-    assert.match(birthdayPageSource, /title="From birthday memory to singable surprise"/);
+    assert.match(birthdayPageSource, /title="From birthday memory to custom happy birthday song"/);
     assert.match(birthdayPageSource, /steps=\{steps\}/);
     assert.doesNotMatch(
       birthdayPageSource,

@@ -127,7 +127,7 @@ export default function BirthdayHeroVisual() {
             <div className="absolute inset-0 transition-transform duration-500 ease-out [transform:translate3d(var(--hero-image-x),var(--hero-image-y),0)_scale(1.05)] will-change-transform">
               <Image
                 src="/images/occasions/birthday-custom-song-hero.png"
-                alt="Smiling birthday recipient listening to a personalized birthday song beside candles"
+                alt="Smiling birthday recipient listening to a custom happy birthday song beside candles"
                 fill
                 priority
                 sizes="(min-width: 1024px) 48vw, 100vw"
@@ -148,7 +148,7 @@ export default function BirthdayHeroVisual() {
                 </span>
                 <div>
                   <p className="text-sm font-black text-[#261712]">
-                    Built for birthday reveals
+                    Built for custom birthday reveals
                   </p>
                   <p className="mt-1 text-xs leading-5 text-[#6f625c]">
                     Play it at cake time, send it by text, or turn it into a

@@ -390,6 +390,14 @@
               "id": "pricing",
               "href": "/#pricing",
               "name": "Pricing"
+            },
+            {
+              "href": "/songs",
+              "name": "My Songs"
+            },
+            {
+              "href": "/samples",
+              "name": "My Samples"
             }
           ]
         },
@@ -407,31 +415,31 @@
           ]
         },
         {
-          "title": "Ai song tools",
+          "title": "Ai Song Maker",
           "links": [
             {
-              "name": "Birthday Song",
-              "href": "/occasions/birthday"
+              "name": "Ai Birthday Song Maker",
+              "href": "/occasions/custom-happy-birthday-song"
             },
             {
-              "name": "Anniversary Songs",
+              "name": "Ai Anniversary Song Maker",
               "href": "/occasions/anniversary"
             },
             {
-              "name": "Music Gifts",
-              "href": "/occasions/music-gift"
+              "name": "Music Personalized Gifts",
+              "href": "/music/personalized-gift"
             },
             {
-              "name": "Lyric Gifts",
+              "name": "Ai Music Generator",
+              "href": "/music/personalized-gift"
+            },
+            {
+              "name": "Ai Lyric Gifts Maker",
               "href": "/free-custom-song-lyric-gifts"
             },
             {
-              "name": "Privacy Policy",
-              "href": "/privacy-policy"
-            },
-            {
-              "name": "Terms of Service",
-              "href": "/terms-of-service"
+              "name": "Ai Lyrics Generator",
+              "href": "/free-custom-song-lyric-gifts"
             }
           ]
         }
