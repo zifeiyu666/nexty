@@ -820,7 +820,7 @@ export function LyricsLineEditor({
                         "size-3.5 justify-self-center transition-opacity",
                         selected
                           ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100",
+                          : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100",
                       )}
                       disabled={!isSelectable || isRewriting}
                       onCheckedChange={(checked) =>
