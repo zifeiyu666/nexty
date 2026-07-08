@@ -11,10 +11,11 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, MoveRight } from "lucide-react";
 import Image from "next/image";
 import {
   useEffect,
@@ -599,6 +600,14 @@ function OccasionPhotoCard({
         <p className="mt-3 min-h-12 text-[12px] leading-5 text-[#655245]">
           {occasion.description}
         </p>
+        <Link
+          href={occasion.href}
+          className="mt-auto inline-flex items-center gap-1.5 pt-4 text-[12px] font-bold text-primary transition hover:text-primary/80"
+          onClick={(event) => event.stopPropagation()}
+        >
+          {occasion.cta}
+          <MoveRight className="size-3.5" aria-hidden="true" />
+        </Link>
       </div>
     </article>
   );

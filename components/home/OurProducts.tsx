@@ -35,8 +35,8 @@ const productImages: Record<
 
 const productHrefs: Record<(typeof productKeys)[number], string> = {
   customSong: "/create-song",
-  videoGift: "/musicvideos",
-  wallArt: "/create-song",
+  videoGift: "/music/personalized-gift",
+  wallArt: "/free-custom-song-lyric-gifts",
 };
 
 const resetProductMagnet = (card: HTMLElement) => {
@@ -121,19 +121,37 @@ export default function OurProducts({
                     {t(`items.${productKey}.description`)}
                   </p>
                   {productKey === "wallArt" ? (
-                    <WallArtStudioCta
-                      className={ctaClassName}
-                      isAuthenticated={isAuthenticated}
-                      label={t(`items.${productKey}.cta`)}
-                      songOptions={wallArtSongOptions}
-                    />
+                    <div className="mt-7 flex flex-col items-center gap-3">
+                      <Link
+                        href={productHrefs[productKey]}
+                        className={ctaClassName.replace("mt-7 ", "")}
+                      >
+                        Turn lyrics into printable wall art
+                        <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                      <WallArtStudioCta
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#7a5a48] transition hover:text-primary"
+                        isAuthenticated={isAuthenticated}
+                        label={t(`items.${productKey}.cta`)}
+                        songOptions={wallArtSongOptions}
+                      />
+                    </div>
                   ) : productKey === "videoGift" ? (
-                    <MusicVideoStudioCta
-                      className={ctaClassName}
-                      isAuthenticated={isAuthenticated}
-                      label={t(`items.${productKey}.cta`)}
-                      songOptions={musicVideoSongOptions}
-                    />
+                    <div className="mt-7 flex flex-col items-center gap-3">
+                      <Link
+                        href={productHrefs[productKey]}
+                        className={ctaClassName.replace("mt-7 ", "")}
+                      >
+                        Explore personalized music gifts
+                        <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                      <MusicVideoStudioCta
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#7a5a48] transition hover:text-primary"
+                        isAuthenticated={isAuthenticated}
+                        label={t(`items.${productKey}.cta`)}
+                        songOptions={musicVideoSongOptions}
+                      />
+                    </div>
                   ) : (
                     <Link
                       href={productHrefs[productKey]}

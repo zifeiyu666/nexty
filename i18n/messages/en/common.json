@@ -335,6 +335,37 @@
         "href": "/samples"
       },
       {
+        "name": "Gift Ideas",
+        "href": "/music/personalized-gift",
+        "items": [
+          {
+            "name": "Birthday song gifts",
+            "href": "/occasions/custom-happy-birthday-song",
+            "description": "Create a personal birthday song with names, stories, and memories."
+          },
+          {
+            "name": "Anniversary song gifts",
+            "href": "/occasions/anniversary",
+            "description": "Turn your love story into an anniversary song they can replay."
+          },
+          {
+            "name": "Music personalized gifts",
+            "href": "/music/personalized-gift",
+            "description": "Explore custom songs, videos, and keepsakes for music lovers."
+          },
+          {
+            "name": "Lyric wall art gifts",
+            "href": "/free-custom-song-lyric-gifts",
+            "description": "Turn custom lyrics into printable wall art and keepsakes."
+          }
+        ]
+      },
+      {
+        "id": "articles",
+        "name": "Articles",
+        "href": "/blog"
+      },
+      {
         "name": "Pricing",
         "href": "/pricing"
       }
@@ -402,44 +433,45 @@
           ]
         },
         {
+          "title": "Gift Ideas",
+          "links": [
+            {
+              "name": "Birthday song gifts",
+              "href": "/occasions/custom-happy-birthday-song"
+            },
+            {
+              "name": "Anniversary song gifts",
+              "href": "/occasions/anniversary"
+            },
+            {
+              "name": "Music personalized gifts",
+              "href": "/music/personalized-gift"
+            },
+            {
+              "name": "Lyric wall art gifts",
+              "href": "/free-custom-song-lyric-gifts"
+            }
+          ]
+        },
+        {
           "title": "Articles",
           "links": [
             {
               "href": "/blog",
               "name": "Blog"
-            },
-            {
-              "href": "/glossary",
-              "name": "Glossary"
             }
           ]
         },
         {
-          "title": "Ai Song Maker",
+          "title": "Resources",
           "links": [
             {
-              "name": "Ai Birthday Song Maker",
-              "href": "/occasions/custom-happy-birthday-song"
+              "href": "/blog",
+              "name": "All articles"
             },
             {
-              "name": "Ai Anniversary Song Maker",
-              "href": "/occasions/anniversary"
-            },
-            {
-              "name": "Music Personalized Gifts",
-              "href": "/music/personalized-gift"
-            },
-            {
-              "name": "Ai Music Generator",
-              "href": "/music/personalized-gift"
-            },
-            {
-              "name": "Ai Lyric Gifts Maker",
-              "href": "/free-custom-song-lyric-gifts"
-            },
-            {
-              "name": "Ai Lyrics Generator",
-              "href": "/free-custom-song-lyric-gifts"
+              "href": "/glossary",
+              "name": "Glossary"
             }
           ]
         }
