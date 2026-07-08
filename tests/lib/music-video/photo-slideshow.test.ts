@@ -558,7 +558,7 @@ describe("photo slideshow music video helpers", () => {
     assert.equal(overlayOptions.length > 0, true);
 
     for (const option of overlayOptions) {
-      assert.match(option.src, /^https:\/\/cdn\.customsong\.top\/overlay\//);
+      assert.match(option.src, /^https:\/\/cdn\.onecustomsong\.com\/overlay\//);
       assert.doesNotMatch(option.src, /^\/overlay\//);
     }
 

@@ -4,23 +4,35 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 
 describe("customer reactions section", () => {
-  test("keeps reaction videos compact and centered", () => {
+  test("loads videos only near the viewport with reliable local posters", () => {
     const source = readFileSync(
       join(process.cwd(), "components/home/CustomerReactions.tsx"),
       "utf8",
     );
 
-    assert.match(source, /mx-auto grid max-w-6xl/);
-    assert.match(source, /gap-3/);
-    assert.match(source, /lg:gap-4/);
-    assert.match(source, /min-h-64/);
-    assert.match(source, /sm:min-h-72/);
-    assert.match(source, /\[--reaction-card-scale:1\.035\]/);
-    assert.match(source, /\[&_.reaction-card:not\(\.is-active\)\]:lg:\[--reaction-card-scale:0\.97\]/);
-    assert.match(source, /\[clip-path:inset\(0_round_1rem\)\]/);
-    assert.match(source, /overflow-hidden rounded-\[inherit\]/);
-    assert.doesNotMatch(source, /min-h-80/);
-    assert.doesNotMatch(source, /\[--reaction-card-scale:1\.08\]/);
-    assert.doesNotMatch(source, /\[--reaction-card-scale:0\.94\]/);
+    assert.match(source, /new IntersectionObserver/);
+    assert.match(source, /rootMargin: "600px 0px"/);
+    assert.match(source, /shouldAttachVideo \? video\.src : undefined/);
+    assert.match(source, /preload=\{shouldAttachVideo \? "metadata" : "none"\}/);
+    assert.match(source, /\/images\/customer-reactions\/\$\{videoName\}\.jpg/);
+    assert.match(source, /Mobile browsers can still defer autoplay/);
+    assert.doesNotMatch(source, /replace\((.*?)\\.jpg/);
+  });
+
+  test("uses a single-card mobile carousel and keeps desktop grid separate", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/home/CustomerReactions.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /from "@\/components\/ui\/carousel"/);
+    assert.match(source, /useSyncExternalStore/);
+    assert.match(source, /const mobileCarouselQuery = "\(max-width: 639px\)"/);
+    assert.match(source, /setApi=\{setMobileApi\}/);
+    assert.match(source, /className="basis-\[88%\] pl-3"/);
+    assert.match(source, /mobileActiveIndex \+ 1\} \/ \{videos\.length\}/);
+    assert.match(source, /Math\.abs\(index - mobileActiveIndex\) <= 1/);
+    assert.match(source, /isMobileLayout \? \(/);
+    assert.match(source, /mx-auto grid max-w-5xl/);
   });
 });

@@ -38,53 +38,53 @@
     ],
     "videos": [
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-2.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-2.mp4",
+        "label": "One Custom Song",
         "title": "Mother's first listen"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
+        "label": "One Custom Song",
         "title": "The happy tears"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
+        "label": "One Custom Song",
         "title": "Best surprise ever"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
+        "label": "One Custom Song",
         "title": "wedding replay"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-12.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-12.mp4",
+        "label": "One Custom Song",
         "title": "Anniversary Surprise"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-5.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-5.mp4",
+        "label": "One Custom Song",
         "title": "Couple's song"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
+        "label": "One Custom Song",
         "title": "From shock to joy"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/giftsong-slide-20.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-20.mp4",
+        "label": "One Custom Song",
         "title": "One more listen"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
+        "label": "One Custom Song",
         "title": "Father's first listen"
       },
       {
-        "src": "https://cdn.customsong.top/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
-        "label": "CustomSong",
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
+        "label": "One Custom Song",
         "title": "Cry tears of joy"
       }
     ]
@@ -191,13 +191,13 @@
     ]
   },
   "SongfinchComparison": {
-    "eyebrow": "Why Users Switch from Songfinch to customsong.top",
-    "title": "<us>customsong.top</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "eyebrow": "Why Users Switch from Songfinch to onecustomsong.com",
+    "title": "<us>onecustomsong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
     "subtitle": "Don’t pay <price>$200+</price> for a single song. Get <strong>elite studio-quality production</strong> with unlimited freedom <underline>at a fraction of the cost.</underline>",
     "tableHeaders": {
       "feature": "Feature / Benefit",
       "songfinch": "Songfinch",
-      "us": "customsong.top (Us)"
+      "us": "onecustomsong.com (Us)"
     },
     "rows": [
       {
@@ -266,7 +266,7 @@
     "description": "Everything you need to know before you create and send a song they’ll cherish forever.",
     "items": [
       {
-        "question": "How does customsong.top work?",
+        "question": "How does onecustomsong.com work?",
         "answer": "It’s pure magic. Just tell us your story by answering a few simple questions, choose your favorite music genre, and our AI will craft a custom song instantly. You will get a free 30-second studio-quality preview. If you love it, unlock the full song and get access to our free video and print editors!"
       },
       {

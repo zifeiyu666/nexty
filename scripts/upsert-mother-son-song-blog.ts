@@ -111,7 +111,7 @@ function buildContent({
 
 - A song from a mother to her son works best when it feels specific, not generic. Personal memories, family language, and the son's life stage matter more than perfect poetry.
 - The most common use cases are mother-son wedding dances, birthdays, graduation gifts, and encouragement songs for major life transitions.
-- CustomSong lets you preview the song direction first, then refine lyrics, genre, and emotional tone before you commit.
+- One Custom Song lets you preview the song direction first, then refine lyrics, genre, and emotional tone before you commit.
 - Current pricing starts at ${singlePrice} for one song, with Pro at ${proPrice} and Unlimited at ${unlimitedPrice}, which is far below the $199+ starting point many traditional custom song services advertise.
 
 ## A song from a mother to her son: what people are really looking for
@@ -191,14 +191,14 @@ If you need a little help getting unstuck, these themes usually work well:
 
 The strongest songs usually avoid trying to say everything. They choose one emotional center and build around it.
 
-## How CustomSong fits this search intent
+## How One Custom Song fits this search intent
 
-CustomSong is a strong fit for this keyword because the product matches the emotional job the reader is trying to get done. Most people searching for a mother-to-son song want one of two outcomes:
+One Custom Song is a strong fit for this keyword because the product matches the emotional job the reader is trying to get done. Most people searching for a mother-to-son song want one of two outcomes:
 
 1. Find a song that already exists.
 2. Create a song that sounds like it was made for their son.
 
-CustomSong supports the second path with a much lower-friction workflow:
+One Custom Song supports the second path with a much lower-friction workflow:
 
 - Start with a story, memory, or message.
 - Choose a musical direction.
@@ -225,7 +225,7 @@ That is a better fit for weddings, birthdays, and other dates that do not move.
 
 Pricing is one of the clearest reasons readers may choose a modern custom song workflow instead of a traditional service.
 
-At CustomSong, the current entry points are:
+At One Custom Song, the current entry points are:
 
 - **${singlePrice}** for one song
 - **${proPrice}** for Pro access
@@ -316,7 +316,7 @@ async function main() {
     }
 
     const preferredAdmin =
-      admins.find((admin) => admin.email === "support@customsong.top") ?? admins[0];
+      admins.find((admin) => admin.email === "support@onecustomsong.com") ?? admins[0];
 
     const livePlans = await db
       .select({
@@ -349,7 +349,7 @@ async function main() {
     const { url: featuredImageUrl } = await uploadCoverImage();
 
     const description =
-      "Create a song from a mother to her son with personal memories, lyric prompts, mother-son dance ideas, and CustomSong's free preview workflow.";
+      "Create a song from a mother to her son with personal memories, lyric prompts, mother-son dance ideas, and One Custom Song's free preview workflow.";
 
     const existingTags = await db
       .select({

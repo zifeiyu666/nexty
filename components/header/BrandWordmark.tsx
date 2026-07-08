@@ -12,7 +12,7 @@ export default function BrandWordmark({
   className,
   heartClassName,
 }: BrandWordmarkProps) {
-  if (title !== "CustomSong") {
+  if (title !== "One Custom Song") {
     return <span className={className}>{title}</span>;
   }
 
@@ -21,12 +21,12 @@ export default function BrandWordmark({
       aria-label={title}
       className={cn("inline-flex items-center whitespace-nowrap", className)}
     >
-      <span aria-hidden="true">CustomS</span>
+      <span aria-hidden="true">One Custom S</span>
       <Heart
         aria-hidden="true"
         className={cn(
           "mx-[0.02em] h-[0.88em] w-[0.88em] translate-y-[0.04em] fill-red-500 text-red-500 drop-shadow-[0_1px_5px_rgba(239,68,68,0.45)]",
-          heartClassName
+          heartClassName,
         )}
         strokeWidth={0}
       />

@@ -39,17 +39,17 @@ describe("KIE Suno adapter normalization", () => {
   });
 
   test("builds a KIE Suno callback URL from WEBHOOK_BASE_URL", () => {
-    process.env.WEBHOOK_BASE_URL = "https://customsong.top/";
+    process.env.WEBHOOK_BASE_URL = "https://onecustomsong.com/";
 
     assert.equal(
       buildKieSunoCallbackUrl(),
-      "https://customsong.top/api/webhooks/kie/suno"
+      "https://onecustomsong.com/api/webhooks/kie/suno"
     );
   });
 
   test("submits music tasks with callBackUrl required by KIE", async () => {
     process.env.KIE_API_KEY = "test-key";
-    process.env.WEBHOOK_BASE_URL = "https://customsong.top";
+    process.env.WEBHOOK_BASE_URL = "https://onecustomsong.com";
     process.env.KIE_SUNO_MOCK_TASK_ID = "false";
 
     let payload: any;
@@ -73,7 +73,7 @@ describe("KIE Suno adapter normalization", () => {
     });
 
     assert.equal(taskId, "kie-music-task");
-    assert.equal(payload.callBackUrl, "https://customsong.top/api/webhooks/kie/suno");
+    assert.equal(payload.callBackUrl, "https://onecustomsong.com/api/webhooks/kie/suno");
   });
 
   test("prepares Suno music prompts with an instrumental intro before vocal sections", () => {
@@ -96,7 +96,7 @@ describe("KIE Suno adapter normalization", () => {
 
   test("submits sanitized music prompts to KIE without changing local lyrics", async () => {
     process.env.KIE_API_KEY = "test-key";
-    process.env.WEBHOOK_BASE_URL = "https://customsong.top";
+    process.env.WEBHOOK_BASE_URL = "https://onecustomsong.com";
     process.env.KIE_SUNO_MOCK_TASK_ID = "false";
 
     let payload: any;
@@ -221,12 +221,12 @@ describe("KIE Suno adapter normalization", () => {
   { "id":"track-a",
     "title":"May,
     My Sweet Valentine",
-    "audioUrl":"https://cdn.customsong.top/a/audio.mp3",
+    "audioUrl":"https://cdn.onecustomsong.com/a/audio.mp3",
     "imageUrl":"https://musicfile.kie.ai/cover.jpeg"
   },
   { "id":"track-b",
     "title":"May, My Sweet Valentine",
-    "audioUrl":"https://cdn.customsong.top/b/audio.mp3"
+    "audioUrl":"https://cdn.onecustomsong.com/b/audio.mp3"
     "imageUrl":"https://musicfile.kie.ai/cover.jpeg"
   }
 ]`;
@@ -245,13 +245,13 @@ describe("KIE Suno adapter normalization", () => {
         {
           id: "track-a",
           title: "May,\n    My Sweet Valentine",
-          audioUrl: "https://cdn.customsong.top/a/audio.mp3",
+          audioUrl: "https://cdn.onecustomsong.com/a/audio.mp3",
           imageUrl: "https://musicfile.kie.ai/cover.jpeg",
         },
         {
           id: "track-b",
           title: "May, My Sweet Valentine",
-          audioUrl: "https://cdn.customsong.top/b/audio.mp3",
+          audioUrl: "https://cdn.onecustomsong.com/b/audio.mp3",
           imageUrl: "https://musicfile.kie.ai/cover.jpeg",
         },
       ],

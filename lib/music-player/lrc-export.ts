@@ -97,7 +97,7 @@ export function buildLrcText(input: BuildLrcTextInput) {
   const header = [
     `[ti:${title}]`,
     length ? `[length:${length}]` : null,
-    "[by:CustomSong]",
+    "[by:One Custom Song]",
     "[offset:0]",
   ].filter((line): line is string => Boolean(line));
 

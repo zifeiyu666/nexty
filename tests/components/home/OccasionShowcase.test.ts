@@ -47,21 +47,25 @@ describe("occasion showcase", () => {
     assert.match(source, /onPointerMove/);
     assert.match(source, /ArrowLeft/);
     assert.match(source, /ArrowRight/);
-    assert.match(source, /window\.addEventListener\("scroll"/);
-    assert.match(
-      source,
-      /const scrollDelta = scrollY - lastScrollYRef\.current/,
-    );
-    assert.match(source, /targetTranslateRef\.current/);
     assert.match(source, /cardOffsetsRef\.current/);
-    assert.match(source, /IntersectionObserver/);
-    assert.match(
-      source,
-      /baseTranslate - scrollDelta \* SCROLL_FOLLOW_MULTIPLIER/,
-    );
-    assert.match(source, /gsap\.ticker\.add\(tick\)/);
     assert.match(source, /gsap\.quickSetter\(track, "x", "px"\)/);
     assert.match(source, /updateActiveIndexForTranslate\(nextTranslate\)/);
+  });
+
+  test("uses a compact mobile carousel while keeping desktop scroll animation guarded", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/home/OccasionShowcase.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /from "@\/components\/ui\/carousel"/);
+    assert.match(source, /setApi=\{setMobileApi\}/);
+    assert.match(source, /className="sm:hidden"/);
+    assert.match(source, /className="basis-\[88%\] pl-3"/);
+    assert.match(source, /isMobileCarouselLayout\(\)/);
+    assert.match(source, /if \(!section \|\| !track \|\| isMobileCarouselLayout\(\)\) return/);
+    assert.match(source, /hidden max-w-\[1420px\].*sm:block/);
+    assert.match(source, /hidden max-w-7xl.*sm:flex/);
   });
 
   test("removes card playback controls while zooming images on card hover", () => {

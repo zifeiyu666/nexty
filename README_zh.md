@@ -1,6 +1,6 @@
-# CustomSong
+# One Custom Song
 
-CustomSong 是一个用于生成个性化 AI 歌曲礼物的 Next.js 16 项目。用户可以把故事和回忆转成定制歌曲，并继续生成可分享的音乐视频和下载内容。
+One Custom Song 是一个用于生成个性化 AI 歌曲礼物的 Next.js 16 项目。用户可以把故事和回忆转成定制歌曲，并继续生成可分享的音乐视频和下载内容。
 
 当前公开站点只启用英文内容，中文和日文 message JSON 已移除，避免多语言文案长期不一致。
 

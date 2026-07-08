@@ -179,11 +179,11 @@ Example:
 
 That is enough to create a far more meaningful result than a generic prompt.
 
-## Why CustomSong fits this search intent
+## Why One Custom Song fits this search intent
 
 Many readers looking for **anniversary songs for couples** are not only comparing playlists. They are trying to find a gift or a moment that feels unmistakably personal.
 
-CustomSong fits that intent because it lets you:
+One Custom Song fits that intent because it lets you:
 
 - start from a real relationship story
 - choose an anniversary mood or genre
@@ -272,7 +272,7 @@ async function main() {
     }
 
     const preferredAdmin =
-      admins.find((admin) => admin.email === "support@customsong.top") ?? admins[0];
+      admins.find((admin) => admin.email === "support@onecustomsong.com") ?? admins[0];
 
     const { url: featuredImageUrl } = await uploadCoverImage();
     const content = buildContent();

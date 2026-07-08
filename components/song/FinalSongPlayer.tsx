@@ -1118,7 +1118,7 @@ export function SharedSongPlayer({ data }: { data: FinalSongPlayerData }) {
             <div className="mt-5 min-h-0">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-red-600">
-                  CustomSong
+                  One Custom Song
                 </p>
                 <StoryDialogButton story={data.story} />
               </div>

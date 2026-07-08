@@ -1,6 +1,6 @@
 import { SiteConfig } from "@/types/siteConfig";
 
-const DEFAULT_SITE_URL = "https://customsong.top";
+const DEFAULT_SITE_URL = "https://onecustomsong.com";
 
 function resolveBaseUrl() {
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -23,8 +23,8 @@ const DISCORD_URL = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL
 const EMAIL_URL = ''
 
 export const siteConfig: SiteConfig = {
-  name: "CustomSong",
-  tagLine: "Custom Song Generator - AI Personalized Song Gifts",
+  name: "One Custom Song",
+  tagLine: "One Custom Song - AI Personalized Song Gifts",
   description: "Turn your unique story into a custom, studio-quality song in just 2 minutes. The perfect personalized AI song gift for birthdays, weddings, and anniversaries. Try it free now!",
   url: BASE_URL,
   authors: [

@@ -2,8 +2,8 @@
   "name": "customsong",
   "version": "3.4.0",
   "author": {
-    "name": "CustomSong",
-    "repository": "https://customsong.top"
+    "name": "One Custom Song",
+    "repository": "https://onecustomsong.com"
   },
   "scripts": {
     "dev": "next dev",

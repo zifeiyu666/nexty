@@ -59,7 +59,7 @@ const withBundleAnalyzerWrapper = withBundleAnalyzer({
 });
 
 if (process.env.NODE_ENV === "development" && !process.env.CUSTOMSONG_WELCOME_SHOWN) {
-  console.log("\nWelcome to CustomSong.");
+  console.log("\nWelcome to One Custom Song.");
   console.log("Local app: http://localhost:3000\n");
   process.env.CUSTOMSONG_WELCOME_SHOWN = "true";
 }

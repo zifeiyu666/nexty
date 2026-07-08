@@ -672,7 +672,7 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
     const template = await getLangTemplate();
     form.setValue("langJsonb", "", { shouldValidate: true });
 
-    const prompt = `This is the localized configuration for a CustomSong pricing card. The copy for the default language (${DEFAULT_LOCALE}) is provided below. Acting as a localization editor, please complete any other language entries already present in the JSON structure. Prices and currency units must remain untouched. Ensure all copy is natural and idiomatic. Here is the template: ${JSON.stringify(
+    const prompt = `This is the localized configuration for a One Custom Song pricing card. The copy for the default language (${DEFAULT_LOCALE}) is provided below. Acting as a localization editor, please complete any other language entries already present in the JSON structure. Prices and currency units must remain untouched. Ensure all copy is natural and idiomatic. Here is the template: ${JSON.stringify(
       template,
       null,
       2

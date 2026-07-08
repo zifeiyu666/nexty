@@ -174,7 +174,7 @@ export type AlignedLyricWord = {
 };
 
 const DEFAULT_DURATION = 30;
-const OVERLAY_CDN_BASE_URL = "https://cdn.customsong.top/overlay";
+const OVERLAY_CDN_BASE_URL = "https://cdn.onecustomsong.com/overlay";
 const overlayCdnSrc = (path: string) => `${OVERLAY_CDN_BASE_URL}/${path}`;
 const DEFAULT_RENDER_DIMENSIONS: MusicVideoRenderDimensions = {
   width: 1080,

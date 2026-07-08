@@ -132,13 +132,13 @@ function buildContent({
   return `## Key Takeaways
 
 - A custom prayer song can cost anywhere from coffee-money to $199+ on traditional custom song sites, depending on how it is made and how many revisions are included.
-- At customsong.top, you can start with one song for ${singlePrice}, step up to Pro for ${proPrice}/month, or unlock Unlimited for ${unlimitedPrice}/year.
+- At onecustomsong.com, you can start with one song for ${singlePrice}, step up to Pro for ${proPrice}/month, or unlock Unlimited for ${unlimitedPrice}/year.
 - You can preview first, tweak lyrics and style before paying, and move much faster than the week-long turnaround common with traditional custom music services.
 - For gift-givers, the biggest practical advantages are lower upfront risk, faster turnaround, and much more freedom to retry until the song feels right.
 
 ## How much does a custom prayer song cost?
 
-If you are searching for how much does a custom prayer song cost, the short answer is this: prices range from affordable AI-assisted tools to premium handcrafted services that can start around $199 or more for a single song. customsong.top sits at the low-risk, high-flexibility end of that spectrum. You can generate a personalized prayer song starting at ${singlePrice}, test the direction before committing, and keep refining the song concept instead of paying a large upfront fee and waiting days for delivery.
+If you are searching for how much does a custom prayer song cost, the short answer is this: prices range from affordable AI-assisted tools to premium handcrafted services that can start around $199 or more for a single song. onecustomsong.com sits at the low-risk, high-flexibility end of that spectrum. You can generate a personalized prayer song starting at ${singlePrice}, test the direction before committing, and keep refining the song concept instead of paying a large upfront fee and waiting days for delivery.
 
 That pricing difference matters because prayer songs are deeply personal. They are often written for healing, remembrance, encouragement, weddings, baptisms, birthdays, church celebrations, or family milestones. In those situations, speed, emotional fit, and the ability to retry the wording can matter just as much as the final audio file.
 
@@ -157,11 +157,11 @@ People usually commission or generate custom prayer songs for occasions like:
 
 Because the message is so personal, the best custom prayer song experience is not just about production quality. It is also about how easily you can adjust the lyrics, tone, and pacing until the song sounds emotionally true.
 
-## customsong.top vs. traditional custom music sites
+## onecustomsong.com vs. traditional custom music sites
 
 Here is the practical comparison most buyers care about:
 
-| Feature | customsong.top | Traditional custom song services |
+| Feature | onecustomsong.com | Traditional custom song services |
 | --- | --- | --- |
 | Starting price | ${singlePrice} for one song | Often $199+ for one song |
 | Delivery speed | Around 2 minutes for an instant preview workflow | Often 4 to 7 days or longer |
@@ -184,7 +184,7 @@ For a prayer song, that tradeoff can feel especially frustrating. A single phras
 
 Prayer songs are not ordinary novelty gifts. Small wording choices change the emotional impact. A line can feel too formal, too broad, too romantic, too generic, or not spiritual enough. That is why retry freedom matters.
 
-With customsong.top, the advantage is not just that the starting price is low. It is that you can steer the result. You can iterate on the story, reshape the lyrical focus, test a softer or more uplifting tone, and push the song closer to the moment you actually want to create.
+With onecustomsong.com, the advantage is not just that the starting price is low. It is that you can steer the result. You can iterate on the story, reshape the lyrical focus, test a softer or more uplifting tone, and push the song closer to the moment you actually want to create.
 
 That is a huge difference from the old model of sending one brief, waiting days, and hoping the final file gets the feeling right on the first try.
 
@@ -202,17 +202,17 @@ For buyers comparing options, the simplest way to think about value is by how mu
 - ${proPrice}/month makes sense if you expect to create multiple songs or want recurring creative capacity for family, church, client, or seasonal gifting needs.
 - ${unlimitedPrice}/year is the strongest long-term value if you want to create often and remove per-song hesitation altogether.
 
-Compared with a traditional service that may start around $199+ for one song, even the entry-level customsong.top path dramatically lowers the cost of trying, refining, and actually finishing a personalized piece of music.
+Compared with a traditional service that may start around $199+ for one song, even the entry-level onecustomsong.com path dramatically lowers the cost of trying, refining, and actually finishing a personalized piece of music.
 
 ## When a traditional human custom song service may still be worth it
 
 There are still cases where a traditional custom song company may be the better choice. If you specifically want a named human songwriter, a heavily curated artist-match experience, or a handcrafted process where the premium itself is part of the appeal, a traditional service can still make sense.
 
-The key is being honest about what you are buying. If you want prestige and a slower white-glove workflow, the higher price may feel justified. If you want emotional personalization, creative control, fast turnaround, and dramatically lower cost, customsong.top is the more practical choice for most people.
+The key is being honest about what you are buying. If you want prestige and a slower white-glove workflow, the higher price may feel justified. If you want emotional personalization, creative control, fast turnaround, and dramatically lower cost, onecustomsong.com is the more practical choice for most people.
 
 ## Bottom line: what should you expect to pay?
 
-If you are asking how much does a custom prayer song cost, a realistic answer is that the market spans from affordable AI-assisted creation to premium traditional services priced at $199+ for one song. customsong.top gives you a much more accessible entry point at ${singlePrice}, with upgrade paths at ${proPrice}/month and ${unlimitedPrice}/year.
+If you are asking how much does a custom prayer song cost, a realistic answer is that the market spans from affordable AI-assisted creation to premium traditional services priced at $199+ for one song. onecustomsong.com gives you a much more accessible entry point at ${singlePrice}, with upgrade paths at ${proPrice}/month and ${unlimitedPrice}/year.
 
 That combination of lower price, fast preview speed, and flexible retries is what makes the platform stand out. You are not locked into a big upfront bet. You can shape the result until it feels right, then pay for what you actually love.
 
@@ -220,11 +220,11 @@ That combination of lower price, fast preview speed, and flexible retries is wha
 
 ### How much does a custom prayer song cost?
 
-A custom prayer song can range from affordable AI-assisted pricing to $199+ on traditional custom music sites. On customsong.top, the current entry point is ${singlePrice} for one song, with higher-tier options at ${proPrice}/month and ${unlimitedPrice}/year.
+A custom prayer song can range from affordable AI-assisted pricing to $199+ on traditional custom music sites. On onecustomsong.com, the current entry point is ${singlePrice} for one song, with higher-tier options at ${proPrice}/month and ${unlimitedPrice}/year.
 
 ### Can I hear a prayer song before paying?
 
-That is one of the biggest differences between modern AI-assisted workflows and many traditional services. customsong.top is positioned around preview-first creation, so buyers can judge the direction before committing to the final unlock.
+That is one of the biggest differences between modern AI-assisted workflows and many traditional services. onecustomsong.com is positioned around preview-first creation, so buyers can judge the direction before committing to the final unlock.
 
 ### Can I edit the lyrics after generating a song?
 
@@ -236,7 +236,7 @@ For many people, yes. If the lyrics are personal, the message is sincere, and th
 
 ### How fast can I get a custom prayer song?
 
-Traditional custom song services often take several days. customsong.top is designed around a much faster preview workflow, with messaging centered on near-instant feedback in minutes instead of nearly a week.
+Traditional custom song services often take several days. onecustomsong.com is designed around a much faster preview workflow, with messaging centered on near-instant feedback in minutes instead of nearly a week.
 
 ## Create your own prayer song
 
@@ -264,7 +264,7 @@ async function main() {
     }
 
     const preferredAdmin =
-      admins.find((admin) => admin.email === "support@customsong.top") ?? admins[0];
+      admins.find((admin) => admin.email === "support@onecustomsong.com") ?? admins[0];
 
     const livePlans = await db
       .select({
@@ -298,7 +298,7 @@ async function main() {
     });
 
     const description =
-      "How much does a custom prayer song cost? Compare customsong.top with traditional custom music sites on price, speed, retries, previews, and gift value.";
+      "How much does a custom prayer song cost? Compare onecustomsong.com with traditional custom music sites on price, speed, retries, previews, and gift value.";
 
     const existingTags = await db
       .select({
@@ -342,7 +342,7 @@ async function main() {
       postType: POST_TYPE,
       authorId: preferredAdmin.id,
       title:
-        "How Much Does a Custom Prayer Song Cost? customsong.top vs. Traditional Custom Music Sites",
+        "How Much Does a Custom Prayer Song Cost? onecustomsong.com vs. Traditional Custom Music Sites",
       slug: SLUG,
       content,
       description,
@@ -407,7 +407,7 @@ async function main() {
           slug: SLUG,
           language: LANGUAGE,
           authorEmail: preferredAdmin.email,
-          usedFallbackAdmin: preferredAdmin.email !== "support@customsong.top",
+          usedFallbackAdmin: preferredAdmin.email !== "support@onecustomsong.com",
           pricing: {
             singlePrice,
             proPrice,

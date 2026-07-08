@@ -1,6 +1,6 @@
-const DEFAULT_SITE_URL = "https://customsong.top";
+const DEFAULT_SITE_URL = "https://onecustomsong.com";
 
-const OWN_SITE_HOSTS = ["customsong.top"];
+const OWN_SITE_HOSTS = ["onecustomsong.com"];
 const COMPETITOR_DOMAINS = [
   "songfinch.com",
   "songlorious.com",

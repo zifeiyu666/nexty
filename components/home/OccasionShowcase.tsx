@@ -5,6 +5,12 @@ import {
   type OccasionCard,
 } from "@/components/home/OccasionShowcase.config";
 import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -40,6 +46,10 @@ const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max);
 };
 
+const isMobileCarouselLayout = () => {
+  return window.matchMedia("(max-width: 639px)").matches;
+};
+
 export default function OccasionShowcase() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -52,6 +62,8 @@ export default function OccasionShowcase() {
   const activeIndexRef = useRef(0);
   const reducedMotionRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [mobileApi, setMobileApi] = useState<CarouselApi>();
+  const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
 
   const setCardRef = (index: number) => (node: HTMLElement | null) => {
     if (node) {
@@ -157,7 +169,9 @@ export default function OccasionShowcase() {
 
     const section = sectionRef.current;
 
-    if (!section || reducedMotionRef.current) return;
+    if (!section || reducedMotionRef.current || isMobileCarouselLayout()) {
+      return;
+    }
 
     const context = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>("[data-occasion-card]");
@@ -191,6 +205,8 @@ export default function OccasionShowcase() {
   }, []);
 
   useEffect(() => {
+    if (isMobileCarouselLayout()) return;
+
     moveToIndex(activeIndexRef.current, false);
 
     const handleResize = () => moveToIndex(activeIndexRef.current, false);
@@ -206,7 +222,7 @@ export default function OccasionShowcase() {
     const section = sectionRef.current;
     const track = trackRef.current;
 
-    if (!section || !track) return;
+    if (!section || !track || isMobileCarouselLayout()) return;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -245,6 +261,23 @@ export default function OccasionShowcase() {
     // ScrollTrigger owns the card-track transform; the heading remains outside it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!mobileApi) return;
+
+    const syncMobileIndex = () => {
+      setMobileActiveIndex(mobileApi.selectedScrollSnap());
+    };
+
+    syncMobileIndex();
+    mobileApi.on("select", syncMobileIndex);
+    mobileApi.on("reInit", syncMobileIndex);
+
+    return () => {
+      mobileApi.off("select", syncMobileIndex);
+      mobileApi.off("reInit", syncMobileIndex);
+    };
+  }, [mobileApi]);
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -390,9 +423,60 @@ export default function OccasionShowcase() {
         </div>
       </div>
 
+      <Carousel
+        setApi={setMobileApi}
+        opts={{ align: "center", containScroll: "trimSnaps" }}
+        className="sm:hidden"
+        aria-label="Occasion carousel"
+      >
+        <CarouselContent className="-ml-3 px-4 pb-6">
+          {occasionCards.map((occasion, index) => (
+            <CarouselItem
+              key={occasion.id}
+              className="basis-[88%] pl-3"
+            >
+              <OccasionPhotoCard
+                occasion={occasion}
+                isActive={mobileActiveIndex === index}
+                mobile
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+
+      <div className="mx-auto flex items-center justify-center gap-4 px-4 sm:hidden">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-lg"
+          onClick={() => mobileApi?.scrollPrev()}
+          disabled={mobileActiveIndex === 0}
+          className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
+          aria-label={copy.previous}
+        >
+          <ArrowLeft className="size-5" />
+        </Button>
+        <div className="min-w-24 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-center text-sm font-semibold text-white shadow-[0_12px_35px_rgba(0,0,0,0.26)] backdrop-blur">
+          {occasionCards[mobileActiveIndex]?.index ?? "01"} /{" "}
+          {occasionCards.length}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-lg"
+          onClick={() => mobileApi?.scrollNext()}
+          disabled={mobileActiveIndex === occasionCards.length - 1}
+          className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
+          aria-label={copy.next}
+        >
+          <ArrowRight className="size-5" />
+        </Button>
+      </div>
+
       <div
         ref={viewportRef}
-        className="mx-auto max-w-[1420px] overflow-hidden px-4 pb-3 pt-2 sm:px-6 lg:px-8"
+        className="mx-auto hidden max-w-[1420px] overflow-hidden px-4 pb-3 pt-2 sm:block sm:px-6 lg:px-8"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -417,7 +501,7 @@ export default function OccasionShowcase() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-7xl items-center justify-center gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto hidden max-w-7xl items-center justify-center gap-4 px-4 sm:flex sm:px-6 lg:px-8">
         <Button
           type="button"
           variant="outline"
@@ -455,32 +539,39 @@ function OccasionPhotoCard({
   onPointerEnter,
   onPointerMove,
   onPointerLeave,
+  mobile = false,
 }: {
   occasion: OccasionCard;
   isActive: boolean;
-  refCallback: (node: HTMLElement | null) => void;
-  onPointerEnter: (event: PointerEvent<HTMLElement>) => void;
-  onPointerMove: (event: PointerEvent<HTMLElement>) => void;
-  onPointerLeave: (event: PointerEvent<HTMLElement>) => void;
+  refCallback?: (node: HTMLElement | null) => void;
+  onPointerEnter?: (event: PointerEvent<HTMLElement>) => void;
+  onPointerMove?: (event: PointerEvent<HTMLElement>) => void;
+  onPointerLeave?: (event: PointerEvent<HTMLElement>) => void;
+  mobile?: boolean;
 }) {
   return (
     <article
       ref={refCallback}
-      data-occasion-card
-      data-rotate={occasion.rotate}
-      data-y={occasion.y}
+      data-occasion-card={mobile ? undefined : true}
+      data-rotate={mobile ? undefined : occasion.rotate}
+      data-y={mobile ? undefined : occasion.y}
       onPointerEnter={onPointerEnter}
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
       className={cn(
-        "group relative flex h-[22rem] w-[min(68vw,16rem)] shrink-0 select-none flex-col rounded-2xl border border-[#efe3d3] bg-white p-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)] will-change-transform sm:h-[22.75rem] sm:w-[16.75rem] lg:w-[17.25rem]",
+        "group relative flex shrink-0 select-none flex-col rounded-2xl border border-[#efe3d3] bg-white p-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)] will-change-transform",
+        mobile
+          ? "h-[21.5rem] w-full"
+          : "h-[22rem] w-[min(68vw,16rem)] sm:h-[22.75rem] sm:w-[16.75rem] lg:w-[17.25rem]",
         isActive && "z-10",
       )}
       style={
-        {
-          "--occasion-rotate": `${occasion.rotate}deg`,
-          transform: `translateY(${occasion.y}px) rotate(${occasion.rotate}deg)`,
-        } as CSSProperties
+        mobile
+          ? undefined
+          : ({
+              "--occasion-rotate": `${occasion.rotate}deg`,
+              transform: `translateY(${occasion.y}px) rotate(${occasion.rotate}deg)`,
+            } as CSSProperties)
       }
     >
       <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[linear-gradient(115deg,rgba(255,255,255,0.55),transparent_36%,rgba(92,55,27,0.06))]" />
@@ -489,7 +580,7 @@ function OccasionPhotoCard({
           src={occasion.image}
           alt={`${occasion.title} custom song occasion`}
           fill
-          sizes="(min-width: 1024px) 18rem, (min-width: 640px) 18rem, 72vw"
+          sizes="(min-width: 1024px) 18rem, (min-width: 640px) 18rem, 88vw"
           className="object-cover saturate-[0.96] transition-transform duration-700 ease-out group-hover:scale-[1.07] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/46 to-transparent" />
