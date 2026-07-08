@@ -103,6 +103,7 @@ function HeroOccasionColumnView({ column }: { column: HeroOccasionColumn }) {
             <Image
               src={tile.src}
               alt=""
+              aria-hidden="true"
               fill
               priority={index < 2}
               sizes="(min-width: 1536px) 14rem, (min-width: 1024px) 12rem, (min-width: 640px) 9rem, 7rem"

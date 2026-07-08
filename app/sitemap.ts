@@ -9,30 +9,83 @@ import { MetadataRoute } from 'next'
 
 const siteUrl = siteConfig.url
 
-const STATIC_PAGE_MTIME = new Date(new Date().getFullYear(), 0, 1)
-
 type ChangeFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never' | undefined
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPages = [
-    '',
-    '/pricing',
-    '/create-song',
-    '/free-custom-song-lyric-gifts',
-    '/occasions/custom-happy-birthday-song',
-    '/occasions/anniversary',
-    '/music/personalized-gift',
-    '/privacy-policy',
-    '/terms-of-service',
-    '/refund-policy',
-  ]
+const staticPages: {
+  path: string
+  lastModified: string
+  changeFrequency: ChangeFrequency
+  priority: number
+}[] = [
+  {
+    path: '',
+    lastModified: '2026-07-08',
+    changeFrequency: 'weekly',
+    priority: 1.0,
+  },
+  {
+    path: '/pricing',
+    lastModified: '2026-07-08',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
+    path: '/create-song',
+    lastModified: '2026-07-08',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
+    path: '/free-custom-song-lyric-gifts',
+    lastModified: '2026-07-08',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
+    path: '/occasions/custom-happy-birthday-song',
+    lastModified: '2026-07-08',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
+    path: '/occasions/anniversary',
+    lastModified: '2026-07-08',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
+    path: '/music/personalized-gift',
+    lastModified: '2026-07-08',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
+    path: '/privacy-policy',
+    lastModified: '2026-07-08',
+    changeFrequency: 'yearly',
+    priority: 0.8,
+  },
+  {
+    path: '/terms-of-service',
+    lastModified: '2026-07-08',
+    changeFrequency: 'yearly',
+    priority: 0.8,
+  },
+  {
+    path: '/refund-policy',
+    lastModified: '2026-07-08',
+    changeFrequency: 'yearly',
+    priority: 0.8,
+  },
+]
 
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = LOCALES.flatMap(locale => {
     return staticPages.map(page => ({
-      url: `${siteUrl}${locale === DEFAULT_LOCALE ? '' : `/${locale}`}${page}`,
-      lastModified: STATIC_PAGE_MTIME,
-      changeFrequency: 'daily' as ChangeFrequency,
-      priority: page === '' ? 1.0 : 0.8,
+      url: `${siteUrl}${locale === DEFAULT_LOCALE ? '' : `/${locale}`}${page.path}`,
+      lastModified: new Date(page.lastModified),
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
     }))
   })
 
@@ -42,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .where(eq(postsSchema.postType, 'glossary'));
   const glossaryContentMtime = latestGlossaryResult?.latest
     ? new Date(latestGlossaryResult.latest)
-    : STATIC_PAGE_MTIME;
+    : new Date(staticPages[0].lastModified);
 
   const allBlogSitemapEntries: MetadataRoute.Sitemap = [];
 
@@ -52,7 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .where(eq(postsSchema.postType, 'blog'));
   const blogContentMtime = latestBlogResult?.latest
     ? new Date(latestBlogResult.latest)
-    : STATIC_PAGE_MTIME;
+    : new Date(staticPages[0].lastModified);
 
   // Add blog list page
   for (const locale of LOCALES) {

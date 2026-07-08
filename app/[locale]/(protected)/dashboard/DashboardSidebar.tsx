@@ -55,7 +55,8 @@ export function DashboardSidebar() {
         >
           <Image
             src="/logo.png"
-            alt="Logo"
+            alt={isCollapsed ? tHome("title") : ""}
+            aria-hidden={!isCollapsed}
             width={24}
             height={24}
             className="rounded-md"

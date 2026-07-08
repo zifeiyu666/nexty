@@ -97,9 +97,20 @@ const MDXComponents: MDXComponentsProps = {
       {...props}
     />
   ),
-  img: (props) => (
-    <img className="rounded-lg border-2 border-gray-200 my-6" {...props} />
-  ),
+  img: ({ alt, src, ...props }) => {
+    if (process.env.NODE_ENV !== "production" && typeof alt !== "string") {
+      console.warn("MDX image is missing alt text.", { src });
+    }
+
+    return (
+      <img
+        className="rounded-lg border-2 border-gray-200 my-6"
+        src={src}
+        alt={typeof alt === "string" ? alt : ""}
+        {...props}
+      />
+    );
+  },
   strong: (props) => <strong className="font-bold" {...props} />,
   table: (props) => (
     <div className="my-3 overflow-x-auto">

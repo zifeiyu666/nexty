@@ -32,7 +32,13 @@ const Header = async () => {
             prefetch={true}
             className="flex items-center space-x-1"
           >
-            <Image src="/logo.png" alt="Logo" width={28} height={28} />
+            <Image
+              src="/logo.png"
+              alt=""
+              aria-hidden="true"
+              width={28}
+              height={28}
+            />
             <BrandWordmark
               title={t("title")}
               className="hidden text-xl font-semibold font-science-gothic text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-colors duration-300 group-data-[scrolled=true]/header:text-zinc-950 group-data-[scrolled=true]/header:drop-shadow-none sm:inline-flex"

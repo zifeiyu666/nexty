@@ -146,6 +146,7 @@ function ImageTrack({
           <Image
             src={src}
             alt=""
+            aria-hidden="true"
             fill
             sizes="(min-width: 1024px) 31rem, (min-width: 640px) 22rem, 18rem"
             className="object-cover"
