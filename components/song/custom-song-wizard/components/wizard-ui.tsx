@@ -731,9 +731,9 @@ export function StepHeading({
 }) {
   return (
     <div className="mx-auto mt-16 max-w-3xl text-center">
-      <h1 className="text-4xl font-black leading-tight tracking-normal text-foreground md:text-5xl">
+      <h2 className="text-4xl font-black leading-tight tracking-normal text-foreground md:text-5xl">
         {title}
-      </h1>
+      </h2>
       <p className="mt-5 text-base leading-8 text-muted-foreground">
         {description}
       </p>

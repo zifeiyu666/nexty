@@ -119,7 +119,7 @@ export default function SongfinchComparison() {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:mt-10 lg:grid-cols-4">
+        <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-4 [scrollbar-width:none] md:grid md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 lg:mt-10 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
           {painPoints.map((item) => {
             const Icon =
               painPointIcons[item.icon as keyof typeof painPointIcons] ??
@@ -128,7 +128,7 @@ export default function SongfinchComparison() {
             return (
               <article
                 key={item.title}
-                className="home-card home-card-hover p-5"
+                className="home-card home-card-hover min-w-[82%] snap-center p-5 min-[430px]:min-w-[76%] md:min-w-0"
               >
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                   <Icon className="h-5 w-5" />

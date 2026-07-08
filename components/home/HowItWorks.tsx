@@ -27,6 +27,7 @@ export default function HowItWorks() {
       kickerClassName="bg-primary text-primary-foreground"
       stepTitleClassName="text-[#2b1710]"
       stepDescriptionClassName="text-sm leading-7 text-[#5f564f] [&_strong]:font-semibold [&_strong]:text-inherit"
+      mobileCarousel
       eyebrow={t("eyebrow")}
       title={t("title")}
       description={

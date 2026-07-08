@@ -308,7 +308,7 @@ function LyricGiftHeroVisual() {
     <div className="relative">
       <div className="relative aspect-[1.6] overflow-hidden rounded-lg bg-[#eaded2] shadow-[0_30px_82px_rgba(53,34,24,0.22)] ring-1 ring-white/80 lg:aspect-[1.38]">
         <Image
-          src="/images/occasions/custom-song-lyric-gifts-hero.png"
+          src="/images/occasions/custom-song-lyric-gifts-hero.webp"
           alt="Custom song lyric gifts with handwritten lyrics, framed wall art, and a music preview"
           fill
           priority

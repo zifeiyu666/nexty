@@ -11,7 +11,10 @@ describe("homepage testimonials marquee", () => {
     );
 
     assert.match(source, /^"use client";/);
-    assert.match(source, /from "gsap"/);
+    assert.doesNotMatch(source, /from "gsap"/);
+    assert.match(source, /import\("gsap"\)/);
+    assert.match(source, /const mobileLayout = window\.matchMedia\("\(max-width: 639px\)"\)\.matches/);
+    assert.match(source, /if \(mobileLayout\) return/);
     assert.match(source, /gsap\.ticker\.add/);
     assert.match(source, /window\.addEventListener\("scroll"/);
     assert.match(source, /const scrollDelta = scrollY - lastScrollYRef\.current/);
@@ -22,8 +25,12 @@ describe("homepage testimonials marquee", () => {
     assert.match(source, /if \(isMarqueeHoveredRef\.current\) return/);
     assert.match(source, /onMouseEnter=\{handleMarqueeMouseEnter\}/);
     assert.match(source, /onMouseLeave=\{handleMarqueeMouseLeave\}/);
-    assert.match(source, /hover:-translate-y-1\.5/);
-    assert.match(source, /hover:shadow-xl/);
+    assert.match(source, /className="relative hidden sm:block"/);
+    assert.match(source, /snap-x snap-mandatory/);
+    assert.match(source, /overflow-x-auto/);
+    assert.match(source, /sectionTestimonials\.map/);
+    assert.match(source, /from "next\/image"/);
+    assert.match(source, /sizes="40px"/);
     assert.doesNotMatch(source, /testimonials-marquee/);
     assert.doesNotMatch(source, /SCROLL_MARQUEE_DURATION/);
   });

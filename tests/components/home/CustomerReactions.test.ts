@@ -35,4 +35,17 @@ describe("customer reactions section", () => {
     assert.match(source, /isMobileLayout \? \(/);
     assert.match(source, /mx-auto grid max-w-5xl/);
   });
+
+  test("keeps mobile trust text compact while preserving desktop icons", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/home/CustomerReactions.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /whitespace-nowrap/);
+    assert.match(source, /text-\[0\.8rem\]/);
+    assert.match(source, /text-\[#8a7a72\]/);
+    assert.match(source, /hidden h-4 w-4 text-primary\/75 sm:block/);
+    assert.match(source, /sm:grid-cols-3/);
+  });
 });

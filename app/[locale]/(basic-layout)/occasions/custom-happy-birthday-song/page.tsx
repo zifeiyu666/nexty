@@ -52,7 +52,7 @@ export async function generateMetadata({
       "Create a custom happy birthday song with names, memories, AI vocals, free previews, music videos, and personalized happy birthday song keepsakes.",
     locale: locale as Locale,
     path: "/occasions/custom-happy-birthday-song",
-    images: ["/images/occasions/birthday-custom-song-hero.png"],
+    images: ["/images/occasions/birthday-custom-song-hero.webp"],
   });
 }
 

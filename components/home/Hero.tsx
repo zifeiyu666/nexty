@@ -2,6 +2,7 @@ import HeroOccasionMosaic from "@/components/home/HeroOccasionMosaic";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { CheckCircle2, PlayCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 export default function Hero() {
   const t = useTranslations("Landing.Hero");
@@ -11,14 +12,23 @@ export default function Hero() {
   const trustItems = t.raw("trustItems") as string[];
 
   return (
-    <section className="relative isolate min-h-[max(600px,calc(100dvh_+_53px))] w-full overflow-hidden bg-[#080605] text-white sm:min-h-[max(640px,calc(100dvh_+_53px))]">
+    <section className="relative isolate min-h-[760px] w-full overflow-hidden bg-[#080605] text-white sm:min-h-[max(640px,calc(100dvh_+_53px))]">
+      <Image
+        src="/images/hero/giftsong-hero-mobile-mosaic.jpg"
+        alt=""
+        aria-hidden="true"
+        fill
+        priority
+        sizes="100vw"
+        className="-z-30 object-cover object-center sm:hidden"
+      />
       <HeroOccasionMosaic />
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.74)_0%,rgba(0,0,0,0.58)_34%,rgba(0,0,0,0.34)_68%,rgba(0,0,0,0.2)_100%)]" />
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,rgba(8,6,5,0.58)_0%,rgba(8,6,5,0.14)_32%,rgba(8,6,5,0.22)_66%,rgba(8,6,5,0.78)_100%)]" />
       <div className="absolute inset-x-0 top-0 -z-20 h-32 bg-gradient-to-b from-black/46 to-transparent" />
 
       <div className="container mx-auto">
-        <div className="flex h-dvh min-h-[600px] -translate-y-1 flex-col items-center justify-center gap-5 pb-12 pt-24 text-center sm:min-h-[640px] sm:-translate-y-3 sm:gap-7 sm:pb-16 sm:pt-28 lg:-translate-y-4 lg:gap-8 lg:pb-24 lg:pt-36 2xl:-translate-y-6 2xl:pb-32 2xl:pt-44">
+        <div className="flex min-h-[760px] flex-col items-center justify-center gap-4 pb-10 pt-20 text-center sm:h-dvh sm:min-h-[640px] sm:-translate-y-3 sm:gap-7 sm:pb-16 sm:pt-28 lg:-translate-y-4 lg:gap-8 lg:pb-24 lg:pt-36 2xl:-translate-y-6 2xl:pb-32 2xl:pt-44">
           <div className="inline-flex max-w-[92vw] items-center gap-2 rounded-full border border-white/18 bg-black/28 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white/84 shadow-[0_12px_34px_rgba(0,0,0,0.26)] backdrop-blur-md sm:px-4 sm:text-sm">
             <span className="size-1.5 rounded-full bg-primary shadow-[0_0_18px_rgba(224,65,50,0.78)]" />
             <span className="truncate">{t("trustBadge")}</span>

@@ -126,7 +126,7 @@ export default function BirthdayHeroVisual() {
           <div className="relative aspect-[1.6] overflow-hidden rounded-2xl bg-[#edd6c9] shadow-[0_28px_80px_rgba(69,34,20,0.2)] ring-1 ring-white/80 lg:aspect-[1.42] [transform:translateZ(0)]">
             <div className="absolute inset-0 transition-transform duration-500 ease-out [transform:translate3d(var(--hero-image-x),var(--hero-image-y),0)_scale(1.05)] will-change-transform">
               <Image
-                src="/images/occasions/birthday-custom-song-hero.png"
+                src="/images/occasions/birthday-custom-song-hero.webp"
                 alt="Smiling birthday recipient listening to a custom happy birthday song beside candles"
                 fill
                 priority

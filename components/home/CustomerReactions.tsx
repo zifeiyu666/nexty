@@ -409,17 +409,17 @@ export default function CustomerReactions({
           </div>
         )}
 
-        <div className="mx-auto mt-6 grid max-w-2xl grid-cols-1 gap-2 text-sm font-medium text-[#6f625c] sm:grid-cols-3 sm:gap-4">
+        <div className="mx-auto mt-5 flex max-w-full items-center justify-center gap-3 overflow-hidden text-[0.8rem] font-medium leading-none text-[#8a7a72] sm:mt-6 sm:grid sm:max-w-2xl sm:grid-cols-3 sm:gap-4 sm:text-sm sm:leading-normal sm:text-[#6f625c]">
           {trustItems.map((item, index) => {
             const Icon = trustIcons[index] ?? CheckCircle2;
 
             return (
               <div
                 key={item}
-                className="flex items-center justify-center gap-2"
+                className="flex min-w-0 items-center justify-center whitespace-nowrap sm:gap-2"
               >
-                <Icon className="h-4 w-4 text-primary/75" />
-                {item}
+                <Icon className="hidden h-4 w-4 text-primary/75 sm:block" />
+                <span className="truncate">{item}</span>
               </div>
             );
           })}

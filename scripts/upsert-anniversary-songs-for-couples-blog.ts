@@ -161,6 +161,17 @@ A custom song is not necessary for every anniversary. But it becomes the better 
 
 This is the difference between “a beautiful song” and “our song.”
 
+Here is what that can look like as a finished anniversary lyric video:
+
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube-nocookie.com/embed/Tl2se8CNf-o"
+  title="Our Forever Story - Personalized Lyric Video | Custom Song Gift for Anniversary"
+  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowFullScreen
+></iframe>
+
 ## How to create your own anniversary song
 
 You do not need to write full lyrics to create a strong anniversary track. Start with four inputs:

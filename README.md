@@ -148,7 +148,7 @@ pnpm remotion:function:deploy
 - Product Hunt launch materials: `product-introduction.md`
 - Site configuration: `config/site.ts`
 - Product images: `public/images/products/`
-- Open Graph image: `public/og.png`
+- Open Graph image: `public/og.jpg`
 
 ## License
 

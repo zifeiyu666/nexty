@@ -62,10 +62,25 @@ describe("homepage wall art studio CTA", () => {
     assert.match(ctaSource, /!isAuthenticated/);
     assert.match(ctaSource, /setIsLoginDialogOpen\(true\)/);
     assert.match(ctaSource, /MusicVideoEditorDrawer/);
-    assert.match(ctaSource, /songId=\{firstSong\?\.id/);
-    assert.match(ctaSource, /audioUrl=\{firstSong\?\.audioUrl/);
-    assert.match(ctaSource, /timestampedLyrics=\{firstSong\?\.timestampedLyrics/);
+    assert.match(ctaSource, /const firstSong = songOptions\[0\]/);
+    assert.match(ctaSource, /initialSong=\{firstSong\}/);
+    assert.match(ctaSource, /songOptions=\{songOptions\}/);
     assert.match(ctaSource, /emptyState=\{firstSong \? undefined : <MusicVideoEmptyState \/>/);
     assert.match(ctaSource, /href="\/create-song"/);
+  });
+
+  test("uses the existing carousel for mobile products and keeps desktop grid", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/home/OurProducts.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /from "@\/components\/ui\/carousel"/);
+    assert.match(source, /aria-label="Our products carousel"/);
+    assert.match(source, /className="mt-10 md:hidden"/);
+    assert.match(source, /basis-\[86%\] pl-3 min-\[430px\]:basis-\[82%\]/);
+    assert.match(source, /mt-12 hidden grid-cols-1 gap-6 md:grid md:grid-cols-3/);
+    assert.match(source, /min-h-\[460px\]/);
+    assert.match(source, /md:min-h-\[510px\]/);
   });
 });

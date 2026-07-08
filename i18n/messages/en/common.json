@@ -1,7 +1,7 @@
 {
   "Home": {
-    "title": "One Custom Song",
-    "tagLine": "<strong>Say it with a custom song.</strong><br></br>  Gift an unforgettable track for birthdays, anniversaries, or just because.",
+    "title": "Custom Song Gifts",
+    "tagLine": "<strong>Personalized AI songs by One Custom Song.</strong><br></br> Gift an unforgettable track for birthdays, anniversaries, or just because.",
     "description": "Turn your memories into studio-quality custom songs in minutes. Create a personalized music gift for birthdays, weddings, anniversaries, and more."
   },
   "Login": {
@@ -339,6 +339,11 @@
         "href": "/music/personalized-gift",
         "items": [
           {
+            "name": "AI song preview tool",
+            "href": "/create-song",
+            "description": "Turn a story into a free song preview before unlocking the full track."
+          },
+          {
             "name": "Birthday song gifts",
             "href": "/occasions/custom-happy-birthday-song",
             "description": "Create a personal birthday song with names, stories, and memories."
@@ -351,7 +356,12 @@
           {
             "name": "Music personalized gifts",
             "href": "/music/personalized-gift",
-            "description": "Explore custom songs, videos, and keepsakes for music lovers."
+            "description": "Explore personalized songs, videos, and keepsakes for music lovers."
+          },
+          {
+            "name": "Custom Song Lyrics",
+            "href": "/blog/custom-song-lyrics",
+            "description": "Use examples and prompts to turn a personal story into custom song lyrics."
           },
           {
             "name": "Lyric wall art gifts",
@@ -415,7 +425,7 @@
           "links": [
             {
               "href": "/#features",
-              "name": "Features"
+              "name": "Gift Features"
             },
             {
               "id": "pricing",
@@ -436,6 +446,10 @@
           "title": "Gift Ideas",
           "links": [
             {
+              "name": "AI Song Preview Tool",
+              "href": "/create-song"
+            },
+            {
               "name": "Birthday song gifts",
               "href": "/occasions/custom-happy-birthday-song"
             },
@@ -446,6 +460,10 @@
             {
               "name": "Music personalized gifts",
               "href": "/music/personalized-gift"
+            },
+            {
+              "name": "Custom Song Lyrics",
+              "href": "/blog/custom-song-lyrics"
             },
             {
               "name": "Lyric wall art gifts",

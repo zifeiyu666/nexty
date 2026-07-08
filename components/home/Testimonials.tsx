@@ -1,8 +1,8 @@
 "use client";
 
-import { gsap } from "gsap";
 import { Star } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 export type TestimonialItem = {
@@ -96,7 +96,7 @@ const RatingStars = () => {
 
 const TestimonialCard = ({ testimonial }: { testimonial: TestimonialItem }) => {
   return (
-    <li className="w-[260px] shrink-0 list-none sm:w-[300px] lg:w-[340px]">
+    <li className="w-[260px] shrink-0 snap-center list-none sm:w-[300px] lg:w-[340px]">
       <figure
         className={`home-card home-card-hover flex h-full transform-gpu flex-col p-5 sm:p-6 ${testimonial.cardClassName ?? "bg-white"}`}
       >
@@ -113,11 +113,12 @@ const TestimonialCard = ({ testimonial }: { testimonial: TestimonialItem }) => {
         </div>
         <figcaption className="flex items-center gap-2.5 pt-6">
           {testimonial.avatar ? (
-            <img
+            <Image
               src={testimonial.avatar}
               alt={testimonial.author}
               width={40}
               height={40}
+              sizes="40px"
               className="h-10 w-10 rounded-full object-cover ring-2 ring-[#f8f2ee]"
             />
           ) : (
@@ -167,86 +168,103 @@ export default function Testimonials({
 
     if (!marquee) return;
 
+    const mobileLayout = window.matchMedia("(max-width: 639px)").matches;
+
+    if (mobileLayout) return;
+
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
     if (reducedMotion) return;
 
-    const setX = gsap.quickSetter(marquee, "x", "px");
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
 
-    const normalizePosition = () => {
-      const loopWidth = loopWidthRef.current;
+    void import("gsap").then((gsapModule) => {
+      if (cancelled) return;
 
-      if (loopWidth <= 0) return;
+      const gsap = gsapModule.gsap;
+      const setX = gsap.quickSetter(marquee, "x", "px");
 
-      while (positionRef.current <= -loopWidth) {
-        positionRef.current += loopWidth;
-      }
+      const normalizePosition = () => {
+        const loopWidth = loopWidthRef.current;
 
-      while (positionRef.current > 0) {
-        positionRef.current -= loopWidth;
-      }
-    };
+        if (loopWidth <= 0) return;
 
-    const updateLoopWidth = () => {
-      loopWidthRef.current = marquee.scrollWidth / 2;
-      baseVelocityRef.current = loopWidthRef.current / BASE_MARQUEE_DURATION;
-      normalizePosition();
-      setX(positionRef.current);
-    };
+        while (positionRef.current <= -loopWidth) {
+          positionRef.current += loopWidth;
+        }
 
-    updateLoopWidth();
-    lastScrollYRef.current = window.scrollY;
+        while (positionRef.current > 0) {
+          positionRef.current -= loopWidth;
+        }
+      };
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
+      const updateLoopWidth = () => {
+        loopWidthRef.current = marquee.scrollWidth / 2;
+        baseVelocityRef.current = loopWidthRef.current / BASE_MARQUEE_DURATION;
+        normalizePosition();
+        setX(positionRef.current);
+      };
 
-      if (scrollY === lastScrollYRef.current) return;
+      updateLoopWidth();
+      lastScrollYRef.current = window.scrollY;
 
-      const scrollDelta = scrollY - lastScrollYRef.current;
-      lastScrollYRef.current = scrollY;
+      const handleScroll = () => {
+        const scrollY = window.scrollY;
 
-      if (isMarqueeHoveredRef.current) return;
+        if (scrollY === lastScrollYRef.current) return;
 
-      isPageScrollingRef.current = true;
-      positionRef.current -= scrollDelta * SCROLL_FOLLOW_MULTIPLIER;
-      normalizePosition();
-      setX(positionRef.current);
+        const scrollDelta = scrollY - lastScrollYRef.current;
+        lastScrollYRef.current = scrollY;
 
-      if (idleTimeoutRef.current) {
-        window.clearTimeout(idleTimeoutRef.current);
-      }
+        if (isMarqueeHoveredRef.current) return;
 
-      idleTimeoutRef.current = window.setTimeout(() => {
-        isPageScrollingRef.current = false;
-      }, IDLE_SCROLL_DELAY);
-    };
+        isPageScrollingRef.current = true;
+        positionRef.current -= scrollDelta * SCROLL_FOLLOW_MULTIPLIER;
+        normalizePosition();
+        setX(positionRef.current);
 
-    const tick = (_time: number, deltaTime: number) => {
-      const loopWidth = loopWidthRef.current;
+        if (idleTimeoutRef.current) {
+          window.clearTimeout(idleTimeoutRef.current);
+        }
 
-      if (loopWidth <= 0) return;
-      if (isMarqueeHoveredRef.current) return;
-      if (isPageScrollingRef.current) return;
+        idleTimeoutRef.current = window.setTimeout(() => {
+          isPageScrollingRef.current = false;
+        }, IDLE_SCROLL_DELAY);
+      };
 
-      positionRef.current -= baseVelocityRef.current * (deltaTime / 1000);
-      normalizePosition();
-      setX(positionRef.current);
-    };
+      const tick = (_time: number, deltaTime: number) => {
+        const loopWidth = loopWidthRef.current;
 
-    window.addEventListener("resize", updateLoopWidth);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    gsap.ticker.add(tick);
+        if (loopWidth <= 0) return;
+        if (isMarqueeHoveredRef.current) return;
+        if (isPageScrollingRef.current) return;
+
+        positionRef.current -= baseVelocityRef.current * (deltaTime / 1000);
+        normalizePosition();
+        setX(positionRef.current);
+      };
+
+      window.addEventListener("resize", updateLoopWidth);
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      gsap.ticker.add(tick);
+
+      cleanup = () => {
+        gsap.ticker.remove(tick);
+        window.removeEventListener("resize", updateLoopWidth);
+        window.removeEventListener("scroll", handleScroll);
+
+        if (idleTimeoutRef.current) {
+          window.clearTimeout(idleTimeoutRef.current);
+        }
+      };
+    });
 
     return () => {
-      gsap.ticker.remove(tick);
-      window.removeEventListener("resize", updateLoopWidth);
-      window.removeEventListener("scroll", handleScroll);
-
-      if (idleTimeoutRef.current) {
-        window.clearTimeout(idleTimeoutRef.current);
-      }
+      cancelled = true;
+      cleanup?.();
     };
   }, []);
 
@@ -274,7 +292,7 @@ export default function Testimonials({
         </div>
       </div>
       <div
-        className="relative"
+        className="relative hidden sm:block"
         onMouseEnter={handleMarqueeMouseEnter}
         onMouseLeave={handleMarqueeMouseLeave}
       >
@@ -284,6 +302,16 @@ export default function Testimonials({
           {marqueeTestimonials.map((testimonial, index) => (
             <TestimonialCard
               key={`${testimonial.author}-${index}`}
+              testimonial={testimonial}
+            />
+          ))}
+        </ul>
+      </div>
+      <div className="sm:hidden">
+        <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {sectionTestimonials.map((testimonial) => (
+            <TestimonialCard
+              key={testimonial.author}
               testimonial={testimonial}
             />
           ))}

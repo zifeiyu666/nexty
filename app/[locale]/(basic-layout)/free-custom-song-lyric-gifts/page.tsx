@@ -52,7 +52,7 @@ export async function generateMetadata({
       "Create custom song lyric gifts with a free lyric AI generator, editable lyrics, lyric wall art, and lyric music video keepsakes.",
     locale: locale as Locale,
     path: "/free-custom-song-lyric-gifts",
-    images: ["/images/occasions/custom-song-lyric-gifts-hero.png"],
+    images: ["/images/occasions/custom-song-lyric-gifts-hero.webp"],
   });
 }
 

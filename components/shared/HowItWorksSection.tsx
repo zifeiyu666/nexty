@@ -1,3 +1,8 @@
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
@@ -25,6 +30,7 @@ type HowItWorksSectionProps = {
   stepTitleClassName?: string;
   stepDescriptionClassName?: string;
   backgroundSlot?: ReactNode;
+  mobileCarousel?: boolean;
 };
 
 export default function HowItWorksSection({
@@ -45,7 +51,41 @@ export default function HowItWorksSection({
   stepTitleClassName,
   stepDescriptionClassName,
   backgroundSlot,
+  mobileCarousel = false,
 }: HowItWorksSectionProps) {
+  const renderStepCard = (step: HowItWorksStep) => (
+    <article
+      key={step.kicker}
+      data-how-it-works-card
+      className={cn("home-card home-card-hover p-6", cardClassName)}
+    >
+      <div
+        className={cn(
+          "mb-6 inline-flex rounded-full bg-[#25130e] px-3 py-1 text-xs font-black text-white",
+          kickerClassName,
+        )}
+      >
+        {step.kicker}
+      </div>
+      <h3
+        className={cn(
+          "text-xl font-black leading-tight text-[#261712]",
+          stepTitleClassName,
+        )}
+      >
+        {step.title}
+      </h3>
+      <div
+        className={cn(
+          "mt-3 text-sm leading-6 text-[#74665f]",
+          stepDescriptionClassName,
+        )}
+      >
+        {step.description}
+      </div>
+    </article>
+  );
+
   return (
     <section
       id={id}
@@ -84,42 +124,33 @@ export default function HowItWorksSection({
           </div>
         </div>
 
-        <div className={cn("mt-12 grid gap-4 lg:grid-cols-4", gridClassName)}>
-          {steps.map((step) => (
-            <article
-              key={step.kicker}
-              data-how-it-works-card
-              className={cn(
-                "home-card home-card-hover p-6",
-                cardClassName,
-              )}
-            >
-              <div
-                className={cn(
-                  "mb-6 inline-flex rounded-full bg-[#25130e] px-3 py-1 text-xs font-black text-white",
-                  kickerClassName,
-                )}
-              >
-                {step.kicker}
-              </div>
-              <h3
-                className={cn(
-                  "text-xl font-black leading-tight text-[#261712]",
-                  stepTitleClassName,
-                )}
-              >
-                {step.title}
-              </h3>
-              <div
-                className={cn(
-                  "mt-3 text-sm leading-6 text-[#74665f]",
-                  stepDescriptionClassName,
-                )}
-              >
-                {step.description}
-              </div>
-            </article>
-          ))}
+        {mobileCarousel && (
+          <Carousel
+            opts={{ align: "start", containScroll: "trimSnaps" }}
+            className="mt-10 md:hidden"
+            aria-label="How it works steps"
+          >
+            <CarouselContent className="-ml-3 px-4 pb-4">
+              {steps.map((step) => (
+                <CarouselItem
+                  key={step.kicker}
+                  className="basis-[86%] pl-3 min-[430px]:basis-[82%]"
+                >
+                  {renderStepCard(step)}
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        )}
+
+        <div
+          className={cn(
+            "mt-12 grid gap-4 lg:grid-cols-4",
+            mobileCarousel && "hidden md:grid",
+            gridClassName,
+          )}
+        >
+          {steps.map((step) => renderStepCard(step))}
         </div>
       </div>
     </section>

@@ -4,12 +4,8 @@ import {
   heroOccasionColumns,
   type HeroOccasionColumn,
 } from "@/components/home/HeroOccasionMosaic.config";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroOccasionMosaic() {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -19,60 +15,81 @@ export default function HeroOccasionMosaic() {
 
     if (!root) return;
 
+    const mobileLayout = window.matchMedia("(max-width: 639px)").matches;
+
+    if (mobileLayout) return;
+
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
     if (reducedMotion) return;
 
-    const context = gsap.context(() => {
-      gsap.utils
-        .toArray<HTMLElement>("[data-hero-occasion-column]")
-        .forEach((column, index) => {
-          const direction = column.dataset.direction === "down" ? 1 : -1;
-          const idleColumn = column.querySelector<HTMLElement>(
-            "[data-hero-occasion-column-idle]",
-          );
+    let context: { revert: () => void } | undefined;
+    let cancelled = false;
 
-          if (idleColumn) {
-            gsap.fromTo(
-              idleColumn,
-              { yPercent: direction * -4 },
-              {
-                yPercent: direction * 4,
-                duration: 32 + index * 2,
-                ease: "sine.inOut",
-                repeat: -1,
-                yoyo: true,
-                delay: index * -2.5,
-              },
-            );
-          }
+    void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
+      ([gsapModule, scrollTriggerModule]) => {
+        if (cancelled) return;
 
-          gsap.fromTo(
-            column,
-            { yPercent: direction * -8 },
-            {
-              yPercent: direction * 18,
-              ease: "none",
-              scrollTrigger: {
-                trigger: root,
-                start: "top top",
-                end: "bottom top",
-                scrub: 2.2,
-              },
-            },
-          );
-        });
-    }, root);
+        const gsap = gsapModule.gsap;
+        const ScrollTrigger = scrollTriggerModule.ScrollTrigger;
 
-    return () => context.revert();
+        gsap.registerPlugin(ScrollTrigger);
+
+        context = gsap.context(() => {
+          gsap.utils
+            .toArray<HTMLElement>("[data-hero-occasion-column]")
+            .forEach((column, index) => {
+              const direction = column.dataset.direction === "down" ? 1 : -1;
+              const idleColumn = column.querySelector<HTMLElement>(
+                "[data-hero-occasion-column-idle]",
+              );
+
+              if (idleColumn) {
+                gsap.fromTo(
+                  idleColumn,
+                  { yPercent: direction * -4 },
+                  {
+                    yPercent: direction * 4,
+                    duration: 32 + index * 2,
+                    ease: "sine.inOut",
+                    repeat: -1,
+                    yoyo: true,
+                    delay: index * -2.5,
+                  },
+                );
+              }
+
+              gsap.fromTo(
+                column,
+                { yPercent: direction * -8 },
+                {
+                  yPercent: direction * 18,
+                  ease: "none",
+                  scrollTrigger: {
+                    trigger: root,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: 2.2,
+                  },
+                },
+              );
+            });
+        }, root);
+      },
+    );
+
+    return () => {
+      cancelled = true;
+      context?.revert();
+    };
   }, []);
 
   return (
     <div
       ref={rootRef}
-      className="absolute inset-0 -z-30 overflow-hidden bg-[#080605]"
+      className="absolute inset-0 -z-30 hidden overflow-hidden bg-[#080605] sm:block"
       aria-hidden="true"
     >
       <div className="absolute left-1/2 top-1/2 flex h-[190vh] w-[150vw] -translate-x-1/2 -translate-y-1/2 rotate-[-12deg] items-center justify-center gap-2 sm:gap-3 lg:gap-4">
@@ -84,7 +101,11 @@ export default function HeroOccasionMosaic() {
   );
 }
 
-function HeroOccasionColumnView({ column }: { column: HeroOccasionColumn }) {
+function HeroOccasionColumnView({
+  column,
+}: {
+  column: HeroOccasionColumn;
+}) {
   return (
     <div
       data-hero-occasion-column
@@ -105,7 +126,6 @@ function HeroOccasionColumnView({ column }: { column: HeroOccasionColumn }) {
               alt=""
               aria-hidden="true"
               fill
-              priority={index < 2}
               sizes="(min-width: 1536px) 14rem, (min-width: 1024px) 12rem, (min-width: 640px) 9rem, 7rem"
               className="object-cover brightness-[0.72] saturate-[0.94]"
             />

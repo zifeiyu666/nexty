@@ -13,9 +13,9 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return constructMetadata({
-    title: "Create a Custom AI Song",
+    title: "Free AI Song Generator | Preview Your Song",
     description:
-      "Create a personalized AI song from a story, capture a free preview, and unlock the full MP3.",
+      "Turn your story into a quick song preview, refine the lyrics and style, then unlock the final MP3 when it feels right.",
     locale: locale as Locale,
     path: "/create-song",
   });
@@ -24,6 +24,13 @@ export async function generateMetadata({
 export default function CreateSongPage() {
   return (
     <div className="w-full min-h-screen bg-background">
+      <section className="sr-only" aria-labelledby="create-song-title">
+        <h1 id="create-song-title">Free AI Song Generator</h1>
+        <p>
+          Start from a personal story, preview a generated song, then refine the
+          lyrics, style, and delivery before unlocking the full MP3.
+        </p>
+      </section>
       <CustomSongWizard />
     </div>
   );

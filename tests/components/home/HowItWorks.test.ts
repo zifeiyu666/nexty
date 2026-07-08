@@ -31,17 +31,17 @@ describe("homepage how it works section", () => {
 
     assert.match(componentSource, /HowItWorksSection/);
     assert.match(componentSource, /const stepKeys = \["story", "preview", "gift", "deliver"\] as const/);
-    assert.match(componentSource, /sectionClassName="isolate bg-muted text-\[#171717\]"/);
+    assert.match(componentSource, /sectionClassName="home-section-muted isolate"/);
     assert.match(componentSource, /data-how-it-works-geometry/);
     assert.match(componentSource, /data-how-it-works-description/);
-    assert.match(componentSource, /rounded-full bg-white\/70/);
-    assert.match(componentSource, /rotate-45 rounded-md bg-muted/);
+    assert.match(componentSource, /rounded-full bg-white\/55/);
+    assert.match(componentSource, /rounded-2xl bg-white\/45/);
     assert.match(componentSource, /kicker: String\(index \+ 1\)\.padStart\(2, "0"\)/);
-    assert.match(componentSource, /kickerClassName="bg-\[#c33f32\] text-white"/);
+    assert.match(componentSource, /kickerClassName="bg-primary text-primary-foreground"/);
+    assert.match(componentSource, /mobileCarousel/);
     assert.doesNotMatch(componentSource, /Cormorant_Garamond/);
     assert.doesNotMatch(componentSource, /lucide-react/);
     assert.doesNotMatch(componentSource, /title-gradient/);
-    assert.doesNotMatch(componentSource, /hover:/);
     assert.doesNotMatch(componentSource, /StepVisual|StoryPromptPreview|PreviewDashboard|GiftBundlePreview/);
     assert.doesNotMatch(componentSource, /#C5A880/);
     assert.doesNotMatch(componentSource, /#9E4747/);
@@ -53,8 +53,13 @@ describe("homepage how it works section", () => {
 
     assert.match(sharedComponentSource, /text-xs font-bold uppercase tracking-\[0\.24em\] text-\[#c33f32\]/);
     assert.match(sharedComponentSource, /mt-12 grid gap-4 lg:grid-cols-4/);
+    assert.match(sharedComponentSource, /from "@\/components\/ui\/carousel"/);
+    assert.match(sharedComponentSource, /mobileCarousel = false/);
+    assert.match(sharedComponentSource, /className="mt-10 md:hidden"/);
+    assert.match(sharedComponentSource, /basis-\[86%\] pl-3 min-\[430px\]:basis-\[82%\]/);
+    assert.match(sharedComponentSource, /mobileCarousel && "hidden md:grid"/);
     assert.match(sharedComponentSource, /data-how-it-works-card/);
-    assert.match(sharedComponentSource, /rounded-lg bg-white p-6 shadow-sm ring-1 ring-\[#eadbd3\]/);
+    assert.match(sharedComponentSource, /home-card home-card-hover p-6/);
     assert.match(sharedComponentSource, /rounded-full bg-\[#25130e\] px-3 py-1 text-xs font-black text-white/);
 
     assert.match(birthdayPageSource, /<HowItWorksSection/);

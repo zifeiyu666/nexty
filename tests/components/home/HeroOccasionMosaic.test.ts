@@ -43,7 +43,7 @@ describe("hero occasion mosaic background", () => {
     assert.doesNotMatch(heroSource, /hero_bg_white\.webp/);
     assert.match(mosaicSource, /rotate-\[-12deg\]/);
     assert.match(mosaicSource, /gap-4/);
-    assert.match(mosaicSource, /lg:gap-6/);
+    assert.match(mosaicSource, /lg:gap-4/);
     assert.match(mosaicSource, /w-28/);
     assert.match(mosaicSource, /2xl:w-56/);
   });
@@ -60,12 +60,11 @@ describe("hero occasion mosaic background", () => {
 
     assert.match(heroSource, /bg-\[#080605\]/);
     assert.match(heroSource, /text-white/);
-    assert.match(heroSource, /bg-black\/62/);
-    assert.match(heroSource, /!text-white/);
-    assert.match(heroSource, /\[\&_strong\]:font-\[200\]/);
-    assert.match(heroSource, /\[\&_strong\]:text-white/);
+    assert.match(heroSource, /bg-black\/28/);
+    assert.match(heroSource, /text-white\/80/);
+    assert.match(heroSource, /\[\&_strong\]:font-normal/);
     assert.match(mosaicSource, /bg-\[#080605\]/);
-    assert.match(mosaicSource, /brightness-\[0\.58\]/);
+    assert.match(mosaicSource, /brightness-\[0\.72\]/);
   });
 
   test("keeps the image columns drifting while the page is idle", () => {
@@ -78,5 +77,25 @@ describe("hero occasion mosaic background", () => {
     assert.match(mosaicSource, /repeat:\s*-1/);
     assert.match(mosaicSource, /yoyo:\s*true/);
     assert.match(mosaicSource, /duration:\s*32/);
+  });
+
+  test("keeps mosaic animation and priority loading off the mobile hero", () => {
+    const heroSource = readFileSync(
+      join(process.cwd(), "components/home/Hero.tsx"),
+      "utf8",
+    );
+    const mosaicSource = readFileSync(
+      join(process.cwd(), "components/home/HeroOccasionMosaic.tsx"),
+      "utf8",
+    );
+
+    assert.match(heroSource, /giftsong-hero-mobile-mosaic\.jpg/);
+    assert.match(heroSource, /priority/);
+    assert.match(heroSource, /sm:hidden/);
+    assert.match(mosaicSource, /hidden overflow-hidden bg-\[#080605\] sm:block/);
+    assert.match(mosaicSource, /const mobileLayout = window\.matchMedia\("\(max-width: 639px\)"\)\.matches/);
+    assert.match(mosaicSource, /if \(mobileLayout\) return/);
+    assert.match(mosaicSource, /import\("gsap"\)/);
+    assert.doesNotMatch(mosaicSource, /priority=\{/);
   });
 });

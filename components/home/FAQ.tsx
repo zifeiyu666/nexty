@@ -48,7 +48,7 @@ export default function FAQ({
         className="home-section-header home-container"
         data-testid="faq-section-heading"
       >
-        <p className="home-eyebrow">Questions</p>
+        <p className="home-eyebrow">FAQ</p>
         <h2 className="home-title">{headingTitle}</h2>
         <p className="home-description">
           {headingDescription}
