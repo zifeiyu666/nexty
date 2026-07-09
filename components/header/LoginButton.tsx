@@ -1,6 +1,10 @@
 "use client";
 
 import LoginDialog from "@/components/auth/LoginDialog";
+import {
+  HeaderActionText,
+  headerActionButtonClassName,
+} from "@/components/header/HeaderActionText";
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -28,8 +32,12 @@ export default function LoginButton() {
 
   return (
     <>
-      <Button onClick={handleLogin} size="sm">
-        {t("Button.signIn")}
+      <Button
+        onClick={handleLogin}
+        size="sm"
+        className={headerActionButtonClassName}
+      >
+        <HeaderActionText>{t("Button.signIn")}</HeaderActionText>
       </Button>
 
       {process.env.NEXT_PUBLIC_LOGIN_MODE === "dialog" && (

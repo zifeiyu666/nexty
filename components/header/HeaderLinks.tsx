@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  HeaderActionText,
+  type HeaderActionTextProps,
+} from "@/components/header/HeaderActionText";
+import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
@@ -18,27 +22,8 @@ type HeaderLinksProps = {
   variant?: "default" | "adaptive";
 };
 
-type RollingNavTextProps = {
-  children: string;
-};
-
-const RollingNavText = ({ children }: RollingNavTextProps) => (
-  <span className="relative inline-block overflow-hidden align-middle leading-[1.15]">
-    <span className="sr-only">{children}</span>
-    <span
-      aria-hidden="true"
-      className="block transition-transform duration-500 ease-[cubic-bezier(0.22,1.38,0.36,1)] motion-reduce:transition-none group-hover/nav-link:translate-y-[120%] group-focus-visible/nav-link:translate-y-[120%]"
-    >
-      {children}
-    </span>
-    <span
-      aria-hidden="true"
-      className="absolute inset-x-0 top-0 block -translate-y-[120%] transition-transform duration-500 ease-[cubic-bezier(0.22,1.38,0.36,1)] motion-reduce:transition-none group-hover/nav-link:translate-y-0 group-focus-visible/nav-link:translate-y-0"
-    >
-      {children}
-    </span>
-  </span>
-);
+export type RollingNavTextProps = HeaderActionTextProps;
+export const RollingNavText = HeaderActionText;
 
 const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
   const pathname = usePathname();

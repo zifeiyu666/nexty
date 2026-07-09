@@ -1,3 +1,7 @@
+import {
+  HeaderActionText,
+  headerActionButtonClassName,
+} from "@/components/header/HeaderActionText";
 import BrandWordmark from "@/components/header/BrandWordmark";
 import HeaderLinks from "@/components/header/HeaderLinks";
 import HeaderShell from "@/components/header/HeaderShell";
@@ -53,11 +57,12 @@ const Header = async () => {
           <div className="hidden lg:flex items-center gap-x-2">
             <Button
               asChild
-              className="h-8 rounded-full bg-white/10 px-3 text-xs font-semibold text-white shadow-none hover:bg-white/15 active:scale-[0.98] group-data-[scrolled=true]/header:bg-zinc-950/5 group-data-[scrolled=true]/header:text-zinc-900 group-data-[scrolled=true]/header:hover:bg-zinc-950/10"
+              className={headerActionButtonClassName}
             >
-              <I18nLink href="/create-song" className="flex items-center gap-2">
-                <Music2 className="h-3.5 w-3.5" />
-                Create Song
+              <I18nLink href="/create-song">
+                <HeaderActionText icon={<Music2 className="h-3.5 w-3.5" />}>
+                  Create Song
+                </HeaderActionText>
               </I18nLink>
             </Button>
             <UserAvatar user={user as User} />

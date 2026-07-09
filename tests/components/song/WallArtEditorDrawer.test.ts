@@ -159,11 +159,11 @@ describe("WallArtEditorDrawer", () => {
     assert.match(source, /const lyricPortraitPresetImages = Array\.from\(\{ length: 4 \}/);
     assert.match(
       source,
-      /src: `\/wallart\/color_preset\/lytric_fill_template\/color_preset\$\{index \+ 1\}\.png`/,
+      /src: `\/wallart\/color_preset\/lytric_fill_template\/color_preset\$\{index \+ 1\}\.avif`/,
     );
     assert.match(
       source,
-      /originSrc: `\/wallart\/color_preset\/lytric_fill_template\/color_preset_origin\$\{index \+ 1\}\.jpg`/,
+      /originSrc: `\/wallart\/color_preset\/lytric_fill_template\/color_preset_origin\$\{index \+ 1\}\.avif`/,
     );
     assert.match(source, /imageLyricPresetIndex: number;/);
     assert.match(

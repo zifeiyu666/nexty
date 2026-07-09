@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useGlobalMusicPlayer } from "@/lib/music-player/global-player-store";
 import { buildLrcFileName, buildLrcText } from "@/lib/music-player/lrc-export";
 import { cn } from "@/lib/utils";
 import {
@@ -46,7 +47,7 @@ import {
   Share2,
   Sparkles,
   Volume2,
-  Wand2
+  Wand2,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -939,12 +940,23 @@ export function FinalSongOwnerPlayer({
   data: FinalSongPlayerData;
   songOptions?: FinalSongPlayerData[];
 }) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(data.duration || 0);
+  const {
+    currentTime: globalCurrentTime,
+    duration: globalDuration,
+    isPlaying: isGlobalPlaying,
+    playTrack,
+    toggle,
+    track,
+  } = useGlobalMusicPlayer();
   const recipientLabel = data.recipientNames.join(" and ") || "someone special";
   const occasionLabel = labelize(data.occasion || "custom song");
+  const isCurrentGlobalTrack =
+    track?.id === data.id && track.audioUrl === data.audioUrl;
+  const isPlaying = isCurrentGlobalTrack && isGlobalPlaying;
+  const currentTime = isCurrentGlobalTrack ? globalCurrentTime : 0;
+  const duration = isCurrentGlobalTrack
+    ? globalDuration || data.duration || 0
+    : data.duration || 0;
   const metadataPills: SongResultMetadataPill[] = [
     { icon: <Heart className="size-4" />, label: `For ${recipientLabel}` },
     { icon: <Cake className="size-4" />, label: occasionLabel },
@@ -965,42 +977,23 @@ export function FinalSongOwnerPlayer({
   });
 
   function toggleOwnerPlayback() {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
+    if (isCurrentGlobalTrack) {
+      toggle();
       return;
     }
 
-    audio
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch(() => setIsPlaying(false));
+    playTrack({
+      id: data.id,
+      title: data.title,
+      artist: `For ${recipientLabel}`,
+      artworkUrl: data.imageUrl || undefined,
+      audioUrl: data.audioUrl,
+      duration: data.duration,
+    });
   }
 
   return (
     <div className="relative w-full pb-8">
-      <audio
-        ref={audioRef}
-        preload="metadata"
-        src={data.audioUrl}
-        onEnded={() => setIsPlaying(false)}
-        onLoadedMetadata={(event) => {
-          setDuration(event.currentTarget.duration || data.duration || 0);
-        }}
-        onDurationChange={(event) => {
-          setDuration(event.currentTarget.duration || data.duration || 0);
-        }}
-        onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-        onTimeUpdate={(event) => {
-          const nextDuration = event.currentTarget.duration || data.duration || 0;
-          setCurrentTime(event.currentTarget.currentTime);
-          setDuration(nextDuration);
-        }}
-      />
       <SongCoverBackdrop imageUrl={data.imageUrl} title={data.title} />
 
       <section className="relative z-10 px-4 pt-2 sm:px-6 lg:px-8">

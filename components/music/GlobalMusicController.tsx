@@ -6,7 +6,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useGlobalMusicPlayer } from "@/lib/music-player/global-player-store";
+import {
+  registerGlobalMusicAudio,
+  useGlobalMusicPlayer,
+} from "@/lib/music-player/global-player-store";
 import { cn } from "@/lib/utils";
 import { Music2, Pause, Play } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -99,11 +102,27 @@ function TrackLabel({
 }
 
 export function GlobalMusicController() {
-  const { isVisible, isPlaying, track, toggle } = useGlobalMusicPlayer();
+  const {
+    duration,
+    isVisible,
+    isPlaying,
+    pause,
+    setCurrentTime,
+    setDuration,
+    setVolume,
+    track,
+    toggle,
+    volume,
+  } = useGlobalMusicPlayer();
   const pathname = usePathname();
   const [position, setPosition] = useState<Position | null>(null);
   const [dockSide, setDockSide] = useState<DockSide>("right");
   const [isDragging, setIsDragging] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const setAudioElement = useCallback((audio: HTMLAudioElement | null) => {
+    audioRef.current = audio;
+    registerGlobalMusicAudio(audio);
+  }, []);
   const dragRef = useRef<{
     pointerId: number;
     startX: number;
@@ -112,10 +131,50 @@ export function GlobalMusicController() {
   } | null>(null);
 
   useEffect(() => {
-    const initialPosition = getDefaultPosition();
-    setPosition(initialPosition);
-    setDockSide(getDockSide(initialPosition));
+    const frame = window.requestAnimationFrame(() => {
+      const initialPosition = getDefaultPosition();
+      setPosition(initialPosition);
+      setDockSide(getDockSide(initialPosition));
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = volume;
+  }, [volume]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (!track) {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      return;
+    }
+
+    if (audio.getAttribute("src") !== track.audioUrl) {
+      audio.src = track.audioUrl;
+      audio.load();
+    }
+  }, [track]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !track) return;
+
+    if (!isPlaying) {
+      audio.pause();
+      return;
+    }
+
+    audio.play().catch(() => pause());
+  }, [isPlaying, pause, track]);
 
   const keepInViewport = useCallback((next: Position) => {
     const maxX = Math.max(EDGE_GAP, window.innerWidth - CONTROL_SIZE - EDGE_GAP);
@@ -158,6 +217,34 @@ export function GlobalMusicController() {
         width: CONTROL_SIZE,
       }}
     >
+      <audio
+        ref={setAudioElement}
+        preload="metadata"
+        onDurationChange={(event) => {
+          setDuration(event.currentTarget.duration || track?.duration || 0);
+        }}
+        onEnded={() => {
+          setCurrentTime(duration || track?.duration || 0);
+          pause();
+        }}
+        onLoadedMetadata={(event) => {
+          setDuration(event.currentTarget.duration || track?.duration || 0);
+        }}
+        onPause={() => {
+          if (isPlaying) {
+            pause();
+          }
+        }}
+        onTimeUpdate={(event) => {
+          const nextDuration =
+            event.currentTarget.duration || track?.duration || 0;
+          setCurrentTime(event.currentTarget.currentTime);
+          setDuration(nextDuration);
+        }}
+        onVolumeChange={(event) => {
+          setVolume(event.currentTarget.volume);
+        }}
+      />
       <div
         aria-label={`${title} music controller`}
         className={cn(

@@ -233,18 +233,18 @@ const IMAGE_LYRIC_MASK_SIDE_PADDING = 0;
 const IMAGE_LYRIC_MASK_MAX_CELLS = 24000;
 const presetImages = Array.from({ length: 10 }, (_, index) => ({
   name: `Design ${index + 1}`,
-  src: `/wallart/color_preset/color_preset${index + 1}.png`,
+  src: `/wallart/color_preset/color_preset${index + 1}.avif`,
 }));
 const template2PresetImages = Array.from({ length: 15 }, (_, index) => ({
   name: `Design ${index + 1}`,
-  src: `/wallart/color_preset/template2_preset/color_preset${index + 1}.png`,
+  src: `/wallart/color_preset/template2_preset/color_preset${index + 1}.avif`,
 }));
 const lyricPortraitPresetImages = Array.from({ length: 4 }, (_, index) => ({
   name: `Design ${index + 1}`,
-  src: `/wallart/color_preset/lytric_fill_template/color_preset${index + 1}.png`,
-  originSrc: `/wallart/color_preset/lytric_fill_template/color_preset_origin${index + 1}.jpg`,
+  src: `/wallart/color_preset/lytric_fill_template/color_preset${index + 1}.avif`,
+  originSrc: `/wallart/color_preset/lytric_fill_template/color_preset_origin${index + 1}.avif`,
 }));
-const heartTemplatePreview = "/wallart/heart_lyrics.jpg";
+const heartTemplatePreview = "/wallart/heart_lyrics.avif";
 const textTargets: EditableTextKey[] = [
   "lyrics",
   "title",

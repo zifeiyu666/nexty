@@ -89,7 +89,7 @@ describe("hero occasion mosaic background", () => {
       "utf8",
     );
 
-    assert.match(heroSource, /giftsong-hero-mobile-mosaic\.jpg/);
+    assert.match(heroSource, /giftsong-hero-mobile-mosaic\.avif/);
     assert.match(heroSource, /priority/);
     assert.match(heroSource, /sm:hidden/);
     assert.match(mosaicSource, /hidden overflow-hidden bg-\[#080605\] sm:block/);
