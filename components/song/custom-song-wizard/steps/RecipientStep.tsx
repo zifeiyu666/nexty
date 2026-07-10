@@ -122,7 +122,7 @@ export function RecipientStep({
           </div>
           <p className="text-sm font-medium text-muted-foreground">Pick one</p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-x-3 gap-y-6 pt-2 sm:grid-cols-2 lg:grid-cols-5">
           {occasions.map((item) => {
             const selected =
               item.value === customOccasionValue
@@ -132,9 +132,13 @@ export function RecipientStep({
             return (
               <MagneticChoiceCard
                 key={item.value}
+                art={item.art}
+                artPlacement="center"
                 icon={item.icon}
                 label={item.title}
                 selected={selected}
+                showIcon={false}
+                showSelectedCheck={false}
                 onClick={() => onSelectOccasion(item.value)}
               />
             );

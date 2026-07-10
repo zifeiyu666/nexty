@@ -7,19 +7,74 @@ import { occasionCards } from "@/components/home/OccasionShowcase.config";
 
 describe("occasion showcase", () => {
   test("keeps the full occasion set with local occasion imagery", () => {
-    assert.equal(occasionCards.length, 23);
+    assert.equal(occasionCards.length, 21);
     assert.deepEqual(
       occasionCards.map((occasion) => occasion.index),
-      Array.from({ length: 23 }, (_, index) =>
-        String(index + 1).padStart(2, "0"),
+      [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "23",
+      ],
+    );
+    assert.ok(
+      occasionCards.every((occasion) =>
+        occasion.image.startsWith("/occasion-generated/avif/"),
+      ),
+    );
+    assert.ok(occasionCards.every((occasion) => occasion.rotate !== 0));
+  });
+
+  test("assigns one R2 sample song per card with data-only match quality", () => {
+    assert.ok(occasionCards.every((occasion) => occasion.sampleTrack));
+    assert.ok(
+      occasionCards.every((occasion) =>
+        occasion.sampleTrack.audioUrl.startsWith(
+          "https://cdn.onecustomsong.com/audio/occasion-demos/",
+        ),
       ),
     );
     assert.ok(
       occasionCards.every((occasion) =>
-        occasion.image.startsWith("/occasion/"),
+        ["exact", "related"].includes(occasion.sampleTrack.matchType),
       ),
     );
-    assert.ok(occasionCards.every((occasion) => occasion.rotate !== 0));
+
+    const anniversary = occasionCards.find(
+      (occasion) => occasion.id === "anniversary",
+    );
+    const wedding = occasionCards.find((occasion) => occasion.id === "wedding");
+
+    assert.equal(anniversary?.sampleTrack.title, "Ten Years, Ava");
+    assert.equal(anniversary?.sampleTrack.sourcePrefix, "anniversary");
+    assert.equal(anniversary?.sampleTrack.matchType, "exact");
+    assert.equal(wedding?.sampleTrack.title, "Final Page Forever");
+    assert.equal(wedding?.sampleTrack.matchType, "related");
+    assert.ok(
+      occasionCards.every(
+        (occasion) =>
+          !occasion.sampleTrack.title
+            .toLowerCase()
+            .startsWith(`${occasion.sampleTrack.sourcePrefix.toLowerCase()}-`),
+      ),
+    );
   });
 
   test("includes the requested occasion copy", () => {
@@ -68,7 +123,7 @@ describe("occasion showcase", () => {
     assert.match(source, /hidden max-w-7xl.*sm:flex/);
   });
 
-  test("removes card playback controls while zooming images on card hover", () => {
+  test("uses global-player card playback controls while zooming images on card hover", () => {
     const source = readFileSync(
       join(process.cwd(), "components/home/OccasionShowcase.tsx"),
       "utf8",
@@ -76,7 +131,11 @@ describe("occasion showcase", () => {
 
     assert.doesNotMatch(source, /Listen:/);
     assert.doesNotMatch(source, /waveformHeights/);
-    assert.doesNotMatch(source, /<Play/);
+    assert.match(source, /OccasionCardPlaybackButton/);
+    assert.match(source, /useGlobalMusicPlayer/);
+    assert.match(source, /playTrack\(\{/);
+    assert.match(source, /title: sampleTrack\.title/);
+    assert.match(source, /toggle\(\)/);
     assert.match(source, /group-hover:scale-\[/);
   });
 

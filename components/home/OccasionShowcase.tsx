@@ -11,11 +11,17 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Link } from "@/i18n/routing";
+import { useGlobalMusicPlayer } from "@/lib/music-player/global-player-store";
 import { cn } from "@/lib/utils";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowLeft, ArrowRight, MoveRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, MoveRight, Pause, Play } from "lucide-react";
 import Image from "next/image";
 import {
   useEffect,
@@ -602,13 +608,66 @@ function OccasionPhotoCard({
         </p>
         <Link
           href={occasion.href}
-          className="mt-auto inline-flex items-center gap-1.5 pt-4 text-[12px] font-bold text-primary transition hover:text-primary/80"
+          className="mt-auto inline-flex items-center gap-1.5 pr-12 pt-4 text-[12px] font-bold text-primary transition hover:text-primary/80"
           onClick={(event) => event.stopPropagation()}
         >
           {occasion.cta}
           <MoveRight className="size-3.5" aria-hidden="true" />
         </Link>
       </div>
+
+      <OccasionCardPlaybackButton occasion={occasion} />
     </article>
+  );
+}
+
+function OccasionCardPlaybackButton({ occasion }: { occasion: OccasionCard }) {
+  const { isPlaying, playTrack, toggle, track } = useGlobalMusicPlayer();
+  const sampleTrack = occasion.sampleTrack;
+  const isCurrentTrack =
+    track?.id === `${occasion.id}-${sampleTrack.id}` &&
+    track.audioUrl === sampleTrack.audioUrl;
+  const isCurrentTrackPlaying = isCurrentTrack && isPlaying;
+  const actionLabel = isCurrentTrackPlaying ? "Pause sample song" : "Play sample song";
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          aria-label={`${actionLabel}: ${sampleTrack.title}`}
+          className={cn(
+            "absolute bottom-3 right-3 z-20 flex size-11 items-center justify-center rounded-full border border-[#2b2019]/10 bg-[#251913] text-white shadow-[0_14px_28px_rgba(37,25,19,0.24)] transition hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+            isCurrentTrackPlaying &&
+              "bg-primary shadow-[0_14px_30px_rgba(239,68,68,0.3)]",
+          )}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (isCurrentTrack) {
+              toggle();
+              return;
+            }
+
+            playTrack({
+              id: `${occasion.id}-${sampleTrack.id}`,
+              title: sampleTrack.title,
+              artist: occasion.title,
+              artworkUrl: occasion.image,
+              audioUrl: sampleTrack.audioUrl,
+            });
+          }}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          {isCurrentTrackPlaying ? (
+            <Pause className="size-4 fill-current" />
+          ) : (
+            <Play className="ml-0.5 size-4 fill-current" />
+          )}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top">{sampleTrack.title}</TooltipContent>
+    </Tooltip>
   );
 }

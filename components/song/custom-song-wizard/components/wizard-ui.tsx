@@ -25,6 +25,7 @@ import {
   Wand2,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import type { PointerEvent, ReactNode } from "react";
 import { useState } from "react";
 
@@ -66,6 +67,8 @@ export function clampMagnetOffset(value: number, limit: number) {
 }
 
 export function MagneticChoiceCard({
+  art,
+  artPlacement = "corner",
   badge,
   hint,
   icon,
@@ -74,7 +77,15 @@ export function MagneticChoiceCard({
   onClick,
   recommended = false,
   selected,
+  showIcon = true,
+  showSelectedCheck = true,
 }: {
+  art?: {
+    src: string;
+    alt: string;
+    className?: string;
+  };
+  artPlacement?: "corner" | "center";
   badge?: string;
   hint?: string;
   icon: ReactNode;
@@ -83,15 +94,29 @@ export function MagneticChoiceCard({
   onClick: () => void;
   recommended?: boolean;
   selected: boolean;
+  showIcon?: boolean;
+  showSelectedCheck?: boolean;
 }) {
+  const hasCenteredArt = Boolean(art && artPlacement === "center");
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
   const contentX = useMotionValue(0);
   const contentY = useMotionValue(0);
+  const artX = useMotionValue(0);
+  const artY = useMotionValue(0);
+  const artScale = useMotionValue(1);
+  const artRotate = useMotionValue(0);
   const springRotateX = useSpring(rotateX, { damping: 20, stiffness: 260 });
   const springRotateY = useSpring(rotateY, { damping: 20, stiffness: 260 });
   const springContentX = useSpring(contentX, { damping: 22, stiffness: 300 });
   const springContentY = useSpring(contentY, { damping: 22, stiffness: 300 });
+  const springArtX = useSpring(artX, { damping: 18, stiffness: 240 });
+  const springArtY = useSpring(artY, { damping: 18, stiffness: 240 });
+  const springArtScale = useSpring(artScale, { damping: 18, stiffness: 260 });
+  const springArtRotate = useSpring(artRotate, {
+    damping: 18,
+    stiffness: 260,
+  });
 
   function handlePointerMove(event: PointerEvent<HTMLButtonElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -102,8 +127,24 @@ export function MagneticChoiceCard({
 
     rotateX.set(clampMagnetOffset(normalizedY * -8, 8));
     rotateY.set(clampMagnetOffset(normalizedX * 8, 8));
-    contentX.set(clampMagnetOffset(normalizedX * 5, 5));
-    contentY.set(clampMagnetOffset(normalizedY * 4, 4));
+    contentX.set(
+      hasCenteredArt ? 0 : clampMagnetOffset(normalizedX * 5, 5),
+    );
+    contentY.set(
+      hasCenteredArt ? 0 : clampMagnetOffset(normalizedY * 4, 4),
+    );
+    artX.set(
+      hasCenteredArt
+        ? clampMagnetOffset(normalizedX * 8, 8)
+        : clampMagnetOffset(normalizedX * 16, 16),
+    );
+    artY.set(
+      hasCenteredArt
+        ? clampMagnetOffset(normalizedY * 6 - 18, 24)
+        : clampMagnetOffset(normalizedY * 14 - 12, 18),
+    );
+    artScale.set(hasCenteredArt ? 1.18 : 1.26);
+    artRotate.set(clampMagnetOffset(normalizedX * (hasCenteredArt ? 3 : 5), 5));
   }
 
   function handlePointerLeave() {
@@ -111,15 +152,25 @@ export function MagneticChoiceCard({
     rotateY.set(0);
     contentX.set(0);
     contentY.set(0);
+    artX.set(0);
+    artY.set(0);
+    artScale.set(1);
+    artRotate.set(0);
   }
 
   return (
     <motion.button
       className={cn(
-        "group relative flex min-h-28 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl bg-card p-3.5 text-center shadow-sm outline-none transition-[background-color,border-color,box-shadow,color,filter,opacity] duration-300 will-change-transform hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary/30",
+        "group relative flex cursor-pointer flex-col rounded-2xl bg-card p-3.5 shadow-sm outline-none transition-[background-color,border-color,box-shadow,color,filter,opacity] duration-300 will-change-transform focus-visible:ring-2 focus-visible:ring-primary/30",
+        hasCenteredArt
+          ? "isolate min-h-40 items-center justify-end overflow-visible text-center hover:z-10 hover:bg-card hover:shadow-xl hover:shadow-primary/15"
+          : "min-h-28 items-center justify-center overflow-hidden text-center hover:shadow-lg",
         recommended && "ring-1 ring-primary/15",
         muted && "opacity-55 grayscale hover:opacity-90 hover:grayscale-0",
-        selected && "bg-primary/10 shadow-md shadow-primary/10",
+        selected &&
+          (hasCenteredArt
+            ? "bg-primary/10 shadow-lg shadow-primary/15 ring-1 ring-primary/20"
+            : "bg-primary/10 shadow-md shadow-primary/10"),
       )}
       style={{
         rotateX: springRotateX,
@@ -134,11 +185,57 @@ export function MagneticChoiceCard({
       onPointerLeave={handlePointerLeave}
       onPointerMove={handlePointerMove}
     >
-      <span className="pointer-events-none absolute -inset-8 rounded-[inherit] bg-primary/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
-      {selected && (
+      {hasCenteredArt ? (
+        <span className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[inherit] bg-card">
+          <span
+            className={cn(
+              "absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(239,68,48,0.16),transparent_46%),linear-gradient(180deg,rgba(255,244,239,0.92),rgba(255,255,255,0.96)_58%,rgba(255,250,246,0.9))] opacity-100 transition-opacity duration-300",
+              selected &&
+                "bg-[radial-gradient(circle_at_50%_18%,rgba(239,68,48,0.26),transparent_50%),linear-gradient(180deg,rgba(255,234,226,0.98),rgba(255,255,255,0.97)_58%,rgba(255,247,242,0.94))]",
+            )}
+          />
+          <span className="absolute -inset-8 rounded-[inherit] bg-primary/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
+          <span className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background/75 via-card/70 to-transparent" />
+        </span>
+      ) : (
+        <span className="pointer-events-none absolute -inset-8 rounded-[inherit] bg-primary/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
+      )}
+      {art && (
         <motion.span
-          className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground"
-          style={{ x: springContentX, y: springContentY, z: 26 }}
+          aria-hidden="true"
+          className={cn(
+            "pointer-events-none absolute aspect-square drop-shadow-[0_14px_18px_rgba(90,44,28,0.14)] transition-[opacity,filter] duration-300 group-hover:opacity-100 group-hover:drop-shadow-[0_26px_32px_rgba(90,44,28,0.24)]",
+            hasCenteredArt
+              ? "left-0 right-0 top-2 mx-auto w-28 opacity-85 sm:w-32"
+              : "opacity-45",
+            selected &&
+              hasCenteredArt &&
+              "opacity-100 drop-shadow-[0_24px_30px_rgba(90,44,28,0.28)]",
+            art.className,
+          )}
+          style={{
+            rotate: springArtRotate,
+            scale: hasCenteredArt && selected ? 1.14 : springArtScale,
+            x: springArtX,
+            y: springArtY,
+            z: 54,
+          }}
+        >
+          <Image
+            alt={art.alt}
+            className="size-full object-contain"
+            draggable={false}
+            fill
+            loading="eager"
+            sizes="(min-width: 1024px) 144px, (min-width: 640px) 128px, 112px"
+            src={art.src}
+          />
+        </motion.span>
+      )}
+      {selected && showSelectedCheck && (
+        <motion.span
+          className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+          style={{ x: springContentX, y: springContentY, z: 68 }}
         >
           <Check className="size-4" />
         </motion.span>
@@ -152,13 +249,38 @@ export function MagneticChoiceCard({
         </motion.span>
       )}
       <motion.span
-        className="relative z-10 flex flex-col items-center"
-        style={{ x: springContentX, y: springContentY, z: 34 }}
+        className={cn(
+          "relative z-10 flex flex-col",
+          hasCenteredArt
+            ? "w-full items-center pt-28 sm:pt-32"
+            : "items-center",
+        )}
+        style={{
+          x: springContentX,
+          y: springContentY,
+          z: hasCenteredArt ? 40 : 34,
+        }}
       >
-        <span className="mb-3 flex size-11 items-center justify-center rounded-full bg-muted text-primary">
-          {icon}
+        {showIcon && (
+          <span
+            className={cn(
+              "flex items-center justify-center rounded-full text-primary",
+              hasCenteredArt
+                ? "mb-2.5 size-10 bg-background/90 shadow-sm backdrop-blur-sm"
+                : "mb-3 size-11 bg-muted",
+            )}
+          >
+            {icon}
+          </span>
+        )}
+        <span
+          className={cn(
+            "text-sm font-semibold leading-snug text-foreground",
+            selected && hasCenteredArt && "text-primary",
+          )}
+        >
+          {label}
         </span>
-        <span className="text-sm font-semibold leading-snug">{label}</span>
         {hint && (
           <span className="mt-1 text-[11px] font-medium leading-tight text-muted-foreground">
             {hint}

@@ -1,5 +1,4 @@
 import { Newsletter } from "@/components/footer/Newsletter";
-import BrandWordmark from "@/components/header/BrandWordmark";
 import { TwitterX } from "@/components/social-icons/icons";
 import { siteConfig } from "@/config/site";
 import { Link as I18nLink } from "@/i18n/routing";
@@ -44,14 +43,11 @@ export default async function Footer() {
                 <div className="items-center space-x-2 flex">
                   <div className="flex items-center gap-2 text-xl font-medium text-white">
                     <Image
-                      src="/logo.png"
+                      src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
                       alt={t("title")}
-                      width={32}
-                      height={32}
-                    />
-                    <BrandWordmark
-                      title={t("title")}
-                      className="font-science-gothic text-2xl font-semibold text-white"
+                      width={2017}
+                      height={337}
+                      className="h-10 w-auto"
                     />
                   </div>
                 </div>

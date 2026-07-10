@@ -14,7 +14,7 @@ export default function Hero() {
   return (
     <section className="relative isolate min-h-[760px] w-full overflow-hidden bg-[#080605] text-white sm:min-h-[max(640px,calc(100dvh_+_53px))]">
       <Image
-        src="/images/hero/giftsong-hero-mobile-mosaic.avif"
+        src="/images/hero/giftsong-hero-mobile-mosaic-occasion-generated.avif"
         alt=""
         aria-hidden="true"
         fill

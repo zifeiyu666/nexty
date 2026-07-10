@@ -59,20 +59,30 @@ function getDockSide(position: Position): DockSide {
 }
 
 function WaveBars({ isPlaying }: { isPlaying: boolean }) {
+  const bars = [
+    { height: "0.86rem", delay: "0ms" },
+    { height: "1.12rem", delay: "150ms" },
+    { height: "1.36rem", delay: "300ms" },
+    { height: "1rem", delay: "450ms" },
+    { height: "1.26rem", delay: "600ms" },
+    { height: "0.92rem", delay: "750ms" },
+  ];
+
   return (
     <span
       aria-hidden="true"
-      className="flex h-6 items-center justify-center gap-0.5"
+      className="grid h-6 grid-flow-col place-items-center justify-center gap-[3px]"
     >
-      {[0, 1, 2, 3].map((bar) => (
+      {bars.map((bar, index) => (
         <span
           className={cn(
-            "h-2 w-1 rounded-full bg-current opacity-90 transition-all duration-300",
-            isPlaying && "animate-[music-wave_0.82s_ease-in-out_infinite]",
+            "h-[0.58rem] w-[1.5px] rounded-full bg-current opacity-90 transition-all duration-500",
+            isPlaying && "animate-[music-wave_1.48s_ease-in-out_infinite]",
           )}
-          key={bar}
+          key={index}
           style={{
-            animationDelay: `${bar * 0.11}s`,
+            ["--music-wave-height" as string]: bar.height,
+            animationDelay: bar.delay,
           }}
         />
       ))}
@@ -128,6 +138,7 @@ export function GlobalMusicController() {
     startX: number;
     startY: number;
     moved: boolean;
+    togglesOnRelease: boolean;
   } | null>(null);
 
   useEffect(() => {
@@ -259,12 +270,24 @@ export function GlobalMusicController() {
           ["--global-music-controller-expanded-width" as string]: `${EXPANDED_WIDTH}px`,
         }}
         onPointerDown={(event) => {
+          const target = event.target;
+
+          if (
+            target instanceof Element &&
+            target.closest("[data-global-music-click-control]")
+          ) {
+            return;
+          }
+
           event.currentTarget.setPointerCapture(event.pointerId);
           dragRef.current = {
             pointerId: event.pointerId,
             startX: event.clientX,
             startY: event.clientY,
             moved: false,
+            togglesOnRelease:
+              target instanceof Element &&
+              Boolean(target.closest("[data-global-music-toggle-handle]")),
           };
         }}
         onPointerMove={(event) => {
@@ -289,8 +312,13 @@ export function GlobalMusicController() {
           });
         }}
         onPointerUp={(event) => {
-          const didDrag = dragRef.current?.moved;
-          if (dragRef.current?.pointerId === event.pointerId) {
+          const drag = dragRef.current;
+          const didDrag = drag?.moved;
+          const shouldToggle = Boolean(
+            drag?.togglesOnRelease && !didDrag && track,
+          );
+
+          if (drag?.pointerId === event.pointerId) {
             window.setTimeout(() => {
               dragRef.current = null;
             }, 0);
@@ -303,6 +331,9 @@ export function GlobalMusicController() {
               return next;
             });
           }
+          if (shouldToggle) {
+            toggle();
+          }
           setIsDragging(false);
         }}
         onPointerCancel={() => {
@@ -314,21 +345,22 @@ export function GlobalMusicController() {
           <TooltipTrigger asChild>
             <button
               aria-label="Drag music controller"
-              className="flex size-12 shrink-0 touch-none items-center justify-center rounded-full text-white outline-none transition focus-visible:ring-2 focus-visible:ring-white/80"
+              className="grid size-12 shrink-0 touch-none place-items-center rounded-full text-white outline-none transition focus-visible:ring-2 focus-visible:ring-white/80"
+              data-global-music-toggle-handle=""
               type="button"
-              onClick={() => {
-                if (!dragRef.current?.moved && track) {
+              onClick={(event) => {
+                if (event.detail === 0 && track) {
                   toggle();
                 }
               }}
             >
               <span
                 className={cn(
-                  "absolute size-8 rounded-full bg-[radial-gradient(circle,#fb7185_0%,#f59e0b_46%,transparent_68%)] opacity-70 blur-md transition",
+                  "absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#fb7185_0%,#f59e0b_46%,transparent_68%)] opacity-70 blur-md transition",
                   isPlaying ? "scale-100" : "scale-75 opacity-40",
                 )}
               />
-              <span className="relative flex size-9 items-center justify-center rounded-full bg-white/9">
+              <span className="relative grid size-9 place-items-center rounded-full bg-white/9">
                 {isPlaying ? (
                   <WaveBars isPlaying={isPlaying} />
                 ) : (
@@ -352,6 +384,7 @@ export function GlobalMusicController() {
           <Button
             aria-label={playbackLabel}
             className="size-9 shrink-0 rounded-full bg-white text-zinc-950 shadow-sm hover:bg-white/88"
+            data-global-music-click-control=""
             disabled={!track}
             size="icon"
             type="button"
@@ -379,10 +412,10 @@ export function GlobalMusicController() {
         @keyframes music-wave {
           0%,
           100% {
-            height: 0.45rem;
+            height: 0.58rem;
           }
           50% {
-            height: 1.45rem;
+            height: var(--music-wave-height);
           }
         }
 

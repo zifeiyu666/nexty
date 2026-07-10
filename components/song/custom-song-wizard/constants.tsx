@@ -325,6 +325,11 @@ export type OccasionOption = {
   icon: ReactNode;
   title: string;
   subtitle: string;
+  art: {
+    src: string;
+    alt: string;
+    className?: string;
+  };
 };
 
 export const occasions: OccasionOption[] = [
@@ -333,72 +338,132 @@ export const occasions: OccasionOption[] = [
     icon: <Flower2 className="size-6" />,
     title: "Mother's Day",
     subtitle: "A warm thank-you song for mom.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/mothers-day.webp",
+      alt: "Mother and child music gift illustration",
+      className: "rotate-3",
+    },
   },
   {
     value: "birthday",
     icon: <Cake className="size-6" />,
     title: "Birthday",
     subtitle: "A celebratory song for their day.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/birthday.webp",
+      alt: "Birthday song celebration illustration",
+      className: "-rotate-2",
+    },
   },
   {
     value: "just-because",
     icon: <Sparkles className="size-6" />,
     title: "Just Because",
     subtitle: "A surprise song without needing a reason.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/just-because.webp",
+      alt: "Surprise custom song gift illustration",
+      className: "rotate-6",
+    },
   },
   {
     value: "anniversary",
     icon: <CalendarHeart className="size-6" />,
     title: "Anniversary",
     subtitle: "A romantic keepsake for your story.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/anniversary.webp",
+      alt: "Anniversary couple song illustration",
+      className: "-rotate-3",
+    },
   },
   {
     value: "wedding",
     icon: <Gem className="size-6" />,
     title: "Wedding",
     subtitle: "A heartfelt song for the big day.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/wedding.webp",
+      alt: "Wedding song keepsake illustration",
+      className: "rotate-2",
+    },
   },
   {
     value: "fathers-day",
     icon: <ShieldCheck className="size-6" />,
     title: "Father's Day",
     subtitle: "A gratitude song for dad.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/fathers-day.webp",
+      alt: "Father and child music gift illustration",
+      className: "-rotate-5",
+    },
   },
   {
     value: "valentines-day",
     icon: <Heart className="size-6" />,
     title: "Valentine's Day",
     subtitle: "A love song for your favorite person.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/valentines-day.webp",
+      alt: "Valentine love song illustration",
+      className: "rotate-4",
+    },
   },
   {
     value: "congratulations",
     icon: <Trophy className="size-6" />,
     title: "Congratulations",
     subtitle: "Celebrate a milestone or big win.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/congratulations.webp",
+      alt: "Congratulations milestone song illustration",
+      className: "-rotate-2",
+    },
   },
   {
     value: "get-well-soon",
     icon: <HeartPulse className="size-6" />,
     title: "Get Well Soon",
     subtitle: "A gentle song for comfort and hope.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/get-well-soon.webp",
+      alt: "Get well soon comfort song illustration",
+      className: "rotate-3",
+    },
   },
   {
     value: "thank-you",
     icon: <HandHeart className="size-6" />,
     title: "Thank You",
     subtitle: "Say what ordinary words cannot.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/thank-you.webp",
+      alt: "Thank you song gift illustration",
+      className: "-rotate-4",
+    },
   },
   {
     value: "in-memoriam",
     icon: <Ribbon className="size-6" />,
     title: "In Memoriam",
     subtitle: "A respectful song for remembrance.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/in-memoriam.webp",
+      alt: "Memorial song remembrance illustration",
+      className: "rotate-2",
+    },
   },
   {
     value: "something-else",
     icon: <Plus className="size-6" />,
     title: "Something else",
     subtitle: "Use your own context and details.",
+    art: {
+      src: "/images/create-song/occasion-cards/v2-webp/something-else.webp",
+      alt: "Custom occasion song idea illustration",
+      className: "rotate-5",
+    },
   },
 ];
 

@@ -66,6 +66,16 @@ describe("GlobalMusicController", () => {
     assert.match(source, /onPointerMove/);
     assert.match(source, /event\.clientX - CONTROL_SIZE \/ 2/);
     assert.match(source, /Math\.hypot/);
+    assert.match(source, /data-global-music-click-control/);
+    assert.match(source, /data-global-music-toggle-handle/);
+    assert.match(source, /togglesOnRelease/);
+    assert.match(source, /target\.closest\("\[data-global-music-click-control\]"\)/);
+    assert.match(source, /grid h-6 grid-flow-col place-items-center/);
+    assert.match(source, /w-\[1\.5px\]/);
+    assert.match(source, /animate-\[music-wave_1\.48s_ease-in-out_infinite\]/);
+    assert.match(source, /--music-wave-height/);
+    assert.match(source, /grid size-12.*place-items-center/);
+    assert.match(source, /left-1\/2 top-1\/2/);
     assert.match(source, /touch-none cursor-grab/);
     assert.doesNotMatch(source, /group-hover:px-/);
     assert.match(source, /dockSide === "right" \? "flex-row-reverse pl-1\.5" : "pr-1\.5"/);

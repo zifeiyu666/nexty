@@ -11,7 +11,11 @@ import {
 describe("hero occasion mosaic background", () => {
   test("builds eight alternating columns from local occasion images", () => {
     assert.ok(heroOccasionSources.length >= 12);
-    assert.ok(heroOccasionSources.every((src) => src.startsWith("/occasion/")));
+    assert.ok(
+      heroOccasionSources.every((src) =>
+        src.startsWith("/occasion-generated/avif/"),
+      ),
+    );
     assert.equal(heroOccasionColumns.length, 8);
 
     for (let index = 1; index < heroOccasionColumns.length; index += 1) {
@@ -89,7 +93,7 @@ describe("hero occasion mosaic background", () => {
       "utf8",
     );
 
-    assert.match(heroSource, /giftsong-hero-mobile-mosaic\.avif/);
+    assert.match(heroSource, /giftsong-hero-mobile-mosaic-occasion-generated\.avif/);
     assert.match(heroSource, /priority/);
     assert.match(heroSource, /sm:hidden/);
     assert.match(mosaicSource, /hidden overflow-hidden bg-\[#080605\] sm:block/);

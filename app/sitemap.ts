@@ -4,6 +4,7 @@ import { DEFAULT_LOCALE, LOCALES } from '@/i18n/routing'
 import { blogCms } from '@/lib/cms'
 import { db } from '@/lib/db'
 import { posts as postsSchema } from '@/lib/db/schema'
+import { getAllPlaylistPaths } from '@/lib/playlists/catalog'
 import { eq, max } from 'drizzle-orm'
 import { MetadataRoute } from 'next'
 
@@ -59,6 +60,12 @@ const staticPages: {
     changeFrequency: 'weekly',
     priority: 0.8,
   },
+  ...getAllPlaylistPaths().map((path) => ({
+    path,
+    lastModified: '2026-07-09',
+    changeFrequency: 'weekly' as ChangeFrequency,
+    priority: path === '/playlists' ? 0.85 : 0.75,
+  })),
   {
     path: '/privacy-policy',
     lastModified: '2026-07-08',

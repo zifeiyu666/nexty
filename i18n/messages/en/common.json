@@ -462,6 +462,10 @@
               "href": "/music/personalized-gift"
             },
             {
+              "name": "Gift playlists",
+              "href": "/playlists"
+            },
+            {
               "name": "Custom Song Lyrics",
               "href": "/blog/custom-song-lyrics"
             },

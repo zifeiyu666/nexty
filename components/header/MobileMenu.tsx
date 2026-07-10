@@ -1,6 +1,5 @@
 "use client";
 
-import BrandWordmark from "@/components/header/BrandWordmark";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +36,7 @@ export default function MobileMenu({
         className={cn(
           "rounded-full p-2 transition-colors",
           variant === "adaptive"
-            ? "text-white hover:bg-white/10 group-data-[scrolled=true]/header:text-zinc-900 group-data-[scrolled=true]/header:hover:bg-zinc-950/5"
+            ? "text-[#fdf9f4] hover:bg-white/10 group-data-[scrolled=true]/header:text-[#270a05] group-data-[scrolled=true]/header:hover:bg-zinc-950/5"
             : "text-foreground hover:bg-accent hover:text-accent-foreground"
         )}
         aria-label="Open menu"
@@ -54,15 +53,10 @@ export default function MobileMenu({
           >
             <Image
               alt={t("title")}
-              src="/logo.png"
-              className="w-6 h-6"
-              width={32}
-              height={32}
-            />
-            <BrandWordmark
-              title={t("title")}
-              className="text-sm"
-              heartClassName="drop-shadow-none"
+              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
+              className="h-6 w-auto"
+              width={2017}
+              height={337}
             />
           </I18nLink>
         </DropdownMenuLabel>

@@ -1484,12 +1484,12 @@ export function CustomSongWizard() {
   const isSongResultStep = step === 5 && songStage === "player";
 
   return (
-    <section className="relative min-h-screen w-full bg-background pb-20 text-foreground">
-      <div className="pointer-events-none absolute inset-0 bg-accent/10" />
+    <section className="relative min-h-screen w-full overflow-hidden bg-[#fff9f5] pb-36 text-foreground">
+      <CreateSongBackground occasion={occasion} />
 
       <div
         className={cn(
-          "relative mx-auto w-full py-5",
+          "relative z-10 mx-auto w-full py-5",
           isSongResultStep
             ? "max-w-none px-0"
             : "max-w-[1040px] px-4 sm:px-6",
@@ -1637,7 +1637,7 @@ export function CustomSongWizard() {
       </div>
 
       {step < 5 && !(step === 4 && lyricsStage === "loading") && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 py-4 shadow-xl backdrop-blur-xl sm:px-8">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/60 bg-white/80 px-4 py-4 shadow-xl shadow-primary/5 backdrop-blur-xl sm:px-8">
           <div className="mx-auto flex max-w-5xl gap-3">
             <Button
               className="h-12 w-32 rounded-full bg-muted text-sm font-bold text-muted-foreground hover:bg-muted disabled:text-muted-foreground"
@@ -1748,6 +1748,110 @@ export function CustomSongWizard() {
         onOpenChange={setIsLoginDialogOpen}
       />
     </section>
+  );
+}
+
+const occasionBackgrounds: Record<string, string> = {
+  anniversary: "/occasion-backgrounds/avif/anniversary.avif",
+  birthday: "/occasion-backgrounds/avif/birthday.avif",
+  congratulations: "/occasion-backgrounds/avif/congratulations.avif",
+  "fathers-day": "/occasion-backgrounds/avif/fathers-day.avif",
+  "get-well-soon": "/occasion-backgrounds/avif/get-well-soon.avif",
+  "in-memoriam": "/occasion-backgrounds/avif/in-memoriam.avif",
+  "just-because": "/occasion-backgrounds/avif/just-because.avif",
+  "mothers-day": "/occasion-backgrounds/avif/mothers-day.avif",
+  "something-else": "/occasion-backgrounds/avif/something-else.avif",
+  "thank-you": "/occasion-backgrounds/avif/thank-you.avif",
+  "valentines-day": "/occasion-backgrounds/avif/valentines-day.avif",
+  wedding: "/occasion-backgrounds/avif/wedding.avif",
+};
+
+function getOccasionBackgroundSrc(occasion: Occasion | null) {
+  if (!occasion) return "";
+  if (occasionBackgrounds[occasion]) return occasionBackgrounds[occasion];
+  if (isCustomOccasion(occasion)) {
+    return occasionBackgrounds[customOccasionValue];
+  }
+  return "";
+}
+
+function CreateSongBackground({ occasion }: { occasion: Occasion | null }) {
+  const occasionBackgroundSrc = getOccasionBackgroundSrc(occasion);
+  const decorations = [
+    {
+      symbol: "♪",
+      className:
+        "left-[10%] top-[23%] text-[58px] text-rose-200/35 blur-[5px] rotate-[-16deg]",
+    },
+    {
+      symbol: "♥",
+      className:
+        "left-[15%] top-[31%] text-[28px] text-rose-200/40 blur-[6px] rotate-[10deg]",
+    },
+    {
+      symbol: "♫",
+      className:
+        "right-[11%] top-[7%] text-[86px] text-rose-300/42 blur-[2px] rotate-[12deg]",
+    },
+    {
+      symbol: "♫",
+      className:
+        "right-[16%] top-[30%] text-[74px] text-rose-300/40 blur-[3px] rotate-[-6deg]",
+    },
+    {
+      symbol: "♥",
+      className:
+        "right-[30%] top-[18%] hidden text-[24px] text-rose-200/45 blur-[2px] rotate-[-12deg] md:block",
+    },
+    {
+      symbol: "♪",
+      className:
+        "left-[7%] bottom-[18%] hidden text-[70px] text-orange-200/20 blur-[8px] rotate-[18deg] lg:block",
+    },
+  ];
+
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,228,218,0.76)_0%,rgba(255,246,239,0.58)_34%,rgba(255,252,248,0.94)_74%,rgba(255,255,255,0.98)_100%)]" />
+      {occasionBackgroundSrc && (
+        <div className="absolute -left-4 top-0 h-[min(82vh,820px)] w-[min(60vw,760px)] min-w-[500px] opacity-80 sm:-left-6">
+          <img
+            alt=""
+            aria-hidden="true"
+            className="size-full object-cover object-left-top blur-[1.25px] saturate-[0.96]"
+            decoding="async"
+            src={occasionBackgroundSrc}
+            style={{
+              maskImage:
+                "linear-gradient(140deg, transparent 0%, black 14%, black 52%, transparent 86%), linear-gradient(180deg, transparent 0%, black 12%, black 76%, transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(140deg, transparent 0%, black 14%, black 52%, transparent 86%), linear-gradient(180deg, transparent 0%, black 12%, black 76%, transparent 100%)",
+              WebkitMaskComposite: "source-in",
+            }}
+          />
+          <div className="absolute -inset-y-10 -left-10 w-[130vw] bg-[linear-gradient(115deg,rgba(255,255,255,0.62)_0%,rgba(255,255,255,0.24)_18%,rgba(255,255,255,0.72)_46%,rgba(255,255,255,0.94)_72%,rgba(255,255,255,0)_100%)]" />
+          <div className="absolute -left-8 -top-8 h-52 w-64 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.82)_42%,rgba(255,255,255,0)_76%)] blur-xl" />
+        </div>
+      )}
+      <div className="absolute -left-[14%] -top-[18%] h-[470px] w-[45vw] min-w-[360px] rounded-full bg-[radial-gradient(circle,rgba(236,125,105,0.28)_0%,rgba(255,204,190,0.18)_42%,rgba(255,255,255,0)_72%)] blur-3xl" />
+      <div className="absolute -right-[14%] -top-[18%] h-[500px] w-[48vw] min-w-[380px] rounded-full bg-[radial-gradient(circle,rgba(223,93,76,0.24)_0%,rgba(255,205,192,0.16)_46%,rgba(255,255,255,0)_74%)] blur-3xl" />
+      <div className="absolute left-1/2 top-[16%] h-[520px] w-[58vw] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.82)_0%,rgba(255,250,246,0.58)_48%,rgba(255,255,255,0)_74%)] blur-2xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.92)_0%,rgba(255,255,255,0.55)_28%,rgba(255,255,255,0)_62%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.55)_0%,rgba(255,255,255,0)_24%),radial-gradient(circle_at_82%_18%,rgba(255,255,255,0.48)_0%,rgba(255,255,255,0)_26%)]" />
+
+      {decorations.map((item, index) => (
+        <span
+          key={`${item.symbol}-${index}`}
+          aria-hidden="true"
+          className={cn(
+            "absolute select-none font-serif leading-none",
+            item.className,
+          )}
+        >
+          {item.symbol}
+        </span>
+      ))}
+    </div>
   );
 }
 

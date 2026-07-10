@@ -30,17 +30,17 @@ const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
 
   const triggerClassName =
     variant === "adaptive"
-      ? "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-white/82 transition-colors hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950 group-data-[scrolled=true]/header:data-[state=open]:bg-zinc-950/5 group-data-[scrolled=true]/header:data-[state=open]:text-zinc-950"
+      ? "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-[#fdf9f4] transition-colors hover:bg-white/10 data-[state=open]:bg-white/10 group-data-[scrolled=true]/header:text-[#270a05] group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:data-[state=open]:bg-zinc-950/5"
       : "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 hover:bg-accent-foreground/10 hover:text-accent-foreground text-sm font-medium text-muted-foreground";
 
   const linkClassName =
     variant === "adaptive"
-      ? "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-white/82 transition-colors hover:bg-white/10 hover:text-white group-data-[scrolled=true]/header:text-zinc-700 group-data-[scrolled=true]/header:hover:bg-zinc-950/5 group-data-[scrolled=true]/header:hover:text-zinc-950"
+      ? "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-[#fdf9f4] transition-colors hover:bg-white/10 group-data-[scrolled=true]/header:text-[#270a05] group-data-[scrolled=true]/header:hover:bg-zinc-950/5"
       : "group/nav-link bg-transparent rounded-xl px-4 py-2 flex items-center gap-x-1 text-sm font-medium text-muted-foreground hover:bg-accent-foreground/10 hover:text-accent-foreground";
 
   const activeClassName =
     variant === "adaptive"
-      ? "bg-white/10 font-semibold text-white group-data-[scrolled=true]/header:bg-zinc-950/5 group-data-[scrolled=true]/header:text-zinc-950"
+      ? "bg-white/10 font-semibold text-[#fdf9f4] group-data-[scrolled=true]/header:bg-zinc-950/5 group-data-[scrolled=true]/header:text-[#270a05]"
       : "font-medium text-accent-foreground";
 
   return (
@@ -51,7 +51,9 @@ const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
             {link.items ? (
               <>
                 <NavigationMenuTrigger className={triggerClassName}>
-                  <RollingNavText>{link.name}</RollingNavText>
+                  <RollingNavText rollingTextClassName="text-current">
+                    {link.name}
+                  </RollingNavText>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="w-[320px] max-w-[calc(100vw-2rem)] gap-1">
@@ -110,7 +112,9 @@ const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
                   pathname === link.href && activeClassName
                 )}
               >
-                <RollingNavText>{link.name}</RollingNavText>
+                <RollingNavText rollingTextClassName="text-current">
+                  {link.name}
+                </RollingNavText>
                 {link.target === "_blank" && (
                   <span className="text-xs">
                     <ExternalLink className="w-4 h-4" />

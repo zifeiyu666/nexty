@@ -24,7 +24,10 @@ describe("homepage hero mobile layout", () => {
     );
 
     assert.match(source, /import Image from "next\/image"/);
-    assert.match(source, /src="\/images\/hero\/giftsong-hero-mobile-mosaic\.avif"/);
+    assert.match(
+      source,
+      /src="\/images\/hero\/giftsong-hero-mobile-mosaic-occasion-generated\.avif"/,
+    );
     assert.match(source, /priority/);
     assert.match(source, /sizes="100vw"/);
     assert.match(source, /className="-z-30 object-cover object-center sm:hidden"/);

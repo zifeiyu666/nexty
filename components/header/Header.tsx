@@ -2,7 +2,6 @@ import {
   HeaderActionText,
   headerActionButtonClassName,
 } from "@/components/header/HeaderActionText";
-import BrandWordmark from "@/components/header/BrandWordmark";
 import HeaderLinks from "@/components/header/HeaderLinks";
 import HeaderShell from "@/components/header/HeaderShell";
 import MobileMenu from "@/components/header/MobileMenu";
@@ -37,15 +36,12 @@ const Header = async () => {
             className="flex items-center space-x-1"
           >
             <Image
-              src="/logo.png"
-              alt=""
-              aria-hidden="true"
-              width={28}
-              height={28}
-            />
-            <BrandWordmark
-              title={t("title")}
-              className="hidden text-xl font-semibold font-science-gothic text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-colors duration-300 group-data-[scrolled=true]/header:text-zinc-950 group-data-[scrolled=true]/header:drop-shadow-none sm:inline-flex"
+              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
+              alt={t("title")}
+              width={2017}
+              height={337}
+              priority
+              className="h-8 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-9"
             />
           </I18nLink>
 

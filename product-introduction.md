@@ -10,6 +10,10 @@ Turn any memory, love note, or celebration into a personalized AI song, lyric po
 
 One Custom Song is an AI-powered music gift platform designed for people who want to celebrate meaningful moments in a more personal way. Users can describe a relationship, memory, occasion, or message, then generate a custom song that captures the emotion and story behind it. The product supports a complete creative workflow, from writing lyrics and generating music to creating personalized lyric posters, shareable music videos, and downloadable keepsakes from a user account dashboard. It is especially suited for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and other moments where a custom music gift can feel more memorable than a standard gift.
 
+### Audience
+
+Gift-givers, couples, families, friends, wedding guests, event organizers, creators, and small businesses who want to turn personal stories, memories, or special occasions into custom AI song gifts, music videos, and lyric keepsakes.
+
 ## 中文
 
 ### 一句话介绍
@@ -19,6 +23,10 @@ One Custom Song is an AI-powered music gift platform designed for people who wan
 ### 详细介绍
 
 One Custom Song 是一个面向个性化音乐礼物场景的 AI 创作平台，帮助用户用更有温度的方式表达情感和纪念重要时刻。用户只需要输入一段关系背景、回忆故事、节日祝福或想传达的信息，就可以生成贴合情绪与主题的定制歌曲，并进一步制作专属歌词海报、可分享的音乐视频和可下载的纪念内容。产品覆盖从歌词创作、音乐生成到视觉内容制作和成品下载管理的完整流程，让这份礼物不仅可以被聆听，也可以被分享、展示和收藏。它特别适合生日、纪念日、婚礼、节日、异地关系、家庭回忆等需要独特表达的场景，让礼物从普通祝福变成一段真正属于收礼人的音乐记忆。
+
+### 受众
+
+适合礼物赠送者、情侣、家人、朋友、婚礼宾客、活动组织者、创作者和小型品牌，用来把个人故事、回忆或特殊场合变成定制 AI 歌曲礼物、音乐视频和歌词纪念内容。
 
 ---
 
@@ -40,6 +48,7 @@ Product Hunt official launch guide reference: https://www.producthunt.com/launch
 | Tags | Artificial Intelligence, Music, Gifts |
 | Backup tag | Personalization, if Gifts is unavailable |
 | Pricing | Paid with a free preview |
+| Starting price | $9.90/month |
 | Promo | Free 30-second preview, no credit card required |
 | Demo video | Not planned for this launch |
 
@@ -47,6 +56,7 @@ Product Hunt official launch guide reference: https://www.producthunt.com/launch
 
 - Tagline length: 45 characters, under the 60-character Product Hunt limit.
 - Description length: 318 characters, under the 500-character Product Hunt limit.
+- Starting price is based on the lowest active paid plan in the project pricing config.
 - 中文说明：One Custom Song 可以把回忆、情书或重要时刻快速变成个性化 AI 歌曲。用户可以先免费试听预览，继续调整歌词和风格，再解锁完整歌曲，并可制作音乐视频和可打印歌词海报，适合生日、纪念日、婚礼、节日和日常表达心意的场景。
 
 ## 2. Core Messaging
