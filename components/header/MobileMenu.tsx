@@ -68,10 +68,10 @@ export default function MobileMenu({
           >
             <Image
               alt={t("title")}
-              src="/images/brand/one-custom-song-wordmark-header.png"
+              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
               className="h-6 w-auto"
-              width={2024}
-              height={333}
+              width={2017}
+              height={337}
             />
           </I18nLink>
         </DropdownMenuLabel>

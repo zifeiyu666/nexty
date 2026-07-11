@@ -37,12 +37,12 @@ const Header = async () => {
             className="absolute left-1/2 flex -translate-x-1/2 items-center space-x-1 lg:static lg:translate-x-0"
           >
             <Image
-              src="/images/brand/one-custom-song-wordmark-header.png"
+              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
               alt={t("title")}
-              width={2024}
-              height={333}
+              width={2017}
+              height={337}
               priority
-              className="h-6 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-7"
+              className="h-7 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-8"
             />
           </I18nLink>
 
