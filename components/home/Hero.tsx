@@ -37,7 +37,7 @@ export default function Hero() {
           <div className="flex max-w-7xl flex-col items-center gap-3 sm:gap-4">
             <h1
               aria-label={t("title")}
-              className="z-10 text-center font-sans text-[2rem] font-black leading-[1.03] tracking-normal text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.62)] min-[390px]:text-[2.22rem] min-[430px]:text-[2.45rem] sm:text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl"
+              className="z-10 text-center font-sans text-[2rem] font-black leading-[1.12] tracking-normal text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.62)] min-[390px]:text-[2.22rem] min-[430px]:text-[2.45rem] sm:text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl"
             >
               <span className="hero-title-warm block text-balance 2xl:whitespace-nowrap">
                 {titleLine}

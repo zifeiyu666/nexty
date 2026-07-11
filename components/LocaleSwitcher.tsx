@@ -18,7 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLocaleStore } from "@/stores/localeStore";
 import { ChevronDown, Languages } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useTransition } from "react";
 
@@ -35,6 +35,7 @@ export default function LocaleSwitcher({
   const pathname = usePathname();
   const params = useParams();
   const locale = useLocale();
+  const t = useTranslations("LanguageDetection");
   const { dismissLanguageAlert } = useLocaleStore();
   const [isPending, startTransition] = useTransition();
 
@@ -57,7 +58,7 @@ export default function LocaleSwitcher({
     return (
       <div
         role="group"
-        aria-label="Select language"
+        aria-label={t("selectLabel")}
         className={cn(
           "inline-flex items-center rounded-md border border-border bg-background p-0.5 shadow-xs",
           isPending && "opacity-70",
@@ -71,7 +72,7 @@ export default function LocaleSwitcher({
               key={cur}
               type="button"
               aria-pressed={active}
-              onClick={() => onSelectChange(cur)}
+              onClick={() => onSelectChange(cur as Locale)}
               className={cn(
                 "h-7 min-w-9 px-2 rounded-[5px] text-xs font-medium transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
@@ -95,7 +96,7 @@ export default function LocaleSwitcher({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Select language"
+          aria-label={t("selectLabel")}
           className={cn(
             "group inline-flex h-8 items-center gap-1.5 rounded-full pl-2.5 pr-2 text-sm font-medium border-0",
             isAdaptive
@@ -134,7 +135,10 @@ export default function LocaleSwitcher({
         sideOffset={8}
         className="min-w-36 rounded-lg border-border/70 p-1.5 shadow-md"
       >
-        <DropdownMenuRadioGroup value={locale} onValueChange={onSelectChange}>
+        <DropdownMenuRadioGroup
+          value={locale}
+          onValueChange={(value) => onSelectChange(value as Locale)}
+        >
           {routing.locales.map((cur) => {
             const active = cur === locale;
             return (

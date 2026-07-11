@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "楽曲サンプル",
+    "description": "作成したサンプルを聴いて、お気に入りを選べます。"
+  },
+  "hero": {
+    "badge": "サンプルライブラリ",
+    "title": "サンプルを聴いて選ぶ",
+    "description": "作成した曲は最初にここへ保存されます。ゲストは<emphasis>72時間</emphasis>以内に完成版を購入できます。"
+  },
+  "filters": {
+    "all": "すべてのサンプル",
+    "searchPlaceholder": "タイトル、用途、贈る相手で検索",
+    "occasions": {
+      "anniversary": "記念日",
+      "birthday": "誕生日",
+      "congratulations": "お祝い",
+      "fathersDay": "父の日",
+      "getWellSoon": "お見舞い",
+      "inMemoriam": "追悼",
+      "justBecause": "何でもない日",
+      "mothersDay": "母の日",
+      "somethingElse": "その他",
+      "thankYou": "感謝",
+      "valentinesDay": "バレンタイン",
+      "wedding": "結婚式"
+    }
+  },
+  "empty": {
+    "title": "サンプルはまだありません",
+    "description": "最初のサンプルを作成すると、ここに表示されます。",
+    "create": "サンプルを作る"
+  }
+}

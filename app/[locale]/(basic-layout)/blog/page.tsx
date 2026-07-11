@@ -28,6 +28,8 @@ export async function generateMetadata({
     description: t("description"),
     locale: locale as Locale,
     path: `/blog`,
+    availableLocales: ["en"],
+    noIndex: locale !== "en",
   });
 }
 
@@ -70,11 +72,11 @@ export default async function Page({ params }: { params: Params }) {
       <PageHero
         badge={{
           icon: <BookOpenText className="size-4" />,
-          label: "Blog library",
+          label: t("heroBadge"),
         }}
         backgroundClassName="bg-[#f3eadf]"
         description={t("description")}
-        titleLines={["Ideas, guides, and stories", "for meaningful song gifts"]}
+        titleLines={[t("heroTitleLine1"), t("heroTitleLine2")]}
       />
 
       <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:py-10">
@@ -106,7 +108,7 @@ export default async function Page({ params }: { params: Params }) {
             contentClassName="p-4 sm:p-4"
             titleClassName="text-base sm:text-lg leading-snug"
             showPublicVisibilityBadge={false}
-            emptyMessage="No posts found."
+            emptyMessage={t("emptyMessage")}
           />
         )}
       </section>

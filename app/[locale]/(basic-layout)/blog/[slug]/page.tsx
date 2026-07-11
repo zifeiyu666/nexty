@@ -95,7 +95,7 @@ export default async function BlogPage({ params }: { params: Params }) {
     notFound();
   }
 
-  const isWallArtStudioPost = slug === "custom-song-lyric-gifts";
+  const isWallArtStudioPost = slug === "song-lyric-wall-art-ideas";
   const finalSongs =
     isWallArtStudioPost && session?.user
       ? await getFinalSongsForOwner(session.user.id)

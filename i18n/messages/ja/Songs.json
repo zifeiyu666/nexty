@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "完成した曲",
+    "description": "完成したオリジナルソングを再生、共有、ダウンロードできます。"
+  },
+  "hero": {
+    "badge": "完成曲ライブラリ",
+    "title": "完成した曲をひとつの場所で管理",
+    "description": "再生、共有、ダウンロード、歌詞アートや動画の作成に使えます。"
+  },
+  "stats": { "label": "曲", "create": "新しい曲を作る" },
+  "filters": {
+    "all": "すべての曲",
+    "searchPlaceholder": "タイトル、ジャンル、用途、贈る相手で検索"
+  },
+  "duration": { "ready": "再生できます" },
+  "card": {
+    "audio": "音声",
+    "created": "{date}に作成",
+    "createdFor": "{names}のために作成",
+    "fallback": "再生・共有できるオリジナルソングです。",
+    "open": "開く",
+    "writtenFor": "{names}のための曲"
+  },
+  "empty": {
+    "create": "曲を作る",
+    "samples": "サンプルを見る",
+    "noMatches": {
+      "title": "検索条件に合う曲がありません",
+      "description": "別のキーワードで検索してください。"
+    },
+    "noSongs": {
+      "title": "完成した曲はまだありません",
+      "description": "サンプルを作成してお気に入りを選ぶと、完成版がここに表示されます。"
+    }
+  }
+}

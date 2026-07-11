@@ -82,7 +82,7 @@ export function StyleStep({
               {selectedOccasionTitle} Recommendations
             </h3>
           </div>
-          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-5">
             {recommendedGenres.map((item) => {
               const selected = genre === item.value;
 
@@ -118,7 +118,7 @@ export function StyleStep({
         </button>
       )}
       {showOtherGenres && (
-        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-5">
           {otherGenres.map((item) => {
             const selected = genre === item.value;
 

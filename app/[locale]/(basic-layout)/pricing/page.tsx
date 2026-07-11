@@ -10,6 +10,7 @@ import { constructMetadata } from "@/lib/metadata";
 import { shouldHidePricingHero } from "@/lib/pricing/page-hero";
 import { Sparkles } from "lucide-react";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 type Params = Promise<{ locale: string }>;
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -50,21 +51,25 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Pricing" });
 
   return constructMetadata({
-    title: "Simple pricing for everyone",
-    description:
-      "Create and tweak until it's perfect. Pay once for a single masterpiece, or upgrade to Pro for monthly downloads and premium video styles.",
+    title: t("title"),
+    description: t("description"),
     locale: locale as Locale,
     path: "/pricing",
   });
 }
 
 export default async function PricingPage({
+  params,
   searchParams,
 }: {
+  params: Params;
   searchParams: SearchParams;
 }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Pricing" });
   const session = await getSession();
   const isAuthenticated = Boolean(session?.user);
   const finalSongs = session?.user
@@ -109,17 +114,14 @@ export default async function PricingPage({
         <PageHero
           badge={{
             icon: <Sparkles className="size-4" />,
-            label: "Flexible plans for every kind of gift",
+            label: t("hero.badge"),
           }}
           backgroundClassName="bg-[#f3eadf]"
-          description="Start with a one-time song for a single unforgettable moment, or unlock Pro for recurring downloads, premium video styles, and more room to create keepsakes people actually replay."
+          description={t("hero.description")}
           descriptionClassName="text-stone-700"
           titleClassName="text-stone-950"
-          titleLines={[
-            "Create heartfelt songs",
-            "Pay only for what you love",
-          ]}
-          underline={{ phrase: "what you love" }}
+          titleLines={[t("hero.titleLine1"), t("hero.titleLine2")]}
+          underline={{ phrase: t("hero.underline") }}
         />
       )}
 

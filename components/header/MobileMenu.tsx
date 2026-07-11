@@ -13,22 +13,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link as I18nLink } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
+import { authClient } from "@/lib/auth/auth-client";
+import { user as userSchema } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { HeaderLink } from "@/types/common";
-import { Menu } from "lucide-react";
+import { LayoutDashboard, LogIn, LogOutIcon, Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 type MobileMenuProps = {
   links: HeaderLink[];
+  user?: typeof userSchema.$inferSelect | null;
   variant?: "default" | "adaptive";
 };
 
 export default function MobileMenu({
   links,
+  user,
   variant = "default",
 }: MobileMenuProps) {
   const t = useTranslations("Home");
+  const loginT = useTranslations("Login");
+  const router = useRouter();
+
+  async function signOut() {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => router.refresh(),
+      },
+    });
+  }
 
   return (
     <DropdownMenu>
@@ -53,10 +68,10 @@ export default function MobileMenu({
           >
             <Image
               alt={t("title")}
-              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
+              src="/images/brand/one-custom-song-wordmark-header.png"
               className="h-6 w-auto"
-              width={2017}
-              height={337}
+              width={2024}
+              height={333}
             />
           </I18nLink>
         </DropdownMenuLabel>
@@ -111,6 +126,33 @@ export default function MobileMenu({
                 </I18nLink>
               </DropdownMenuItem>
             )
+          )}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          {user ? (
+            <>
+              <DropdownMenuItem asChild>
+                <I18nLink href="/dashboard" className="flex items-center gap-2">
+                  <LayoutDashboard className="size-4" />
+                  Dashboard
+                </I18nLink>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="flex cursor-pointer items-center gap-2 text-red-600 dark:text-red-400"
+                onClick={signOut}
+              >
+                <LogOutIcon className="size-4" />
+                {loginT("Button.signOut")}
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <DropdownMenuItem asChild>
+              <I18nLink href="/login" className="flex items-center gap-2">
+                <LogIn className="size-4" />
+                {loginT("Button.signIn")}
+              </I18nLink>
+            </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -19,6 +19,7 @@ export const getR2Endpoint = () => {
 export const createR2Client = () => new S3Client({
   region: "auto",
   endpoint: getR2Endpoint(),
+  forcePathStyle: true,
   credentials: {
     accessKeyId: process.env.R2_ACCESS_KEY_ID!,
     secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,

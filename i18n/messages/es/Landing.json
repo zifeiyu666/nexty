@@ -1,0 +1,313 @@
+{
+  "Hero": {
+    "badge": {
+      "label": "",
+      "text": "✨ Crea una canción personalizada con IA",
+      "href": ""
+    },
+    "title": "Regala una canción personalizada que nunca olvidarán.",
+    "titleLine": "Regala una canción personalizada",
+    "titleAccent": "que nunca olvidarán",
+    "description": "<p class=\"hero-subtitle\">Cuéntanos vuestra historia. Nuestra IA convierte tus recuerdos en una <strong>canción personalizada</strong> con sonido de estudio que podrás escuchar, ajustar y enviar como un <strong>regalo musical único</strong>.</p>",
+    "trustBadge": "Canción personalizada · Muestra gratuita",
+    "trustItems": ["Muestra gratis", "Lista en minutos", "Sin tarjeta"],
+    "getStarted": "Crear una muestra gratis",
+    "getStartedLink": "/create-song",
+    "howItWorksCta": "Cómo funciona",
+    "watchReactionsCta": "Ver reacciones",
+    "viewDocs": "Leer artículos",
+    "viewDocsLink": "/blog"
+  },
+  "OccasionShowcase": {
+    "eyebrow": "Ocasiones",
+    "title": "Una melodía personal para cada momento especial",
+    "description": "Crea una canción única para recordar las historias y emociones que de verdad importan.",
+    "previous": "Ocasión anterior",
+    "next": "Ocasión siguiente",
+    "carouselLabel": "Carrusel de ocasiones"
+  },
+  "CustomerReactions": {
+    "badge": { "label": "REACCIONES", "text": "😭 Lágrimas de alegría" },
+    "title": "Reacciones reales a canciones personalizadas",
+    "description": "<p>Ten un pañuelo a mano. Pasa el cursor para ver una muestra sin sonido y haz clic para escuchar cómo una <strong>canción personalizada</strong> convierte un recuerdo en algo inolvidable.</p>",
+    "playLabel": "Reproducir {title} con sonido",
+    "muteLabel": "Silenciar {title}",
+    "trustItems": [
+      "Pruébalo gratis",
+      "Lista en minutos",
+      "No necesitas saber de música"
+    ],
+    "videos": [
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-2.mp4",
+        "label": "One Custom Song",
+        "title": "La primera vez que mamá la escucha"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
+        "label": "One Custom Song",
+        "title": "Lágrimas de felicidad"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
+        "label": "One Custom Song",
+        "title": "La mejor sorpresa"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
+        "label": "One Custom Song",
+        "title": "Volver a vivir la boda"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-12.mp4",
+        "label": "One Custom Song",
+        "title": "Sorpresa de aniversario"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-5.mp4",
+        "label": "One Custom Song",
+        "title": "La canción de la pareja"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
+        "label": "One Custom Song",
+        "title": "De la sorpresa a la alegría"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-20.mp4",
+        "label": "One Custom Song",
+        "title": "Escucharla una vez más"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
+        "label": "One Custom Song",
+        "title": "La primera escucha de papá"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
+        "label": "One Custom Song",
+        "title": "Llorar de alegría"
+      }
+    ]
+  },
+  "HowItWorks": {
+    "eyebrow": "Cómo funciona",
+    "title": "De un recuerdo a una canción emocionante en pocos minutos",
+    "description": "Crea una <strong>canción personalizada</strong>, escucha gratis una muestra y desbloquea un regalo completo con <strong>vídeo musical</strong> y una <strong>lámina con la letra</strong> lista para imprimir.",
+    "steps": {
+      "story": {
+        "title": "Cuéntanos vuestra historia",
+        "description": "Elige la ocasión y el estilo musical, y comparte algunos recuerdos. La IA los transforma en una letra personal y natural.",
+        "cta": "Crear mi canción"
+      },
+      "preview": {
+        "title": "Escucha y ajusta la muestra gratis",
+        "description": "Recibe una muestra de 60 segundos con sonido de estudio. Puedes retocar la letra o probar otro estilo antes de decidir."
+      },
+      "gift": {
+        "title": "Desbloquea el regalo completo",
+        "description": "Obtén la <strong>canción personalizada</strong> completa y crea un <strong>vídeo musical</strong> o una <strong>lámina con la letra</strong> usando nuestras plantillas."
+      },
+      "deliver": {
+        "title": "Compártela como prefieras",
+        "description": "Envía la canción en privado, acompáñala con un <strong>vídeo musical</strong> o imprime una <strong>lámina con la letra</strong> para convertir un recuerdo en un regalo que podrán conservar."
+      }
+    }
+  },
+  "OurProducts": {
+    "eyebrow": "Qué puedes crear",
+    "title": "Mucho más que una canción personalizada",
+    "description": "Convierte una historia en un regalo musical completo: una canción personalizada con IA, un vídeo para compartir y una lámina digital lista para imprimir.",
+    "items": {
+      "customSong": {
+        "label": "Principal",
+        "title": "Canción personalizada",
+        "price": "Desde $29.99",
+        "description": "Crea una canción con tus recuerdos, nombres, fechas y mensaje. Escucha una muestra gratis, ajusta la letra y regala algo que podrán volver a escuchar siempre.",
+        "cta": "Crear una canción",
+        "imageAlt": "Pareja escuchando en el teléfono una canción personalizada"
+      },
+      "videoGift": {
+        "label": "Complemento",
+        "title": "Vídeo musical personalizado",
+        "price": "Desde $23.99",
+        "description": "Combina la canción con fotos, letras sincronizadas y plantillas emotivas. Compártelo por mensaje, correo o redes sociales.",
+        "cta": "Crear un vídeo",
+        "imageAlt": "Vídeo musical personalizado con una foto familiar y la letra de una canción"
+      },
+      "wallArt": {
+        "label": "Complemento",
+        "title": "Lámina digital con la letra",
+        "price": "Desde $7.99",
+        "description": "Convierte la letra en una lámina, un póster inspirado en un disco o una composición con fotos. Descárgala en alta resolución para imprimirla.",
+        "cta": "Crear una lámina",
+        "imageAlt": "Láminas imprimibles creadas con la letra de una canción personalizada"
+      }
+    }
+  },
+  "UseCases": {
+    "badge": {
+      "label": "VENTAJAS",
+      "text": "Un regalo musical hecho para esa persona"
+    },
+    "title": "Una canción personal, sin complicaciones",
+    "description": "Crea, escucha y ajusta tu regalo antes de pagar. Tú decides cómo debe sonar y cómo quieres entregarlo.",
+    "cases": [
+      {
+        "title": "Una muestra en pocos minutos",
+        "description": "Responde unas preguntas sencillas y convierte tus recuerdos en una primera versión. No necesitas cantar, componer ni saber de producción musical.",
+        "image": "/placeholder.webp",
+        "icon": "Zap"
+      },
+      {
+        "title": "Sonido cuidado y voces expresivas",
+        "description": "Instrumentos, voces y mezcla pensados para que la canción se sienta como un regalo terminado, no como una simple demo.",
+        "image": "/placeholder.webp",
+        "icon": "Mic2"
+      },
+      {
+        "title": "Un precio claro",
+        "description": "Escucha primero la muestra y desbloquea la canción solo cuando estés conforme. Sin pagar una tarifa elevada por adelantado.",
+        "image": "/placeholder.webp",
+        "icon": "CircleDollarSign"
+      },
+      {
+        "title": "Pruébala gratis antes de comprar",
+        "description": "No hace falta introducir una tarjeta para escuchar la muestra. Cambia la letra o el estilo antes de desbloquear la versión completa.",
+        "image": "/placeholder.webp",
+        "icon": "Sparkles"
+      },
+      {
+        "title": "Plantillas de vídeo y láminas",
+        "description": "Acompaña la canción con un vídeo personalizado o convierte la letra en una pieza lista para imprimir y regalar.",
+        "image": "/placeholder.webp",
+        "icon": "Palette"
+      },
+      {
+        "title": "Editores de personalización incluidos",
+        "description": "Añade tus fotos, fechas y mensajes. Ajusta el vídeo o la composición de la lámina directamente desde tu cuenta.",
+        "image": "/placeholder.webp",
+        "icon": "SlidersHorizontal"
+      }
+    ]
+  },
+  "SongfinchComparison": {
+    "eyebrow": "Por qué algunas personas eligen onecustomsong.com frente a Songfinch",
+    "title": "<us>onecustomsong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "subtitle": "No necesitas pagar <price>más de $200</price> por una sola canción. Consigue una <strong>producción con sonido de estudio</strong>, escucha primero una muestra y conserva el control <underline>por mucho menos.</underline>",
+    "tableHeaders": {
+      "feature": "Característica",
+      "songfinch": "Songfinch",
+      "us": "onecustomsong.com"
+    },
+    "rows": [
+      {
+        "feature": "Precio inicial",
+        "songfinch": "Desde $199 por canción",
+        "us": "Opciones más asequibles"
+      },
+      {
+        "feature": "Tiempo de entrega",
+        "songfinch": "Entre 4 y 7 días",
+        "us": "Muestra en pocos minutos"
+      },
+      {
+        "feature": "Prueba antes de pagar",
+        "songfinch": "Pago por adelantado",
+        "us": "Muestra gratuita"
+      },
+      {
+        "feature": "Cambios en la letra",
+        "songfinch": "Limitados o con coste adicional",
+        "us": "Ediciones incluidas"
+      },
+      {
+        "feature": "Vídeo musical",
+        "songfinch": "No incluido",
+        "us": "Plantillas personalizables disponibles"
+      },
+      {
+        "feature": "Lámina imprimible",
+        "songfinch": "No incluida",
+        "us": "Editor de póster con la letra incluido"
+      }
+    ],
+    "painPoints": [
+      {
+        "icon": "value",
+        "title": "Un regalo personal a un precio razonable",
+        "description": "Songfinch parte de $199. En One Custom Song puedes escuchar una muestra antes de pagar y elegir el formato que mejor encaja con tu regalo."
+      },
+      {
+        "icon": "speed",
+        "title": "De tus recuerdos a la música en minutos",
+        "description": "No hace falta esperar una semana. Puedes tener una primera muestra a tiempo incluso cuando el cumpleaños o el aniversario está muy cerca."
+      },
+      {
+        "icon": "edits",
+        "title": "Ajusta la letra y el estilo",
+        "description": "Cambia palabras, corrige detalles o prueba otro género desde tu cuenta, sin cadenas de correos ni cargos por cada pequeño ajuste."
+      },
+      {
+        "icon": "bundle",
+        "title": "Un regalo musical más completo",
+        "description": "Además de la canción, puedes crear un vídeo con fotos y una lámina imprimible con la letra para entregar el recuerdo de distintas formas."
+      }
+    ]
+  },
+  "Testimonials": {
+    "badge": { "label": "OPINIONES" },
+    "title": "Lo que cuentan nuestros clientes",
+    "description": "Historias de personas que ya han regalado su canción"
+  },
+  "FAQ": {
+    "title": "Preguntas frecuentes sobre las canciones personalizadas",
+    "description": "Lo esencial antes de crear y enviar tu regalo musical.",
+    "items": [
+      {
+        "question": "¿Cómo funciona onecustomsong.com?",
+        "answer": "Cuéntanos la historia, elige un estilo musical y nuestra IA preparará una canción personalizada. Primero recibirás una muestra gratuita de 60 segundos. Si te gusta, podrás desbloquear la canción completa y usar los editores de vídeo y láminas."
+      },
+      {
+        "question": "¿Qué diferencia a One Custom Song de otras plataformas?",
+        "answer": "Puedes escuchar una muestra antes de pagar, editar la letra y probar otros estilos. Además, la canción puede acompañarse con un vídeo personalizado y una lámina imprimible creada desde nuestros editores."
+      },
+      {
+        "question": "¿Puedo cambiar la letra o el género musical?",
+        "answer": "Sí. Antes de desbloquear la versión final puedes retocar la letra, cambiar el estilo musical y elegir otra voz hasta que la canción encaje con lo que quieres contar."
+      },
+      {
+        "question": "¿Cómo comparto mi regalo musical personalizado?",
+        "answer": "Cada canción tiene una página privada que puedes enviar por mensaje, correo o redes sociales. También puedes añadir una imagen, una dedicatoria y crear un vídeo o una lámina con la letra."
+      },
+      {
+        "question": "¿Hay costes ocultos? ¿El pago es seguro?",
+        "answer": "No hay cargos ocultos. Pagas cuando decides desbloquear la canción después de escuchar la muestra. Stripe procesa el pago de forma cifrada y no guardamos los datos de tu tarjeta en nuestros servidores."
+      },
+      {
+        "question": "¿Durante cuánto tiempo se guardan mis canciones?",
+        "answer": "Las canciones compradas, los vídeos y los diseños de láminas permanecen asociados a tu cuenta. Puedes volver a escucharlos y descargarlos cuando quieras."
+      },
+      {
+        "question": "¿Tengo que registrarme para empezar?",
+        "answer": "No necesitas crear una cuenta antes de preparar la muestra. Introduce tu correo para escucharla y podrás acceder más adelante con Google o mediante correo electrónico."
+      },
+      {
+        "question": "¿Qué hago si la generación se queda bloqueada?",
+        "answer": "Actualiza la página y comprueba de nuevo el estado desde tu cuenta. Si el problema continúa, contacta con soporte para que podamos revisar la generación."
+      }
+    ]
+  },
+  "CTA": {
+    "title": "Crea una canción personalizada que nunca olvidarán",
+    "description": "Cuéntanos vuestra historia y convierte los recuerdos en una <strong>canción personalizada</strong> con sonido de estudio. Crea y <strong>envía una canción</strong> como <strong>regalo musical único</strong> para cumpleaños, bodas o aniversarios.",
+    "button": "Crear mi canción",
+    "trustText": "Hecha para momentos que importan",
+    "features": {
+      "deploy": "🎵 Sonido de estudio",
+      "production": "🎁 Lista para regalar",
+      "updates": "⚡ Muestra gratuita",
+      "i18n": "💌 Fácil de compartir"
+    }
+  }
+}

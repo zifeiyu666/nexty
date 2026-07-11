@@ -13,5 +13,6 @@
   "type_subscription_grant": "Subscription Grant",
   "type_feature_usage": "Feature Usage",
   "type_refund_revoke": "Refund Revoke",
-  "type_subscription_ended_revoke": "Subscription Ended Revoke"
+  "type_subscription_ended_revoke": "Subscription Ended Revoke",
+  "type_welcome_bonus": "Welcome Bonus"
 }

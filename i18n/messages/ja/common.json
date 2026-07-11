@@ -1,0 +1,305 @@
+{
+  "Home": {
+    "title": "One Custom Song",
+    "tagLine": "<strong>思い出から作る、世界にひとつのAIソング。</strong><br></br>誕生日や記念日に、心に残る音楽の贈り物を。",
+    "description": "大切な思い出を、スタジオ品質のオリジナルソングに。誕生日、結婚式、記念日に贈れるパーソナルな楽曲を数分で作れます。"
+  },
+  "Login": {
+    "title": "おかえりなさい",
+    "description": "ログイン方法を選択してください",
+    "Toast": {
+      "rateLimitTitle": "試行回数が多すぎます",
+      "rateLimitDescription": "少し時間をおいてからもう一度お試しください。",
+      "Email": {
+        "successTitle": "ログインリンクを送信しました",
+        "successDescription": "メールをご確認ください。",
+        "errorTitle": "エラー",
+        "errorDescription": "ログインリンクを送信できませんでした。"
+      },
+      "OTP": {
+        "errorTitle": "エラー",
+        "sendSuccessTitle": "確認コードを送信しました",
+        "sendSuccessDescription": "メールに届いた確認コードをご入力ください。",
+        "sendErrorDescription": "確認コードを送信できませんでした。",
+        "verifySuccessTitle": "ログインしました",
+        "verifySuccessDescription": "ログインが完了しました。",
+        "verifyErrorDescription": "確認コードが正しくないか、有効期限が切れています。"
+      },
+      "Google": {
+        "errorTitle": "エラー",
+        "errorDescription": "Googleでログインできませんでした。"
+      },
+      "Github": {
+        "errorTitle": "エラー",
+        "errorDescription": "GitHubでログインできませんでした。"
+      }
+    },
+    "Button": { "signIn": "ログイン", "signOut": "ログアウト" },
+    "signInMethods": {
+      "or": "または",
+      "signInWithGoogle": "Googleで続ける",
+      "signInWithGithub": "GitHubで続ける",
+      "signInWithEmail": "メールで続ける",
+      "otpMethod": "確認コード",
+      "magicLinkMethod": "ログインリンク",
+      "sendOTP": "コードを送信",
+      "verifyOTP": "コードを確認",
+      "resendOTP": "コードが届かない場合は再送信",
+      "backToEmail": "戻る",
+      "otpSentTo": "確認コードの送信先"
+    },
+    "UserMenus": [
+      { "name": "設定", "href": "/dashboard/settings", "icon": "Settings" },
+      {
+        "name": "注文履歴",
+        "href": "/dashboard/my-orders",
+        "icon": "ShoppingCart"
+      },
+      {
+        "name": "サブスクリプション",
+        "href": "/dashboard/subscription",
+        "icon": "WalletCards"
+      },
+      {
+        "name": "クレジット履歴",
+        "href": "/dashboard/credit-history",
+        "icon": "Coins"
+      }
+    ]
+  },
+  "Blogs": {
+    "title": "記事",
+    "description": "オリジナルソングの作り方や、心に残る音楽ギフトのアイデア。",
+    "emptyState": {
+      "title": "日本語の記事はまだありません",
+      "description": "現在準備中です。しばらくお待ちください。"
+    },
+    "loadMorePostsFailed": "記事を読み込めませんでした",
+    "loadMorePosts": "記事を読み込んでいます...",
+    "filterPostsFailed": "記事を読み込めませんでした",
+    "noPostsFoundForThisTag": "このタグの記事はありません",
+    "reachedTheEnd": "すべての記事を表示しました",
+    "heroBadge": "記事ライブラリ",
+    "heroTitleLine1": "大切な人に贈る歌の",
+    "heroTitleLine2": "アイデアとガイド",
+    "emptyMessage": "記事が見つかりません。",
+    "BlogDetail": {
+      "featured": "注目の記事",
+      "viewCount": "{count}回閲覧",
+      "accessRestricted": "アクセスが制限されています",
+      "unauthorized": "この記事を読むにはログインが必要です",
+      "premium": "プレミアムコンテンツ",
+      "premiumContent": "この記事はサブスク会員限定です",
+      "signIn": "ログイン",
+      "upgrade": "プランを変更",
+      "backToBlogs": "記事一覧へ戻る",
+      "notFound": "記事が見つかりません"
+    }
+  },
+  "About": {
+    "title": "One Custom Songについて",
+    "description": "思い出からオリジナルソングを作るサービスです。"
+  },
+  "ErrorPage": {
+    "403": {
+      "title": "403 - アクセスできません",
+      "description": "このページを表示する権限がありません。",
+      "button": { "name": "ホームへ戻る", "href": "/" }
+    },
+    "RedirectError": {
+      "title": "リダイレクトエラー",
+      "description": "ログイン処理中にエラーが発生しました。",
+      "goToHome": "ホームへ戻る",
+      "goToLogin": "ログインする",
+      "invalid_params": {
+        "title": "情報が不足しています",
+        "description": "必要な情報がリクエストに含まれていません。"
+      },
+      "invalid_redirect": {
+        "title": "無効な移動先です",
+        "description": "指定されたURLへ移動できません。"
+      },
+      "token_expired": {
+        "title": "有効期限が切れています",
+        "description": "確認用リンクの期限が切れました。もう一度ログインしてください。"
+      },
+      "invalid_token": {
+        "title": "無効なトークンです",
+        "description": "確認用トークンが正しくありません。"
+      },
+      "invalid_link_or_expired": {
+        "title": "リンクが無効です",
+        "description": "確認リンクが正しくないか、有効期限が切れています。"
+      },
+      "server_error": {
+        "title": "サーバーエラー",
+        "description": "ログイン処理中に予期しないエラーが発生しました。"
+      },
+      "unknown": {
+        "title": "ログインエラー",
+        "description": "ログイン処理中にエラーが発生しました。"
+      }
+    },
+    "StripeError": {
+      "title": "決済画面を開けませんでした",
+      "description": "お支払い情報の処理中にエラーが発生しました。",
+      "goToHome": "ホームへ戻る",
+      "goToDashboard": "マイページへ"
+    }
+  },
+  "LanguageDetection": {
+    "title": "表示言語のご案内",
+    "description": "ブラウザの言語と現在の表示言語が異なります。いつでも切り替えられます。",
+    "countdown": "{countdown}秒後に閉じます",
+    "switchTo": "切り替える",
+    "alertLabel": "言語のご案内",
+    "dismissLabel": "言語案内を閉じる",
+    "selectLabel": "言語を選択"
+  },
+  "MusicPlayer": {
+    "pause": "音楽を一時停止",
+    "play": "音楽を再生",
+    "noMusicPlaying": "再生中の曲はありません",
+    "ready": "次の曲を再生できます",
+    "controller": "{title}の再生コントロール",
+    "dragController": "再生コントロールを移動",
+    "dragOrToggle": "ドラッグまたはクリックして切り替え"
+  },
+  "Header": {
+    "createSong": "曲を作る",
+    "links": [
+      { "name": "マイソング", "href": "/songs" },
+      { "name": "サンプル", "href": "/samples" },
+      {
+        "name": "ギフトアイデア",
+        "href": "/music/personalized-gift",
+        "items": [
+          {
+            "name": "オリジナルソングを作る",
+            "href": "/create-song",
+            "description": "物語から無料サンプルを作り、完成版を購入する前に試聴できます。"
+          },
+          {
+            "name": "誕生日ソング",
+            "href": "/occasions/custom-happy-birthday-song",
+            "description": "名前や思い出を入れた誕生日ソングを作れます。"
+          },
+          {
+            "name": "記念日ソング",
+            "href": "/occasions/anniversary",
+            "description": "二人の物語を、何度でも聴ける記念日の曲に。"
+          },
+          {
+            "name": "音楽のパーソナルギフト",
+            "href": "/music/personalized-gift",
+            "description": "オリジナルソング、動画、歌詞アートを組み合わせた贈り物。"
+          },
+          {
+            "name": "オリジナル歌詞",
+            "href": "/blog/custom-song-lyrics",
+            "description": "個人的な物語を歌詞にするためのヒント。"
+          },
+          {
+            "name": "歌詞アート",
+            "href": "/lyricwallart",
+            "description": "オリジナル歌詞を印刷できるアート作品に。"
+          }
+        ]
+      },
+      { "id": "articles", "name": "記事", "href": "/blog" },
+      { "name": "料金", "href": "/pricing" }
+    ]
+  },
+  "Footer": {
+    "Copyright": "Copyright © {year} {name}. All rights reserved.",
+    "About": "サービスについて",
+    "PrivacyPolicy": "プライバシーポリシー（英語）",
+    "TermsOfService": "利用規約（英語）",
+    "RefundPolicy": "返金ポリシー（英語）",
+    "Newsletter": {
+      "title": "最新情報を受け取る",
+      "description": "新機能やギフトアイデアをメールでお届けします。",
+      "subscribe": {
+        "invalidEmail": "有効なメールアドレスを入力してください",
+        "defaultErrorMessage": "登録できませんでした。しばらくしてからもう一度お試しください。",
+        "successMessage": "ニュースレターに登録しました。",
+        "multipleSubmissions": "試行回数が多すぎます。明日もう一度お試しください。"
+      },
+      "unsubscribe": {
+        "title": "ニュースレターの配信停止",
+        "success": "ニュースレターの配信を停止しました。",
+        "emailPrefix": "メールアドレス：",
+        "regretMessage": "いつでも再登録できます。",
+        "errorGeneric": "配信停止を処理できませんでした",
+        "errorNoToken": "配信停止用の情報がありません",
+        "errorMessage": "正しい配信停止リンクをご利用ください。問題が続く場合はサポートへお問い合わせください。",
+        "contactPrefix": "お問い合わせ：",
+        "contactPrefixSuccess": "ご不明な点はこちらへ：",
+        "backToHome": "ホームへ戻る",
+        "invalidEmail": "メールアドレスが正しくありません",
+        "notInNewsletter": "このメールアドレスは登録されていません",
+        "confirmTitle": "配信停止の確認",
+        "confirmMessage": "ニュースレターの配信を停止しますか？",
+        "confirmButton": "配信を停止する",
+        "cancelButton": "キャンセル",
+        "processing": "処理中...",
+        "finalWarning": "配信停止後も、いつでも再登録できます。",
+        "errorInvalidToken": "配信停止リンクが無効です。リンクが破損しているか、有効期限が切れている可能性があります。"
+      }
+    },
+    "Links": {
+      "groups": [
+        {
+          "title": "サービス",
+          "links": [
+            { "href": "/#features", "name": "ギフト機能" },
+            { "id": "pricing", "href": "/#pricing", "name": "料金" },
+            { "href": "/songs", "name": "マイソング" },
+            { "href": "/samples", "name": "サンプル" }
+          ]
+        },
+        {
+          "title": "ギフトアイデア",
+          "links": [
+            { "name": "AIソング試聴ツール", "href": "/create-song" },
+            {
+              "name": "誕生日ソング",
+              "href": "/occasions/custom-happy-birthday-song"
+            },
+            { "name": "記念日ソング", "href": "/occasions/anniversary" },
+            {
+              "name": "音楽のパーソナルギフト",
+              "href": "/music/personalized-gift"
+            },
+            { "name": "ギフト用プレイリスト", "href": "/playlists" },
+            { "name": "オリジナル歌詞", "href": "/blog/custom-song-lyrics" },
+            { "name": "歌詞アート", "href": "/lyricwallart" }
+          ]
+        },
+        { "title": "記事", "links": [{ "href": "/blog", "name": "ブログ" }] },
+        {
+          "title": "資料",
+          "links": [
+            { "href": "/blog", "name": "すべての記事" },
+            { "href": "/glossary", "name": "用語集" }
+          ]
+        }
+      ]
+    }
+  },
+  "CreateSong": {
+    "title": "AIでオリジナルソングを作成",
+    "description": "思い出を入力して、無料の楽曲サンプルを数分で作成できます。",
+    "srTitle": "オリジナルソング作成ツール",
+    "srDescription": "名前、思い出、メッセージから楽曲を作成します。"
+  },
+  "Subscription": {
+    "title": "サブスクリプション",
+    "description": "契約内容を確認・管理できます。",
+    "notSubscribed": "現在有効なサブスクリプションはありません。",
+    "upgradePlan": "プランを見る",
+    "portalUnavailable": "管理画面は現在利用できません。",
+    "stripePortalHint": "Stripeの安全な画面で支払いと請求書を管理します。",
+    "creemPortalHint": "Creemの安全な画面でサブスクリプションを管理します。"
+  }
+}

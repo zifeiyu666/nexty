@@ -1,18 +1,24 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Link as I18nLink, LOCALE_NAMES, routing } from "@/i18n/routing";
+import {
+  Link as I18nLink,
+  Locale,
+  LOCALE_NAMES,
+  routing,
+} from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { useLocaleStore } from "@/stores/localeStore";
 import { ArrowRight, Globe, X } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 
 export function LanguageDetectionAlert() {
   const [countdown, setCountdown] = useState(10); // countdown 10s and dismiss
   const [isVisible, setIsVisible] = useState(false);
   const locale = useLocale();
-  const [detectedLocale, setDetectedLocale] = useState<string | null>(null);
+  const t = useTranslations("LanguageDetection");
+  const [detectedLocale, setDetectedLocale] = useState<Locale | null>(null);
   const {
     showLanguageAlert,
     setShowLanguageAlert,
@@ -73,9 +79,6 @@ export function LanguageDetectionAlert() {
 
   if (!showLanguageAlert || !detectedLocale) return null;
 
-  const messages = require(`@/i18n/messages/${detectedLocale}/common.json`);
-  const alertMessages = messages.LanguageDetection;
-
   return (
     <div
       className={cn(
@@ -87,7 +90,7 @@ export function LanguageDetectionAlert() {
       )}
       role="banner"
       aria-live="polite"
-      aria-label="Language detection alert"
+      aria-label={t("alertLabel")}
     >
       <div className="bg-background/95 backdrop-blur-md border border-border rounded-xl shadow-lg p-4 relative">
         <Button
@@ -95,7 +98,7 @@ export function LanguageDetectionAlert() {
           size="icon"
           className="absolute right-2 top-2 h-6 w-6 opacity-50 hover:opacity-100"
           onClick={handleDismiss}
-          aria-label="Dismiss language suggestion"
+          aria-label={t("dismissLabel")}
         >
           <X className="h-4 w-4" />
         </Button>
@@ -104,30 +107,30 @@ export function LanguageDetectionAlert() {
           <div className="flex items-center gap-2 mb-3">
             <Globe className="h-4 w-4 text-primary" />
             <h3 className="font-medium text-sm text-foreground">
-              {alertMessages.title}
+              {t("title")}
             </h3>
           </div>
 
           <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-            {alertMessages.description}
+            {t("description")}
           </p>
 
           <div className="flex items-center justify-between">
             <Button asChild onClick={handleSwitchLanguage}>
               <I18nLink
                 href="/"
-                title={`${alertMessages.switchTo} ${LOCALE_NAMES[detectedLocale]}`}
-                locale={detectedLocale as any}
+                title={`${t("switchTo")} ${LOCALE_NAMES[detectedLocale]}`}
+                locale={detectedLocale}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-lg",
                   "bg-primary text-primary-foreground hover:bg-primary/90",
                   "text-sm font-medium transition-colors",
                   "group focus:outline-hidden focus:ring-2 focus:ring-primary/50"
                 )}
-                aria-label={`${alertMessages.switchTo} ${LOCALE_NAMES[detectedLocale]}`}
+                aria-label={`${t("switchTo")} ${LOCALE_NAMES[detectedLocale]}`}
               >
                 <span>
-                  {alertMessages.switchTo} {LOCALE_NAMES[detectedLocale]}
+                  {t("switchTo")} {LOCALE_NAMES[detectedLocale]}
                 </span>
                 <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
               </I18nLink>

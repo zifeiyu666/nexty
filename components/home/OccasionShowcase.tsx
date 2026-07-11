@@ -2,6 +2,7 @@
 
 import {
   occasionCards,
+  occasionCardTranslations,
   type OccasionCard,
 } from "@/components/home/OccasionShowcase.config";
 import { Button } from "@/components/ui/button";
@@ -23,8 +24,10 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowLeft, ArrowRight, MoveRight, Pause, Play } from "lucide-react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -32,15 +35,6 @@ import {
 } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const copy = {
-  eyebrow: "Occasions",
-  title: "For Every Precious Moment, A Personal Melody",
-  description:
-    "Custom-craft a unique song to honor life's special stories and emotions.",
-  previous: "Previous occasion",
-  next: "Next occasion",
-};
 
 type DragState = {
   pointerId: number;
@@ -58,6 +52,18 @@ const isMobileCarouselLayout = () => {
 };
 
 export default function OccasionShowcase() {
+  const t = useTranslations("Landing.OccasionShowcase");
+  const locale = useLocale();
+  const localizedCards = useMemo(() => {
+    const translations = occasionCardTranslations[locale as "es" | "ja"];
+
+    if (!translations) return occasionCards;
+
+    return occasionCards.map((card) => ({
+      ...card,
+      ...(translations[card.id] || {}),
+    }));
+  }, [locale]);
   const sectionRef = useRef<HTMLElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -89,7 +95,7 @@ export default function OccasionShowcase() {
     const maxScroll = Math.max(0, track.scrollWidth - viewport.clientWidth);
 
     maxScrollRef.current = maxScroll;
-    cardOffsetsRef.current = occasionCards.map((_, index) => {
+    cardOffsetsRef.current = localizedCards.map((_, index) => {
       return cardRefs.current.get(index)?.offsetLeft ?? index * 320;
     });
 
@@ -112,7 +118,7 @@ export default function OccasionShowcase() {
 
     if (!track) return;
 
-    const nextIndex = clamp(index, 0, occasionCards.length - 1);
+    const nextIndex = clamp(index, 0, localizedCards.length - 1);
     const targetTranslate = getTargetTranslate(nextIndex);
 
     gsap.killTweensOf(track);
@@ -417,16 +423,14 @@ export default function OccasionShowcase() {
       />
       <div className="home-container relative">
         <div className="home-section-header">
-          <p className="home-eyebrow">{copy.eyebrow}</p>
+          <p className="home-eyebrow">{t("eyebrow")}</p>
           <h2
             id="occasion-showcase-heading"
             className="home-title hero-title-warm"
           >
-            {copy.title}
+            {t("title")}
           </h2>
-          <p className="home-description text-white/70">
-            {copy.description}
-          </p>
+          <p className="home-description text-white/70">{t("description")}</p>
         </div>
       </div>
 
@@ -434,14 +438,11 @@ export default function OccasionShowcase() {
         setApi={setMobileApi}
         opts={{ align: "center", containScroll: "trimSnaps" }}
         className="sm:hidden"
-        aria-label="Occasion carousel"
+        aria-label={t("carouselLabel")}
       >
         <CarouselContent className="-ml-3 px-4 pb-6">
-          {occasionCards.map((occasion, index) => (
-            <CarouselItem
-              key={occasion.id}
-              className="basis-[88%] pl-3"
-            >
+          {localizedCards.map((occasion, index) => (
+            <CarouselItem key={occasion.id} className="basis-[88%] pl-3">
               <OccasionPhotoCard
                 occasion={occasion}
                 isActive={mobileActiveIndex === index}
@@ -460,22 +461,22 @@ export default function OccasionShowcase() {
           onClick={() => mobileApi?.scrollPrev()}
           disabled={mobileActiveIndex === 0}
           className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
-          aria-label={copy.previous}
+          aria-label={t("previous")}
         >
           <ArrowLeft className="size-5" />
         </Button>
         <div className="min-w-24 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-center text-sm font-semibold text-white shadow-[0_12px_35px_rgba(0,0,0,0.26)] backdrop-blur">
-          {occasionCards[mobileActiveIndex]?.index ?? "01"} /{" "}
-          {occasionCards.length}
+          {localizedCards[mobileActiveIndex]?.index ?? "01"} /{" "}
+          {localizedCards.length}
         </div>
         <Button
           type="button"
           variant="outline"
           size="icon-lg"
           onClick={() => mobileApi?.scrollNext()}
-          disabled={mobileActiveIndex === occasionCards.length - 1}
+          disabled={mobileActiveIndex === localizedCards.length - 1}
           className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
-          aria-label={copy.next}
+          aria-label={t("next")}
         >
           <ArrowRight className="size-5" />
         </Button>
@@ -494,7 +495,7 @@ export default function OccasionShowcase() {
           ref={trackRef}
           className="flex cursor-grab gap-4 pb-8 pl-8 pt-3 will-change-transform active:cursor-grabbing sm:gap-5 sm:pl-10 lg:gap-5"
         >
-          {occasionCards.map((occasion, index) => (
+          {localizedCards.map((occasion, index) => (
             <OccasionPhotoCard
               key={occasion.id}
               refCallback={setCardRef(index)}
@@ -516,21 +517,21 @@ export default function OccasionShowcase() {
           onClick={() => moveToIndex(activeIndex - 1)}
           disabled={activeIndex === 0}
           className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
-          aria-label={copy.previous}
+          aria-label={t("previous")}
         >
           <ArrowLeft className="size-5" />
         </Button>
         <div className="min-w-24 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-center text-sm font-semibold text-white shadow-[0_12px_35px_rgba(0,0,0,0.26)] backdrop-blur">
-          {occasionCards[activeIndex]?.index ?? "01"} / {occasionCards.length}
+          {localizedCards[activeIndex]?.index ?? "01"} / {localizedCards.length}
         </div>
         <Button
           type="button"
           variant="outline"
           size="icon-lg"
           onClick={() => moveToIndex(activeIndex + 1)}
-          disabled={activeIndex === occasionCards.length - 1}
+          disabled={activeIndex === localizedCards.length - 1}
           className="rounded-full border-white/15 bg-white/8 text-white shadow-[0_12px_34px_rgba(0,0,0,0.28)] backdrop-blur hover:border-primary/50 hover:bg-white/12 disabled:opacity-40"
-          aria-label={copy.next}
+          aria-label={t("next")}
         >
           <ArrowRight className="size-5" />
         </Button>
@@ -628,7 +629,9 @@ function OccasionCardPlaybackButton({ occasion }: { occasion: OccasionCard }) {
     track?.id === `${occasion.id}-${sampleTrack.id}` &&
     track.audioUrl === sampleTrack.audioUrl;
   const isCurrentTrackPlaying = isCurrentTrack && isPlaying;
-  const actionLabel = isCurrentTrackPlaying ? "Pause sample song" : "Play sample song";
+  const actionLabel = isCurrentTrackPlaying
+    ? "Pause sample song"
+    : "Play sample song";
 
   return (
     <Tooltip>

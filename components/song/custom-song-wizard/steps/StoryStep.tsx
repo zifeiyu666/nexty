@@ -86,19 +86,19 @@ export function StoryStep({
           100-200 words works best
         </span>
       </div>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div className="mb-4 flex flex-nowrap items-center gap-2 sm:gap-3">
         <Button
-          className="rounded-full bg-card px-4 py-2 text-sm font-bold text-foreground shadow-sm hover:bg-primary/10 hover:text-primary"
+          className="shrink-0 whitespace-nowrap rounded-full bg-card px-3 py-2 text-sm font-bold text-foreground shadow-sm hover:bg-primary/10 hover:text-primary sm:px-4"
           type="button"
           variant="ghost"
           onClick={onOpenHelper}
         >
-          <Wand2 className="size-5 text-primary" />
+          <Wand2 className="hidden size-5 text-primary sm:block" />
           Help me write
         </Button>
         <Button
           className={cn(
-            "rounded-full px-4 text-sm font-bold shadow-sm",
+            "shrink-0 whitespace-nowrap rounded-full px-3 text-sm font-bold shadow-sm sm:px-4",
             isRecording
               ? "bg-primary/10 text-primary hover:bg-primary/15"
               : "bg-card text-foreground hover:bg-primary/10 hover:text-primary",
@@ -108,28 +108,28 @@ export function StoryStep({
           onClick={onToggleRecording}
         >
           {isRecording ? (
-            <MicOff className="size-5 text-primary" />
+            <MicOff className="hidden size-5 text-primary sm:block" />
           ) : (
-            <Mic2 className="size-5 text-primary" />
+            <Mic2 className="hidden size-5 text-primary sm:block" />
           )}
           {isRecording ? "Stop recording" : "Speak"}
         </Button>
         {isRecording && (
-          <span className="text-sm font-semibold text-primary/70">
+          <span className="hidden text-sm font-semibold text-primary/70 sm:inline">
             Listening...
           </span>
         )}
         <Button
-          className="ml-auto rounded-full bg-primary/10 px-4 py-2 text-sm font-bold text-primary shadow-sm hover:bg-primary/15"
+          className="ml-auto shrink-0 whitespace-nowrap rounded-full bg-primary/10 px-3 py-2 text-sm font-bold text-primary shadow-sm hover:bg-primary/15 sm:px-4"
           disabled={isPolishingStory || story.trim().length < 10}
           type="button"
           variant="ghost"
           onClick={onPolishStory}
         >
           {isPolishingStory ? (
-            <Loader2 className="size-5 animate-spin text-primary" />
+            <Loader2 className="hidden size-5 animate-spin text-primary sm:block" />
           ) : (
-            <Sparkles className="size-5 text-primary" />
+            <Sparkles className="hidden size-5 text-primary sm:block" />
           )}
           {isPolishingStory ? "AI polishing..." : "AI polish story"}
         </Button>

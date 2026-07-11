@@ -21,6 +21,7 @@ import {
   Video,
 } from "lucide-react";
 import Image from "next/image";
+import { useFormatter, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
 export type MusicVideoListItem = {
@@ -36,14 +37,7 @@ export type MusicVideoListItem = {
 };
 
 type MusicVideosListProps = {
-  createLabel: string;
-  emptyDescription: string;
-  emptyTitle: string;
   items: MusicVideoListItem[];
-  locale: string;
-  noMatchesDescription: string;
-  noMatchesTitle: string;
-  searchPlaceholder: string;
 };
 
 export function filterMusicVideosByTitle(
@@ -59,21 +53,6 @@ export function filterMusicVideosByTitle(
   );
 }
 
-function formatCreatedAt(date: string, locale: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(date));
-}
-
-function statusLabel(status: MusicVideoStatus) {
-  if (status === "completed") return "Completed";
-  if (status === "failed") return "Failed";
-  if (status === "rendering") return "Rendering";
-  return "Queued";
-}
-
 function statusClassName(status: MusicVideoStatus) {
   if (status === "completed") return "bg-emerald-500 text-white";
   if (status === "failed") return "bg-destructive text-destructive-foreground";
@@ -83,11 +62,19 @@ function statusClassName(status: MusicVideoStatus) {
 
 function MusicVideoCard({
   item,
-  locale,
 }: {
   item: MusicVideoListItem;
-  locale: string;
 }) {
+  const t = useTranslations("MusicVideos");
+  const format = useFormatter();
+
+  const statusLabel = {
+    completed: t("status.completed"),
+    failed: t("status.failed"),
+    rendering: t("status.rendering"),
+    queued: t("status.queued"),
+  }[item.status];
+
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
       <div className="relative aspect-video bg-[#171412]">
@@ -122,7 +109,7 @@ function MusicVideoCard({
             item.status,
           )}`}
         >
-          {statusLabel(item.status)}
+          {statusLabel}
         </Badge>
       </div>
 
@@ -134,7 +121,11 @@ function MusicVideoCard({
           {item.songTitle}
         </p>
         <p className="mt-4 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-          {formatCreatedAt(item.createdAt, locale)}
+          {format.dateTime(new Date(item.createdAt), {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2">
@@ -142,7 +133,7 @@ function MusicVideoCard({
             <Button asChild className="h-10 rounded-full px-4" size="sm">
               <a download href={`/api/musicvideos/${item.id}/download`}>
                 <Download className="size-4" />
-                Download
+                {t("actions.download")}
               </a>
             </Button>
           ) : null}
@@ -153,7 +144,7 @@ function MusicVideoCard({
             variant="outline"
           >
             <Link href={`/songs/${item.songId}`}>
-              Song
+              {t("actions.viewSong")}
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -164,15 +155,9 @@ function MusicVideoCard({
 }
 
 export function MusicVideosList({
-  createLabel,
-  emptyDescription,
-  emptyTitle,
   items,
-  locale,
-  noMatchesDescription,
-  noMatchesTitle,
-  searchPlaceholder,
 }: MusicVideosListProps) {
+  const t = useTranslations("MusicVideos");
   const [query, setQuery] = useState("");
   const filteredItems = useMemo(
     () => filterMusicVideosByTitle(items, query),
@@ -185,20 +170,20 @@ export function MusicVideosList({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.18em] text-primary">
-            Library
+            {t("library.label")}
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-stone-950">
-            All generated videos
+            {t("library.title")}
           </h2>
         </div>
 
         <div className="relative w-full max-w-md">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
-            aria-label={searchPlaceholder}
+            aria-label={t("filters.searchPlaceholder")}
             className="h-12 w-full rounded-full border border-border bg-white pl-11 pr-4 text-base outline-none shadow-sm transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10"
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={searchPlaceholder}
+            placeholder={t("filters.searchPlaceholder")}
             type="search"
             value={query}
           />
@@ -208,7 +193,7 @@ export function MusicVideosList({
       {filteredItems.length ? (
         <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredItems.map((item) => (
-            <MusicVideoCard item={item} key={item.id} locale={locale} />
+            <MusicVideoCard item={item} key={item.id} />
           ))}
         </div>
       ) : (
@@ -224,14 +209,20 @@ export function MusicVideosList({
                 <Video className="size-6" />
               )}
             </EmptyMedia>
-            <EmptyTitle>{hasVideos ? noMatchesTitle : emptyTitle}</EmptyTitle>
+            <EmptyTitle>
+              {hasVideos
+                ? t("empty.noMatches.title")
+                : t("empty.noVideos.title")}
+            </EmptyTitle>
             <EmptyDescription>
-              {hasVideos ? noMatchesDescription : emptyDescription}
+              {hasVideos
+                ? t("empty.noMatches.description")
+                : t("empty.noVideos.description")}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button asChild className="rounded-full">
-              <Link href="/songs">{createLabel}</Link>
+              <Link href="/songs">{t("actions.createFromSong")}</Link>
             </Button>
           </EmptyContent>
         </Empty>

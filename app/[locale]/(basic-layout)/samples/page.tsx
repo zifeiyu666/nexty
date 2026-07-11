@@ -10,6 +10,7 @@ import { constructMetadata } from "@/lib/metadata";
 import { cn } from "@/lib/utils";
 import { Library, Search } from "lucide-react";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 type Params = Promise<{ locale: string }>;
 type SearchParams = Promise<{ q?: string; occasion?: string }>;
@@ -20,11 +21,11 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Samples" });
 
   return constructMetadata({
-    title: "Your Song Samples",
-    description:
-      "Browse your generated song samples and choose your favorite version.",
+    title: t("meta.title"),
+    description: t("meta.description"),
     locale: locale as Locale,
     path: "/samples",
     noIndex: true,
@@ -39,10 +40,14 @@ function labelize(value: string): string {
 }
 
 export default async function SamplesPage({
+  params,
   searchParams,
 }: {
+  params: Params;
   searchParams: SearchParams;
 }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Samples" });
   const session = await getSession();
   const { q = "", occasion = "all" } = await searchParams;
   const benefits = session?.user?.id
@@ -81,22 +86,35 @@ export default async function SamplesPage({
           "thank-you",
         ]),
   ];
+  const occasionLabels: Record<string, string> = {
+    anniversary: t("filters.occasions.anniversary"),
+    birthday: t("filters.occasions.birthday"),
+    congratulations: t("filters.occasions.congratulations"),
+    "fathers-day": t("filters.occasions.fathersDay"),
+    "get-well-soon": t("filters.occasions.getWellSoon"),
+    "in-memoriam": t("filters.occasions.inMemoriam"),
+    "just-because": t("filters.occasions.justBecause"),
+    "mothers-day": t("filters.occasions.mothersDay"),
+    "something-else": t("filters.occasions.somethingElse"),
+    "thank-you": t("filters.occasions.thankYou"),
+    "valentines-day": t("filters.occasions.valentinesDay"),
+    wedding: t("filters.occasions.wedding"),
+  };
+  const formAction = locale === "en" ? "/samples" : `/${locale}/samples`;
 
   return (
     <main className="min-h-screen w-full bg-[#fbfaf7] text-foreground">
       <PageHero
         badge={{
           icon: <Library className="size-4" />,
-          label: "Sample library",
+          label: t("hero.badge"),
         }}
-        description={
-          <>
-            Every generated song lands here first. Subscribers keep samples
-            permanently; guests and non-subscribers can unlock within{" "}
-            <strong className="text-stone-950">72 hours</strong>.
-          </>
-        }
-        titleLines={["Your samples, ready to choose"]}
+        description={t.rich("hero.description", {
+          emphasis: (chunks) => (
+            <strong className="text-stone-950">{chunks}</strong>
+          ),
+        })}
+        titleLines={[t("hero.title")]}
       />
 
       <section className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-8">
@@ -113,12 +131,14 @@ export default async function SamplesPage({
                 )}
                 href={`/samples?occasion=${value}`}
               >
-                {value === "all" ? "All samples" : labelize(value)}
+                {value === "all"
+                  ? t("filters.all")
+                  : occasionLabels[value] || labelize(value)}
               </Link>
             ))}
           </div>
 
-          <form action="/samples" className="relative w-full max-w-xs sm:w-80">
+          <form action={formAction} className="relative w-full max-w-xs sm:w-80">
             {occasion !== "all" && (
               <input name="occasion" type="hidden" value={occasion} />
             )}
@@ -127,7 +147,7 @@ export default async function SamplesPage({
               className="h-10 rounded-full border-0 bg-white pl-9 pr-4 text-sm font-medium outline-none shadow-[0_10px_30px_rgba(28,25,23,0.10)] transition placeholder:text-muted-foreground focus-visible:ring-4 focus-visible:ring-primary/10"
               defaultValue={q}
               name="q"
-              placeholder="Search title, occasion, recipient"
+              placeholder={t("filters.searchPlaceholder")}
             />
           </form>
         </div>
@@ -137,14 +157,13 @@ export default async function SamplesPage({
         {!filteredSamples.length && (
           <div className="mt-10 rounded-2xl border border-dashed border-border bg-card p-8 text-center">
             <h2 className="text-xl font-black text-foreground">
-              No samples yet
+              {t("empty.title")}
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Create a song sample first, then it will appear here for your
-              sample library.
+              {t("empty.description")}
             </p>
             <Button asChild className="mt-5 rounded-full">
-              <Link href="/create-song">Create a sample</Link>
+              <Link href="/create-song">{t("empty.create")}</Link>
             </Button>
           </div>
         )}

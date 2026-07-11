@@ -5,6 +5,7 @@ import { listMusicVideosWithSongsForUser } from "@/lib/music-video/renders";
 import { constructMetadata } from "@/lib/metadata";
 import { Film, Plus, Sparkles, Video } from "lucide-react";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { MusicVideosList } from "./MusicVideosList";
 
@@ -16,10 +17,11 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "MusicVideos" });
 
   return constructMetadata({
-    title: "Music Videos",
-    description: "Browse every generated music video version for your songs.",
+    title: t("meta.title"),
+    description: t("meta.description"),
     locale: locale as Locale,
     path: "/musicvideos",
     noIndex: true,
@@ -28,6 +30,7 @@ export async function generateMetadata({
 
 export default async function MusicVideosPage({ params }: { params: Params }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "MusicVideos" });
   const session = await getSession();
   if (!session?.user) redirect("/login");
 
@@ -46,15 +49,13 @@ export default async function MusicVideosPage({ params }: { params: Params }) {
             <div>
               <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase text-primary shadow-sm">
                 <Video className="size-4" />
-                Music Videos
+                {t("hero.badge")}
               </p>
               <h1 className="mt-6 max-w-5xl text-5xl font-black leading-[0.96] tracking-normal text-stone-950 md:text-7xl">
-                Generated MV Versions
+                {t("hero.title")}
               </h1>
               <p className="mt-6 max-w-3xl text-lg leading-8 text-stone-700">
-                Browse every rendered music video, preview completed exports,
-                and jump back to the source song when you want to create another
-                version.
+                {t("hero.description")}
               </p>
             </div>
 
@@ -62,7 +63,7 @@ export default async function MusicVideosPage({ params }: { params: Params }) {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-bold text-stone-500">
-                    Total videos
+                    {t("stats.totalVideos")}
                   </p>
                   <p className="mt-1 text-5xl font-black text-stone-950">
                     {videos.length}
@@ -74,12 +75,12 @@ export default async function MusicVideosPage({ params }: { params: Params }) {
               </div>
               <div className="mt-4 flex items-center gap-2 text-sm font-bold text-stone-600">
                 <Film className="size-4 text-primary" />
-                {completedCount} completed exports
+                {t("stats.completedExports", { count: completedCount })}
               </div>
               <Button asChild className="mt-5 w-full rounded-full">
                 <Link href="/songs">
                   <Plus className="size-4" />
-                  Create from a song
+                  {t("actions.createFromSong")}
                 </Link>
               </Button>
             </div>
@@ -88,9 +89,6 @@ export default async function MusicVideosPage({ params }: { params: Params }) {
       </section>
 
       <MusicVideosList
-        createLabel="Create from a song"
-        emptyDescription="Open a finalized song, bind photos to the lyrics, and generate a vertical MV. Every render will appear here as its own version."
-        emptyTitle="No music videos yet"
         items={videos.map(({ musicVideo, song }) => ({
           createdAt: musicVideo.createdAt.toISOString(),
           id: musicVideo.id,
@@ -102,10 +100,6 @@ export default async function MusicVideosPage({ params }: { params: Params }) {
           title: musicVideo.title,
           videoUrl: musicVideo.videoUrl,
         }))}
-        locale={locale}
-        noMatchesDescription="Try a different title keyword or clear the search field to see every generated version."
-        noMatchesTitle="No matching videos"
-        searchPlaceholder="Search by video title"
       />
     </main>
   );

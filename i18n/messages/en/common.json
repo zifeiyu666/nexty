@@ -123,6 +123,10 @@
     "filterPostsFailed": "Failed to load posts",
     "noPostsFoundForThisTag": "No posts found with this tag",
     "reachedTheEnd": "You've reached the end of all posts",
+    "heroBadge": "Blog library",
+    "heroTitleLine1": "Ideas, guides, and stories",
+    "heroTitleLine2": "for meaningful song gifts",
+    "emptyMessage": "No posts found.",
     "BlogDetail": {
       "featured": "Featured Post",
       "viewCount": "{count} views",
@@ -322,9 +326,22 @@
     "title": "Language Suggestion",
     "description": "We noticed your browser language differs from the current site language. You can switch languages anytime.",
     "countdown": "Closing in {countdown} seconds",
-    "switchTo": "Switch to"
+    "switchTo": "Switch to",
+    "alertLabel": "Language detection alert",
+    "dismissLabel": "Dismiss language suggestion",
+    "selectLabel": "Select language"
+  },
+  "MusicPlayer": {
+    "pause": "Pause music",
+    "play": "Play music",
+    "noMusicPlaying": "No music playing",
+    "ready": "Ready for the next song",
+    "controller": "{title} music controller",
+    "dragController": "Drag music controller",
+    "dragOrToggle": "Drag or click to toggle"
   },
   "Header": {
+    "createSong": "Create Song",
     "links": [
       {
         "name": "My Songs",
@@ -365,7 +382,7 @@
           },
           {
             "name": "Lyric wall art gifts",
-            "href": "/free-custom-song-lyric-gifts",
+            "href": "/lyricwallart",
             "description": "Turn custom lyrics into printable wall art and keepsakes."
           }
         ]
@@ -471,7 +488,7 @@
             },
             {
               "name": "Lyric wall art gifts",
-              "href": "/free-custom-song-lyric-gifts"
+              "href": "/lyricwallart"
             }
           ]
         },
@@ -499,5 +516,20 @@
         }
       ]
     }
+  },
+  "CreateSong": {
+    "title": "Free AI Song Generator | Preview Your Song",
+    "description": "Turn your story into a quick song preview, refine the lyrics and style, then unlock the final MP3 when it feels right.",
+    "srTitle": "Free AI Song Generator",
+    "srDescription": "Start from a personal story, preview a generated song, then refine the lyrics, style, and delivery before unlocking the full MP3."
+  },
+  "Subscription": {
+    "title": "Subscription",
+    "description": "Manage your subscription plan and billing details.",
+    "stripePortalHint": "You will be redirected to Stripe to manage your subscription details.",
+    "creemPortalHint": "You will be redirected to manage your subscription details.",
+    "portalUnavailable": "Unable to load subscription management portal.",
+    "notSubscribed": "You are currently not subscribed to any plan.",
+    "upgradePlan": "Upgrade Plan"
   }
 }

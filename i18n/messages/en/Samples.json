@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "Your Song Samples",
+    "description": "Browse your generated song samples and choose your favorite version."
+  },
+  "hero": {
+    "badge": "Sample library",
+    "title": "Your samples, ready to choose",
+    "description": "Every generated song lands here first. Subscribers keep samples permanently; guests and non-subscribers can unlock within <emphasis>72 hours</emphasis>."
+  },
+  "filters": {
+    "all": "All samples",
+    "searchPlaceholder": "Search title, occasion, recipient",
+    "occasions": {
+      "anniversary": "Anniversary",
+      "birthday": "Birthday",
+      "congratulations": "Congratulations",
+      "fathersDay": "Father's Day",
+      "getWellSoon": "Get Well Soon",
+      "inMemoriam": "In Memoriam",
+      "justBecause": "Just Because",
+      "mothersDay": "Mother's Day",
+      "somethingElse": "Something else",
+      "thankYou": "Thank You",
+      "valentinesDay": "Valentine's Day",
+      "wedding": "Wedding"
+    }
+  },
+  "empty": {
+    "title": "No samples yet",
+    "description": "Create a song sample first, then it will appear here for your sample library.",
+    "create": "Create a sample"
+  }
+}

@@ -24,6 +24,36 @@ const nextConfig = {
       destination: "/:locale/blog/custom-happy-birthday-song",
       permanent: true,
     },
+    {
+      source: "/free-custom-song-lyric-gifts",
+      destination: "/ai-song-lyric-generator",
+      permanent: true,
+    },
+    {
+      source: "/:locale/free-custom-song-lyric-gifts",
+      destination: "/:locale/ai-song-lyric-generator",
+      permanent: true,
+    },
+    {
+      source: "/blog/custom-song-lyric-gifts",
+      destination: "/blog/song-lyric-wall-art-ideas",
+      permanent: true,
+    },
+    {
+      source: "/:locale/blog/custom-song-lyric-gifts",
+      destination: "/:locale/blog/song-lyric-wall-art-ideas",
+      permanent: true,
+    },
+    {
+      source: "/musicvideo",
+      destination: "/music-video-gift-maker",
+      permanent: true,
+    },
+    {
+      source: "/:locale/musicvideo",
+      destination: "/:locale/music-video-gift-maker",
+      permanent: true,
+    },
   ],
   images: {
     unoptimized:

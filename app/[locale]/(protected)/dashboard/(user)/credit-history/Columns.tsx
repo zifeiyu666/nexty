@@ -10,8 +10,12 @@ import {
 } from "@/components/ui/tooltip";
 import type { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
+import type { EnglishMessages } from "@/i18n/messages";
 
-const formatLogType = (type: string, t: (key: string) => string) => {
+type CreditHistoryMessageKey = keyof EnglishMessages["CreditHistory"];
+type CreditHistoryTranslator = (key: CreditHistoryMessageKey) => string;
+
+const formatLogType = (type: string, t: CreditHistoryTranslator) => {
   switch (type) {
     case "one_time_purchase":
       return (
@@ -63,7 +67,7 @@ const formatEntitlements = (value: unknown) => {
 };
 
 export const getColumns = (
-  t: (key: string) => string
+  t: CreditHistoryTranslator
 ): ColumnDef<CreditLog>[] => [
   {
     accessorKey: "createdAt",

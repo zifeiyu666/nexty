@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "ミュージックビデオ",
+    "description": "作成したすべての動画を確認できます。"
+  },
+  "hero": {
+    "badge": "ミュージックビデオ",
+    "title": "作成した動画一覧",
+    "description": "完成した動画の試聴とダウンロード、新しいバージョンの作成ができます。"
+  },
+  "stats": {
+    "totalVideos": "動画数",
+    "completedExports": "完成済み {count}本"
+  },
+  "actions": {
+    "createFromSong": "曲から作成",
+    "download": "ダウンロード",
+    "viewSong": "曲を見る"
+  },
+  "library": { "label": "ライブラリ", "title": "作成した動画" },
+  "filters": { "searchPlaceholder": "動画タイトルで検索" },
+  "empty": {
+    "noVideos": {
+      "title": "動画はまだありません",
+      "description": "完成した曲を開き、写真と歌詞を組み合わせて動画を作成してください。"
+    },
+    "noMatches": {
+      "title": "該当する動画がありません",
+      "description": "別のタイトルで検索してください。"
+    }
+  },
+  "status": {
+    "completed": "完了",
+    "failed": "失敗",
+    "rendering": "作成中",
+    "queued": "待機中"
+  }
+}

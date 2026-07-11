@@ -4,13 +4,22 @@ import { subscribeToNewsletter } from "@/actions/newsletter";
 import { normalizeEmail, validateEmail } from "@/lib/email";
 import { cn } from "@/lib/utils";
 import { Send } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
-export function Newsletter() {
-  const t = useTranslations("Footer.Newsletter");
-  const currentLocale = useLocale();
+type NewsletterLabels = {
+  defaultErrorMessage: string;
+  description: string;
+  invalidEmail: string;
+  successMessage: string;
+  title: string;
+};
 
+type NewsletterProps = {
+  labels: NewsletterLabels;
+  locale: string;
+};
+
+export function Newsletter({ labels, locale }: NewsletterProps) {
   const [email, setEmail] = useState("");
   const [subscribeStatus, setSubscribeStatus] = useState<
     "idle" | "loading" | "success" | "error"
@@ -28,7 +37,7 @@ export function Newsletter() {
 
     if (!isValid) {
       setSubscribeStatus("error");
-      setErrorMessage(validationError || t("subscribe.invalidEmail"));
+      setErrorMessage(validationError || labels.invalidEmail);
       setTimeout(() => setSubscribeStatus("idle"), 5000);
       return;
     }
@@ -38,11 +47,11 @@ export function Newsletter() {
 
       const result = await subscribeToNewsletter(
         normalizedEmailAddress,
-        currentLocale
+        locale
       );
 
       if (!result.success) {
-        throw new Error(result.error || t("subscribe.defaultErrorMessage"));
+        throw new Error(result.error || labels.defaultErrorMessage);
       }
 
       setSubscribeStatus("success");
@@ -53,7 +62,7 @@ export function Newsletter() {
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : t("subscribe.defaultErrorMessage")
+          : labels.defaultErrorMessage
       );
     } finally {
       setTimeout(() => setSubscribeStatus("idle"), 5000);
@@ -61,8 +70,8 @@ export function Newsletter() {
   };
   return (
     <div className="">
-      <div className="mb-3 font-semibold text-white">{t("title")}</div>
-      <p className="mb-3 text-sm text-white/62">{t("description")}</p>
+      <div className="mb-3 font-semibold text-white">{labels.title}</div>
+      <p className="mb-3 text-sm text-white/62">{labels.description}</p>
       <form onSubmit={handleSubscribe} className="flex flex-col gap-2 max-w-64">
         <div className="flex">
           <input
@@ -88,7 +97,7 @@ export function Newsletter() {
         </div>
         {subscribeStatus === "success" && (
           <p className="mt-1 text-xs text-white/70">
-            {t("subscribe.successMessage")}
+            {labels.successMessage}
           </p>
         )}
         {subscribeStatus === "error" && (

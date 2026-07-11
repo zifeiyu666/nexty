@@ -10,17 +10,21 @@
     "titleAccent": "Cherish Forever",
     "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI turns your memories into a studio-quality <strong>custom song</strong> you can preview, refine, and send as a <strong>personalized music gift</strong>.</p>",
     "trustBadge": "Custom song gifts · Free preview first",
-    "trustItems": [
-      "Free preview",
-      "Ready in minutes",
-      "No credit card needed"
-    ],
+    "trustItems": ["Free preview", "Ready in minutes", "No credit card needed"],
     "getStarted": "Start a Free Preview",
     "getStartedLink": "/create-song",
     "howItWorksCta": "How It Works",
     "watchReactionsCta": "Watch Reactions",
     "viewDocs": "Read the Blog",
     "viewDocsLink": "/blog"
+  },
+  "OccasionShowcase": {
+    "eyebrow": "Occasions",
+    "title": "For Every Precious Moment, A Personal Melody",
+    "description": "Custom-craft a unique song to honor life's special stories and emotions.",
+    "previous": "Previous occasion",
+    "next": "Next occasion",
+    "carouselLabel": "Occasion carousel"
   },
   "CustomerReactions": {
     "badge": {

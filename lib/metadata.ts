@@ -38,10 +38,10 @@ export async function constructMetadata({
   });
 
   const pageTitle = title || t(`title`);
-  const rawMessages = (
-    await import(`../i18n/messages/${locale || DEFAULT_LOCALE}/common.json`)
-  ).default as Record<string, Record<string, string>>;
-  const pageTagLine = (rawMessages.Home?.tagLine || "").replace(/<[^>]*>/g, "");
+  const pageTagLine = String(t.raw("tagLine"))
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   const pageDescription = description || t(`description`);
 
   const finalTitle =
@@ -78,8 +78,7 @@ export async function constructMetadata({
   // If images is explicitly provided and not empty, use them
   // If images is undefined/not provided and useDefaultOgImage is false, return undefined to let Next.js use opengraph-image.tsx
   // If images is undefined/not provided and useDefaultOgImage is true, use default static OG image
-  const defaultOgImage =
-    locale === DEFAULT_LOCALE ? "/og.jpg" : `/og_${locale}.png`;
+  const defaultOgImage = "/og.jpg";
   const imageUrls =
     images && images.length > 0
       ? images.map((img) => ({
@@ -94,7 +93,7 @@ export async function constructMetadata({
             },
           ]
         : undefined;
-  const pageURL = `${locale === DEFAULT_LOCALE ? "" : `/${locale}`}${path}`;
+  const pageURL = `${locale === DEFAULT_LOCALE ? "" : `/${locale}`}${path || ""}` || "/";
 
   return {
     title: finalTitle,
@@ -117,7 +116,7 @@ export async function constructMetadata({
       description: pageDescription,
       url: pageURL,
       siteName: t("title"),
-      locale: locale,
+      locale: LOCALE_TO_HREFLANG[locale || DEFAULT_LOCALE] || locale,
       ...(imageUrls && { images: imageUrls }),
     },
     twitter: {

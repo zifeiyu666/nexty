@@ -47,9 +47,11 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return constructMetadata({
-    title: "Custom Happy Birthday Song | Personalized Music Gift",
-    description:
-      "Create a custom happy birthday song with names, memories, AI vocals, free previews, music videos, and personalized happy birthday song keepsakes.",
+    title: locale === "es" ? "Canción de cumpleaños personalizada" : locale === "ja" ? "名前と思い出を入れたオリジナル誕生日ソング" : "Custom Happy Birthday Song | Personalized Music Gift",
+    description: locale === "es"
+      ? "Crea una canción de cumpleaños personalizada con nombres, recuerdos y una muestra gratuita. Un regalo musical único, listo para compartir."
+      : locale === "ja" ? "名前や思い出を入れた誕生日ソングを作成できます。無料サンプルを試聴してから、大切な人へ贈れます。"
+      : "Create a custom happy birthday song with names, memories, AI vocals, free previews, music videos, and personalized happy birthday song keepsakes.",
     locale: locale as Locale,
     path: "/occasions/custom-happy-birthday-song",
     images: ["/images/occasions/birthday-custom-song-hero.webp"],

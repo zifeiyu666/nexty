@@ -1,0 +1,298 @@
+{
+  "Hero": {
+    "badge": { "label": "", "text": "✨ AIで作る世界にひとつの歌", "href": "" },
+    "title": "ずっと心に残る、世界にひとつの歌を贈ろう。",
+    "titleLine": "世界にひとつの歌を",
+    "titleAccent": "大切な人へ",
+    "description": "<p class=\"hero-subtitle\">思い出を聞かせてください。AIが物語を、試聴・編集できるスタジオ品質の<strong>オリジナルソング</strong>に仕上げ、<strong>音楽ギフト</strong>として届けられます。</p>",
+    "trustBadge": "オリジナルソング · まずは無料試聴",
+    "trustItems": ["無料サンプル", "数分で完成", "カード登録不要"],
+    "getStarted": "無料サンプルを作る",
+    "getStartedLink": "/create-song",
+    "howItWorksCta": "作り方を見る",
+    "watchReactionsCta": "リアクションを見る",
+    "viewDocs": "記事を読む",
+    "viewDocsLink": "/blog"
+  },
+  "OccasionShowcase": {
+    "eyebrow": "さまざまなシーンに",
+    "title": "大切な瞬間に、その人だけのメロディを",
+    "description": "人生の特別な物語や気持ちを、世界にひとつのオリジナルソングに込められます。",
+    "previous": "前のシーン",
+    "next": "次のシーン",
+    "carouselLabel": "用途別ソングのカルーセル"
+  },
+  "CustomerReactions": {
+    "badge": { "label": "リアクション", "text": "😭 思わずこぼれるうれし涙" },
+    "title": "オリジナルソングを受け取った瞬間",
+    "description": "<p>大切な人が、自分だけの<strong>オリジナルソング</strong>を初めて聴く瞬間をご覧ください。</p>",
+    "playLabel": "{title}を音声付きで再生",
+    "muteLabel": "{title}をミュート",
+    "trustItems": ["無料で試せます", "数分で完成", "音楽経験は不要です"],
+    "videos": [
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-2.mp4",
+        "label": "One Custom Song",
+        "title": "お母さんが初めて聴いた瞬間"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
+        "label": "One Custom Song",
+        "title": "うれし涙"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
+        "label": "One Custom Song",
+        "title": "最高のサプライズ"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
+        "label": "One Custom Song",
+        "title": "結婚式の思い出をもう一度"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-12.mp4",
+        "label": "One Custom Song",
+        "title": "記念日のサプライズ"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-5.mp4",
+        "label": "One Custom Song",
+        "title": "ふたりの歌"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
+        "label": "One Custom Song",
+        "title": "驚きが笑顔に変わる瞬間"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-20.mp4",
+        "label": "One Custom Song",
+        "title": "もう一度聴きたい"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
+        "label": "One Custom Song",
+        "title": "お父さんが初めて聴いた瞬間"
+      },
+      {
+        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
+        "label": "One Custom Song",
+        "title": "喜びの涙"
+      }
+    ]
+  },
+  "HowItWorks": {
+    "eyebrow": "作り方",
+    "title": "ひとつの思い出が、数分で心を動かす歌に",
+    "description": "<strong>オリジナルソング</strong>を無料で試聴し、気に入ったら<strong>ミュージックビデオ</strong>や印刷できる<strong>歌詞アート</strong>と一緒に完成版を受け取れます。",
+    "steps": {
+      "story": {
+        "title": "思い出を教えてください",
+        "description": "用途と音楽ジャンルを選び、大切な出来事や伝えたい言葉を入力します。AIが自然な歌詞にまとめます。",
+        "cta": "曲を作る"
+      },
+      "preview": {
+        "title": "無料で試聴して調整",
+        "description": "スタジオ品質の60秒サンプルを聴けます。歌詞やジャンルを変更して、納得できる形に仕上げてください。"
+      },
+      "gift": {
+        "title": "完成版をギフトに",
+        "description": "<strong>オリジナルソング</strong>の完成版に加え、<strong>ミュージックビデオ</strong>と編集できる<strong>歌詞アート</strong>も作れます。"
+      },
+      "deliver": {
+        "title": "好きな方法で贈れます",
+        "description": "完成した曲を直接送り、<strong>ミュージックビデオ</strong>を共有したり、<strong>歌詞アート</strong>を印刷したりできます。"
+      }
+    }
+  },
+  "OurProducts": {
+    "eyebrow": "作れるもの",
+    "title": "オリジナルソングだけではありません",
+    "description": "ひとつの物語から、楽曲、共有できる動画、印刷できる歌詞アートまで、ひとまとまりの音楽ギフトを作れます。",
+    "items": {
+      "customSong": {
+        "label": "メイン",
+        "title": "オリジナルソング",
+        "price": "$29.99から",
+        "description": "思い出、名前、日付、メッセージからスタジオ品質の一曲を作ります。無料サンプルを聴き、歌詞を調整してから完成版を贈れます。",
+        "cta": "曲を作る",
+        "imageAlt": "スマートフォンでオリジナルソングを聴くカップル"
+      },
+      "videoGift": {
+        "label": "オプション",
+        "title": "ミュージックビデオ",
+        "price": "$23.99から",
+        "description": "写真と同期した歌詞を組み合わせ、メッセージやSNSで共有しやすい動画に仕上げます。",
+        "cta": "動画を作る",
+        "imageAlt": "家族写真と歌詞を使ったミュージックビデオ"
+      },
+      "wallArt": {
+        "label": "オプション",
+        "title": "デジタル歌詞アート",
+        "price": "$7.99から",
+        "description": "歌詞をレコード風ポスターや写真入りアートにして、高解像度でダウンロードできます。",
+        "cta": "歌詞アートを作る",
+        "imageAlt": "オリジナル歌詞から作った印刷用アート"
+      }
+    }
+  },
+  "UseCases": {
+    "badge": { "label": "特徴", "text": "気持ちが伝わる音楽ギフト" },
+    "title": "難しい作業なしで、特別な一曲を",
+    "description": "購入前に試聴し、歌詞や雰囲気を自分で調整できます。",
+    "cases": [
+      {
+        "title": "数分で無料サンプル",
+        "description": "簡単な質問に答えるだけで、思い出から最初の楽曲サンプルを作れます。音楽経験は必要ありません。",
+        "image": "/placeholder.webp",
+        "icon": "Zap"
+      },
+      {
+        "title": "丁寧なサウンド",
+        "description": "感情の伝わる歌声、楽器、ミックスで、ギフトとして届けられる音に仕上げます。",
+        "image": "/placeholder.webp",
+        "icon": "Mic2"
+      },
+      {
+        "title": "わかりやすい料金",
+        "description": "無料サンプルを聴いてから完成版を購入できます。高額な前払いはありません。",
+        "image": "/placeholder.webp",
+        "icon": "CircleDollarSign"
+      },
+      {
+        "title": "購入前に無料で試せます",
+        "description": "カード登録なしで試聴できます。歌詞やジャンルを変更してから完成版を選べます。",
+        "image": "/placeholder.webp",
+        "icon": "Sparkles"
+      },
+      {
+        "title": "動画と歌詞アートのテンプレート",
+        "description": "曲に写真を加えた動画や、印刷して飾れる歌詞アートを作れます。",
+        "image": "/placeholder.webp",
+        "icon": "Palette"
+      },
+      {
+        "title": "編集ツールを用意",
+        "description": "写真、日付、メッセージを追加し、動画や歌詞アートを自分らしく調整できます。",
+        "image": "/placeholder.webp",
+        "icon": "SlidersHorizontal"
+      }
+    ]
+  },
+  "SongfinchComparison": {
+    "eyebrow": "SongfinchとOne Custom Songの違い",
+    "title": "<us>onecustomsong.com</us> <vs>と</vs> <songfinch>Songfinch</songfinch>",
+    "subtitle": "1曲に<price>$200以上</price>支払う前に、まず無料サンプルを試せます。<strong>スタジオ品質のサウンド</strong>と自由な編集を<underline>より手頃な価格で。</underline>",
+    "tableHeaders": {
+      "feature": "比較項目",
+      "songfinch": "Songfinch",
+      "us": "onecustomsong.com"
+    },
+    "rows": [
+      {
+        "feature": "開始価格",
+        "songfinch": "1曲$199から",
+        "us": "手頃な料金プラン"
+      },
+      { "feature": "納期", "songfinch": "4〜7日", "us": "数分でサンプル" },
+      {
+        "feature": "購入前の試聴",
+        "songfinch": "前払い",
+        "us": "無料サンプルあり"
+      },
+      {
+        "feature": "歌詞の修正",
+        "songfinch": "制限または追加料金",
+        "us": "自由に編集可能"
+      },
+      {
+        "feature": "ミュージックビデオ",
+        "songfinch": "含まれません",
+        "us": "編集テンプレートを利用可能"
+      },
+      {
+        "feature": "印刷用歌詞アート",
+        "songfinch": "含まれません",
+        "us": "歌詞ポスター編集機能あり"
+      }
+    ],
+    "painPoints": [
+      {
+        "icon": "value",
+        "title": "無理のない価格で特別な贈り物",
+        "description": "無料サンプルを聴いてから、必要な内容に合うプランを選べます。"
+      },
+      {
+        "icon": "speed",
+        "title": "思い出が数分で音楽に",
+        "description": "誕生日や記念日が近くても、短時間で最初のサンプルを確認できます。"
+      },
+      {
+        "icon": "edits",
+        "title": "歌詞とジャンルを自分で調整",
+        "description": "メールで何度もやり取りせず、アカウントから歌詞や音楽スタイルを変更できます。"
+      },
+      {
+        "icon": "bundle",
+        "title": "曲以外のギフトも作れます",
+        "description": "写真入り動画や印刷できる歌詞アートを加え、ひとつの思い出をさまざまな形で贈れます。"
+      }
+    ]
+  },
+  "Testimonials": {
+    "badge": { "label": "お客様の声" },
+    "title": "お客様の声",
+    "description": "実際にオリジナルソングを贈った方の感想です。"
+  },
+  "FAQ": {
+    "title": "オリジナルソングについてのよくある質問",
+    "description": "作成前に知っておきたいことをご案内します。",
+    "items": [
+      {
+        "question": "onecustomsong.comはどのように使いますか？",
+        "answer": "思い出を入力し、音楽ジャンルを選ぶと、AIがオリジナルソングを作成します。まず60秒の無料サンプルを試聴し、気に入ったら完成版を購入できます。"
+      },
+      {
+        "question": "他のオリジナルソングサービスとの違いは？",
+        "answer": "購入前に無料で試聴でき、歌詞やジャンルを自分で調整できます。動画や印刷用歌詞アートも作れます。"
+      },
+      {
+        "question": "歌詞やジャンルを変更できますか？",
+        "answer": "はい。完成版を購入する前に、歌詞、音楽スタイル、歌声の雰囲気を調整できます。"
+      },
+      {
+        "question": "音楽ギフトはどうやって共有できますか？",
+        "answer": "専用の共有ページをメッセージ、メール、SNSで送れます。写真やメッセージを加えた動画も作成できます。"
+      },
+      {
+        "question": "追加料金はありますか？決済は安全ですか？",
+        "answer": "表示されていない追加料金はありません。決済はStripeで安全に処理され、カード情報を当社サーバーに保存することはありません。"
+      },
+      {
+        "question": "作成した曲はいつまで保存されますか？",
+        "answer": "購入した曲、動画、歌詞アートはアカウントに保存され、いつでも再生・ダウンロードできます。"
+      },
+      {
+        "question": "作成前に会員登録が必要ですか？",
+        "answer": "サンプル作成を始めるための事前登録は不要です。試聴時にメールアドレスを入力し、後からGoogleまたはメールでログインできます。"
+      },
+      {
+        "question": "曲の作成が止まった場合は？",
+        "answer": "ページを再読み込みし、アカウントから状態をご確認ください。解決しない場合はサポートへお問い合わせください。"
+      }
+    ]
+  },
+  "CTA": {
+    "title": "大切な人だけの歌を作ろう",
+    "description": "思い出を、スタジオ品質の<strong>オリジナルソング</strong>に。曲を作って<strong>大切な人へ届ける</strong>、誕生日や結婚式、記念日のための<strong>音楽ギフト</strong>です。",
+    "button": "曲を作る",
+    "trustText": "忘れられない瞬間のために",
+    "features": {
+      "deploy": "🎵 スタジオ品質のサウンド",
+      "production": "🎁 そのまま贈れます",
+      "updates": "⚡ 無料サンプル",
+      "i18n": "💌 簡単に共有"
+    }
+  }
+}

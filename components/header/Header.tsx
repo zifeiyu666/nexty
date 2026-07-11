@@ -18,8 +18,9 @@ type User = typeof userSchema.$inferSelect;
 
 const Header = async () => {
   const locale = await getLocale();
-  const [t, session, headerLinks] = await Promise.all([
+  const [t, headerT, session, headerLinks] = await Promise.all([
     getTranslations("Home"),
+    getTranslations("Header"),
     getSession(),
     getHeaderNavigationLinks(locale),
   ]);
@@ -27,21 +28,21 @@ const Header = async () => {
 
   return (
     <HeaderShell>
-      <nav className="flex justify-between items-center container max-w-8xl mx-auto">
+      <nav className="relative flex items-center justify-between container max-w-8xl mx-auto">
         <div className="flex items-center space-x-6 md:space-x-12">
           <I18nLink
             href="/"
             title={t("title")}
             prefetch={true}
-            className="flex items-center space-x-1"
+            className="absolute left-1/2 flex -translate-x-1/2 items-center space-x-1 lg:static lg:translate-x-0"
           >
             <Image
-              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
+              src="/images/brand/one-custom-song-wordmark-header.png"
               alt={t("title")}
-              width={2017}
-              height={337}
+              width={2024}
+              height={333}
               priority
-              className="h-8 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-9"
+              className="h-6 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-7"
             />
           </I18nLink>
 
@@ -57,7 +58,7 @@ const Header = async () => {
             >
               <I18nLink href="/create-song">
                 <HeaderActionText icon={<Music2 className="h-3.5 w-3.5" />}>
-                  Create Song
+                  {headerT("createSong")}
                 </HeaderActionText>
               </I18nLink>
             </Button>
@@ -66,18 +67,11 @@ const Header = async () => {
 
           {/* Mobile */}
           <div className="flex lg:hidden items-center gap-x-2">
-            <Button
-              asChild
-              size="icon"
-              className="h-9 w-9 rounded-full shadow-sm hover:shadow-md active:scale-[0.96]"
-              aria-label="Create song"
-            >
-              <I18nLink href="/create-song">
-                <Music2 className="h-4 w-4" />
-              </I18nLink>
-            </Button>
-            <UserAvatar user={user as User} />
-            <MobileMenu links={headerLinks} variant="adaptive" />
+            <MobileMenu
+              links={headerLinks}
+              user={user as User}
+              variant="adaptive"
+            />
           </div>
         </div>
       </nav>

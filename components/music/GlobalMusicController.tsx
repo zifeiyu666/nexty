@@ -12,6 +12,7 @@ import {
 } from "@/lib/music-player/global-player-store";
 import { cn } from "@/lib/utils";
 import { Music2, Pause, Play } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -112,6 +113,7 @@ function TrackLabel({
 }
 
 export function GlobalMusicController() {
+  const t = useTranslations("MusicPlayer");
   const {
     duration,
     isVisible,
@@ -214,9 +216,9 @@ export function GlobalMusicController() {
     return null;
   }
 
-  const playbackLabel = isPlaying ? "Pause music" : "Play music";
-  const title = track?.title || "No music playing";
-  const artist = track?.artist || "Ready for the next song";
+  const playbackLabel = isPlaying ? t("pause") : t("play");
+  const title = track?.title || t("noMusicPlaying");
+  const artist = track?.artist || t("ready");
 
   return (
     <div
@@ -257,7 +259,7 @@ export function GlobalMusicController() {
         }}
       />
       <div
-        aria-label={`${title} music controller`}
+        aria-label={t("controller", { title })}
         className={cn(
           "absolute top-0 flex h-12 w-12 touch-none cursor-grab select-none items-center gap-2 overflow-hidden rounded-full border border-white/12 bg-zinc-950/92 p-0 text-white shadow-[0_16px_40px_rgba(10,10,20,0.3)] backdrop-blur-xl transition-[width,border-radius,box-shadow,background-color] duration-300 ease-out active:cursor-grabbing group-hover:rounded-[1.5rem] group-focus-within:rounded-[1.5rem]",
           dockSide === "right" ? "right-0 flex-row-reverse" : "left-0",
@@ -344,7 +346,7 @@ export function GlobalMusicController() {
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              aria-label="Drag music controller"
+              aria-label={t("dragController")}
               className="grid size-12 shrink-0 touch-none place-items-center rounded-full text-white outline-none transition focus-visible:ring-2 focus-visible:ring-white/80"
               data-global-music-toggle-handle=""
               type="button"
@@ -370,7 +372,7 @@ export function GlobalMusicController() {
             </button>
           </TooltipTrigger>
           <TooltipContent side="top">
-            {track ? "Drag or click to toggle" : "Drag music controller"}
+            {track ? t("dragOrToggle") : t("dragController")}
           </TooltipContent>
         </Tooltip>
 

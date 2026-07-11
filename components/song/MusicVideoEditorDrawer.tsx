@@ -146,6 +146,15 @@ import {
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 
+type MusicVideoStudioProps = {
+  className?: string;
+  emptyState?: ReactNode;
+  initialSong?: MusicVideoSongOption;
+  songOptions?: MusicVideoSongOption[];
+  surface?: "page" | "sheet";
+  trigger?: ReactNode;
+};
+
 type MusicVideoEditorDrawerProps = {
   emptyState?: ReactNode;
   initialSong?: MusicVideoSongOption;
@@ -2558,12 +2567,14 @@ function WaveRadioBackgroundOptionCard({
   );
 }
 
-export function MusicVideoEditorDrawer({
+export function MusicVideoStudio({
+  className,
   emptyState,
   initialSong,
   songOptions,
+  surface = "page",
   trigger,
-}: MusicVideoEditorDrawerProps) {
+}: MusicVideoStudioProps) {
   const selectableSongs = useMemo(() => {
     const seen = new Set<string>();
     const options = [initialSong, ...(songOptions ?? [])].filter(
@@ -2578,7 +2589,7 @@ export function MusicVideoEditorDrawer({
   }, [initialSong, songOptions]);
   const fallbackSong = selectableSongs[0] ?? null;
   const fallbackSongId = fallbackSong?.id ?? "";
-  const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const [isStudioOpen, setIsStudioOpen] = useState(surface === "page");
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [selectedSongId, setSelectedSongId] = useState(fallbackSongId);
   const selectedSong =
@@ -3673,11 +3684,9 @@ export function MusicVideoEditorDrawer({
         onOrientationChange={updateMinimalVinylDiscCropOrientation}
         onTransformChange={updateMinimalVinylDiscCropTransform}
       />
-      <Sheet open={isStudioOpen} onOpenChange={handleStudioOpenChange}>
-        <SheetTrigger asChild>{trigger}</SheetTrigger>
-        <SheetContent
-          className={cn(studioGlassStyles.sheetContent, "overflow-hidden")}
-        >
+      {(() => {
+        const content = (
+          <>
           <style>{wallArtFontFaceCss}</style>
           <style>{musicVideoMotionCss}</style>
           <StudioBlurBackdrop imageUrl={studioBackdropUrl} />
@@ -3685,7 +3694,9 @@ export function MusicVideoEditorDrawer({
             closeLabel="Close music video studio"
             description="Create, preview, and render your music video."
             icon={Video}
-            onClose={requestCloseStudio}
+            onClose={surface === "sheet" ? requestCloseStudio : undefined}
+            showClose={surface === "sheet"}
+            surface={surface}
             title="Music Video Studio"
             action={
               <Select value={activeSongId} onValueChange={handleSongSelection}>
@@ -3924,8 +3935,34 @@ export function MusicVideoEditorDrawer({
               </aside>
             </div>
           )}
-        </SheetContent>
-      </Sheet>
+          </>
+        );
+
+        if (surface === "sheet" && trigger) {
+          return (
+            <Sheet open={isStudioOpen} onOpenChange={handleStudioOpenChange}>
+              <SheetTrigger asChild>{trigger}</SheetTrigger>
+              <SheetContent
+                className={cn(studioGlassStyles.sheetContent, "overflow-hidden")}
+              >
+                {content}
+              </SheetContent>
+            </Sheet>
+          );
+        }
+
+        return (
+          <div
+            className={cn(
+              studioGlassStyles.sheetContent,
+              "relative flex min-h-[calc(100svh-64px)] w-full flex-col overflow-hidden",
+              className,
+            )}
+          >
+            {content}
+          </div>
+        );
+      })()}
       <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
         <AlertDialogContent className={musicVideoCloseConfirmDialogClassName}>
           <div className="flex gap-3.5 px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
@@ -3959,5 +3996,22 @@ export function MusicVideoEditorDrawer({
         </AlertDialogContent>
       </AlertDialog>
     </>
+  );
+}
+
+export function MusicVideoEditorDrawer({
+  emptyState,
+  initialSong,
+  songOptions,
+  trigger,
+}: MusicVideoEditorDrawerProps) {
+  return (
+    <MusicVideoStudio
+      emptyState={emptyState}
+      initialSong={initialSong}
+      songOptions={songOptions}
+      surface="sheet"
+      trigger={trigger}
+    />
   );
 }

@@ -361,20 +361,19 @@ export default function CustomSongLyricGiftsPage({
           <div className="max-w-2xl">
             <div className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-sm text-[#695851] shadow-[0_18px_40px_rgba(92,48,28,0.08),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-xl">
               <Stars />
-              <span className="font-bold text-[#251a15]">Free lyric start</span>
+              <span className="font-bold text-[#251a15]">Free AI lyric generator</span>
               <span className="text-[#d7c3b8]">/</span>
-              <span>Custom song lyric gifts</span>
+              <span>Personalized song lyrics</span>
             </div>
 
             <h1 className="mt-5 max-w-[12ch] text-balance font-sans text-[2.55rem] font-black leading-[0.98] tracking-normal text-[#24120d] min-[420px]:text-[3rem] sm:text-[3.8rem] lg:text-[4.55rem]">
-              Custom Song Lyric Gifts
+              Free AI Song Lyric Generator
             </h1>
 
             <p className="mt-5 max-w-xl text-base leading-7 text-[#6b5e57] sm:text-lg">
-              Turn a real story into personal lyrics first, then make the gift
-              bigger: create a custom song, printable lyric wall art, or a lyric
-              music video. Start with the free lyric AI generator and edit every
-              line until it sounds like the person you love.
+              Turn a real story into personal lyrics, edit every line, and create
+              a custom song when the words sound right. Your finished song can
+              also become a printable lyric poster or a shareable music video.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -393,6 +392,12 @@ export default function CustomSongLyricGiftsPage({
                 songOptions={wallArtSongOptions}
               />
             </div>
+            <I18nLink
+              href="/blog/song-lyric-wall-art-ideas"
+              className="mt-5 inline-flex text-sm font-bold text-[#8a3a2f] underline decoration-[#d7b9aa] underline-offset-4 transition hover:text-[#63261d]"
+            >
+              Explore lyric wall art ideas
+            </I18nLink>
           </div>
 
           <LyricGiftHeroVisual />
@@ -404,7 +409,7 @@ export default function CustomSongLyricGiftsPage({
           <SectionHeader
             eyebrow="Why lyric gifts work"
             title="One set of words, three ways to give it"
-            description="Custom song lyric gifts begin with the message. Once the lyrics are right, they can become audio, printable art, or a visual keepsake."
+            description="Start with a story and shape the lyrics before choosing how you want to share the finished song."
           />
 
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -430,8 +435,8 @@ export default function CustomSongLyricGiftsPage({
 
       <HowItWorksSection
         eyebrow="How it works"
-        title="From story to lyric keepsake"
-        description="You bring the details. The lyric generator and editors help turn them into words that can be sung, printed, or watched."
+        title="From story to personalized lyrics"
+        description="You bring the details. The lyric generator and editor help turn them into words that can become a song, poster, or video."
         steps={steps}
         sectionClassName="bg-[#f5eee7]"
         cardClassName="border border-[#eadbd3] shadow-[0_14px_34px_rgba(54,35,23,0.06)]"
@@ -571,15 +576,15 @@ export default function CustomSongLyricGiftsPage({
       </section>
 
       <Testimonials
-        title="Lyric gifts people keep"
+        title="Personal lyrics people keep"
         description="When the words include their real life, the song, poster, or video feels less like a template and more like a memory."
         items={testimonials}
         contentWidthClassName="max-w-6xl"
       />
 
       <FAQ
-        title="Custom song lyric gift questions"
-        description="A few practical details about the lyric generator, editor, wall art studio, and lyric music video flow."
+        title="AI song lyric generator questions"
+        description="Practical details about writing, editing, and turning personalized lyrics into a finished song or keepsake."
         items={faqs}
         ctaTitle="Ready to write the lyric gift?"
         ctaDescription="Start with the story, generate free lyrics, and turn the best lines into a custom song, wall art, or lyric video."

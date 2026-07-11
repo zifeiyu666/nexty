@@ -255,6 +255,21 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.doesNotMatch(uiSource, /style=\{\{ x: springX, y: springY \}\}/);
   });
 
+  test("occasion choices use two columns on mobile", () => {
+    const recipientStepSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/steps/RecipientStep.tsx",
+      ),
+      "utf8",
+    );
+
+    assert.match(
+      recipientStepSource,
+      /grid grid-cols-2 gap-x-2 gap-y-6 pt-2 sm:gap-x-3 lg:grid-cols-5/,
+    );
+  });
+
   test("genre recommendations render separately and collapse more styles", () => {
     const styleStepSource = readFileSync(
       join(
@@ -277,6 +292,12 @@ describe("CustomSongWizard lyric version comparison", () => {
       /setShowMoreGenres\(\(current\) => !current\)/,
     );
     assert.match(styleStepSource, /More styles/);
+    assert.equal(
+      styleStepSource.match(
+        /grid grid-cols-2 gap-2\.5 lg:grid-cols-5/g,
+      )?.length,
+      2,
+    );
     assert.doesNotMatch(styleStepSource, /Recommended for this occasion/);
     assert.doesNotMatch(styleStepSource, /May not fit this occasion/);
     assert.doesNotMatch(styleStepSource, /badge=\{/);
@@ -334,6 +355,23 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.match(storyStepSource, /Click words to use templates/);
     assert.match(storyStepSource, /insertTemplate\(template\.text\)/);
     assert.match(storyStepSource, /underline decoration-primary/);
+  });
+
+  test("story actions stay on one row and hide decorative icons on mobile", () => {
+    const storyStepSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/steps/StoryStep.tsx",
+      ),
+      "utf8",
+    );
+
+    assert.match(storyStepSource, /flex flex-nowrap items-center gap-2 sm:gap-3/);
+    assert.equal(
+      storyStepSource.match(/hidden size-5[^\"]*sm:block/g)?.length,
+      5,
+    );
+    assert.match(storyStepSource, /hidden text-sm[^\"]*sm:inline/);
   });
 
   test("story helper generates a GPT story with local fallback", () => {

@@ -1,0 +1,118 @@
+{
+  "badge": { "label": "PRECIOS", "text": "Paquetes sencillos para tu canción" },
+  "title": "Elige el regalo musical que mejor encaja con tu momento",
+  "description": "Escucha gratis una muestra de tu canción personalizada y desbloquea la versión completa y los extras que quieras cuando estés listo.",
+  "annual": "Anual",
+  "monthly": "Mensual",
+  "onetime": "Pago único",
+  "saveTip": "Ahorra un 20 %",
+  "notIncluded": "No incluido",
+  "hero": {
+    "badge": "Opciones para cada tipo de regalo",
+    "titleLine1": "Crea una canción con significado",
+    "titleLine2": "Paga solo cuando te guste",
+    "underline": "cuando te guste",
+    "description": "Elige un pago único para un momento especial o accede a Pro si quieres crear canciones con frecuencia, descargar más versiones y usar estilos de vídeo premium."
+  },
+  "promotion": {
+    "badge": "Extras de regalo",
+    "title": "Por tiempo limitado",
+    "titleAccent": "100 % gratis",
+    "lead": "Consigue estos extras premium con cualquier plan mientras dure la promoción.",
+    "description": "Pro y Platinum ya incluyen ventajas mensuales. Esta promoción permite que los demás planes también añadan recuerdos extra durante el pago.",
+    "freeNow": "Gratis ahora",
+    "from": "Antes",
+    "interactiveHint": "Pasa el cursor para abrir el estudio",
+    "automaticHint": "Se añade automáticamente al completar un pago válido"
+  },
+  "addOns": {
+    "video": {
+      "title": "Vídeo musical cinematográfico",
+      "description": "Convierte tu canción en una historia visual con tus propias fotos y recuerdos.",
+      "cta": "Abrir el estudio de vídeo",
+      "suffix": "por vídeo",
+      "promo": "EXTRA GRATIS"
+    },
+    "wallArt": {
+      "title": "Lámina digital con la letra",
+      "description": "Un diseño en alta resolución con la letra de tu canción, listo para descargar, imprimir y enmarcar.",
+      "cta": "Abrir el estudio de láminas",
+      "suffix": "por lámina",
+      "promo": "EXTRA GRATIS"
+    },
+    "mp3": {
+      "title": "MP3 con calidad de estudio",
+      "description": "Descarga tu canción en alta calidad para guardarla y escucharla sin conexión en cualquier dispositivo.",
+      "suffix": "por canción",
+      "promo": "EXTRA GRATIS"
+    }
+  },
+  "trust": {
+    "checkout": {
+      "title": "Pago seguro",
+      "description": "Verificación segura e inmediata mediante Creem"
+    },
+    "satisfaction": {
+      "title": "Satisfacción garantizada",
+      "description": "Ajusta tu canción gratis hasta que estés conforme con el resultado."
+    },
+    "support": {
+      "title": "Soporte cuando lo necesites",
+      "description": "Estamos aquí para ayudarte durante todo el proceso."
+    }
+  },
+  "fallbackPlans": {
+    "single": {
+      "title": "Una canción",
+      "description": "Una canción para una ocasión, sin suscripción.",
+      "button": "Crear una canción",
+      "suffix": "pago único",
+      "cta": "Pago único",
+      "features": [
+        "Una canción",
+        "Letra personalizada para la ocasión",
+        "Página personalizada para compartir",
+        "Descarga MP3",
+        "Regalo en vídeo",
+        "Lámina con la letra"
+      ]
+    },
+    "pro": {
+      "title": "Pro",
+      "description": "Canciones y vídeos cada mes con calidad de estudio.",
+      "button": "Elegir Pro",
+      "suffix": "mes",
+      "cta": "Elegir Pro",
+      "highlight": "Más popular",
+      "features": [
+        "Crea 3 canciones al mes",
+        "2 estilos de vídeo al mes",
+        "2 láminas al mes",
+        "Descarga canciones en MP3",
+        "Voces y producción con calidad de estudio",
+        "Letras personalizadas",
+        "Página para compartir",
+        "Portada única",
+        "Cancela cuando quieras"
+      ]
+    },
+    "platinum": {
+      "title": "Platinum",
+      "description": "Canciones y vídeos sin límites. Todo lo de Pro y más.",
+      "button": "Elegir Platinum",
+      "suffix": "año",
+      "cta": "Elegir Platinum",
+      "highlight": "Mejor opción",
+      "features": [
+        "Crea canciones sin límite",
+        "10 estilos de vídeo al mes",
+        "10 láminas al mes",
+        "Descarga canciones en MP3",
+        "Voces y producción con calidad de estudio",
+        "Letras personalizadas",
+        "Página para compartir",
+        "Portada única"
+      ]
+    }
+  }
+}

@@ -77,7 +77,7 @@ export async function unsubscribeFromNewsletter(token: string, locale = DEFAULT_
   } catch (error) {
     console.error('failed to unsubscribe from newsletter:', error);
     const t = await getTranslations({ locale, namespace: 'Footer.Newsletter' });
-    const errorMessage = error instanceof Error ? error.message : t('unsubscribe.defaultErrorMessage');
+    const errorMessage = error instanceof Error ? error.message : t('subscribe.defaultErrorMessage');
     return actionResponse.error(errorMessage);
   }
 }

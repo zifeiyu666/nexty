@@ -2,6 +2,7 @@ import CustomSongWizard from "@/components/song/CustomSongWizard";
 import { Locale } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 type Params = Promise<{ locale: string }>;
 
@@ -11,25 +12,24 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "CreateSong" });
 
   return constructMetadata({
-    title: "Free AI Song Generator | Preview Your Song",
-    description:
-      "Turn your story into a quick song preview, refine the lyrics and style, then unlock the final MP3 when it feels right.",
+    title: t("title"),
+    description: t("description"),
     locale: locale as Locale,
     path: "/create-song",
   });
 }
 
-export default function CreateSongPage() {
+export default async function CreateSongPage() {
+  const t = await getTranslations("CreateSong");
+
   return (
     <div className="w-full min-h-screen bg-background">
       <section className="sr-only" aria-labelledby="create-song-title">
-        <h1 id="create-song-title">Free AI Song Generator</h1>
-        <p>
-          Start from a personal story, preview a generated song, then refine the
-          lyrics, style, and delivery before unlocking the full MP3.
-        </p>
+        <h1 id="create-song-title">{t("srTitle")}</h1>
+        <p>{t("srDescription")}</p>
       </section>
       <CustomSongWizard />
     </div>

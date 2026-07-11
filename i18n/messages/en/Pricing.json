@@ -8,5 +8,33 @@
   "annual": "Annual",
   "monthly": "Monthly",
   "onetime": "One-Time",
-  "saveTip": "Save 20%"
+  "saveTip": "Save 20%",
+  "notIncluded": "Not included",
+  "hero": {
+    "badge": "Flexible plans for every kind of gift",
+    "titleLine1": "Create heartfelt songs",
+    "titleLine2": "Pay only for what you love",
+    "underline": "what you love",
+    "description": "Start with a one-time song for a single unforgettable moment, or unlock Pro for recurring downloads, premium video styles, and more room to create keepsakes people actually replay."
+  },
+  "promotion": {
+    "badge": "Bonus Gift Unlock", "title": "Limited-Time", "titleAccent": "100% Free", "lead": "Claim these premium add-ons with any plan before this offer ends.",
+    "description": "Pro & Platinum already include monthly perks. This bonus is for everyone else too, so you can unlock extra keepsakes at checkout while the promotion is live.",
+    "freeNow": "Free Now", "from": "From", "interactiveHint": "Hover to preview and open the studio", "automaticHint": "Add automatically with eligible checkout"
+  },
+  "addOns": {
+    "video": {"title":"Cinematic Music Video","description":"Transform your custom song into a visual story with your own memories.","cta":"Open video studio","suffix":"per video","promo":"FREE ADD-ON"},
+    "wallArt": {"title":"Digital Lyrics Wall Art","description":"A high-resolution design of your custom song lyrics, ready to download, print, and frame.","cta":"Open wall art studio","suffix":"per print","promo":"FREE ADD-ON"},
+    "mp3": {"title":"Studio-Quality MP3","description":"Download your custom song in high quality, keep it offline, and play it on any device.","suffix":"per song","promo":"FREE ADD-ON"}
+  },
+  "trust": {
+    "checkout":{"title":"Secure Checkout","description":"Safe and instant verification via Creem"},
+    "satisfaction":{"title":"100% Satisfaction","description":"Tweak your track for free until you are completely satisfied."},
+    "support":{"title":"Dedicated Support","description":"We are here if you need a hand along the way."}
+  },
+  "fallbackPlans": {
+    "single":{"title":"Single Song","description":"One song, one occasion, no subscription.","button":"Start with one song","suffix":"one-time","cta":"One-time payment","features":["One song only","Personalised lyrics crafted for your occasion","Personalised sharing page","MP3 Download","Video gift","Wall art"]},
+    "pro":{"title":"Pro","description":"Monthly songs and video gifts, studio quality.","button":"Go Pro","suffix":"month","cta":"Go Pro","highlight":"Most Popular","features":["Create 3 songs monthly","2 video styles per month","2 wall art per month","Download songs in MP3 format","Studio-quality vocals and production","Personalised lyrics crafted for your occasion","Personalised sharing page","Unique album artwork","Cancel anytime"]},
+    "platinum":{"title":"Platinum","description":"Unlimited songs and videos. Everything in Pro, and more.","button":"Go Platinum - Best Value","suffix":"year","cta":"Go Platinum - Best Value","highlight":"Best Value","features":["Create unlimited songs","10 video styles per month","10 wall art per month","Download songs in MP3 format","Studio-quality vocals and production","Personalised lyrics crafted for your occasion","Personalised sharing page","Unique album artwork"]}
+  }
 }

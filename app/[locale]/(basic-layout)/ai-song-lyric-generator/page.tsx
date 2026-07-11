@@ -47,16 +47,18 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return constructMetadata({
-    title: "Free Custom Song Lyric Gifts",
-    description:
-      "Create custom song lyric gifts with a free lyric AI generator, editable lyrics, lyric wall art, and lyric music video keepsakes.",
+    title: locale === "es" ? "Generador gratuito de letras de canciones con IA" : locale === "ja" ? "無料のAI歌詞作成・編集ツール" : "Free AI Song Lyric Generator & Editor",
+    description: locale === "es"
+      ? "Crea y edita gratis la letra de una canción a partir de una historia real. Después conviértela en una canción personalizada, un vídeo o una lámina."
+      : locale === "ja" ? "大切な物語から歌詞を無料で作成・編集し、オリジナルソング、動画、歌詞アートに仕上げられます。"
+      : "Generate and edit personal song lyrics free from a real story, then create a custom song, printable lyric poster, or a shareable lyric music video keepsake.",
     locale: locale as Locale,
-    path: "/free-custom-song-lyric-gifts",
+    path: "/ai-song-lyric-generator",
     images: ["/images/occasions/custom-song-lyric-gifts-hero.webp"],
   });
 }
 
-export default async function FreeCustomSongLyricGiftsPage() {
+export default async function AiSongLyricGeneratorPage() {
   const session = await getSession();
   const isAuthenticated = Boolean(session?.user);
   const finalSongs = session?.user

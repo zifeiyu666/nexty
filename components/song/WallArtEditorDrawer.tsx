@@ -173,6 +173,14 @@ type WallArtTemplateSettings = {
   customTexts: CustomTextLayer[];
 };
 
+type WallArtStudioProps = {
+  className?: string;
+  initialSong?: WallArtSongOption;
+  songOptions?: WallArtSongOption[];
+  surface?: "page" | "sheet";
+  trigger?: ReactNode;
+};
+
 type WallArtEditorDrawerProps = {
   initialSong?: WallArtSongOption;
   songOptions?: WallArtSongOption[];
@@ -755,11 +763,13 @@ function FontWeightSelect({
   );
 }
 
-export function WallArtEditorDrawer({
+export function WallArtStudio({
+  className,
   initialSong,
   songOptions,
+  surface = "page",
   trigger,
-}: WallArtEditorDrawerProps) {
+}: WallArtStudioProps) {
   const spiralId = useId().replace(/:/g, "");
   const template2Id = useId().replace(/:/g, "");
   const imageLyricUploadInputId = `${template2Id}-image-lyric-upload`;
@@ -793,7 +803,7 @@ export function WallArtEditorDrawer({
     () => createWallArtTemplateSettingsMap(activeSongTitle, activeLyrics),
     [activeLyrics, activeSongTitle],
   );
-  const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const [isStudioOpen, setIsStudioOpen] = useState(surface === "page");
   const [activeTarget, setActiveTarget] = useState<ActiveTarget>("lyrics");
   const [activeTemplate, setActiveTemplate] =
     useState<WallArtTemplateKey>("template2");
@@ -2207,29 +2217,17 @@ export function WallArtEditorDrawer({
         ) : null}
       </DiscArtworkCropDialog>
 
-      <Sheet
-        open={isStudioOpen}
-        onOpenChange={(open) => {
-          setIsStudioOpen(open);
-          if (!open) closePresetPanelImmediately();
-        }}
-      >
-        <SheetTrigger asChild>{trigger}</SheetTrigger>
-        <SheetContent
-          className={studioGlassStyles.sheetContent}
-          onPointerDownOutside={(event) => {
-            const target = event.target as HTMLElement;
-            if (target.closest("[data-wall-art-preset-panel]")) {
-              event.preventDefault();
-            }
-          }}
-        >
+      {(() => {
+        const content = (
+          <>
         <style>{`${wallArtFontFaceCss}${wallArtMotionCss}`}</style>
         <StudioBlurBackdrop imageUrl={activeImageUrl} />
         <StudioHeader
           closeLabel="Close wall art studio"
           description="Choose a template, edit the spiral lyrics, and tune the poster details."
           icon={Disc3}
+          showClose={surface === "sheet"}
+          surface={surface}
           title="Wall Art Studio"
           action={
               <Select value={selectedSongId} onValueChange={handleSongSelection}>
@@ -3889,8 +3887,61 @@ export function WallArtEditorDrawer({
             </div>
           </div>
         )}
-      </SheetContent>
-      </Sheet>
+          </>
+        );
+
+        if (surface === "sheet" && trigger) {
+          return (
+            <Sheet
+              open={isStudioOpen}
+              onOpenChange={(open) => {
+                setIsStudioOpen(open);
+                if (!open) closePresetPanelImmediately();
+              }}
+            >
+              <SheetTrigger asChild>{trigger}</SheetTrigger>
+              <SheetContent
+                className={studioGlassStyles.sheetContent}
+                onPointerDownOutside={(event) => {
+                  const target = event.target as HTMLElement;
+                  if (target.closest("[data-wall-art-preset-panel]")) {
+                    event.preventDefault();
+                  }
+                }}
+              >
+                {content}
+              </SheetContent>
+            </Sheet>
+          );
+        }
+
+        return (
+          <div
+            className={cn(
+              studioGlassStyles.sheetContent,
+              "relative flex min-h-[calc(100svh-64px)] w-full flex-col",
+              className,
+            )}
+          >
+            {content}
+          </div>
+        );
+      })()}
     </>
+  );
+}
+
+export function WallArtEditorDrawer({
+  initialSong,
+  songOptions,
+  trigger,
+}: WallArtEditorDrawerProps) {
+  return (
+    <WallArtStudio
+      initialSong={initialSong}
+      songOptions={songOptions}
+      surface="sheet"
+      trigger={trigger}
+    />
   );
 }

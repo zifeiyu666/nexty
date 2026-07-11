@@ -19,7 +19,7 @@ import {
   Video,
   X
 } from "lucide-react";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 type PricingPlan = typeof pricingPlansSchema.$inferSelect;
 
@@ -206,8 +206,38 @@ export default async function PricingAll({
   wallArtSongOptions?: WallArtSongOption[];
 } = {}) {
   const locale = await getLocale();
+  const t = await getTranslations("Pricing");
+  const featureList = (key: "single" | "pro" | "platinum") =>
+    (t.raw(`fallbackPlans.${key}.features`) as string[]).map((description, index) => ({
+      description,
+      included: key === "single" ? index < 3 : true,
+      bold: index === 0,
+    }));
+  const localizedFallbackPlans: DisplayPlan[] = [
+    { ...fallbackPlans[0], cardTitle:t("fallbackPlans.single.title"), cardDescription:t("fallbackPlans.single.description"), buttonText:t("fallbackPlans.single.button"), priceSuffix:t("fallbackPlans.single.suffix"), staticCta:t("fallbackPlans.single.cta"), features:featureList("single") },
+    { ...fallbackPlans[1], cardTitle:t("fallbackPlans.pro.title"), cardDescription:t("fallbackPlans.pro.description"), buttonText:t("fallbackPlans.pro.button"), priceSuffix:t("fallbackPlans.pro.suffix"), staticCta:t("fallbackPlans.pro.cta"), highlightText:t("fallbackPlans.pro.highlight"), features:featureList("pro") },
+    { ...fallbackPlans[2], cardTitle:t("fallbackPlans.platinum.title"), cardDescription:t("fallbackPlans.platinum.description"), buttonText:t("fallbackPlans.platinum.button"), priceSuffix:t("fallbackPlans.platinum.suffix"), staticCta:t("fallbackPlans.platinum.cta"), highlightText:t("fallbackPlans.platinum.highlight"), features:featureList("platinum") },
+  ];
+  const localizedAddOns: Array<InteractiveAddOn | StaticAddOn> = [
+    { ...addOns[0], title:t("addOns.video.title"), description:t("addOns.video.description"), ctaLabel:t("addOns.video.cta"), suffix:t("addOns.video.suffix"), promoLabel:t("addOns.video.promo") } as InteractiveAddOn,
+    { ...addOns[1], title:t("addOns.wallArt.title"), description:t("addOns.wallArt.description"), ctaLabel:t("addOns.wallArt.cta"), suffix:t("addOns.wallArt.suffix"), promoLabel:t("addOns.wallArt.promo") } as InteractiveAddOn,
+    { ...addOns[2], title:t("addOns.mp3.title"), description:t("addOns.mp3.description"), suffix:t("addOns.mp3.suffix"), promoLabel:t("addOns.mp3.promo") },
+  ];
+  const localizedTrustItems = [
+    { ...trustItems[0], title:t("trust.checkout.title"), description:t("trust.checkout.description") },
+    { ...trustItems[1], title:t("trust.satisfaction.title"), description:t("trust.satisfaction.description") },
+    { ...trustItems[2], title:t("trust.support.title"), description:t("trust.support.description") },
+  ];
   const result = await getPublicPricingPlans();
   const dbPlans = result.success ? result.data || [] : [];
+
+  if (process.env.NODE_ENV !== "production" && locale === "ja") {
+    for (const plan of dbPlans) {
+      if (!(plan.langJsonb as PricingPlanLangJsonb)?.ja) {
+        console.warn(`[pricing] Missing langJsonb.ja for public plan ${plan.id}`);
+      }
+    }
+  }
 
   if (!result.success) {
     console.error("Failed to fetch public pricing plans:", result.error);
@@ -217,7 +247,7 @@ export default async function PricingAll({
     ? dbPlans.slice(0, 3).map((plan, index) =>
         toDisplayPlan(plan, locale, index)
       )
-    : fallbackPlans;
+    : localizedFallbackPlans;
 
   return (
     <section id="pricing" className="py-8 sm:py-10">
@@ -226,6 +256,7 @@ export default async function PricingAll({
           {displayPlans.map((plan) => (
             <PricingGiftCard
               key={plan.id}
+              notIncludedLabel={t("notIncluded")}
               plan={plan}
               unlockSongContext={unlockSongContext}
             />
@@ -235,23 +266,21 @@ export default async function PricingAll({
         <section className="mt-10 overflow-hidden rounded-2xl border border-primary/15 bg-[radial-gradient(circle_at_top,_rgba(251,113,133,0.12),_transparent_38%),linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(255,247,245,0.92))] px-4 py-10 shadow-[0_24px_80px_-48px_rgba(251,113,133,0.7)] sm:px-6 lg:px-10">
           <div className="mx-auto max-w-3xl text-center">
             <div className="inline-flex items-center rounded-full border border-primary/15 bg-background/80 px-4 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-primary shadow-sm backdrop-blur">
-              Bonus Gift Unlock
+              {t("promotion.badge")}
             </div>
             <h2 className="mt-4 text-3xl font-black tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              Limited-Time <span className="text-primary">100% Free</span>
+              {t("promotion.title")} <span className="text-primary">{t("promotion.titleAccent")}</span>
             </h2>
             <p className="mt-3 text-lg font-bold text-primary sm:text-xl">
-              Claim these premium add-ons with any plan before this offer ends.
+              {t("promotion.lead")}
             </p>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-              Pro & Platinum already include monthly perks. This bonus is for
-              everyone else too, so you can unlock extra keepsakes at
-              checkout while the promotion is live.
+              {t("promotion.description")}
             </p>
           </div>
 
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
-            {addOns.map((item) => {
+            {localizedAddOns.map((item) => {
               const Icon = item.icon;
               const hasOverlayCta = isInteractiveAddOn(item);
 
@@ -283,7 +312,7 @@ export default async function PricingAll({
                   )}
 
                   <div className="absolute right-[-3.5rem] top-6 z-10 rotate-45 bg-gradient-to-r from-orange-400 via-primary to-rose-500 px-14 py-2 text-sm font-black uppercase tracking-[0.08em] text-white shadow-lg">
-                    Free Now
+                    {t("promotion.freeNow")}
                   </div>
 
                   <div className="mb-6 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 ease-out group-hover:scale-110">
@@ -299,7 +328,7 @@ export default async function PricingAll({
                   <div className="mt-8 border-t border-primary/10 pt-5">
                     <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
                       <span className="text-xl font-black tracking-tight text-muted-foreground/75 line-through">
-                        From {item.originalPrice}
+                        {t("promotion.from")} {item.originalPrice}
                       </span>
                       <span className="text-4xl font-black leading-none tracking-[-0.06em] text-foreground">
                         $0
@@ -316,11 +345,11 @@ export default async function PricingAll({
                     </div>
                     {hasOverlayCta ? (
                       <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                        Hover to preview and open the studio
+                        {t("promotion.interactiveHint")}
                       </p>
                     ) : (
                       <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
-                        Add automatically with eligible checkout
+                        {t("promotion.automaticHint")}
                       </p>
                     )}
                   </div>
@@ -331,7 +360,7 @@ export default async function PricingAll({
         </section>
 
         <section className="mt-8 grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-3">
-          {trustItems.map((item) => {
+          {localizedTrustItems.map((item) => {
             const Icon = item.icon;
 
             return (
@@ -393,9 +422,11 @@ function toDisplayPlan(
 }
 
 function PricingGiftCard({
+  notIncludedLabel,
   plan,
   unlockSongContext,
 }: {
+  notIncludedLabel: string;
   plan: DisplayPlan & { rawPlan?: PricingPlan };
   unlockSongContext?: UnlockSongContext | null;
 }) {
@@ -520,7 +551,7 @@ function PricingGiftCard({
       {excludedFeatures.length > 0 && (
         <div className="mt-5 border-t border-border pt-4">
           <p className="mb-3 text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-            Not included
+          {notIncludedLabel}
           </p>
           <ul className="space-y-2.5">
             {excludedFeatures.map((feature, index) => (

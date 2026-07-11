@@ -37,8 +37,8 @@ const staticPages: {
     priority: 0.8,
   },
   {
-    path: '/free-custom-song-lyric-gifts',
-    lastModified: '2026-07-08',
+    path: '/ai-song-lyric-generator',
+    lastModified: '2026-07-11',
     changeFrequency: 'weekly',
     priority: 0.8,
   },
@@ -86,9 +86,17 @@ const staticPages: {
   },
 ]
 
+const englishOnlyStaticPaths = new Set([
+  '/privacy-policy',
+  '/terms-of-service',
+  '/refund-policy',
+]);
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = LOCALES.flatMap(locale => {
-    return staticPages.map(page => ({
+    return staticPages
+      .filter(page => locale === DEFAULT_LOCALE || !englishOnlyStaticPaths.has(page.path))
+      .map(page => ({
       url: `${siteUrl}${locale === DEFAULT_LOCALE ? '' : `/${locale}`}${page.path}`,
       lastModified: new Date(page.lastModified),
       changeFrequency: page.changeFrequency,
@@ -115,7 +123,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     : new Date(staticPages[0].lastModified);
 
   // Add blog list page
-  for (const locale of LOCALES) {
+  for (const locale of [DEFAULT_LOCALE]) {
     allBlogSitemapEntries.push({
       url: `${siteUrl}${locale === DEFAULT_LOCALE ? '' : `/${locale}`}/blog`,
       lastModified: blogContentMtime,
@@ -124,7 +132,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  for (const locale of LOCALES) {
+  for (const locale of [DEFAULT_LOCALE]) {
     const { posts: localPosts } = await blogCms.getLocalList(locale);
     localPosts
       .filter((post) => post.slug && post.status !== "draft")
@@ -141,7 +149,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
   }
 
-  for (const locale of LOCALES) {
+  for (const locale of [DEFAULT_LOCALE]) {
     const serverResult = await listPublishedPostsAction({
       locale: locale,
       pageSize: 1000,
@@ -165,11 +173,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const uniqueBlogPostEntries = Array.from(
     new Map(allBlogSitemapEntries.map((entry) => [entry.url, entry])).values()
+  ).filter(
+    (entry) => !entry.url.endsWith('/blog/custom-song-lyric-gifts'),
   );
 
   const allGlossarySitemapEntries: MetadataRoute.Sitemap = [];
 
-  for (const locale of LOCALES) {
+  for (const locale of [DEFAULT_LOCALE]) {
     allGlossarySitemapEntries.push({
       url: `${siteUrl}${locale === DEFAULT_LOCALE ? '' : `/${locale}`}/glossary`,
       lastModified: glossaryContentMtime,
@@ -178,7 +188,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  for (const locale of LOCALES) {
+  for (const locale of [DEFAULT_LOCALE]) {
     const serverResult = await listPublishedPostsAction({
       locale: locale,
       pageSize: 1000,

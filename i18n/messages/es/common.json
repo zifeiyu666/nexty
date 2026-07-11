@@ -1,0 +1,133 @@
+{
+  "Home": {
+    "title": "One Custom Song",
+    "tagLine": "<strong>Canciones personalizadas con IA de One Custom Song.</strong><br></br> Un regalo inolvidable para cumpleaños, aniversarios o cualquier ocasión.",
+    "description": "Convierte tus recuerdos en una canción personalizada con sonido de estudio. Crea en minutos un regalo musical único para cumpleaños, bodas, aniversarios y mucho más."
+  },
+  "Login": {
+    "title": "Te damos la bienvenida",
+    "description": "Elige cómo quieres iniciar sesión",
+    "Toast": {
+      "rateLimitTitle": "Demasiados intentos",
+      "rateLimitDescription": "Espera un momento antes de volver a intentarlo.",
+      "Email": {
+        "successTitle": "Enlace enviado",
+        "successDescription": "Revisa tu correo para acceder con el enlace.",
+        "errorTitle": "Error",
+        "errorDescription": "No pudimos enviar el enlace. Inténtalo de nuevo."
+      },
+      "OTP": {
+        "errorTitle": "Error",
+        "sendSuccessTitle": "Código enviado",
+        "sendSuccessDescription": "Revisa tu correo para ver el código de verificación.",
+        "sendErrorDescription": "No pudimos enviar el código. Inténtalo de nuevo.",
+        "verifySuccessTitle": "Sesión iniciada",
+        "verifySuccessDescription": "Has iniciado sesión correctamente.",
+        "verifyErrorDescription": "El código no es válido o ha caducado. Solicita uno nuevo."
+      },
+      "Google": {"errorTitle": "Error", "errorDescription": "No pudimos iniciar sesión con Google. Inténtalo de nuevo."},
+      "Github": {"errorTitle": "Error", "errorDescription": "No pudimos iniciar sesión con GitHub. Inténtalo de nuevo."}
+    },
+    "signInMethods": {
+      "or": "O continúa con",
+      "signInWithGoogle": "Continuar con Google",
+      "signInWithGithub": "Continuar con GitHub",
+      "signInWithEmail": "Continuar con correo electrónico",
+      "otpMethod": "Código de verificación",
+      "magicLinkMethod": "Enlace de acceso",
+      "sendOTP": "Enviar código",
+      "verifyOTP": "Verificar código",
+      "resendOTP": "¿No recibiste el código? Reenviar",
+      "backToEmail": "Volver",
+      "otpSentTo": "Hemos enviado un código de verificación a"
+    },
+    "Button": {"signIn": "Iniciar sesión", "signOut": "Cerrar sesión"},
+    "UserMenus": [
+      {"name": "Ajustes", "href": "/dashboard/settings", "icon": "Settings"},
+      {"name": "Mis pedidos", "href": "/dashboard/my-orders", "icon": "ShoppingCart"},
+      {"name": "Suscripción", "href": "/dashboard/subscription", "icon": "WalletCards"},
+      {"name": "Historial de créditos", "href": "/dashboard/credit-history", "icon": "Coins"}
+    ]
+  },
+  "Blogs": {
+    "title": "Artículos",
+    "description": "Ideas de regalo y guías para crear canciones personalizadas.",
+    "emptyState": {"title": "Aún no hay artículos en español", "description": "Estamos preparando nuevos contenidos. Vuelve pronto."},
+    "loadMorePostsFailed": "No pudimos cargar más artículos",
+    "loadMorePosts": "Cargando más artículos...",
+    "filterPostsFailed": "No pudimos cargar los artículos",
+    "noPostsFoundForThisTag": "No hay artículos con esta etiqueta",
+    "reachedTheEnd": "Has llegado al final",
+    "heroBadge": "Biblioteca de artículos",
+    "heroTitleLine1": "Ideas, guías e historias",
+    "heroTitleLine2": "para regalar canciones con significado",
+    "emptyMessage": "No se encontraron artículos.",
+    "BlogDetail": {
+      "featured": "Artículo destacado", "viewCount": "{count} visualizaciones", "accessRestricted": "Acceso restringido",
+      "unauthorized": "Este artículo solo está disponible para usuarios con sesión iniciada", "premium": "Contenido premium",
+      "premiumContent": "Este artículo es exclusivo para suscriptores", "signIn": "Iniciar sesión", "upgrade": "Mejorar plan",
+      "backToBlogs": "Volver a los artículos", "notFound": "Artículo no encontrado"
+    }
+  },
+  "About": {"title": "Sobre nosotros", "description": "Conoce One Custom Song"},
+  "ErrorPage": {
+    "403": {"title": "403 - Acceso denegado", "description": "No tienes permiso para acceder a esta página.", "button": {"name": "Volver al inicio", "href": "/"}},
+    "RedirectError": {
+      "title": "Error de redirección", "description": "Se produjo un error durante el inicio de sesión.", "goToHome": "Ir al inicio", "goToLogin": "Iniciar sesión",
+      "invalid_params": {"title": "Parámetros no válidos", "description": "Faltan datos necesarios en la solicitud."},
+      "invalid_redirect": {"title": "Dirección no permitida", "description": "La dirección de redirección no está permitida."},
+      "token_expired": {"title": "El enlace ha caducado", "description": "Tu token de verificación ha caducado. Vuelve a iniciar sesión."},
+      "invalid_token": {"title": "Token no válido", "description": "El token de verificación no es válido."},
+      "invalid_link_or_expired": {"title": "Enlace no válido o caducado", "description": "El enlace de verificación no es válido o ha caducado."},
+      "server_error": {"title": "Error del servidor", "description": "Se produjo un error inesperado durante el inicio de sesión."},
+      "unknown": {"title": "Error de autenticación", "description": "Se produjo un error desconocido durante el inicio de sesión."}
+    },
+    "StripeError": {"title": "Error en el portal de pagos", "description": "Se produjo un error con tus datos de pago.", "goToHome": "Ir al inicio", "goToDashboard": "Ir a mi cuenta"}
+  },
+  "LanguageDetection": {
+    "title": "Idioma disponible", "description": "El idioma de tu navegador no coincide con el de la página. Puedes cambiarlo cuando quieras.",
+    "countdown": "Se cerrará en {countdown} segundos", "switchTo": "Cambiar a", "alertLabel": "Sugerencia de idioma",
+    "dismissLabel": "Cerrar sugerencia de idioma", "selectLabel": "Seleccionar idioma"
+  },
+  "MusicPlayer": {
+    "pause": "Pausar música", "play": "Reproducir música", "noMusicPlaying": "No hay ninguna canción en reproducción",
+    "ready": "Listo para la siguiente canción", "controller": "Controles de {title}", "dragController": "Mover controles de música", "dragOrToggle": "Arrastra o haz clic para cambiar"
+  },
+  "Header": {
+    "createSong": "Crear una canción",
+    "links": [
+      {"name": "Mis canciones", "href": "/songs"},
+      {"name": "Mis muestras", "href": "/samples"},
+      {"name": "Ideas de regalo", "href": "/music/personalized-gift", "items": [
+        {"name": "Crear una canción", "href": "/create-song", "description": "Convierte una historia en una muestra gratuita antes de desbloquear la canción completa."},
+        {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song", "description": "Crea una canción de cumpleaños con nombres, historias y recuerdos."},
+        {"name": "Canciones de aniversario", "href": "/occasions/anniversary", "description": "Convierte vuestra historia en una canción de aniversario para escuchar una y otra vez."},
+        {"name": "Regalos musicales personalizados", "href": "/music/personalized-gift", "description": "Descubre canciones, vídeos y recuerdos personalizados para amantes de la música."},
+        {"name": "Letras personalizadas", "href": "/blog/custom-song-lyrics", "description": "Ideas para convertir una historia personal en la letra de una canción."},
+        {"name": "Láminas con letras", "href": "/lyricwallart", "description": "Convierte tu letra personalizada en una lámina lista para imprimir."}
+      ]},
+      {"id": "articles", "name": "Artículos", "href": "/blog"},
+      {"name": "Precios", "href": "/pricing"}
+    ]
+  },
+  "Footer": {
+    "Copyright": "Copyright © {year} {name}. Todos los derechos reservados.",
+    "About": "Sobre nosotros", "PrivacyPolicy": "Política de privacidad (en inglés)", "TermsOfService": "Términos del servicio (en inglés)", "RefundPolicy": "Política de reembolso (en inglés)",
+    "Newsletter": {
+      "title": "Recibe nuestras novedades", "description": "Ideas de regalo y novedades de One Custom Song directamente en tu correo.",
+      "subscribe": {"invalidEmail": "Introduce un correo válido", "defaultErrorMessage": "No pudimos completar la suscripción. Inténtalo más tarde", "successMessage": "Te has suscrito correctamente", "multipleSubmissions": "Demasiados intentos. Vuelve a probar mañana"},
+      "unsubscribe": {"title": "Cancelar suscripción", "success": "Has cancelado tu suscripción a los correos de One Custom Song.", "emailPrefix": "Correo:", "regretMessage": "Puedes volver a suscribirte cuando quieras.", "errorGeneric": "No pudimos procesar la solicitud", "errorNoToken": "Falta el código de cancelación", "errorMessage": "Comprueba que has usado el enlace correcto. Si el problema continúa, contacta con soporte.", "contactPrefix": "Escríbenos a:", "contactPrefixSuccess": "Si tienes alguna pregunta, escríbenos a:"}
+    }
+  },
+  "CreateSong": {
+    "title": "Crea una canción personalizada con IA",
+    "description": "Cuéntanos tu historia y crea gratis una muestra de canción personalizada en pocos minutos.",
+    "srTitle": "Generador de canciones personalizadas",
+    "srDescription": "Crea una canción a partir de tus recuerdos, nombres y mensaje."
+  },
+  "Subscription": {
+    "title": "Suscripción", "description": "Consulta y gestiona tu suscripción.", "notSubscribed": "No tienes una suscripción activa.",
+    "upgradePlan": "Ver planes", "portalUnavailable": "El portal de gestión no está disponible en este momento.",
+    "stripePortalHint": "Gestiona pagos y facturas en el portal seguro de Stripe.", "creemPortalHint": "Gestiona tu suscripción desde el portal seguro de Creem."
+  }
+}

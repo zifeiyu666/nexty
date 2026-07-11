@@ -112,9 +112,11 @@ export function StudioBlurBackdrop({ imageUrl }: { imageUrl?: string | null }) {
 export function StudioCloseButton({
   label,
   onClose,
+  surface = "sheet",
 }: {
   label: string;
   onClose?: () => void;
+  surface?: "page" | "sheet";
 }) {
   const button = (
     <button
@@ -128,6 +130,7 @@ export function StudioCloseButton({
   );
 
   if (onClose) return button;
+  if (surface === "page") return button;
 
   return <SheetClose asChild>{button}</SheetClose>;
 }
@@ -138,6 +141,8 @@ export function StudioHeader({
   description,
   icon: Icon,
   onClose,
+  showClose = true,
+  surface = "sheet",
   title,
 }: {
   action?: ReactNode;
@@ -145,8 +150,13 @@ export function StudioHeader({
   description: string;
   icon: LucideIcon;
   onClose?: () => void;
+  showClose?: boolean;
+  surface?: "page" | "sheet";
   title: string;
 }) {
+  const Title = surface === "sheet" ? SheetTitle : "h2";
+  const Description = surface === "sheet" ? SheetDescription : "p";
+
   return (
     <SheetHeader className={studioGlassStyles.header}>
       <div className="flex items-start justify-between gap-2">
@@ -156,17 +166,23 @@ export function StudioHeader({
               <Icon className="size-3.5" />
             </div>
             <div className="flex min-w-0 flex-col lg:flex-row lg:items-baseline lg:gap-2">
-              <SheetTitle className={studioGlassStyles.headerTitle}>
+              <Title className={studioGlassStyles.headerTitle}>
                 {title}
-              </SheetTitle>
-              <SheetDescription className={studioGlassStyles.headerDescription}>
+              </Title>
+              <Description className={studioGlassStyles.headerDescription}>
                 {description}
-              </SheetDescription>
+              </Description>
             </div>
           </div>
           {action}
         </div>
-        <StudioCloseButton label={closeLabel} onClose={onClose} />
+        {showClose ? (
+          <StudioCloseButton
+            label={closeLabel}
+            onClose={onClose}
+            surface={surface}
+          />
+        ) : null}
       </div>
     </SheetHeader>
   );

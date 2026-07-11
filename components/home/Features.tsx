@@ -96,9 +96,9 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
 };
 
 export default function Features() {
-  const t = useTranslations("Landing.Features");
+  const t = useTranslations("Landing.UseCases");
 
-  const features: Feature[] = t.raw("items");
+  const features: Feature[] = t.raw("cases");
 
   return (
     <section id="features" className="py-20">

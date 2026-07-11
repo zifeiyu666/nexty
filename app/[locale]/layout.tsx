@@ -106,12 +106,12 @@ export default async function LocaleLayout({
               {messages.LanguageDetection && <LanguageDetectionAlert />}
 
               {children}
+              <GlobalMusicController />
             </PostHogProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
         <GoogleOneTap />
         <CrispChat />
-        <GlobalMusicController />
         <Toaster richColors />
         <TailwindIndicator />
         <>

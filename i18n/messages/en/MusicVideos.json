@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "title": "Music Videos",
+    "description": "Browse every generated music video version for your songs."
+  },
+  "hero": {
+    "badge": "Music Videos",
+    "title": "Generated MV Versions",
+    "description": "Browse every rendered music video, preview completed exports, and jump back to the source song when you want to create another version."
+  },
+  "stats": {
+    "totalVideos": "Total videos",
+    "completedExports": "{count} completed exports"
+  },
+  "actions": {
+    "createFromSong": "Create from a song",
+    "download": "Download",
+    "viewSong": "Song"
+  },
+  "library": {
+    "label": "Library",
+    "title": "All generated videos"
+  },
+  "filters": {
+    "searchPlaceholder": "Search by video title"
+  },
+  "empty": {
+    "noVideos": {
+      "title": "No music videos yet",
+      "description": "Open a finalized song, bind photos to the lyrics, and generate a vertical MV. Every render will appear here as its own version."
+    },
+    "noMatches": {
+      "title": "No matching videos",
+      "description": "Try a different title keyword or clear the search field to see every generated version."
+    }
+  },
+  "status": {
+    "completed": "Completed",
+    "failed": "Failed",
+    "rendering": "Rendering",
+    "queued": "Queued"
+  }
+}

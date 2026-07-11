@@ -47,9 +47,11 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return constructMetadata({
-    title: "Anniversary Songs for Couples",
-    description:
-      "Create anniversary songs for couples with names, memories, vows, free previews, studio-quality vocals, music videos, and lyric keepsakes.",
+    title: locale === "es" ? "Canción de aniversario personalizada para parejas" : locale === "ja" ? "ふたりの思い出から作る記念日ソング" : "Anniversary Songs for Couples",
+    description: locale === "es"
+      ? "Convierte vuestra historia, nombres y recuerdos en una canción de aniversario personalizada. Escucha una muestra gratis antes de desbloquearla."
+      : locale === "ja" ? "ふたりの名前や思い出、伝えたい言葉から記念日のオリジナルソングを作成。完成版の前に無料で試聴できます。"
+      : "Create anniversary songs for couples with names, memories, vows, free previews, studio-quality vocals, music videos, and lyric keepsakes.",
     locale: locale as Locale,
     path: "/occasions/anniversary",
     images: ["/images/occasions/anniversary-songs-hero.webp"],

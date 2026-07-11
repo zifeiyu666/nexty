@@ -53,15 +53,24 @@ export function DashboardSidebar() {
           prefetch={true}
           className="flex items-center space-x-1 px-2 py-1"
         >
-          <Image
-            src="/logo.png"
-            alt={isCollapsed ? tHome("title") : ""}
-            aria-hidden={!isCollapsed}
-            width={24}
-            height={24}
-            className="rounded-md"
-          />
-          {!isCollapsed && <h1 className="font-semibold">{tHome("title")}</h1>}
+          {isCollapsed ? (
+            <Image
+              src="/logo.png"
+              alt={tHome("title")}
+              width={24}
+              height={24}
+              className="rounded-md"
+            />
+          ) : (
+            <Image
+              src="/images/brand/one-custom-song-wordmark-header.png"
+              alt={tHome("title")}
+              width={2024}
+              height={333}
+              priority
+              className="h-8 w-auto max-w-full object-contain"
+            />
+          )}
         </I18nLink>
       </SidebarHeader>
 

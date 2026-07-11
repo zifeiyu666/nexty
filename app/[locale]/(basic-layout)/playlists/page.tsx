@@ -13,9 +13,11 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return constructMetadata({
-    title: "Gift Playlist Ideas for Custom Song Gifts",
-    description:
-      "Browse song playlists for gifts by occasion, recipient, and music style, then add a custom song made from your story.",
+    title: locale === "es" ? "Ideas de playlists para regalar" : locale === "ja" ? "プレゼントにおすすめのプレイリストアイデア" : "Gift Playlist Ideas for Custom Song Gifts",
+    description: locale === "es"
+      ? "Descubre ideas de playlists por ocasión, destinatario y estilo musical, y añade una canción personalizada creada con vuestra historia."
+      : locale === "ja" ? "用途、贈る相手、音楽スタイル別のプレイリストに、思い出から作ったオリジナルソングを加えられます。"
+      : "Browse song playlists for gifts by occasion, recipient, and music style, then add a custom song made from your story.",
     locale: locale as Locale,
     path: "/playlists",
   });
