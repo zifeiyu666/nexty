@@ -13,7 +13,7 @@ interface CombinedStatCardProps {
   title: string;
   count: StatData;
   revenue: StatData;
-  t: (key: string) => string;
+  t: (key: "yesterday") => string;
 }
 
 export function CombinedStatCard({

@@ -1,8 +1,9 @@
 import { getUsers } from "@/actions/users/admin";
+import { Locale } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
 import { Loader2 } from "lucide-react";
 import { Metadata } from "next";
-import { Locale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { columns } from "./Columns";

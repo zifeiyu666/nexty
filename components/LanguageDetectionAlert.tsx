@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Link as I18nLink,
   Locale,
+  LOCALES,
   LOCALE_NAMES,
   routing,
 } from "@/i18n/routing";
@@ -42,11 +43,11 @@ export function LanguageDetectionAlert() {
     const storedDismiss = getLangAlertDismissed();
 
     if (!storedDismiss) {
-      let supportedLang = routing.locales.find((l) => l === detectedLang);
+      let supportedLang = LOCALES.find((l) => l === detectedLang);
 
       if (!supportedLang) {
         const mainLang = detectedLang.split("-")[0];
-        supportedLang = routing.locales.find((l) => l.startsWith(mainLang));
+        supportedLang = LOCALES.find((l) => l.startsWith(mainLang));
       }
 
       if (supportedLang && supportedLang !== locale) {

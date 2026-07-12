@@ -10,7 +10,7 @@ interface StatCardProps {
   growthRate: number;
   total?: number;
   unit?: "count" | "revenue";
-  t: (key: string) => string;
+  t: (key: "yesterday" | "totalUsers") => string;
 }
 
 export function StatCard({

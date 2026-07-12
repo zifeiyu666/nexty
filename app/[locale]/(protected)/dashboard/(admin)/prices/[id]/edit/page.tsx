@@ -1,10 +1,10 @@
 import { isAdmin } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
+import { Locale } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
 import { eq } from "drizzle-orm";
 import { Metadata } from "next";
-import { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { PricePlanForm } from "../../PricePlanForm";

@@ -1,9 +1,9 @@
 import { listR2Files } from "@/actions/r2-resources";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ADMIN_UPLOAD_IMAGE_PATH, BLOGS_IMAGE_PATH } from "@/config/common";
+import { Locale } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
-import { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { ImagesDataTable } from "./ImagesDataTable";
 
