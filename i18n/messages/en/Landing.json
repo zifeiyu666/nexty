@@ -10,7 +10,7 @@
     "titleAccent": "Cherish Forever",
     "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI turns your memories into a studio-quality <strong>custom song</strong> you can preview, refine, and send as a <strong>personalized music gift</strong>.</p>",
     "trustBadge": "Custom song gifts · Free preview first",
-    "trustItems": ["Free preview", "Ready in minutes", "No credit card needed"],
+    "trustItems": ["Free to preview", "Ready in minutes", "Just for you"],
     "getStarted": "Start a Free Preview",
     "getStartedLink": "/create-song",
     "howItWorksCta": "How It Works",
@@ -36,9 +36,9 @@
     "playLabel": "Play {title} with sound",
     "muteLabel": "Mute {title}",
     "trustItems": [
-      "Free to try",
+      "Free to preview",
       "Ready in minutes",
-      "No musical skills needed"
+      "Just for you"
     ],
     "videos": [
       {

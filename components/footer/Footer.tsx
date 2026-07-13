@@ -1,4 +1,5 @@
 import { Newsletter } from "@/components/footer/Newsletter";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { TwitterX } from "@/components/social-icons/icons";
 import { siteConfig } from "@/config/site";
 import { Link as I18nLink } from "@/i18n/routing";
@@ -155,6 +156,10 @@ export default async function Footer() {
                       <MailIcon className="w-4 h-4" />
                     </Link>
                   )}
+                </div>
+
+                <div className="pt-2">
+                  <LocaleSwitcher variant="footer" />
                 </div>
 
               </div>
