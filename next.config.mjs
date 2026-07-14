@@ -25,13 +25,13 @@ const nextConfig = {
       permanent: true,
     },
     {
-      source: "/free-custom-song-lyric-gifts",
-      destination: "/ai-song-lyric-generator",
+      source: "/ai-song-lyric-generator",
+      destination: "/free-custom-song-lyric-gifts",
       permanent: true,
     },
     {
-      source: "/:locale/free-custom-song-lyric-gifts",
-      destination: "/:locale/ai-song-lyric-generator",
+      source: "/:locale/ai-song-lyric-generator",
+      destination: "/:locale/free-custom-song-lyric-gifts",
       permanent: true,
     },
     {

@@ -12,7 +12,7 @@ import { type FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
 import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
 import { buildSongShareUrl, getFinalSongsForOwner } from "@/lib/ai/final-song";
 import { getSession } from "@/lib/auth/server";
-import { getMessages } from "next-intl/server";
+import { getLocale, getMessages } from "next-intl/server";
 
 function getTimestampedLyrics(
   metadata: unknown,
@@ -45,7 +45,7 @@ function getTimestampedLyrics(
 }
 
 export default async function HomeComponent() {
-  const messages = await getMessages();
+  const [messages, locale] = await Promise.all([getMessages(), getLocale()]);
   const session = await getSession();
   const isAuthenticated = Boolean(session?.user);
   const finalSongs = session?.user

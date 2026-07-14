@@ -37,8 +37,8 @@ const staticPages: {
     priority: 0.8,
   },
   {
-    path: '/ai-song-lyric-generator',
-    lastModified: '2026-07-11',
+    path: '/free-custom-song-lyric-gifts',
+    lastModified: '2026-07-13',
     changeFrequency: 'weekly',
     priority: 0.8,
   },

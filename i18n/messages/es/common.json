@@ -103,11 +103,8 @@
         {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song", "description": "Crea una canción de cumpleaños con nombres, historias y recuerdos."},
         {"name": "Canciones de aniversario", "href": "/occasions/anniversary", "description": "Convierte vuestra historia en una canción de aniversario para escuchar una y otra vez."},
         {"name": "Regalos musicales personalizados", "href": "/music/personalized-gift", "description": "Descubre canciones, vídeos y recuerdos personalizados para amantes de la música."},
-        {"name": "Letras personalizadas", "href": "/blog/custom-song-lyrics", "description": "Ideas para convertir una historia personal en la letra de una canción."},
         {"name": "Láminas con letras", "href": "/lyricwallart", "description": "Convierte tu letra personalizada en una lámina lista para imprimir."}
-      ]},
-      {"id": "articles", "name": "Artículos", "href": "/blog"},
-      {"name": "Precios", "href": "/pricing"}
+      ]}
     ]
   },
   "Footer": {

@@ -195,19 +195,12 @@
             "description": "オリジナルソング、動画、歌詞アートを組み合わせた贈り物。"
           },
           {
-            "name": "オリジナル歌詞",
-            "href": "/blog/custom-song-lyrics",
-            "description": "個人的な物語を歌詞にするためのヒント。"
-          },
-          {
             "name": "歌詞アート",
             "href": "/lyricwallart",
             "description": "オリジナル歌詞を印刷できるアート作品に。"
           }
         ]
-      },
-      { "id": "articles", "name": "記事", "href": "/blog" },
-      { "name": "料金", "href": "/pricing" }
+      }
     ]
   },
   "Footer": {
@@ -272,7 +265,6 @@
               "href": "/music/personalized-gift"
             },
             { "name": "ギフト用プレイリスト", "href": "/playlists" },
-            { "name": "オリジナル歌詞", "href": "/blog/custom-song-lyrics" },
             { "name": "歌詞アート", "href": "/lyricwallart" }
           ]
         },

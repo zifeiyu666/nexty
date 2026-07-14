@@ -376,25 +376,11 @@
             "description": "Explore personalized songs, videos, and keepsakes for music lovers."
           },
           {
-            "name": "Custom Song Lyrics",
-            "href": "/blog/custom-song-lyrics",
-            "description": "Use examples and prompts to turn a personal story into custom song lyrics."
-          },
-          {
-            "name": "Lyric wall art gifts",
-            "href": "/lyricwallart",
+            "name": "Custom Song Lyric Gifts",
+            "href": "/free-custom-song-lyric-gifts",
             "description": "Turn custom lyrics into printable wall art and keepsakes."
           }
         ]
-      },
-      {
-        "id": "articles",
-        "name": "Articles",
-        "href": "/blog"
-      },
-      {
-        "name": "Pricing",
-        "href": "/pricing"
       }
     ]
   },
@@ -483,12 +469,8 @@
               "href": "/playlists"
             },
             {
-              "name": "Custom Song Lyrics",
-              "href": "/blog/custom-song-lyrics"
-            },
-            {
-              "name": "Lyric wall art gifts",
-              "href": "/lyricwallart"
+              "name": "Custom Song Lyric Gifts",
+              "href": "/free-custom-song-lyric-gifts"
             }
           ]
         },
