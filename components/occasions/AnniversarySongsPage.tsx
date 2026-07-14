@@ -124,7 +124,32 @@ const useCases: IconBlock[] = [
   },
 ];
 
+const partnerSongIdeas: IconBlock[] = [
+  {
+    title: "Anniversary Songs for Boyfriends",
+    description:
+      "Make an anniversary song for your boyfriend feel like your relationship, not a generic love track. Include the first trip you took together, the joke only he understands, the way he supports you, and one small everyday detail you never want to forget.",
+    icon: <Music2 className="size-5" />,
+  },
+  {
+    title: "Anniversary Songs for Girlfriends",
+    description:
+      "Create an anniversary song for your girlfriend around the moments that make her feel seen. Add where you met, what you admire about her, a memory that still makes you smile, and the promise or future you want the chorus to hold.",
+    icon: <Heart className="size-5" />,
+  },
+];
+
 const exampleBriefs = [
+  {
+    label: "Boyfriend",
+    title: "Anniversary song for a boyfriend",
+    text: "Write a warm anniversary song for my boyfriend, Marcus. Mention our first road trip, the terrible motel coffee, how he always reaches for my hand in crowded places, and how two years with him made ordinary days feel like home.",
+  },
+  {
+    label: "Girlfriend",
+    title: "Anniversary song for a girlfriend",
+    text: "Create a romantic anniversary song for my girlfriend, Sophie. Include our bookstore first date, Sunday pancakes, the way she makes every room lighter, and my promise to keep choosing new adventures with her.",
+  },
   {
     label: "Romantic partner",
     title: "Private anniversary dinner",
@@ -183,6 +208,16 @@ const faqs = [
       "Yes. Add both names, your relationship details, favorite memories, and the feeling you want. The anniversary song can naturally weave those details into the verses and chorus.",
   },
   {
+    question: "What should I include in anniversary songs for boyfriends?",
+    answer:
+      "Anniversary songs for boyfriends work best with details that sound unmistakably like him: a shared adventure, a private joke, something he does that makes you feel supported, and the moment you knew the relationship mattered. Those specifics give the lyrics emotional weight without making them feel generic.",
+  },
+  {
+    question: "What should I include in anniversary songs for girlfriends?",
+    answer:
+      "Anniversary songs for girlfriends can include where you met, the qualities you admire, a favorite everyday ritual, a meaningful milestone, and what you hope to share next. A strong chorus should express the central feeling clearly, while the verses carry the personal memories only the two of you recognize.",
+  },
+  {
     question: "What makes a good marriage anniversary song?",
     answer:
       "A strong marriage anniversary song feels specific. The best ones include shared history, emotional truth, replay value, and a message that still feels meaningful after the celebration is over.",
@@ -193,7 +228,8 @@ const faqs = [
       "Absolutely. You can ask for country anniversary songs with acoustic textures, storytelling lyrics, small-town imagery, and a warmer, grounded tone.",
   },
   {
-    question: "Is this useful for wedding anniversary songs for couple celebrations?",
+    question:
+      "Is this useful for wedding anniversary songs for couple celebrations?",
     answer:
       "Yes. It works especially well for wedding anniversary songs for couple dinners, family gatherings, anniversary dances, and vow renewals where a shared playlist feels too generic.",
   },
@@ -275,9 +311,10 @@ export default function AnniversarySongsPage({
 
             <p className="mt-5 max-w-lg text-base leading-7 text-[#6c5f59] sm:text-lg">
               Turn your names, favorite memories, and shared promises into an
-              anniversary song that sounds personal from the first line. Create
-              a free preview, refine the lyrics, and make an anniversary gift
-              that feels more lasting than a playlist.
+              anniversary song that sounds personal from the first line. Whether
+              it is for a boyfriend, girlfriend, or spouse, you can create a
+              free preview, refine the lyrics, and make an anniversary gift that
+              feels more lasting than a playlist.
             </p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -365,6 +402,42 @@ export default function AnniversarySongsPage({
                 <p className="mt-3 text-sm leading-6 text-[#74665f]">
                   {useCase.description}
                 </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#fff4ef] px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeader
+            eyebrow="Made for your person"
+            title="Anniversary Songs for Boyfriends and Girlfriends"
+            description="The relationship label may change, but the strongest anniversary song always starts with details that could only belong to the two of you. Shape those memories into a personal gift for him or for her."
+          />
+
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            {partnerSongIdeas.map((idea) => (
+              <article
+                key={idea.title}
+                className="rounded-lg border border-[#eed8ce] bg-white p-7 shadow-[0_16px_42px_rgba(76,38,24,0.06)] sm:p-8"
+              >
+                <div className="mb-5 flex size-11 items-center justify-center rounded-lg bg-[#ffe0e7] text-[#bf3f5d]">
+                  {idea.icon}
+                </div>
+                <h3 className="text-2xl font-black leading-tight text-[#261712]">
+                  {idea.title}
+                </h3>
+                <p className="mt-4 text-base leading-7 text-[#74665f]">
+                  {idea.description}
+                </p>
+                <I18nLink
+                  href={createAnniversarySongHref}
+                  className="mt-6 inline-flex items-center gap-2 font-bold text-[#b83b30] transition-colors hover:text-[#8f2b23]"
+                >
+                  Create a personal anniversary song
+                  <ArrowRight className="size-4" />
+                </I18nLink>
               </article>
             ))}
           </div>
