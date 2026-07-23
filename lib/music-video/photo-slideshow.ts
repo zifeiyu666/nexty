@@ -92,7 +92,8 @@ function inferMediaTypeFromValue(value?: string | null) {
 
 export function getUploadedMediaType(
   media:
-    | Pick<UploadedPhoto, "mediaType" | "name" | "objectUrl" | "url">
+    | (Pick<UploadedPhoto, "mediaType" | "name" | "objectUrl" | "url"> &
+        Partial<Pick<UploadedPhoto, "id">>)
     | null
     | undefined,
 ) {

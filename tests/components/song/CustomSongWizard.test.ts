@@ -308,7 +308,7 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.match(source, /font-medium text-muted-foreground/);
     assert.doesNotMatch(
       source,
-      /previewTime\.toFixed\(0\).*s \/.*Math\.ceil\(displayDuration\).*s/s,
+      /previewTime\.toFixed\(0\)[\s\S]*s \/[\s\S]*Math\.ceil\(displayDuration\)[\s\S]*s/,
     );
     assert.match(source, /md:grid-cols-2/);
     assert.match(source, /before:bg-gradient-to-b/);

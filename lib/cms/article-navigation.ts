@@ -46,7 +46,7 @@ function isArticlesFooterGroup(group: FooterLink) {
   return group.title === "Articles";
 }
 
-function withPricingPath<T extends { id?: string; href: string; items?: T[] }>(
+function withPricingPath<T extends { id?: string; href?: string; items?: T[] }>(
   links: T[]
 ): T[] {
   const pricingPath = process.env.NEXT_PUBLIC_PRICING_PATH;
