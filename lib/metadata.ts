@@ -12,6 +12,7 @@ type MetadataProps = {
   page?: string; // legacy
   title?: string;
   description?: string;
+  keywords?: string[];
   images?: string[] | undefined;
   noIndex?: boolean;
   locale?: Locale;
@@ -24,6 +25,7 @@ type MetadataProps = {
 export async function constructMetadata({
   title,
   description,
+  keywords = [],
   images,
   noIndex = false,
   locale,
@@ -93,12 +95,13 @@ export async function constructMetadata({
             },
           ]
         : undefined;
-  const pageURL = `${locale === DEFAULT_LOCALE ? "" : `/${locale}`}${path || ""}` || "/";
+  const pageURL =
+    `${locale === DEFAULT_LOCALE ? "" : `/${locale}`}${path || ""}` || "/";
 
   return {
     title: finalTitle,
     description: pageDescription,
-    keywords: [],
+    keywords,
     authors: siteConfig.authors,
     creator: siteConfig.creator,
     metadataBase: new URL(siteConfig.url),

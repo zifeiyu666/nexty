@@ -68,6 +68,7 @@ export type FinalSongPlayerData = {
   language: string;
   vocalGender: string;
   recipientNames: string[];
+  personalNote?: string;
   story: string;
   audioUrl: string;
   imageUrl?: string | null;
@@ -316,9 +317,7 @@ function cleanDisplayLyricLine(line: string): string {
 }
 
 function getDisplayLyricLines(lyrics: string): string[] {
-  return getLyricLines(lyrics)
-    .map(cleanDisplayLyricLine)
-    .filter(Boolean);
+  return getLyricLines(lyrics).map(cleanDisplayLyricLine).filter(Boolean);
 }
 
 function getLyricLineWeight(line: string): number {
@@ -444,10 +443,7 @@ function OwnerHeroLyricTicker({
   }
 
   return (
-    <div
-      aria-live="polite"
-      className="h-5 overflow-hidden"
-    >
+    <div aria-live="polite" className="h-5 overflow-hidden">
       <div
         className="transition-transform duration-500 ease-out motion-reduce:transition-none"
         style={{ transform: `translateY(-${activeIndex * 1.25}rem)` }}
@@ -610,19 +606,13 @@ function SharePanel({
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:justify-end">
-          <Button
-            asChild
-            className={glassButtonClassName}
-          >
+          <Button asChild className={glassButtonClassName}>
             <a href={audioUrl} rel="noreferrer" target="_blank">
               <Download className="size-4" />
               Download
             </a>
           </Button>
-          <Button
-            asChild
-            className={glassButtonClassName}
-          >
+          <Button asChild className={glassButtonClassName}>
             <a href={shareUrl} rel="noreferrer" target="_blank">
               <ExternalLink className="size-4" />
               Preview
@@ -630,9 +620,7 @@ function SharePanel({
           </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                className={glassButtonClassName}
-              >
+              <Button className={glassButtonClassName}>
                 <QrCode className="size-4" />
                 QR
               </Button>
@@ -696,19 +684,13 @@ function SharePanel({
                     )}
                     {copied ? "Copied link" : "Copy link"}
                   </Button>
-                  <Button
-                    asChild
-                    className={glassDialogButtonClassName}
-                  >
+                  <Button asChild className={glassDialogButtonClassName}>
                     <a href={tweetUrl} rel="noreferrer" target="_blank">
                       <TwitterX className="size-4" />
                       Share to X
                     </a>
                   </Button>
-                  <Button
-                    asChild
-                    className={glassDialogButtonClassName}
-                  >
+                  <Button asChild className={glassDialogButtonClassName}>
                     <a href={shareUrl} rel="noreferrer" target="_blank">
                       <ExternalLink className="size-4" />
                       Preview share page
@@ -964,7 +946,10 @@ export function FinalSongOwnerPlayer({
     { icon: <Mic2 className="size-4" />, label: data.vocalGender },
     { icon: <Languages className="size-4" />, label: data.language },
   ];
-  const heroLyricLines = useMemo(() => getDisplayLyricLines(data.lyrics), [data.lyrics]);
+  const heroLyricLines = useMemo(
+    () => getDisplayLyricLines(data.lyrics),
+    [data.lyrics],
+  );
   const playbackProgress =
     Number.isFinite(duration) && duration > 0
       ? Math.min(currentTime / duration, 1)

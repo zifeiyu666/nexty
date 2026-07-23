@@ -1,6 +1,10 @@
 import { redis } from "@/lib/upstash";
 import { REDIS_KEYS_CONFIGS } from "@/lib/upstash/redis-keys";
+import type { SongCoverArtDirection } from "@/types/song-cover";
 import type { KieSongVersion, SongTaskStatus } from "./adapters/kie-suno";
+import type { SpokenIntro } from "./spoken-intro";
+import type { SpokenIntroRender } from "./song-intro-composer";
+import type { SongPreviewRender } from "./song-preview-composer";
 
 const TTL = 3 * 24 * 60 * 60;
 const keys = REDIS_KEYS_CONFIGS.songTask;
@@ -11,6 +15,7 @@ export type SongLyricsTask = {
   status: SongTaskStatus;
   title?: string;
   lyrics?: string;
+  coverArt?: SongCoverArtDirection;
   error?: string;
   createdAt: number;
   updatedAt: number;
@@ -31,6 +36,12 @@ export type SongGenerationTask = {
   story: string;
   vocalGender: string;
   language: string;
+  spokenIntro?: SpokenIntro;
+  spokenIntroRenders?: SpokenIntroRender[];
+  songPreviewRenders?: SongPreviewRender[];
+  fullVersions?: KieSongVersion[];
+  mockMode?: boolean;
+  mockReadyAt?: number;
   versions: KieSongVersion[];
   error?: string;
   lastKiePollAt?: number;
@@ -42,7 +53,9 @@ export type SongGenerationTask = {
 
 async function setJson(key: string, value: unknown): Promise<void> {
   if (!redis) {
-    throw new Error("Redis is not configured for temporary song generation storage.");
+    throw new Error(
+      "Redis is not configured for temporary song generation storage.",
+    );
   }
   await redis.set(key, JSON.stringify(value), { ex: TTL });
 }
@@ -59,11 +72,14 @@ async function getJson<T>(key: string): Promise<T | null> {
   try {
     return JSON.parse(data);
   } catch (error) {
-    console.warn("[song-task-store] Redis value is not valid JSON, returning raw string", {
-      key,
-      data,
-      error: error instanceof Error ? error.message : error,
-    });
+    console.warn(
+      "[song-task-store] Redis value is not valid JSON, returning raw string",
+      {
+        key,
+        data,
+        error: error instanceof Error ? error.message : error,
+      },
+    );
     return data as unknown as T;
   }
 }
@@ -74,7 +90,9 @@ export function createExpiresAt(createdAt = Date.now()): number {
 
 export function assertSongTaskStoreConfigured(): void {
   if (!redis) {
-    throw new Error("Redis is not configured for temporary song generation storage.");
+    throw new Error(
+      "Redis is not configured for temporary song generation storage.",
+    );
   }
 }
 
@@ -87,7 +105,10 @@ export const songTaskStore = {
     return getJson<SongLyricsTask>(keys.task(taskId));
   },
 
-  async updateLyrics(taskId: string, updates: Partial<SongLyricsTask>): Promise<SongLyricsTask | null> {
+  async updateLyrics(
+    taskId: string,
+    updates: Partial<SongLyricsTask>,
+  ): Promise<SongLyricsTask | null> {
     const task = await this.getLyrics(taskId);
     if (!task) return null;
     const updated = { ...task, ...updates, updatedAt: Date.now() };
@@ -106,7 +127,9 @@ export const songTaskStore = {
     return getJson<SongGenerationTask>(keys.song(songId));
   },
 
-  async getSongByExternalId(externalId: string): Promise<SongGenerationTask | null> {
+  async getSongByExternalId(
+    externalId: string,
+  ): Promise<SongGenerationTask | null> {
     const rawSongId = await getJson<string>(keys.songExternalId(externalId));
     console.log("[song-task-store] External ID lookup", {
       externalId,
@@ -121,7 +144,10 @@ export const songTaskStore = {
     return this.getSong(rawSongId);
   },
 
-  async updateSong(songId: string, updates: Partial<SongGenerationTask>): Promise<SongGenerationTask | null> {
+  async updateSong(
+    songId: string,
+    updates: Partial<SongGenerationTask>,
+  ): Promise<SongGenerationTask | null> {
     const task = await this.getSong(songId);
     if (!task) return null;
     const updated = { ...task, ...updates, updatedAt: Date.now() };
@@ -131,7 +157,9 @@ export const songTaskStore = {
 
   async claimSongSampleReadyEmail(songId: string): Promise<boolean> {
     if (!redis) {
-      throw new Error("Redis is not configured for temporary song generation storage.");
+      throw new Error(
+        "Redis is not configured for temporary song generation storage.",
+      );
     }
 
     const result = await redis.set(keys.sampleReadyEmailSent(songId), "1", {

@@ -3,6 +3,7 @@ import type { MusicVideoSongOption } from "@/components/song/MusicVideoEditorDra
 import type { WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
 import {
   buildSongShareUrl,
+  getSongPersonalNote,
   type FinalSong,
 } from "@/lib/ai/final-song";
 
@@ -41,9 +42,7 @@ export function toMusicVideoSongOption(song: FinalSong): MusicVideoSongOption {
     id: song.id,
     title: song.title,
     lyrics: song.lyrics,
-    timestampedLyrics: getTimestampedLyricsFromSongMetadata(
-      song.metadataJsonb,
-    ),
+    timestampedLyrics: getTimestampedLyricsFromSongMetadata(song.metadataJsonb),
     audioUrl: song.audioUrl,
     imageUrl: song.imageUrl,
     duration: song.duration,
@@ -63,6 +62,7 @@ export function toFinalSongPlayerData(song: FinalSong): FinalSongPlayerData {
           (value): value is string => typeof value === "string",
         )
       : [],
+    personalNote: getSongPersonalNote(song.metadataJsonb),
     story: song.story,
   };
 }

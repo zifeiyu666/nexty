@@ -1,13 +1,14 @@
-import { openai } from "@ai-sdk/openai";
-import { generateText } from "ai";
 import Replicate from "replicate";
 
 import { fetchExternalUrlToR2 } from "@/lib/cloudflare/r2-fetch-upload";
 import { generateR2Key } from "@/lib/cloudflare/r2-utils";
+import type { SongCoverArtDirection } from "@/types/song-cover";
 
-export const SONG_COVER_PROMPT_MODEL =
-  process.env.SONG_COVER_PROMPT_MODEL || "gpt-4o-mini";
-export const SONG_COVER_IMAGE_MODEL = "black-forest-labs/flux-2-pro";
+export const SONG_COVER_IMAGE_MODEL = "black-forest-labs/flux-dev";
+
+export function getSongCoverImageModel() {
+  return process.env.SONG_COVER_IMAGE_MODEL || SONG_COVER_IMAGE_MODEL;
+}
 
 export type SongCoverGenerationInput = {
   title: string;
@@ -18,6 +19,7 @@ export type SongCoverGenerationInput = {
   recipientNames: string[];
   story: string;
   vocalGender: string;
+  coverArt?: SongCoverArtDirection;
   songId?: string;
 };
 
@@ -45,32 +47,56 @@ type GenerateSongCoverDependencies = {
 };
 
 export function buildSongCoverPromptRequest(input: SongCoverGenerationInput) {
-  const recipientLabel = input.recipientNames
-    .map((name) => name.trim())
+  const recipientNames = input.recipientNames
+    .map((name) =>
+      name
+        .replace(/[\r\n"\\]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 40),
+    )
     .filter(Boolean)
-    .join(", ");
+    .slice(0, 3);
+  const recipientLabel =
+    recipientNames.length <= 1
+      ? recipientNames[0] || "Someone Special"
+      : recipientNames.length === 2
+        ? recipientNames.join(" & ")
+        : `${recipientNames.slice(0, -1).join(", ")} & ${recipientNames.at(-1)}`;
+  const dedication = `For ${recipientLabel}`;
+  const art: SongCoverArtDirection = input.coverArt ?? {
+    style: "cinematic-keepsake",
+    styleDescription:
+      "emotionally composed cinematic realism with refined keepsake texture",
+    subject: `a symbolic scene inspired by this personal story: ${input.story}`,
+    mood: "warm, sincere, intimate and quietly celebratory",
+    palette: "harmonious warm neutrals with restrained celebratory accents",
+    lighting: "soft cinematic light with a gentle natural glow",
+    composition:
+      "a balanced central scene with subtle breathing room in the lower-right",
+    giftFeeling: "a treasured personal keepsake, thoughtful and premium",
+  };
 
   return [
-    "Create one English prompt for an AI image model to generate a square album cover.",
+    "Create a premium square album cover designed as a deeply personal gift.",
     "",
-    "Hard rules:",
-    "- Return only the final image prompt, no markdown, no JSON, no labels.",
-    "- The cover must contain no readable text, no logo, no album title, no typography, no watermark, no signature.",
-    "- Do not ask for a celebrity, living artist style, brand, copyrighted character, or direct imitation of another artwork.",
-    "- Use the song's emotional symbols instead of literal lyric transcription.",
-    "- Make it suitable for a polished 1:1 music album cover.",
+    "Personal dedication:",
+    `- Include exactly one small, elegant handwritten inscription reading "${dedication}".`,
+    "- Spell the dedication exactly as written, preserving capitalization.",
+    "- Integrate it naturally into the lower-right area like a tasteful personal signature on a keepsake.",
+    "- Include no other readable text, letters, words, title, logo, caption, watermark, or signature.",
     "",
-    "Song context:",
-    `Title: ${input.title}`,
-    `Occasion: ${input.occasion}`,
-    `Genre: ${input.genre}`,
-    `Language: ${input.language}`,
-    `Vocal gender: ${input.vocalGender}`,
-    `Recipients: ${recipientLabel || "someone special"}`,
-    `Story: ${input.story}`,
+    `Selected visual style: ${art.style}.`,
+    `Medium and texture: ${art.styleDescription}.`,
+    `Subject: ${art.subject}.`,
+    `Mood: ${art.mood}.`,
+    `Color palette: ${art.palette}.`,
+    `Lighting: ${art.lighting}.`,
+    `Composition: ${art.composition}.`,
+    `Gift feeling: ${art.giftFeeling}.`,
     "",
-    "Lyrics:",
-    input.lyrics,
+    "Use no celebrity, living artist style, brand, copyrighted character, or imitation of existing artwork.",
+    "Keep the result emotionally specific, polished, cohesive, and framed for a 1:1 album cover.",
   ].join("\n");
 }
 
@@ -84,23 +110,21 @@ export function normalizeSongCoverPrompt(value: string) {
     .trim();
 
   if (!prompt) {
-    throw new Error("OpenAI returned an empty album-cover prompt.");
+    throw new Error("Received an empty album-cover prompt.");
   }
 
-  return prompt.slice(0, 1400);
+  return prompt.slice(0, 2400);
 }
 
-function assertSongCoverEnvironment() {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error(
-      "Missing API key: OPENAI_API_KEY is required for cover prompt generation.",
-    );
-  }
+function assertReplicateEnvironment() {
   if (!process.env.REPLICATE_API_TOKEN) {
     throw new Error(
       "Missing API key: REPLICATE_API_TOKEN is required for cover image generation.",
     );
   }
+}
+
+function assertR2Environment() {
   if (
     !process.env.R2_ACCOUNT_ID ||
     !process.env.R2_ACCESS_KEY_ID ||
@@ -114,22 +138,13 @@ function assertSongCoverEnvironment() {
   }
 }
 
-async function generatePromptWithOpenAI({
+async function generatePromptFromSongContext({
   prompt,
-  system,
 }: {
   prompt: string;
   system: string;
 }) {
-  const result = await generateText({
-    model: openai(SONG_COVER_PROMPT_MODEL),
-    prompt,
-    system,
-    maxOutputTokens: 420,
-    temperature: 0.7,
-  });
-
-  return result.text;
+  return prompt;
 }
 
 async function generateImageWithReplicate(prompt: string) {
@@ -138,13 +153,18 @@ async function generateImageWithReplicate(prompt: string) {
     useFileOutput: false,
   });
 
-  const output = await replicate.run(SONG_COVER_IMAGE_MODEL, {
-    input: {
-      prompt,
-      aspect_ratio: "1:1",
-      output_format: "webp",
+  const output = await replicate.run(
+    getSongCoverImageModel() as `${string}/${string}`,
+    {
+      input: {
+        prompt,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+        num_outputs: 1,
+        go_fast: true,
+      },
     },
-  });
+  );
 
   const imageUrl = extractReplicateImageUrl(output);
   if (!imageUrl) {
@@ -182,16 +202,13 @@ export async function generateSongCover(
   input: SongCoverGenerationInput,
   dependencies: GenerateSongCoverDependencies = {},
 ): Promise<SongCoverGenerationResult> {
-  if (
-    !dependencies.generatePrompt ||
-    !dependencies.generateImage ||
-    !dependencies.uploadImage
-  ) {
-    assertSongCoverEnvironment();
-  }
+  if (!dependencies.generateImage) assertReplicateEnvironment();
+  if (!dependencies.uploadImage) assertR2Environment();
 
-  const generatePrompt = dependencies.generatePrompt ?? generatePromptWithOpenAI;
-  const generateImage = dependencies.generateImage ?? generateImageWithReplicate;
+  const generatePrompt =
+    dependencies.generatePrompt ?? generatePromptFromSongContext;
+  const generateImage =
+    dependencies.generateImage ?? generateImageWithReplicate;
   const uploadImage = dependencies.uploadImage ?? fetchExternalUrlToR2;
   const promptRequest = buildSongCoverPromptRequest(input);
   const prompt = normalizeSongCoverPrompt(

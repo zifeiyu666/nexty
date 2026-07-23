@@ -387,6 +387,63 @@ describe("final song helpers", () => {
     );
   });
 
+  test("stores the personal gift note in song metadata", async () => {
+    const fakeDb = createFinalizeFakeDb();
+
+    const result = await finalizeSongFromSample({
+      dbClient: fakeDb.dbClient,
+      personalNote: "You make every ordinary day feel like home.",
+      sample: createSample(),
+      userId: "user-1",
+      versionId: "provider-a",
+    });
+
+    assert.equal(result.success, true);
+    assert.equal(
+      (fakeDb.state.insertedSong?.metadataJsonb as Record<string, unknown>)
+        .personalNote,
+      "You make every ordinary day feel like home.",
+    );
+  });
+
+  test("uses the private full version instead of the public preview when finalizing", async () => {
+    const fakeDb = createFinalizeFakeDb();
+    const sample = {
+      ...createSample({
+        versions: [
+          {
+            id: "provider-a",
+            title: "Version A",
+            audioUrl: "https://cdn.example.com/a-preview.mp3",
+            duration: 60,
+          },
+        ],
+      }),
+      fullVersions: [
+        {
+          id: "provider-a",
+          title: "Version A",
+          audioUrl: "https://cdn.example.com/a-full.mp3",
+          duration: 143,
+        },
+      ],
+    } as SongSampleView;
+
+    const result = await finalizeSongFromSample({
+      dbClient: fakeDb.dbClient,
+      sample,
+      userId: "user-1",
+      versionId: "provider-a",
+    });
+
+    assert.equal(result.success, true);
+    assert.equal(
+      fakeDb.state.insertedSong?.audioUrl,
+      "https://cdn.example.com/a-full.mp3",
+    );
+    assert.equal(fakeDb.state.insertedSong?.duration, 143);
+  });
+
   test("does not skip deduction for historical unlockedVersionIds data", async () => {
     const fakeDb = createFinalizeFakeDb({
       usageBalanceJsonb: {

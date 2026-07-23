@@ -11,15 +11,12 @@ const lyricsSchema = z.object({
       z.object({
         name: z.string().trim().max(80).default(""),
         relationship: z.string().trim().max(80).default(""),
-      })
+      }),
     )
     .max(3)
     .optional(),
   recipientNames: z.array(z.string().trim().min(1).max(80)).max(3).default([]),
-  recipientRelationships: z
-    .array(z.string().trim().max(80))
-    .max(3)
-    .default([]),
+  recipientRelationships: z.array(z.string().trim().max(80)).max(3).default([]),
   revisionInstruction: z.string().trim().max(500).optional(),
   story: z.string().trim().min(10).max(5000),
   vocalGender: z.string().trim().min(1).max(80),
@@ -48,12 +45,13 @@ export async function POST(req: Request) {
       status: task.status,
       title: task.title,
       lyrics: task.lyrics,
+      coverArt: task.coverArt,
       expiresAt: new Date(task.expiresAt).toISOString(),
     });
   } catch (error) {
     console.error("[songs/lyrics] Failed to submit lyrics task:", error);
     return apiResponse.serverError(
-      error instanceof Error ? error.message : "Failed to generate lyrics."
+      error instanceof Error ? error.message : "Failed to generate lyrics.",
     );
   }
 }

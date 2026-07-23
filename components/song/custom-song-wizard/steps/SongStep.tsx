@@ -60,10 +60,14 @@ type SongStepProps = {
   story: string;
   vocalGender: string;
   isGeneratingCover: boolean;
+  isUploadingCover: boolean;
+  isMockMode: boolean;
   isPlaying: boolean;
   onChooseVersion: (version: string) => void;
   onGenerateCover: () => void;
+  onUploadCover: (file: File) => void;
   onNoteChange: (value: string) => void;
+  onSaveNote: () => void;
   onPlaybackToggle: (version: string, audioUrl: string) => void;
   onRespin: () => void;
   onRetryGeneration: () => void;
@@ -92,10 +96,14 @@ export function SongStep({
   songVersions,
   vocalGender,
   isGeneratingCover,
+  isUploadingCover,
+  isMockMode,
   isPlaying,
   onChooseVersion,
   onGenerateCover,
+  onUploadCover,
   onNoteChange,
+  onSaveNote,
   onPlaybackToggle,
   onRespin,
   onRetryGeneration,
@@ -131,9 +139,13 @@ export function SongStep({
         coverImageUrl={coverImageUrl}
         coverPrompt={coverPrompt}
         isGeneratingCover={isGeneratingCover}
+        isUploadingCover={isUploadingCover}
+        isMockMode={isMockMode}
         note={personalNote}
         onGenerateCover={onGenerateCover}
+        onUploadCover={onUploadCover}
         onNoteChange={onNoteChange}
+        onSaveNote={onSaveNote}
         progress={progress}
         recipientLabel={recipientLabel}
       />

@@ -3,13 +3,7 @@
 import { AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import LoginDialog from "@/components/auth/LoginDialog";
@@ -21,6 +15,8 @@ import {
   LyricsLineRewriteSuggestion,
   parseLyricsText,
 } from "@/lib/ai/song-lyrics";
+import { addSpokenIntroToLyrics } from "@/lib/ai/spoken-intro";
+import { normalizeSpokenIntroContentType } from "@/lib/audio/spoken-intro-upload";
 import { authClient } from "@/lib/auth/auth-client";
 import {
   GenreWarningDialog,
@@ -30,14 +26,17 @@ import {
 
 import {
   createCheckoutSession,
+  createSongCoverUpload,
   finalizeSongVersion,
   generateSongCover,
   generateStoryFromHelper,
+  createSpokenIntroUpload,
   getLyricsGenerationStatus,
   getSongGenerationStatus,
   rewriteLyricsLines,
   startLyricsGeneration,
   startSongGeneration,
+  transcribeSpokenIntro,
 } from "@/components/song/custom-song-wizard/api";
 import {
   customOccasionValue,
@@ -79,6 +78,7 @@ import { SongStep } from "@/components/song/custom-song-wizard/steps/SongStep";
 import { StoryStep } from "@/components/song/custom-song-wizard/steps/StoryStep";
 import { StyleStep } from "@/components/song/custom-song-wizard/steps/StyleStep";
 import { cn } from "@/lib/utils";
+import type { SongCoverArtDirection } from "@/types/song-cover";
 import type {
   CaptureLeadResponse,
   GenreOption,
@@ -88,6 +88,7 @@ import type {
   RecipientInput,
   SongStage,
   SongVersion,
+  SpokenIntroDraft,
   StoredDraft,
   WizardStep,
 } from "@/components/song/custom-song-wizard/types";
@@ -100,6 +101,9 @@ export function CustomSongWizard() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const storyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const speechRecognitionRef = useRef<any>(null);
+  const blessingAudioRef = useRef<HTMLAudioElement | null>(null);
+  const blessingRecorderRef = useRef<MediaRecorder | null>(null);
+  const blessingChunksRef = useRef<Blob[]>([]);
   const customOccasionInputRef = useRef<HTMLInputElement | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [step, setStep] = useState<WizardStep>(1);
@@ -113,6 +117,13 @@ export function CustomSongWizard() {
     { name: "", relationship: "" },
   ]);
   const [story, setStory] = useState("");
+  const [spokenMode, setSpokenMode] = useState<"recording" | "text">(
+    "recording",
+  );
+  const [spokenBlessing, setSpokenBlessing] = useState("");
+  const [spokenIntro, setSpokenIntro] = useState<SpokenIntroDraft | null>(null);
+  const [isRecordingBlessing, setIsRecordingBlessing] = useState(false);
+  const [isUploadingBlessing, setIsUploadingBlessing] = useState(false);
   const [songTitle, setSongTitle] = useState("");
   const [generatedLyrics, setGeneratedLyrics] = useState("");
   const [isNewLyricsVersionDialogOpen, setIsNewLyricsVersionDialogOpen] =
@@ -142,14 +153,17 @@ export function CustomSongWizard() {
   const [songStage, setSongStage] = useState<SongStage>("loading");
   const [songTaskId, setSongTaskId] = useState("");
   const [songError, setSongError] = useState("");
+  const [isMockMode, setIsMockMode] = useState(false);
   const [progress, setProgress] = useState(0);
   const [loadingCopyIndex, setLoadingCopyIndex] = useState(0);
   const [leadData, setLeadData] = useState<CaptureLeadResponse | null>(null);
   const [personalNote, setPersonalNote] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [coverPrompt, setCoverPrompt] = useState("");
+  const [coverArt, setCoverArt] = useState<SongCoverArtDirection | null>(null);
   const [coverError, setCoverError] = useState("");
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [previewTime, setPreviewTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(60);
@@ -264,11 +278,20 @@ export function CustomSongWizard() {
     occasion,
     recipients,
     story,
+    spokenBlessing: spokenMode === "text" ? spokenBlessing : "",
+    spokenMode,
     vocalGender,
   });
   const editableLyricLines = useMemo(
     () => parseLyricsText(generatedLyrics),
     [generatedLyrics],
+  );
+  const withTextSpokenIntro = useCallback(
+    (lyrics: string) =>
+      spokenMode === "text"
+        ? addSpokenIntroToLyrics(lyrics, spokenBlessing)
+        : lyrics,
+    [spokenBlessing, spokenMode],
   );
 
   useEffect(() => {
@@ -302,12 +325,21 @@ export function CustomSongWizard() {
         const draftRecipients = normalizeRecipientsFromDraft(draft);
         setRecipients(draftRecipients);
         if (draft.story !== undefined) setStory(draft.story);
+        if (draft.personalNote !== undefined)
+          setPersonalNote(draft.personalNote);
+        if (draft.spokenMode) setSpokenMode(draft.spokenMode);
+        if (draft.spokenBlessing !== undefined)
+          setSpokenBlessing(draft.spokenBlessing);
+        if (draft.spokenIntro) setSpokenIntro(draft.spokenIntro);
         const restoredLyricsInputKey = createLyricsInputKey({
           genre: draftGenre || defaultGenre,
           language: draftLanguage,
           occasion: draft.occasion || null,
           recipients: draftRecipients,
           story: draft.story || "",
+          spokenBlessing:
+            draft.spokenMode === "text" ? draft.spokenBlessing || "" : "",
+          spokenMode: draft.spokenMode || "recording",
           vocalGender: draftVocalGender || defaultVocalGender,
         });
         const canRestoreLyrics =
@@ -317,7 +349,15 @@ export function CustomSongWizard() {
 
         if (canRestoreLyrics) {
           if (draft.songTitle !== undefined) setSongTitle(draft.songTitle);
-          setGeneratedLyrics(draft.generatedLyrics || "");
+          if (draft.coverArt) setCoverArt(draft.coverArt);
+          setGeneratedLyrics(
+            draft.spokenMode === "text"
+              ? addSpokenIntroToLyrics(
+                  draft.generatedLyrics || "",
+                  draft.spokenBlessing || "",
+                )
+              : draft.generatedLyrics || "",
+          );
           setLyricsGeneratedBy("ai");
           setLyricsInputKey(restoredLyricsInputKey);
           setLyricsStage("editor");
@@ -391,23 +431,29 @@ export function CustomSongWizard() {
     if (!isHydrated) return;
 
     const draft: StoredDraft = {
+      coverArt: coverArt || undefined,
       generatedLyrics,
       genre,
       language,
       lyricsGeneratedBy: lyricsGeneratedBy || undefined,
       lyricsInputKey,
       occasion,
+      personalNote,
       recipients,
       recipientNames: recipientNameList,
       recipientRelationships: recipientRelationshipList,
       songStage,
       songTitle,
       story,
+      spokenBlessing,
+      spokenIntro: spokenIntro || undefined,
+      spokenMode,
       vocalGender,
     };
 
     window.localStorage.setItem(draftStorageKey, JSON.stringify(draft));
   }, [
+    coverArt,
     generatedLyrics,
     genre,
     isHydrated,
@@ -415,12 +461,16 @@ export function CustomSongWizard() {
     lyricsGeneratedBy,
     lyricsInputKey,
     occasion,
+    personalNote,
     recipientNameList,
     recipientRelationshipList,
     recipients,
     songStage,
     songTitle,
     story,
+    spokenBlessing,
+    spokenIntro,
+    spokenMode,
     vocalGender,
   ]);
 
@@ -461,6 +511,7 @@ export function CustomSongWizard() {
         setLyricsInputKey("");
         setSongTitle("");
         setGeneratedLyrics("");
+        setCoverArt(null);
         resetCoverGeneration();
       }
       setPendingLyricsComparisonSource(comparisonSource ?? null);
@@ -486,6 +537,7 @@ export function CustomSongWizard() {
               originalLyrics: comparisonSource.lyrics,
               newTitle: data.title || "Your Custom Song",
               newLyrics: data.lyrics || "",
+              newCoverArt: data.coverArt,
             });
             setPendingLyricsComparisonSource(null);
             setLyricsRequestInputKey("");
@@ -494,7 +546,8 @@ export function CustomSongWizard() {
           }
 
           setSongTitle(data.title || "Your Custom Song");
-          setGeneratedLyrics(data.lyrics || "");
+          setGeneratedLyrics(withTextSpokenIntro(data.lyrics || ""));
+          setCoverArt(data.coverArt || null);
           setLyricsGeneratedBy("ai");
           setLyricsInputKey(currentLyricsInputKey);
           setPendingLyricsComparisonSource(null);
@@ -525,6 +578,7 @@ export function CustomSongWizard() {
       resetCoverGeneration,
       story,
       vocalGender,
+      withTextSpokenIntro,
     ],
   );
 
@@ -590,6 +644,7 @@ export function CustomSongWizard() {
               originalLyrics: pendingLyricsComparisonSource.lyrics,
               newTitle: data.title || "Your Custom Song",
               newLyrics: data.lyrics || "",
+              newCoverArt: data.coverArt,
             });
             setPendingLyricsComparisonSource(null);
             setLyricsRequestInputKey("");
@@ -599,7 +654,8 @@ export function CustomSongWizard() {
           }
 
           setSongTitle(data.title || "Your Custom Song");
-          setGeneratedLyrics(data.lyrics || "");
+          setGeneratedLyrics(withTextSpokenIntro(data.lyrics || ""));
+          setCoverArt(data.coverArt || null);
           setLyricsGeneratedBy("ai");
           setLyricsInputKey(currentLyricsInputKey);
           setPendingLyricsComparisonSource(null);
@@ -635,6 +691,7 @@ export function CustomSongWizard() {
     lyricsStage,
     lyricsTaskId,
     pendingLyricsComparisonSource,
+    withTextSpokenIntro,
   ]);
 
   useEffect(() => {
@@ -660,6 +717,7 @@ export function CustomSongWizard() {
 
     setSongTaskId("");
     setSongError("");
+    setIsMockMode(false);
     setLeadData(null);
     setPreviewTime(0);
     setIsPlaying(false);
@@ -677,9 +735,12 @@ export function CustomSongWizard() {
         story,
         title: songTitle,
         lyrics: generatedLyrics,
+        spokenIntro:
+          spokenMode === "recording" ? spokenIntro || undefined : undefined,
         vocalGender,
       });
       setSongTaskId(data.songId);
+      setIsMockMode(data.mockMode);
       setProgress(18);
     } catch (error) {
       setSongError(
@@ -698,6 +759,8 @@ export function CustomSongWizard() {
     recipientRelationshipList,
     session?.user,
     songTitle,
+    spokenIntro,
+    spokenMode,
     story,
     vocalGender,
   ]);
@@ -716,6 +779,7 @@ export function CustomSongWizard() {
       try {
         const data = await getSongGenerationStatus(songTaskId);
         if (cancelled) return;
+        setIsMockMode(data.mockMode);
 
         setProgress((current) => Math.min(92, current + 12));
 
@@ -802,6 +866,7 @@ export function CustomSongWizard() {
 
     try {
       const result = await generateSongCover({
+        coverArt: coverArt || undefined,
         occasion,
         genre,
         language,
@@ -827,6 +892,65 @@ export function CustomSongWizard() {
     } finally {
       setIsGeneratingCover(false);
     }
+  }
+
+  async function uploadSongCover(file: File) {
+    const allowedContentTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ] as const;
+    if (
+      !allowedContentTypes.includes(
+        file.type as (typeof allowedContentTypes)[number],
+      )
+    ) {
+      setCoverError("Choose a JPEG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setCoverError("Choose an image under 10MB.");
+      return;
+    }
+
+    setCoverError("");
+    setIsUploadingCover(true);
+    try {
+      const upload = await createSongCoverUpload({
+        contentType: file.type as (typeof allowedContentTypes)[number],
+        fileName: file.name,
+        size: file.size,
+      });
+      const response = await fetch(upload.presignedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": upload.contentType },
+        body: file,
+      });
+      if (!response.ok) throw new Error("Unable to upload the album cover.");
+
+      setCoverImageUrl(upload.publicObjectUrl);
+      setCoverPrompt("");
+      toast.success("Your album cover was uploaded.");
+    } catch (error) {
+      setCoverError(
+        error instanceof Error
+          ? error.message
+          : "Unable to upload the album cover.",
+      );
+    } finally {
+      setIsUploadingCover(false);
+    }
+  }
+
+  function savePersonalNote() {
+    const note = personalNote.trim();
+    if (!note) {
+      toast.info("Write a personal note before saving.");
+      return;
+    }
+
+    if (note !== personalNote) setPersonalNote(note);
+    toast.success("Personal note saved to your draft.");
   }
 
   function appendHelperText(text: string) {
@@ -961,7 +1085,8 @@ export function CustomSongWizard() {
         recipientNames: recipientNameList,
         recipientRelationships: recipientRelationshipList,
         answers: storyHelperAnswers.map((answer, index) => ({
-          question: storyHelperSteps[index]?.question || `Question ${index + 1}`,
+          question:
+            storyHelperSteps[index]?.question || `Question ${index + 1}`,
           answer,
         })),
         vocalGender,
@@ -975,7 +1100,9 @@ export function CustomSongWizard() {
     } catch (error) {
       console.error("[Story Helper] Failed to generate AI story:", error);
       if (composedStory) setStory(composedStory);
-      toast.info("We used your answers directly because AI story writing was unavailable.");
+      toast.info(
+        "We used your answers directly because AI story writing was unavailable.",
+      );
     } finally {
       setIsCreatingStory(false);
       setIsStoryHelperOpen(false);
@@ -1038,6 +1165,115 @@ export function CustomSongWizard() {
     setIsRecording(true);
   }
 
+  async function uploadAndTranscribeBlessing(file: File) {
+    const contentType = normalizeSpokenIntroContentType(file.type);
+    if (!contentType) {
+      toast.error("Please choose a WebM, MP3, MP4, WAV, or OGG recording.");
+      return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      toast.error("Keep your recording under 12MB.");
+      return;
+    }
+    setIsUploadingBlessing(true);
+    try {
+      const upload = await createSpokenIntroUpload({
+        contentType,
+        fileName: file.name,
+        size: file.size,
+      });
+      const put = await fetch(upload.presignedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": upload.contentType },
+        body: file,
+      });
+      if (!put.ok) throw new Error("Unable to upload your recording.");
+      const transcription = await transcribeSpokenIntro({
+        audioKey: upload.key,
+        audioUrl: upload.publicObjectUrl,
+      });
+      if (transcription.durationSeconds > 45)
+        throw new Error("Please keep your blessing under 45 seconds.");
+      setSpokenIntro({
+        audioKey: upload.key,
+        audioUrl: upload.publicObjectUrl,
+        ...transcription,
+      });
+      setSpokenBlessing(transcription.transcript);
+      toast.success("Your voice blessing is ready.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to process your recording.",
+      );
+    } finally {
+      setIsUploadingBlessing(false);
+    }
+  }
+
+  async function toggleBlessingRecording() {
+    if (isRecordingBlessing) {
+      blessingRecorderRef.current?.stop();
+      return;
+    }
+    if (
+      !navigator.mediaDevices?.getUserMedia ||
+      typeof MediaRecorder === "undefined"
+    ) {
+      toast.error("Audio recording is not supported in this browser.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(
+        stream,
+        MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+          ? { mimeType: "audio/webm;codecs=opus" }
+          : undefined,
+      );
+      blessingChunksRef.current = [];
+      recorder.ondataavailable = (event) => {
+        if (event.data.size) blessingChunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        setIsRecordingBlessing(false);
+        const blob = new Blob(blessingChunksRef.current, {
+          type: recorder.mimeType || "audio/webm",
+        });
+        if (blob.size)
+          void uploadAndTranscribeBlessing(
+            new File([blob], "voice-blessing.webm", { type: blob.type }),
+          );
+      };
+      recorder.start();
+      blessingRecorderRef.current = recorder;
+      setIsRecordingBlessing(true);
+      window.setTimeout(
+        () => recorder.state === "recording" && recorder.stop(),
+        45000,
+      );
+    } catch {
+      toast.error("Microphone access is required to record your blessing.");
+    }
+  }
+
+  function toggleBlessingPlayback() {
+    if (!spokenIntro) return;
+    const audio = blessingAudioRef.current;
+    if (!audio) return;
+    if (audio.paused) void audio.play();
+    else audio.pause();
+  }
+
+  function updateSpokenBlessing(value: string) {
+    setSpokenBlessing(value);
+    if (spokenMode === "recording" && spokenIntro) {
+      setSpokenIntro({ ...spokenIntro, transcript: value });
+    }
+  }
+
   function updateRecipient(
     index: number,
     field: keyof RecipientInput,
@@ -1096,6 +1332,7 @@ export function CustomSongWizard() {
   function resetLyricsForGeneration() {
     setSongTitle("");
     setGeneratedLyrics("");
+    setCoverArt(null);
     setSelectedLyricLineIds([]);
     setLyricRewriteSuggestions([]);
     setLyricRewriteInstruction("");
@@ -1142,7 +1379,8 @@ export function CustomSongWizard() {
     if (!lyricsVersionComparison) return;
 
     setSongTitle(lyricsVersionComparison.newTitle);
-    setGeneratedLyrics(lyricsVersionComparison.newLyrics);
+    setGeneratedLyrics(withTextSpokenIntro(lyricsVersionComparison.newLyrics));
+    setCoverArt(lyricsVersionComparison.newCoverArt || null);
     setLyricsGeneratedBy("ai");
     setLyricsInputKey(currentLyricsInputKey);
     setLyricsVersionComparison(null);
@@ -1433,6 +1671,7 @@ export function CustomSongWizard() {
     try {
       const result = await finalizeSongVersion({
         coverImageUrl: coverImageUrl || undefined,
+        personalNote: personalNote.trim() || undefined,
         songId: leadData.songId,
         versionId: providerVersionId,
       });
@@ -1485,14 +1724,12 @@ export function CustomSongWizard() {
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-[#fff9f5] pb-36 text-foreground">
-      <CreateSongBackground occasion={occasion} />
+      <CreateSongBackground occasion={step === 5 ? null : occasion} />
 
       <div
         className={cn(
           "relative z-10 mx-auto w-full py-5",
-          isSongResultStep
-            ? "max-w-none px-0"
-            : "max-w-[1040px] px-4 sm:px-6",
+          isSongResultStep ? "max-w-none px-0" : "max-w-[1040px] px-4 sm:px-6",
         )}
       >
         {!(step === 5 && songStage === "player") && (
@@ -1549,15 +1786,30 @@ export function CustomSongWizard() {
             <StepFrame key="story">
               <StoryStep
                 isRecording={isRecording}
+                isRecordingBlessing={isRecordingBlessing}
+                isUploadingBlessing={isUploadingBlessing}
                 isPolishingStory={isPolishingStory}
                 occasion={occasion}
                 story={story}
                 storyTextareaRef={storyTextareaRef}
                 storyWordCount={storyWordCount}
+                spokenBlessing={spokenBlessing}
+                spokenIntro={spokenIntro}
+                spokenMode={spokenMode}
                 onOpenHelper={startStoryHelper}
                 onPolishStory={polishStoryWithAi}
                 onStoryChange={setStory}
                 onToggleRecording={toggleRecording}
+                onSpokenBlessingChange={updateSpokenBlessing}
+                onSpokenModeChange={setSpokenMode}
+                onToggleBlessingRecording={toggleBlessingRecording}
+                onUploadBlessing={uploadAndTranscribeBlessing}
+                onToggleBlessingPlayback={toggleBlessingPlayback}
+              />
+              <audio
+                ref={blessingAudioRef}
+                preload="metadata"
+                src={spokenIntro?.audioUrl}
               />
             </StepFrame>
           )}
@@ -1619,10 +1871,14 @@ export function CustomSongWizard() {
                 story={story}
                 vocalGender={vocalGender}
                 isGeneratingCover={isGeneratingCover}
+                isUploadingCover={isUploadingCover}
+                isMockMode={isMockMode}
                 isPlaying={isPlaying}
                 onChooseVersion={chooseSongVersion}
                 onGenerateCover={generateCoverWithAi}
+                onUploadCover={uploadSongCover}
                 onNoteChange={setPersonalNote}
+                onSaveNote={savePersonalNote}
                 onPlaybackToggle={toggleSongPlayback}
                 onRespin={respinSongPreview}
                 onRetryGeneration={() => {

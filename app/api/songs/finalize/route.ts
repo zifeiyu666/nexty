@@ -6,6 +6,7 @@ import { z } from "zod";
 
 const finalizeSchema = z.object({
   coverImageUrl: z.string().trim().url().max(2000).optional(),
+  personalNote: z.string().trim().max(500).optional(),
   songId: z.string().trim().min(1),
   versionId: z.string().trim().min(1),
 });
@@ -27,7 +28,9 @@ export async function POST(req: Request) {
     return apiResponse.badRequest(message);
   }
 
-  const sample = await songSampleStore.get(input.songId);
+  const sample = await songSampleStore.get(input.songId, {
+    includeFullVersions: true,
+  });
   if (!sample) {
     console.warn("[songs/finalize] Sample not found", {
       songId: input.songId,
@@ -50,8 +53,18 @@ export async function POST(req: Request) {
     sampleVersionIds: sample.versions.map((version) => version.id),
   });
 
+  if (input.personalNote !== undefined) {
+    await songSampleStore.updatePersonalNote({
+      personalNote: input.personalNote,
+      songId: input.songId,
+      userId: session.user.id,
+    });
+    sample.personalNote = input.personalNote;
+  }
+
   const result = await finalizeSongFromSample({
     coverImageUrl: input.coverImageUrl,
+    personalNote: input.personalNote,
     sample,
     userId: session.user.id,
     versionId: input.versionId,

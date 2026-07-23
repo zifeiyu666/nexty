@@ -4,6 +4,104 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 
 describe("CustomSongWizard lyric version comparison", () => {
+  test("saves a personal note with visible feedback and finalizes it with the song", () => {
+    const wizardSource = readFileSync(
+      join(process.cwd(), "components/song/CustomSongWizard.tsx"),
+      "utf8",
+    );
+    const songStepSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/steps/SongStep.tsx",
+      ),
+      "utf8",
+    );
+    const uiSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/components/wizard-ui.tsx",
+      ),
+      "utf8",
+    );
+    const apiSource = readFileSync(
+      join(process.cwd(), "components/song/custom-song-wizard/api.ts"),
+      "utf8",
+    );
+
+    assert.match(wizardSource, /function savePersonalNote\(\)/);
+    assert.match(wizardSource, /toast\.success\("Personal note saved/);
+    assert.match(wizardSource, /onSaveNote=\{savePersonalNote\}/);
+    assert.match(songStepSource, /onSaveNote/);
+    assert.match(uiSource, /onClick=\{onSaveNote\}/);
+    assert.match(apiSource, /personalNote/);
+    assert.match(wizardSource, /personalNote,/);
+  });
+
+  test("supports uploading a custom album cover alongside AI generation", () => {
+    const wizardSource = readFileSync(
+      join(process.cwd(), "components/song/CustomSongWizard.tsx"),
+      "utf8",
+    );
+    const songStepSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/steps/SongStep.tsx",
+      ),
+      "utf8",
+    );
+    const uiSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/components/wizard-ui.tsx",
+      ),
+      "utf8",
+    );
+    const apiSource = readFileSync(
+      join(process.cwd(), "components/song/custom-song-wizard/api.ts"),
+      "utf8",
+    );
+
+    assert.match(apiSource, /createSongCoverUpload/);
+    assert.match(wizardSource, /uploadSongCover/);
+    assert.match(wizardSource, /onUploadCover=\{uploadSongCover\}/);
+    assert.match(songStepSource, /onUploadCover/);
+    assert.match(uiSource, /type="file"/);
+    assert.match(uiSource, /accept="image\/jpeg,image\/png,image\/webp"/);
+    assert.match(uiSource, /onUploadCover\(file\)/);
+    assert.doesNotMatch(uiSource, /\n\s+disabled\n\s+type="button"/);
+  });
+
+  test("shows an explicit notice while a mock song is generating", () => {
+    const wizardSource = readFileSync(
+      join(process.cwd(), "components/song/CustomSongWizard.tsx"),
+      "utf8",
+    );
+    const songStepSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/steps/SongStep.tsx",
+      ),
+      "utf8",
+    );
+    const uiSource = readFileSync(
+      join(
+        process.cwd(),
+        "components/song/custom-song-wizard/components/wizard-ui.tsx",
+      ),
+      "utf8",
+    );
+    const apiSource = readFileSync(
+      join(process.cwd(), "components/song/custom-song-wizard/api.ts"),
+      "utf8",
+    );
+
+    assert.match(apiSource, /mockMode: boolean/);
+    assert.match(wizardSource, /setIsMockMode\(data\.mockMode\)/);
+    assert.match(songStepSource, /isMockMode=\{isMockMode\}/);
+    assert.match(uiSource, /Mock mode/i);
+    assert.match(uiSource, /No new music\s+is being generated/i);
+  });
+
   test("shows a comparison dialog before applying a generated lyrics version", () => {
     const wizardSource = readFileSync(
       join(process.cwd(), "components/song/CustomSongWizard.tsx"),
@@ -116,7 +214,6 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.match(uiSource, /coverError/);
   });
 
-
   test("respin keeps users on the song step and starts a fresh preview", () => {
     const wizardSource = readFileSync(
       join(process.cwd(), "components/song/CustomSongWizard.tsx"),
@@ -140,11 +237,17 @@ describe("CustomSongWizard lyric version comparison", () => {
       wizardSource,
       /onRegenerate=\{\(\) => \{[\s\S]*?setWizardStep\(1\);[\s\S]*?\}\}/,
     );
-    assert.doesNotMatch(wizardSource, /function respinSongPreview\(\)[\s\S]*?setWizardStep\(1\)/);
+    assert.doesNotMatch(
+      wizardSource,
+      /function respinSongPreview\(\)[\s\S]*?setWizardStep\(1\)/,
+    );
     assert.match(songStepSource, /onRespin: \(\) => void/);
     assert.match(songStepSource, /SongResultView/);
     assert.match(songStepSource, /Try fresh takes/);
-    assert.match(songStepSource, /Generate two fresh takes with the same lyrics and style\./);
+    assert.match(
+      songStepSource,
+      /Generate two fresh takes with the same lyrics and style\./,
+    );
     assert.doesNotMatch(songStepSource, /Change your inputs & recreate/);
   });
 
@@ -184,7 +287,10 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.match(source, /showVisualizer = false/);
     assert.match(source, /onPlaybackToggle/);
     assert.match(source, /song-cover-visualizer/);
-    assert.match(source, /aria-pressed=\{isInteractive \? isPlaying : undefined\}/);
+    assert.match(
+      source,
+      /aria-pressed=\{isInteractive \? isPlaying : undefined\}/,
+    );
     assert.doesNotMatch(source, /scaleX: shouldMorph \? 0\.8 : 1/);
     assert.doesNotMatch(source, /scaleY: shouldMorph \? 1\.1 : 1/);
     assert.match(source, /scaleX: shouldMorph \? 1\.08 : 1/);
@@ -200,7 +306,10 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.match(source, /function formatPlaybackTime\(seconds: number\)/);
     assert.match(source, /return `\$\{minutes\}m \$\{remainingSeconds\}s`/);
     assert.match(source, /font-medium text-muted-foreground/);
-    assert.doesNotMatch(source, /previewTime\.toFixed\(0\).*s \/.*Math\.ceil\(displayDuration\).*s/s);
+    assert.doesNotMatch(
+      source,
+      /previewTime\.toFixed\(0\).*s \/.*Math\.ceil\(displayDuration\).*s/s,
+    );
     assert.match(source, /md:grid-cols-2/);
     assert.match(source, /before:bg-gradient-to-b/);
     assert.match(source, /Title: \{lyricTitle\}/);
@@ -216,7 +325,10 @@ describe("CustomSongWizard lyric version comparison", () => {
 
     assert.match(source, /SongResultView/);
     assert.match(source, /statusBanner=\{statusBanner\}/);
-    assert.match(source, /disabled: Boolean\(data\.isExpired \|\| !songVersion\?\.audioUrl\)/);
+    assert.match(
+      source,
+      /disabled: Boolean\(data\.isExpired \|\| !songVersion\?\.audioUrl\)/,
+    );
     assert.match(source, /This sample has expired\./);
     assert.match(source, /regenerateHref/);
     assert.match(source, /Change your inputs & recreate/);
@@ -293,9 +405,8 @@ describe("CustomSongWizard lyric version comparison", () => {
     );
     assert.match(styleStepSource, /More styles/);
     assert.equal(
-      styleStepSource.match(
-        /grid grid-cols-2 gap-2\.5 lg:grid-cols-5/g,
-      )?.length,
+      styleStepSource.match(/grid grid-cols-2 gap-2\.5 lg:grid-cols-5/g)
+        ?.length,
       2,
     );
     assert.doesNotMatch(styleStepSource, /Recommended for this occasion/);
@@ -366,7 +477,10 @@ describe("CustomSongWizard lyric version comparison", () => {
       "utf8",
     );
 
-    assert.match(storyStepSource, /flex flex-nowrap items-center gap-2 sm:gap-3/);
+    assert.match(
+      storyStepSource,
+      /flex flex-nowrap items-center gap-2 sm:gap-3/,
+    );
     assert.equal(
       storyStepSource.match(/hidden size-5[^\"]*sm:block/g)?.length,
       5,
@@ -407,7 +521,10 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.match(wizardSource, /polishStoryWithAi/);
     assert.match(wizardSource, /generateStoryFromHelper\(\{/);
     assert.match(wizardSource, /sourceStory: story/);
-    assert.match(wizardSource, /question: storyHelperSteps\[index\]\?\.question/);
+    assert.match(
+      wizardSource,
+      /question: storyHelperSteps\[index\]\?\.question/,
+    );
     assert.match(wizardSource, /setStory\(generatedStory\.story\)/);
     assert.match(wizardSource, /composeStoryFromHelper\(storyHelperAnswers\)/);
     assert.match(wizardSource, /onPolishStory=\{polishStoryWithAi\}/);

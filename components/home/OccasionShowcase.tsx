@@ -453,7 +453,7 @@ export default function OccasionShowcase() {
         </CarouselContent>
       </Carousel>
 
-      <div className="mx-auto flex items-center justify-center gap-4 px-4 sm:hidden">
+      <div className="mx-auto flex items-center justify-center gap-4 px-4 pt-2 sm:hidden">
         <Button
           type="button"
           variant="outline"
@@ -509,7 +509,7 @@ export default function OccasionShowcase() {
         </div>
       </div>
 
-      <div className="mx-auto hidden max-w-7xl items-center justify-center gap-4 px-4 sm:flex sm:px-6 lg:px-8">
+      <div className="mx-auto hidden max-w-7xl items-center justify-center gap-4 px-4 pt-4 sm:flex sm:px-6 lg:px-8">
         <Button
           type="button"
           variant="outline"

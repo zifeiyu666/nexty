@@ -10,6 +10,9 @@ Turn any memory, love note, or celebration into a personalized AI song, lyric po
 
 One Custom Song is an AI-powered music gift platform designed for people who want to celebrate meaningful moments in a more personal way. Users can describe a relationship, memory, occasion, or message, then generate a custom song that captures the emotion and story behind it. The product supports a complete creative workflow, from writing lyrics and generating music to creating personalized lyric posters, shareable music videos, and downloadable keepsakes from a user account dashboard. It is especially suited for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and other moments where a custom music gift can feel more memorable than a standard gift.
 
+### Why I built it
+The idea came from a simple problem: traditional gifts often say "I remembered the day," but not "I remembered us." I wanted a creative process where a person could stay involved while making something meaningful, change a line, hear a new direction, and keep the result rooted in real memories instead of generic romantic language. One Custom Song exists to make personal stories the starting point, to let people experiment with lyrics and music without paying for every attempt, and to turn a song into a gift people can feel confident giving.
+
 ### Audience
 
 Gift-givers, couples, families, friends, wedding guests, event organizers, creators, and small businesses who want to turn personal stories, memories, or special occasions into custom AI song gifts, music videos, and lyric keepsakes.
@@ -23,6 +26,9 @@ Gift-givers, couples, families, friends, wedding guests, event organizers, creat
 ### 详细介绍
 
 One Custom Song 是一个面向个性化音乐礼物场景的 AI 创作平台，帮助用户用更有温度的方式表达情感和纪念重要时刻。用户只需要输入一段关系背景、回忆故事、节日祝福或想传达的信息，就可以生成贴合情绪与主题的定制歌曲，并进一步制作专属歌词海报、可分享的音乐视频和可下载的纪念内容。产品覆盖从歌词创作、音乐生成到视觉内容制作和成品下载管理的完整流程，让这份礼物不仅可以被聆听，也可以被分享、展示和收藏。它特别适合生日、纪念日、婚礼、节日、异地关系、家庭回忆等需要独特表达的场景，让礼物从普通祝福变成一段真正属于收礼人的音乐记忆。
+
+### 创作动机
+这个项目源于一个简单却强烈的感受：很多礼物只能表达“我记得今天”，却无法说“我记得我们”。我希望找到一种创作方式，让送礼的人可以参与其中，随时调整一句歌词、试听新的音乐方向，并且始终让作品扎根于真实的回忆，而不是泛泛的浪漫表述。One Custom Song 的目标是让故事成为起点，在不限次数的试听里逐步打磨歌词和音乐，并把歌曲做成一份真正可以放心送出的礼物。
 
 ### 受众
 

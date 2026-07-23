@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "ngrok:webhook": "env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY ngrok http 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0 && pnpm i18n:check",

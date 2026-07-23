@@ -15,9 +15,10 @@ export interface FooterLink {
 
 interface Link {
   id?: string;
-  href: string;
+  href?: string;
   name: string;
   target?: string;
   rel?: string;
   useA?: boolean;
+  isSubTitle?: boolean;
 };

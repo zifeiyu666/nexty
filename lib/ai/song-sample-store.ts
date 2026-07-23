@@ -14,40 +14,46 @@ export type SongSample = {
   lyrics: string;
   genre: string;
   occasion: string;
+  personalNote?: string;
   language: string;
   vocalGender: string;
   recipientNames: string[];
   story: string;
   versions: KieSongVersion[];
+  fullVersions?: KieSongVersion[];
   previewLimitSeconds: number | null;
   createdAt: number;
   updatedAt: number;
   accessExpiresAt: number | null;
 };
 
-export type SongSampleView = SongSample & {
+export type SongSampleView = Omit<SongSample, "fullVersions"> & {
+  fullVersions?: KieSongVersion[];
   isExpired: boolean;
 };
 
 type SampleAccessOptions = {
   hasActiveSubscription?: boolean;
+  includeFullVersions?: boolean;
 };
 
 export function getSampleAccessExpiresAt(
-  sample: Pick<SongSample, "accessExpiresAt" | "createdAt">
+  sample: Pick<SongSample, "accessExpiresAt" | "createdAt">,
 ): number {
   return sample.accessExpiresAt ?? sample.createdAt + ACCESS_WINDOW_MS;
 }
 
-function sampleToView(
+export function createSongSampleView(
   sample: SongSample,
   now = Date.now(),
-  options: SampleAccessOptions = {}
+  options: SampleAccessOptions = {},
 ): SongSampleView {
   const accessExpiresAt = getSampleAccessExpiresAt(sample);
+  const { fullVersions, ...publicSample } = sample;
 
   return {
-    ...sample,
+    ...publicSample,
+    ...(options.includeFullVersions && fullVersions ? { fullVersions } : {}),
     accessExpiresAt,
     isExpired: options.hasActiveSubscription ? false : now > accessExpiresAt,
   };
@@ -65,11 +71,14 @@ async function getJson<T>(key: string): Promise<T | null> {
   try {
     return JSON.parse(data);
   } catch (error) {
-    console.warn("[song-sample-store] Redis value is not valid JSON, returning raw string", {
-      key,
-      data,
-      error: error instanceof Error ? error.message : error,
-    });
+    console.warn(
+      "[song-sample-store] Redis value is not valid JSON, returning raw string",
+      {
+        key,
+        data,
+        error: error instanceof Error ? error.message : error,
+      },
+    );
     return data as unknown as T;
   }
 }
@@ -91,7 +100,7 @@ function removeValue(values: string[] | null, value: string): string[] {
 
 export function createSongSampleFromTask(
   task: SongGenerationTask,
-  now = Date.now()
+  now = Date.now(),
 ): SongSample {
   return {
     songId: task.songId,
@@ -106,7 +115,8 @@ export function createSongSampleFromTask(
     recipientNames: task.recipientNames,
     story: task.story,
     versions: task.versions,
-    previewLimitSeconds: task.isSubscriber ? null : 60,
+    fullVersions: task.fullVersions,
+    previewLimitSeconds: 60,
     createdAt: task.createdAt,
     updatedAt: now,
     accessExpiresAt: task.createdAt + ACCESS_WINDOW_MS,
@@ -119,17 +129,40 @@ export const songSampleStore = {
 
     if (sample.userId && redis) {
       const indexKey = keys.samplesByUser(sample.userId);
-      const ids = unique([sample.songId, ...((await getJson<string[]>(indexKey)) || [])]);
+      const ids = unique([
+        sample.songId,
+        ...((await getJson<string[]>(indexKey)) || []),
+      ]);
       await setJson(indexKey, ids);
     }
   },
 
   async get(
     songId: string,
-    options: SampleAccessOptions = {}
+    options: SampleAccessOptions = {},
   ): Promise<SongSampleView | null> {
     const sample = await getJson<SongSample>(keys.sample(songId));
-    return sample ? sampleToView(sample, Date.now(), options) : null;
+    return sample ? createSongSampleView(sample, Date.now(), options) : null;
+  },
+
+  async updatePersonalNote({
+    personalNote,
+    songId,
+    userId,
+  }: {
+    personalNote: string;
+    songId: string;
+    userId: string;
+  }): Promise<boolean> {
+    const sample = await getJson<SongSample>(keys.sample(songId));
+    if (!sample || (sample.userId && sample.userId !== userId)) return false;
+
+    await setJson(keys.sample(songId), {
+      ...sample,
+      personalNote,
+      updatedAt: Date.now(),
+    });
+    return true;
   },
 
   async list(input: {
@@ -140,15 +173,17 @@ export const songSampleStore = {
     if (!redis) return [];
 
     const ids = unique(
-      (input.userId ? await getJson<string[]>(keys.samplesByUser(input.userId)) : null) || []
+      (input.userId
+        ? await getJson<string[]>(keys.samplesByUser(input.userId))
+        : null) || [],
     );
 
     const samples = await Promise.all(
       ids.map((songId) =>
         this.get(songId, {
           hasActiveSubscription: input.hasActiveSubscription,
-        })
-      )
+        }),
+      ),
     );
     return samples
       .filter((sample): sample is SongSampleView => Boolean(sample))
@@ -170,8 +205,8 @@ export const songSampleStore = {
       const indexKey = keys.samplesByUser(sample.userId);
       operations.push(
         getJson<string[]>(indexKey).then((ids) =>
-          setJson(indexKey, removeValue(ids, songId))
-        )
+          setJson(indexKey, removeValue(ids, songId)),
+        ),
       );
     }
     await Promise.all(operations);

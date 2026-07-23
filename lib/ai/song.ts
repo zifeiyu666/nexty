@@ -1,9 +1,18 @@
 import { db } from "@/lib/db";
-import {
-  subscriptions as subscriptionsSchema,
-} from "@/lib/db/schema";
+import { subscriptions as subscriptionsSchema } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { getMockKieSunoMusicResult, submitMusicTask } from "./adapters/kie-suno";
+import { z } from "zod";
+import {
+  SONG_COVER_STYLES,
+  type SongCoverArtDirection,
+} from "@/types/song-cover";
+import {
+  getMockKieSunoMusicResult,
+  getMockKieSunoDelayMs,
+  getMockKieSunoTaskId,
+  submitMusicTask,
+  type KieSongVersion,
+} from "./adapters/kie-suno";
 import {
   generateTextWithReplicateGpt5,
   getReplicateGpt5LyricsModel,
@@ -20,7 +29,13 @@ import {
   SongLyricsTask,
   songTaskStore,
 } from "./song-task-store";
-import { completeSongTaskFromKieResult } from "./kie-suno-song-completion";
+import {
+  completeSongTaskFromKieResult,
+  refreshSongPreviewComposition,
+  refreshSpokenIntroComposition,
+  startSongPreviewComposition,
+} from "./kie-suno-song-completion";
+import { addSpokenIntroToLyrics, type SpokenIntro } from "./spoken-intro";
 
 export type SongInputContext = {
   occasion: string;
@@ -40,12 +55,75 @@ export type SongInputContext = {
 export type SongGenerationInput = SongInputContext & {
   title: string;
   lyrics: string;
+  spokenIntro?: SpokenIntro;
   sessionUser: {
     id: string;
     email: string;
     isAnonymous?: boolean;
   };
 };
+
+export function getPublicSongGenerationVersions(
+  task: Pick<SongGenerationTask, "status" | "versions">,
+): KieSongVersion[] {
+  return task.status === "succeeded" ? task.versions : [];
+}
+
+export function needsSongPreview(
+  task: Pick<
+    SongGenerationTask,
+    "fullVersions" | "songPreviewRenders" | "status" | "versions"
+  >,
+): boolean {
+  return (
+    task.status === "succeeded" &&
+    task.versions.length > 0 &&
+    !task.fullVersions?.length &&
+    !task.songPreviewRenders?.length &&
+    task.versions.some((version) => !version.audioUrl.includes("/preview.mp3"))
+  );
+}
+
+const songCoverArtDirectionSchema = z.object({
+  style: z.enum(SONG_COVER_STYLES),
+  styleDescription: z.string().trim().min(3).max(500),
+  subject: z.string().trim().min(3).max(500),
+  mood: z.string().trim().min(3).max(300),
+  palette: z.string().trim().min(3).max(300),
+  lighting: z.string().trim().min(3).max(300),
+  composition: z.string().trim().min(3).max(500),
+  giftFeeling: z.string().trim().min(3).max(500),
+});
+
+const songLyricsGenerationSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  lyrics: z.string().trim().min(20).max(8000),
+  coverArt: songCoverArtDirectionSchema,
+});
+
+export function parseSongLyricsGeneration(value: string): {
+  title: string;
+  lyrics: string;
+  coverArt: SongCoverArtDirection;
+} {
+  const normalized = value
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  try {
+    return songLyricsGenerationSchema.parse(JSON.parse(normalized));
+  } catch (error) {
+    console.error("[song lyrics] Invalid structured generation", {
+      error: error instanceof Error ? error.message : error,
+      outputLength: value.length,
+    });
+    throw new Error(
+      "The lyrics model did not return a valid gift cover art direction.",
+    );
+  }
+}
 
 export type SongLyricsRewriteInput = Pick<
   SongInputContext,
@@ -92,13 +170,12 @@ function formatRecipientsForPrompt(input: {
   recipientNames: string[];
   recipientRelationships?: string[];
 }): string {
-  const recipients =
-    input.recipients?.length
-      ? input.recipients
-      : input.recipientNames.map((name, index) => ({
-          name,
-          relationship: input.recipientRelationships?.[index] || "",
-        }));
+  const recipients = input.recipients?.length
+    ? input.recipients
+    : input.recipientNames.map((name, index) => ({
+        name,
+        relationship: input.recipientRelationships?.[index] || "",
+      }));
   const labels = recipients
     .map((recipient) => {
       const name = recipient.name.trim();
@@ -216,12 +293,43 @@ ${revisionInstruction}
 - Must include English structure tags that Suno can recognize. Use only English tags, for example: [Verse 1], [Verse 2], [Chorus], [Bridge], [Outro].
 - The lyrics must fit the selected occasion and its emotional atmosphere. Avoid plain narration. Use metaphors and imagery that match the selected genre.
 - Pay close attention to rhyme scheme, rhythm alignment, and singability in the target language.
-- Keep the lyrics concise enough for a complete song, with no explanations before or after the lyrics.
-- Start with a single title line formatted exactly as: Title: <song title>
-- Then output the lyrics only.`;
+- Keep the lyrics concise enough for a complete song.
+
+[Gift Cover Art Direction]
+Recommend one painting or visual-art direction that turns the user's story into a personal, premium gift. Select exactly one style identifier from this curated list:
+- heirloom-storybook: warm illustrated-book craftsmanship with a timeless keepsake feeling
+- hand-painted-gouache: intimate painted texture, soft edges, and handmade warmth
+- cinematic-keepsake: emotionally composed cinematic realism with a treasured-memory feeling
+- editorial-collage: sophisticated paper, photograph, and tactile editorial layering
+- pressed-botanical: delicate preserved flowers and natural materials arranged like a personal memento
+- paper-cut-craft: layered handcrafted paper shapes with depth and celebratory charm
+- dreamy-watercolor: luminous washes, gentle transitions, and poetic emotional imagery
+- vintage-photo-album: refined analog-photo character with subtle archival texture
+
+Derive the subject, mood, palette, lighting, composition, and gift feeling from the user's real story. Do not mention a living artist, brand, copyrighted character, existing artwork, album title, lettering, or typography. Reserve subtle visual breathing room in the lower-right area for a short personal dedication that will be added later.
+
+[Required Output]
+Return only one valid JSON object with exactly this structure. Do not use markdown fences or add commentary:
+{
+  "title": "concise original song title",
+  "lyrics": "complete lyrics using \\n for line breaks and English section tags such as [Verse 1]",
+  "coverArt": {
+    "style": "one curated style identifier",
+    "styleDescription": "specific English description of the selected visual medium and texture",
+    "subject": "specific symbolic scene derived only from the user's story",
+    "mood": "emotional atmosphere",
+    "palette": "cohesive color palette",
+    "lighting": "lighting direction",
+    "composition": "square album-cover composition with dedication space",
+    "giftFeeling": "how the artwork should feel personal, handmade, premium, and gift-ready"
+  }
+}`;
 }
 
-export function inferTitleFromLyrics(lyrics: string, fallback = "Your Custom Song"): string {
+export function inferTitleFromLyrics(
+  lyrics: string,
+  fallback = "Your Custom Song",
+): string {
   const lines = lyrics
     .split("\n")
     .map((line) => line.trim())
@@ -229,10 +337,17 @@ export function inferTitleFromLyrics(lyrics: string, fallback = "Your Custom Son
 
   const titleLine = lines.find((line) => /^title\s*:/i.test(line));
   if (titleLine) {
-    return titleLine.replace(/^title\s*:/i, "").trim().replace(/^["']|["']$/g, "") || fallback;
+    return (
+      titleLine
+        .replace(/^title\s*:/i, "")
+        .trim()
+        .replace(/^["']|["']$/g, "") || fallback
+    );
   }
 
-  const firstLyric = lines.find((line) => !/^\[.*\]$/.test(line) && !/^(verse|chorus|bridge)/i.test(line));
+  const firstLyric = lines.find(
+    (line) => !/^\[.*\]$/.test(line) && !/^(verse|chorus|bridge)/i.test(line),
+  );
   return firstLyric ? firstLyric.slice(0, 80) : fallback;
 }
 
@@ -259,7 +374,9 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
   return true;
 }
 
-export async function createLyricsGeneration(input: SongInputContext): Promise<SongLyricsTask> {
+export async function createLyricsGeneration(
+  input: SongInputContext,
+): Promise<SongLyricsTask> {
   assertSongTaskStoreConfigured();
   const now = Date.now();
   const result = await generateSongLyrics(input);
@@ -269,6 +386,7 @@ export async function createLyricsGeneration(input: SongInputContext): Promise<S
     status: "succeeded",
     title: result.title,
     lyrics: result.lyrics,
+    coverArt: result.coverArt,
     createdAt: now,
     updatedAt: now,
     expiresAt: createExpiresAt(now),
@@ -278,12 +396,14 @@ export async function createLyricsGeneration(input: SongInputContext): Promise<S
   return task;
 }
 
-export async function refreshLyricsGeneration(taskId: string): Promise<SongLyricsTask | null> {
+export async function refreshLyricsGeneration(
+  taskId: string,
+): Promise<SongLyricsTask | null> {
   return songTaskStore.getLyrics(taskId);
 }
 
 export async function generateSongStory(
-  input: SongStoryInput
+  input: SongStoryInput,
 ): Promise<{ story: string }> {
   const model = getReplicateGpt5LyricsModel();
   const prompt = buildStoryPrompt(input);
@@ -310,6 +430,7 @@ export async function generateSongStory(
 export async function generateSongLyrics(input: SongInputContext): Promise<{
   title: string;
   lyrics: string;
+  coverArt: SongCoverArtDirection;
 }> {
   const model = getReplicateGpt5LyricsModel();
   const prompt = buildLyricsPrompt(input);
@@ -320,23 +441,20 @@ export async function generateSongLyrics(input: SongInputContext): Promise<{
     promptLength: prompt.length,
   });
 
-  const lyrics = await generateTextWithReplicateGpt5({
+  const output = await generateTextWithReplicateGpt5({
     model,
     prompt,
-    maxCompletionTokens: 2200,
+    maxCompletionTokens: 2800,
     systemPrompt:
-      "You are a careful, original lyric-writing assistant. Follow safety and output-format instructions exactly.",
+      "You are a careful, original lyricist and gift art director. Return only the required valid JSON object and follow all safety instructions exactly.",
     verbosity: "medium",
   });
 
-  return {
-    title: inferTitleFromLyrics(lyrics),
-    lyrics,
-  };
+  return parseSongLyricsGeneration(output);
 }
 
 export async function rewriteSongLyricsLines(
-  input: SongLyricsRewriteInput
+  input: SongLyricsRewriteInput,
 ): Promise<{ lines: string[] }> {
   const selectedLines = input.selectedLines
     .map((line) => line.trim())
@@ -377,7 +495,9 @@ export async function rewriteSongLyricsLines(
   };
 }
 
-export async function createSongGeneration(input: SongGenerationInput): Promise<SongGenerationTask> {
+export async function createSongGeneration(
+  input: SongGenerationInput,
+): Promise<SongGenerationTask> {
   assertSongTaskStoreConfigured();
   const user = input.sessionUser;
   const isSubscriber =
@@ -390,6 +510,8 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
   });
   const now = Date.now();
   const externalId = await submitMusicTask(input);
+  const mockMode = externalId === getMockKieSunoTaskId();
+  const mockDelayMs = mockMode ? getMockKieSunoDelayMs() : 0;
   const task: SongGenerationTask = {
     songId: crypto.randomUUID(),
     externalId,
@@ -397,13 +519,19 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
     userId: user?.id,
     isSubscriber: Boolean(isSubscriber),
     title: input.title,
-    lyrics: input.lyrics,
+    // Keep the spoken text in display lyrics while sending only song lyrics to Suno.
+    lyrics: input.spokenIntro
+      ? addSpokenIntroToLyrics(input.lyrics, input.spokenIntro.transcript)
+      : input.lyrics,
     genre: input.genre,
     occasion: input.occasion,
     recipientNames: input.recipientNames,
     story: input.story,
     vocalGender: input.vocalGender,
     language: input.language,
+    spokenIntro: input.spokenIntro,
+    mockMode,
+    mockReadyAt: mockMode ? now + mockDelayMs : undefined,
     versions: [],
     createdAt: now,
     updatedAt: now,
@@ -426,13 +554,47 @@ export async function createSongGeneration(input: SongGenerationInput): Promise<
       externalId,
       status: mockResult.status,
       versions: mockResult.versions.length,
+      delayMs: mockDelayMs,
     });
-    return (await completeSongTaskFromKieResult({ result: mockResult, task })) || task;
+    if (mockDelayMs > 0) return task;
+    return (
+      (await completeSongTaskFromKieResult({ result: mockResult, task })) ||
+      task
+    );
   }
 
   return task;
 }
 
-export async function refreshSongGeneration(songId: string): Promise<SongGenerationTask | null> {
-  return songTaskStore.getSong(songId);
+export async function refreshSongGeneration(
+  songId: string,
+): Promise<SongGenerationTask | null> {
+  const task = await songTaskStore.getSong(songId);
+  if (!task) return task;
+  if (needsSongPreview(task)) {
+    return startSongPreviewComposition({
+      dependencies: {},
+      task,
+      versions: task.versions,
+    });
+  }
+  if (task.status !== "processing") return task;
+  if (task.songPreviewRenders?.length) {
+    return refreshSongPreviewComposition({ task });
+  }
+  if (task.spokenIntroRenders?.length) {
+    return refreshSpokenIntroComposition({ task });
+  }
+  if (!task.mockMode) return task;
+  if (task.mockReadyAt && Date.now() < task.mockReadyAt) return task;
+
+  const mockResult = getMockKieSunoMusicResult(task.externalId);
+  if (!mockResult) {
+    return songTaskStore.updateSong(task.songId, {
+      status: "failed",
+      error: "KIE Suno mock configuration changed before completion.",
+    });
+  }
+
+  return completeSongTaskFromKieResult({ result: mockResult, task });
 }

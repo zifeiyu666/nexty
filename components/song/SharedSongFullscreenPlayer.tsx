@@ -87,7 +87,10 @@ function CueProgress({
   currentTime: number;
 }) {
   const duration = Math.max(cue.end - cue.start, 0.01);
-  const progress = Math.min(Math.max((currentTime - cue.start) / duration, 0), 1);
+  const progress = Math.min(
+    Math.max((currentTime - cue.start) / duration, 0),
+    1,
+  );
 
   return (
     <span
@@ -114,7 +117,7 @@ function GiftStoryPrompt({
   onOpen: () => void;
 }) {
   const recipientLabel = getRecipientLabel(data.recipientNames);
-  const story = data.story.trim();
+  const story = (data.personalNote || data.story).trim();
 
   return (
     <>
@@ -263,7 +266,13 @@ function LyricsStage({
   );
 }
 
-function CoverBackdrop({ imageUrl, title }: { imageUrl?: string | null; title: string }) {
+function CoverBackdrop({
+  imageUrl,
+  title,
+}: {
+  imageUrl?: string | null;
+  title: string;
+}) {
   if (!imageUrl) {
     return (
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_18%,rgba(255,124,102,0.42),transparent_28%),radial-gradient(circle_at_78%_28%,rgba(65,186,196,0.28),transparent_32%),linear-gradient(140deg,#140d10,#1e201a_45%,#06080c)]" />

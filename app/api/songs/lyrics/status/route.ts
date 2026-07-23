@@ -20,13 +20,17 @@ export async function GET(req: Request) {
       status: task.status,
       title: task.title,
       lyrics: task.lyrics,
+      coverArt: task.coverArt,
       error: task.error,
       expiresAt: new Date(task.expiresAt).toISOString(),
     });
   } catch (error) {
-    console.error("[songs/lyrics/status] Failed to refresh lyrics task:", error);
+    console.error(
+      "[songs/lyrics/status] Failed to refresh lyrics task:",
+      error,
+    );
     return apiResponse.serverError(
-      error instanceof Error ? error.message : "Failed to check lyrics status."
+      error instanceof Error ? error.message : "Failed to check lyrics status.",
     );
   }
 }

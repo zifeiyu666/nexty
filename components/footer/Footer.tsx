@@ -38,8 +38,8 @@ export default async function Footer() {
       />
       <footer className="container relative mx-auto max-w-8xl py-2">
         <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-12 lg:grid-cols-7">
-            <div className="w-full flex flex-col sm:flex-row lg:flex-col gap-4 col-span-full md:col-span-2">
+          <div className="grid grid-cols-1 gap-8 py-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12">
+            <div className="col-span-full flex w-full flex-col gap-4 sm:flex-row md:col-span-2 lg:col-span-1 lg:max-w-xs lg:flex-col xl:col-span-3">
               <div className="space-y-4 flex-1">
                 <div className="items-center space-x-2 flex">
                   <div className="flex items-center gap-2 text-xl font-medium text-white">
@@ -175,46 +175,58 @@ export default async function Footer() {
               return (
                 <div
                   key={section.title}
-                  className={cn("flex-1", isArticlesSection && "lg:col-span-2")}
+                  className="min-w-0 lg:col-span-1 xl:col-span-2"
                 >
                   <div className="mb-4 text-lg font-semibold text-white">
                     {section.title}
                   </div>
                   <ul className="space-y-2 text-sm">
-                    {section.links.map((link) => (
-                      <li key={link.href}>
-                        {link.href.startsWith("/") && !link.useA ? (
-                          <I18nLink
-                            href={link.href}
-                            title={link.name}
-                            prefetch={false}
-                            className={linkClassName}
-                            target={link.target || ""}
-                            rel={link.rel || ""}
-                          >
-                            {link.name}
-                          </I18nLink>
-                        ) : (
-                          <Link
-                            href={link.href}
-                            title={link.name}
-                            prefetch={false}
-                            className={linkClassName}
-                            target={link.target || ""}
-                            rel={link.rel || ""}
-                          >
-                            {link.name}
-                          </Link>
-                        )}
-                      </li>
-                    ))}
+                    {section.links.map((link, index) => {
+                      if (link.isSubTitle) {
+                        return (
+                          <li key={index} className="pt-4">
+                            <div className="mb-2 text-lg font-semibold text-white">
+                              {link.name}
+                            </div>
+                          </li>
+                        );
+                      }
+
+                      return (
+                        <li key={link.href}>
+                          {link.href!.startsWith("/") && !link.useA ? (
+                            <I18nLink
+                              href={link.href!}
+                              title={link.name}
+                              prefetch={false}
+                              className={linkClassName}
+                              target={link.target || ""}
+                              rel={link.rel || ""}
+                            >
+                              {link.name}
+                            </I18nLink>
+                          ) : (
+                            <Link
+                              href={link.href!}
+                              title={link.name}
+                              prefetch={false}
+                              className={linkClassName}
+                              target={link.target || ""}
+                              rel={link.rel || ""}
+                            >
+                              {link.name}
+                            </Link>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               );
             })}
 
             {messages.Footer.Newsletter && (
-              <div className="w-full flex-1">
+              <div className="w-full lg:col-span-1 xl:col-span-3">
                 <Newsletter
                   labels={{
                     defaultErrorMessage: tFooter(

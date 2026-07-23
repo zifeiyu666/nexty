@@ -57,7 +57,7 @@ describe("song unlock payment helpers", () => {
         songId: "sample-1",
         versionId: "provider-a",
         returnTo: "/samples/sample-1",
-      }
+      },
     );
 
     assert.equal(
@@ -65,7 +65,7 @@ describe("song unlock payment helpers", () => {
         type: "unlock_song",
         songId: "sample-1",
       }),
-      null
+      null,
     );
   });
 
@@ -84,11 +84,14 @@ describe("song unlock payment helpers", () => {
       unlockVersionId: "provider-a",
       unlockReturnTo: "/samples/sample-1",
     });
-    assert.deepEqual(parseUnlockSongMetadata(buildUnlockSongMetadata(context)), context);
+    assert.deepEqual(
+      parseUnlockSongMetadata(buildUnlockSongMetadata(context)),
+      context,
+    );
 
     assert.equal(
       buildUnlockSongCheckoutParams(context).toString(),
-      "type=unlock_song&songId=sample-1&versionId=provider-a&returnTo=%2Fsamples%2Fsample-1"
+      "type=unlock_song&songId=sample-1&versionId=provider-a&returnTo=%2Fsamples%2Fsample-1",
     );
   });
 
@@ -124,7 +127,7 @@ describe("song unlock payment helpers", () => {
         sampleSongId: "sample-1",
         versionId: "provider-a",
         returnTo: "/samples/sample-1",
-      }
+      },
     );
   });
 
@@ -143,12 +146,12 @@ describe("song unlock payment helpers", () => {
         {
           planName: "Single Song",
         },
-        result
+        result,
       ),
       {
         planName: "Single Song",
         unlockSong: result,
-      }
+      },
     );
   });
 
@@ -169,7 +172,12 @@ describe("song unlock payment helpers", () => {
         },
       },
       async finalizeSong({ sample, userId, versionId }) {
-        calls.push({ kind: "finalize", sampleId: sample.songId, userId, versionId });
+        calls.push({
+          kind: "finalize",
+          sampleId: sample.songId,
+          userId,
+          versionId,
+        });
         return {
           success: true,
           alreadyFinalized: false,
@@ -193,7 +201,10 @@ describe("song unlock payment helpers", () => {
       {
         kind: "get",
         songId: "sample-1",
-        options: { hasActiveSubscription: true },
+        options: {
+          hasActiveSubscription: true,
+          includeFullVersions: true,
+        },
       },
       {
         kind: "finalize",
@@ -229,7 +240,13 @@ describe("song unlock payment helpers", () => {
     });
 
     assert.equal(result?.status, "completed");
-    assert.equal(result?.status === "completed" && result.alreadyFinalized, true);
-    assert.equal(result?.status === "completed" && result.songId, "existing-song");
+    assert.equal(
+      result?.status === "completed" && result.alreadyFinalized,
+      true,
+    );
+    assert.equal(
+      result?.status === "completed" && result.songId,
+      "existing-song",
+    );
   });
 });

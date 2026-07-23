@@ -7,6 +7,7 @@ import { getSession, isAdmin } from '@/lib/auth/server'
 import { db } from '@/lib/db'
 import { posts as postsSchema, PostStatus, postTags as postTagsSchema, PostType, subscriptions as subscriptionsSchema, tags as tagsSchema } from '@/lib/db/schema'
 import { getErrorMessage } from '@/lib/error-utils'
+import { resolvePublishedAt } from '@/lib/cms/post-publishing'
 import { buildPublicPostUrl, submitIndexNowUrls, submitPostToIndexNow } from '@/lib/indexnow'
 import { PostWithTags, PublicPost, PublicPostWithContent } from '@/types/cms'
 import { and, count, desc, eq, getTableColumns, ilike, inArray, or, sql } from 'drizzle-orm'
@@ -341,6 +342,7 @@ export async function updatePostAction({
         slug: postsSchema.slug,
         language: postsSchema.language,
         status: postsSchema.status,
+        publishedAt: postsSchema.publishedAt,
         postType: postsSchema.postType,
         visibility: postsSchema.visibility,
       })
@@ -363,6 +365,12 @@ export async function updatePostAction({
       .update(postsSchema)
       .set({
         ...postUpdateData,
+        publishedAt: resolvePublishedAt({
+          currentStatus: currentPost.status,
+          nextStatus: postUpdateData.status,
+          currentPublishedAt: currentPost.publishedAt,
+          now: new Date(),
+        }),
         postType: finalPostType,
         featuredImageUrl: finalFeaturedImageUrl,
         content: postUpdateData.content || null,

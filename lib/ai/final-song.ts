@@ -103,6 +103,14 @@ export function getVersionTimestampedLyrics(
   return timestampedLyrics;
 }
 
+export function getSongPersonalNote(metadata: unknown): string | undefined {
+  if (!metadata || typeof metadata !== "object") return undefined;
+  const personalNote = (metadata as Record<string, unknown>).personalNote;
+  return typeof personalNote === "string" && personalNote.trim()
+    ? personalNote.trim()
+    : undefined;
+}
+
 export async function getSongForOwner(
   songId: string,
   userId: string,
@@ -192,12 +200,14 @@ export async function getSharedSongByShortCode(
 export async function finalizeSongFromSample({
   coverImageUrl,
   dbClient = db,
+  personalNote,
   sample,
   userId,
   versionId,
 }: {
   coverImageUrl?: string;
   dbClient?: FinalizeSongDbClient;
+  personalNote?: string;
   sample: SongSampleView;
   userId: string;
   versionId: string;
@@ -226,7 +236,10 @@ export async function finalizeSongFromSample({
     };
   }
 
-  const selectedVersion = findSampleVersion(sample.versions, versionId);
+  const selectedVersion = findSampleVersion(
+    sample.fullVersions?.length ? sample.fullVersions : sample.versions,
+    versionId,
+  );
   if (!selectedVersion) {
     console.warn("[final-song] Finalize rejected: version not found", {
       sampleId: sample.songId,
@@ -381,6 +394,9 @@ export async function finalizeSongFromSample({
                 selectedVersionTitle: selectedVersion.title,
                 kieTaskId: sample.externalId,
                 selectedAudioId: selectedVersion.id,
+                ...((personalNote || sample.personalNote)?.trim() && {
+                  personalNote: (personalNote || sample.personalNote)?.trim(),
+                }),
                 timestampedLyrics: getVersionTimestampedLyrics(selectedVersion),
               },
             })

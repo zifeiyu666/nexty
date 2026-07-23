@@ -13,6 +13,8 @@ export function createLyricsInputKey({
   occasion,
   recipients,
   story,
+  spokenBlessing = "",
+  spokenMode = "recording",
   vocalGender,
 }: {
   genre: string;
@@ -20,6 +22,8 @@ export function createLyricsInputKey({
   occasion: Occasion | null;
   recipients: RecipientInput[];
   story: string;
+  spokenBlessing?: string;
+  spokenMode?: "recording" | "text";
   vocalGender: string;
 }) {
   return JSON.stringify({
@@ -28,6 +32,8 @@ export function createLyricsInputKey({
     occasion,
     recipients: cleanRecipients(recipients),
     story: story.trim(),
+    spokenBlessing: spokenMode === "text" ? spokenBlessing.trim() : "",
+    spokenMode,
     vocalGender,
   });
 }

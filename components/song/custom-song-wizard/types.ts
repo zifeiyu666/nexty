@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { SongCoverArtDirection } from "@/types/song-cover";
 
 export type Occasion = string;
 export type WizardStep = 1 | 2 | 3 | 4 | 5;
@@ -8,6 +9,14 @@ export type LyricsStage = "loading" | "editor";
 export type LyricLine = {
   time: number;
   line: string;
+};
+
+export type SpokenIntroDraft = {
+  alignedWords: Array<{ word: string; startS: number; endS: number }>;
+  audioKey: string;
+  audioUrl: string;
+  durationSeconds: number;
+  transcript: string;
 };
 
 export type SongVersion = {
@@ -23,6 +32,7 @@ export type LyricsVersionComparison = {
   originalLyrics: string;
   newTitle: string;
   newLyrics: string;
+  newCoverArt?: SongCoverArtDirection;
 };
 
 export type CaptureLeadResponse = {
@@ -53,17 +63,22 @@ export type RecipientInput = {
 };
 
 export type StoredDraft = {
+  coverArt?: SongCoverArtDirection;
   generatedLyrics?: string;
   genre?: string;
   language?: string;
   lyricsGeneratedBy?: "ai";
   lyricsInputKey?: string;
   occasion?: Occasion | null;
+  personalNote?: string;
   recipients?: RecipientInput[];
   recipientNames?: string[];
   recipientRelationships?: string[];
   songStage?: SongStage;
   songTitle?: string;
   story?: string;
+  spokenBlessing?: string;
+  spokenIntro?: SpokenIntroDraft;
+  spokenMode?: "recording" | "text";
   vocalGender?: string;
 };

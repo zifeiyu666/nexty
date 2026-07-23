@@ -1,4 +1,5 @@
-import type { Occasion, RecipientInput } from "./types";
+import type { Occasion, RecipientInput, SpokenIntroDraft } from "./types";
+import type { SongCoverArtDirection } from "@/types/song-cover";
 
 type SongWizardInput = {
   genre: string;
@@ -8,6 +9,9 @@ type SongWizardInput = {
   recipientNames: string[];
   recipientRelationships: string[];
   story: string;
+  spokenBlessing?: string;
+  spokenIntro?: SpokenIntroDraft;
+  spokenMode?: "recording" | "text";
   vocalGender: string;
 };
 
@@ -21,6 +25,7 @@ type SongGenerationInput = SongWizardInput & {
 };
 
 type SongCoverGenerationInput = SongWizardInput & {
+  coverArt?: SongCoverArtDirection;
   lyrics: string;
   songId?: string;
   title: string;
@@ -32,7 +37,10 @@ type LyricsRewriteInput = SongWizardInput & {
   selectedLines: string[];
 };
 
-type StoryHelperGenerationInput = Omit<SongWizardInput, "story" | "occasion"> & {
+type StoryHelperGenerationInput = Omit<
+  SongWizardInput,
+  "story" | "occasion"
+> & {
   occasion: Occasion;
   sourceStory?: string;
   answers: Array<{
@@ -77,6 +85,7 @@ export async function startLyricsGeneration(input: LyricsGenerationInput) {
   });
 
   return parseApiResponse<{
+    coverArt?: SongCoverArtDirection;
     lyrics?: string;
     status: "succeeded" | "processing" | "failed";
     taskId: string;
@@ -90,6 +99,7 @@ export async function getLyricsGenerationStatus(taskId: string) {
   );
 
   return parseApiResponse<{
+    coverArt?: SongCoverArtDirection;
     error?: string;
     lyrics?: string;
     status: "succeeded" | "processing" | "failed";
@@ -117,10 +127,44 @@ export async function startSongGeneration(input: SongGenerationInput) {
     body: JSON.stringify(input),
   });
 
-  return parseApiResponse<{ songId: string }>(
+  return parseApiResponse<{ mockMode: boolean; songId: string }>(
     response,
     "Unable to start song generation.",
   );
+}
+
+export async function createSpokenIntroUpload(input: {
+  contentType: string;
+  fileName: string;
+  size: number;
+}) {
+  const response = await fetch("/api/songs/intro/presign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseApiResponse<{
+    contentType: string;
+    key: string;
+    presignedUrl: string;
+    publicObjectUrl: string;
+  }>(response, "Unable to prepare audio upload.");
+}
+
+export async function transcribeSpokenIntro(input: {
+  audioKey: string;
+  audioUrl: string;
+}) {
+  const response = await fetch("/api/songs/intro/transcribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseApiResponse<{
+    alignedWords: SpokenIntroDraft["alignedWords"];
+    durationSeconds: number;
+    transcript: string;
+  }>(response, "Unable to transcribe your recording.");
 }
 
 export async function getSongGenerationStatus(songId: string) {
@@ -132,6 +176,7 @@ export async function getSongGenerationStatus(songId: string) {
     error?: string;
     expiresAt?: string;
     previewLimitSeconds?: number | null;
+    mockMode: boolean;
     songId: string;
     status: "succeeded" | "processing" | "failed";
     versions?: Array<{
@@ -155,6 +200,25 @@ export async function generateSongCover(input: SongCoverGenerationInput) {
     imageUrl: string;
     prompt: string;
   }>(response, "Unable to generate cover image.");
+}
+
+export async function createSongCoverUpload(input: {
+  contentType: "image/jpeg" | "image/png" | "image/webp";
+  fileName: string;
+  size: number;
+}) {
+  const response = await fetch("/api/songs/cover/presign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+
+  return parseApiResponse<{
+    contentType: string;
+    key: string;
+    presignedUrl: string;
+    publicObjectUrl: string;
+  }>(response, "Unable to prepare album cover upload.");
 }
 
 export async function createCheckoutSession({
@@ -195,10 +259,12 @@ export async function createCheckoutSession({
 
 export async function finalizeSongVersion({
   coverImageUrl,
+  personalNote,
   songId,
   versionId,
 }: {
   coverImageUrl?: string;
+  personalNote?: string;
   songId: string;
   versionId: string;
 }) {
@@ -207,6 +273,7 @@ export async function finalizeSongVersion({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       coverImageUrl,
+      personalNote,
       songId,
       versionId,
     }),

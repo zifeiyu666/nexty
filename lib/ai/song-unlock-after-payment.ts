@@ -80,7 +80,7 @@ function base64UrlToUuid(value: string): string | null {
     if (hex.length !== 32) return null;
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(
       12,
-      16
+      16,
     )}-${hex.slice(16, 20)}-${hex.slice(20)}`;
   } catch {
     return null;
@@ -93,7 +93,9 @@ function parsePayPalUnlockPayload(value: string): UnlockSongContext | null {
       .slice(PAYPAL_UUID_UNLOCK_PREFIX.length)
       .split(".");
     const songId = encodedSongId ? base64UrlToUuid(encodedSongId) : null;
-    const versionId = encodedVersionId ? base64UrlToUuid(encodedVersionId) : null;
+    const versionId = encodedVersionId
+      ? base64UrlToUuid(encodedVersionId)
+      : null;
     if (songId && versionId) {
       return {
         type: "unlock_song",
@@ -119,7 +121,9 @@ function parsePayPalUnlockPayload(value: string): UnlockSongContext | null {
   }
 
   if (value.startsWith(PAYPAL_JSON_UNLOCK_PREFIX)) {
-    const decoded = fromBase64Url(value.slice(PAYPAL_JSON_UNLOCK_PREFIX.length));
+    const decoded = fromBase64Url(
+      value.slice(PAYPAL_JSON_UNLOCK_PREFIX.length),
+    );
     if (!decoded) return null;
 
     try {
@@ -150,7 +154,9 @@ function parsePayPalUnlockPayload(value: string): UnlockSongContext | null {
   return null;
 }
 
-export function parseUnlockSongContext(input: unknown): UnlockSongContext | null {
+export function parseUnlockSongContext(
+  input: unknown,
+): UnlockSongContext | null {
   if (!input || typeof input !== "object") return null;
 
   const source = input as MetadataRecord;
@@ -171,7 +177,7 @@ export function parseUnlockSongContext(input: unknown): UnlockSongContext | null
 }
 
 export function buildUnlockSongMetadata(
-  context: UnlockSongContext | null | undefined
+  context: UnlockSongContext | null | undefined,
 ): Record<string, string> {
   if (!context) return {};
 
@@ -184,7 +190,7 @@ export function buildUnlockSongMetadata(
 }
 
 export function parseUnlockSongMetadata(
-  metadata: unknown
+  metadata: unknown,
 ): UnlockSongContext | null {
   if (!metadata || typeof metadata !== "object") return null;
 
@@ -211,7 +217,7 @@ export function parseUnlockSongMetadata(
 }
 
 export function buildUnlockSongCheckoutParams(
-  context: UnlockSongContext | null | undefined
+  context: UnlockSongContext | null | undefined,
 ): URLSearchParams {
   const params = new URLSearchParams();
   if (!context) return params;
@@ -226,7 +232,7 @@ export function buildUnlockSongCheckoutParams(
 
 export function appendUnlockSongParams(
   path: string,
-  context: UnlockSongContext | null | undefined
+  context: UnlockSongContext | null | undefined,
 ): string {
   const params = buildUnlockSongCheckoutParams(context);
   const query = params.toString();
@@ -236,7 +242,7 @@ export function appendUnlockSongParams(
 }
 
 export function serializeUnlockSongForPayPal(
-  context: UnlockSongContext | null | undefined
+  context: UnlockSongContext | null | undefined,
 ): string | null {
   if (!context) return null;
 
@@ -248,7 +254,7 @@ export function serializeUnlockSongForPayPal(
 
   if (encodedSongId) {
     const mixedPayload = `${PAYPAL_SAMPLE_UUID_UNLOCK_PREFIX}${encodedSongId}.${toBase64Url(
-      context.versionId
+      context.versionId,
     )}`;
     if (mixedPayload.length <= PAYPAL_UNLOCK_PAYLOAD_MAX_LENGTH) {
       return mixedPayload;
@@ -259,7 +265,7 @@ export function serializeUnlockSongForPayPal(
     JSON.stringify({
       s: context.songId,
       v: context.versionId,
-    })
+    }),
   )}`;
   if (jsonPayload.length <= PAYPAL_UNLOCK_PAYLOAD_MAX_LENGTH) {
     return jsonPayload;
@@ -275,22 +281,25 @@ export function serializeUnlockSongForPayPal(
     {
       songIdLength: context.songId.length,
       versionIdLength: context.versionId.length,
-    }
+    },
   );
   return null;
 }
 
-export function mergeUnlockSongMetadata<T extends MetadataRecord | null | undefined>(
-  metadata: T,
-  result: UnlockSongResult
-): MetadataRecord {
+export function mergeUnlockSongMetadata<
+  T extends MetadataRecord | null | undefined,
+>(metadata: T, result: UnlockSongResult): MetadataRecord {
   return {
-    ...((metadata && typeof metadata === "object" ? metadata : {}) as MetadataRecord),
+    ...((metadata && typeof metadata === "object"
+      ? metadata
+      : {}) as MetadataRecord),
     unlockSong: result,
   };
 }
 
-export function getUnlockSongResult(metadata: unknown): UnlockSongResult | null {
+export function getUnlockSongResult(
+  metadata: unknown,
+): UnlockSongResult | null {
   if (!metadata || typeof metadata !== "object") return null;
   const value = (metadata as MetadataRecord).unlockSong;
   if (!value || typeof value !== "object") return null;
@@ -336,7 +345,7 @@ export function getUnlockSongResult(metadata: unknown): UnlockSongResult | null 
 }
 
 export function buildPendingUnlockSongResult(
-  context: UnlockSongContext | null | undefined
+  context: UnlockSongContext | null | undefined,
 ): UnlockSongResult | null {
   if (!context) return null;
   return {
@@ -358,7 +367,10 @@ export async function finalizeSongUnlockAfterPayment({
   sampleStore?: {
     get: (
       songId: string,
-      options?: { hasActiveSubscription?: boolean }
+      options?: {
+        hasActiveSubscription?: boolean;
+        includeFullVersions?: boolean;
+      },
     ) => Promise<SongSampleView | null>;
   };
   finalizeSong?: FinalizeSong;
@@ -374,6 +386,7 @@ export async function finalizeSongUnlockAfterPayment({
   try {
     const sample = await sampleStore.get(context.songId, {
       hasActiveSubscription: true,
+      includeFullVersions: true,
     });
     if (!sample) {
       return {
@@ -420,7 +433,7 @@ export async function finalizeSongUnlockAfterPayment({
 
 export async function recordOrderUnlockSongResult(
   orderId: string | null | undefined,
-  result: UnlockSongResult | null
+  result: UnlockSongResult | null,
 ): Promise<void> {
   if (!orderId || !result) return;
 
@@ -432,13 +445,18 @@ export async function recordOrderUnlockSongResult(
 
   await db
     .update(ordersSchema)
-    .set({ metadata: mergeUnlockSongMetadata(order?.metadata as MetadataRecord, result) })
+    .set({
+      metadata: mergeUnlockSongMetadata(
+        order?.metadata as MetadataRecord,
+        result,
+      ),
+    })
     .where(eq(ordersSchema.id, orderId));
 }
 
 export async function recordSubscriptionUnlockSongResult(
   subscriptionId: string | null | undefined,
-  result: UnlockSongResult | null
+  result: UnlockSongResult | null,
 ): Promise<void> {
   if (!subscriptionId || !result) return;
 
@@ -453,7 +471,7 @@ export async function recordSubscriptionUnlockSongResult(
     .set({
       metadata: mergeUnlockSongMetadata(
         subscription?.metadata as MetadataRecord,
-        result
+        result,
       ),
     })
     .where(eq(subscriptionsSchema.subscriptionId, subscriptionId));

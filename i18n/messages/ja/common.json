@@ -248,7 +248,10 @@
             { "href": "/#features", "name": "ギフト機能" },
             { "id": "pricing", "href": "/#pricing", "name": "料金" },
             { "href": "/songs", "name": "マイソング" },
-            { "href": "/samples", "name": "サンプル" }
+            { "href": "/samples", "name": "サンプル" },
+            { "isSubTitle": true, "name": "資料" },
+            { "href": "/blog", "name": "すべての記事" },
+            { "href": "/glossary", "name": "用語集" }
           ]
         },
         {
@@ -260,6 +263,26 @@
               "href": "/occasions/custom-happy-birthday-song"
             },
             { "name": "記念日ソング", "href": "/occasions/anniversary" },
+            { "name": "母の日ソング", "href": "/occasions/mothers-day" },
+            { "name": "父の日ソング", "href": "/occasions/fathers-day" },
+            {
+              "name": "バレンタインソング",
+              "href": "/occasions/valentines-day"
+            },
+            {
+              "name": "お祝いソング",
+              "href": "/occasions/congratulations"
+            },
+            { "name": "ウェディングソング", "href": "/occasions/wedding" },
+            {
+              "name": "メモリアルソング",
+              "href": "/occasions/in-memoriam"
+            },
+            { "name": "感謝の歌", "href": "/occasions/thank-you" },
+            {
+              "name": "お見舞いソング",
+              "href": "/occasions/get-well-soon"
+            },
             {
               "name": "音楽のパーソナルギフト",
               "href": "/music/personalized-gift"
@@ -268,14 +291,7 @@
             { "name": "歌詞アート", "href": "/lyricwallart" }
           ]
         },
-        { "title": "記事", "links": [{ "href": "/blog", "name": "ブログ" }] },
-        {
-          "title": "資料",
-          "links": [
-            { "href": "/blog", "name": "すべての記事" },
-            { "href": "/glossary", "name": "用語集" }
-          ]
-        }
+        { "title": "記事", "links": [{ "href": "/blog", "name": "ブログ" }] }
       ]
     }
   },

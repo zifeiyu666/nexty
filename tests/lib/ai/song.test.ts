@@ -14,9 +14,17 @@ import {
   SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
   parseLyricsText,
 } from "../../../lib/ai/song-lyrics";
-import { buildLyricsPrompt, buildStoryPrompt, refreshSongGeneration } from "../../../lib/ai/song";
+import {
+  buildLyricsPrompt,
+  buildStoryPrompt,
+  getPublicSongGenerationVersions,
+  needsSongPreview,
+  parseSongLyricsGeneration,
+  refreshSongGeneration,
+} from "../../../lib/ai/song";
 import {
   createSongSampleFromTask,
+  createSongSampleView,
   getSampleAccessExpiresAt,
 } from "../../../lib/ai/song-sample-store";
 import { songTaskStore } from "../../../lib/ai/song-task-store";
@@ -36,9 +44,15 @@ describe("song lyrics prompt", () => {
     assert.match(prompt, /Lyrics language: English/);
     assert.match(prompt, /Core Safety & Compliance Guidelines/i);
     assert.match(prompt, /politically sensitive/i);
-    assert.match(prompt, /Do not directly copy, splice, paraphrase, or rewrite/i);
+    assert.match(
+      prompt,
+      /Do not directly copy, splice, paraphrase, or rewrite/i,
+    );
     assert.match(prompt, /recognizable public figure/i);
-    assert.match(prompt, /抱歉，您输入的内容包含敏感信息或可能引发版权争议，请调整提示词后重试。/);
+    assert.match(
+      prompt,
+      /抱歉，您输入的内容包含敏感信息或可能引发版权争议，请调整提示词后重试。/,
+    );
     assert.match(prompt, /Rhyme/i);
     assert.match(prompt, /Singability/i);
     assert.match(prompt, /Music style \/ genre: Acoustic Folk/);
@@ -46,6 +60,10 @@ describe("song lyrics prompt", () => {
     assert.match(prompt, /\[Verse 1\]/);
     assert.match(prompt, /\[Chorus\]/);
     assert.match(prompt, /She always sang while cooking dinner/);
+    assert.match(prompt, /heirloom-storybook/);
+    assert.match(prompt, /hand-painted-gouache/);
+    assert.match(prompt, /coverArt/);
+    assert.match(prompt, /valid JSON/i);
   });
 
   test("adds optional new-version direction to the lyric prompt", () => {
@@ -63,6 +81,53 @@ describe("song lyrics prompt", () => {
     assert.match(prompt, /Additional New Version Direction/i);
     assert.match(prompt, /Add Maya's name to the title/);
     assert.match(prompt, /more romantic/);
+  });
+
+  test("parses lyrics and a gift-oriented cover art direction", () => {
+    const result = parseSongLyricsGeneration(`\`\`\`json
+{
+  "title": "Kitchen Light",
+  "lyrics": "[Verse 1]\\nShe sang above the Sunday steam",
+  "coverArt": {
+    "style": "hand-painted-gouache",
+    "styleDescription": "intimate hand-painted gouache with visible brush texture",
+    "subject": "a warmly lit family kitchen with one red balloon",
+    "mood": "tender, nostalgic and quietly joyful",
+    "palette": "warm coral, soft green, muted gold and ivory",
+    "lighting": "gentle evening window light",
+    "composition": "a central symbolic scene with space in the lower-right",
+    "giftFeeling": "a treasured handmade keepsake, personal and premium"
+  }
+}
+\`\`\``);
+
+    assert.equal(result.title, "Kitchen Light");
+    assert.match(result.lyrics, /Sunday steam/);
+    assert.equal(result.coverArt.style, "hand-painted-gouache");
+    assert.match(result.coverArt.giftFeeling, /handmade keepsake/);
+  });
+
+  test("rejects unsupported cover art styles", () => {
+    assert.throws(
+      () =>
+        parseSongLyricsGeneration(
+          JSON.stringify({
+            title: "Kitchen Light",
+            lyrics: "[Verse 1]\\nShe sang above the Sunday steam",
+            coverArt: {
+              style: "in-the-style-of-a-famous-artist",
+              styleDescription: "artist imitation",
+              subject: "a kitchen",
+              mood: "warm",
+              palette: "gold",
+              lighting: "evening light",
+              composition: "centered",
+              giftFeeling: "personal",
+            },
+          }),
+        ),
+      /cover art direction/i,
+    );
   });
 });
 
@@ -153,16 +218,83 @@ describe("Replicate GPT-5 lyrics adapter", () => {
     assert.equal(normalizeReplicateTextOutput("Title: One"), "Title: One");
     assert.equal(
       normalizeReplicateTextOutput(["Title: ", "One", "\n[Verse 1]"]),
-      "Title: One\n[Verse 1]"
+      "Title: One\n[Verse 1]",
     );
     assert.equal(
       normalizeReplicateTextOutput({ output: ["Line ", "one"] }),
-      "Line one"
+      "Line one",
     );
   });
 });
 
 describe("song generation status refresh", () => {
+  test("migrates a historical succeeded task that still exposes full audio", () => {
+    assert.equal(
+      needsSongPreview({
+        status: "succeeded",
+        versions: [
+          {
+            id: "a",
+            title: "Historical full version",
+            audioUrl: "https://cdn.test/a-full.mp3",
+          },
+        ],
+      }),
+      true,
+    );
+    assert.equal(
+      needsSongPreview({
+        status: "succeeded",
+        fullVersions: [
+          {
+            id: "a",
+            title: "Private full version",
+            audioUrl: "https://cdn.test/a-full.mp3",
+          },
+        ],
+        versions: [
+          {
+            id: "a",
+            title: "Public preview",
+            audioUrl: "https://cdn.test/a/preview.mp3",
+          },
+        ],
+      }),
+      false,
+    );
+  });
+
+  test("does not expose full audio versions while preview rendering is processing", () => {
+    assert.deepEqual(
+      getPublicSongGenerationVersions({
+        status: "processing",
+        versions: [
+          {
+            id: "a",
+            title: "Full version",
+            audioUrl: "https://cdn.test/a-full.mp3",
+          },
+        ],
+      }),
+      [],
+    );
+  });
+
+  test("returns only finalized preview versions after the task succeeds", () => {
+    const versions = [
+      {
+        id: "a",
+        title: "Preview version",
+        audioUrl: "https://cdn.test/a-preview.mp3",
+      },
+    ];
+
+    assert.equal(
+      getPublicSongGenerationVersions({ status: "succeeded", versions }),
+      versions,
+    );
+  });
+
   test("reads processing song tasks locally without external polling", async () => {
     const originalGetSong = (songTaskStore as any).getSong;
     const originalFetch = globalThis.fetch;
@@ -200,29 +332,134 @@ describe("song generation status refresh", () => {
       globalThis.fetch = originalFetch;
     }
   });
+
+  test("keeps a delayed mock song processing until its configured ready time", async () => {
+    const originalGetSong = (songTaskStore as any).getSong;
+    const originalUpdateSong = (songTaskStore as any).updateSong;
+    const originalMockTaskId = process.env.KIE_SUNO_MOCK_TASK_ID;
+    const task = {
+      songId: "song-mock-waiting",
+      externalId: "mock-task",
+      status: "processing" as const,
+      mockMode: true,
+      mockReadyAt: Date.now() + 60_000,
+      isSubscriber: true,
+      title: "Waiting Mock Song",
+      lyrics: "[Verse]\nHello",
+      genre: "Pop",
+      occasion: "birthday",
+      recipientNames: ["Maya"],
+      story: "A birthday story",
+      vocalGender: "Female",
+      language: "English",
+      versions: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      expiresAt: Date.now() + 120_000,
+    };
+    let updateCalls = 0;
+
+    try {
+      process.env.KIE_SUNO_MOCK_TASK_ID = "mock-task";
+      (songTaskStore as any).getSong = async () => task;
+      (songTaskStore as any).updateSong = async () => {
+        updateCalls += 1;
+        return null;
+      };
+
+      assert.deepEqual(await refreshSongGeneration(task.songId), task);
+      assert.equal(updateCalls, 0);
+    } finally {
+      (songTaskStore as any).getSong = originalGetSong;
+      (songTaskStore as any).updateSong = originalUpdateSong;
+      if (originalMockTaskId === undefined) {
+        delete process.env.KIE_SUNO_MOCK_TASK_ID;
+      } else {
+        process.env.KIE_SUNO_MOCK_TASK_ID = originalMockTaskId;
+      }
+    }
+  });
+
+  test("settles a delayed mock song after its configured ready time", async () => {
+    const originalGetSong = (songTaskStore as any).getSong;
+    const originalUpdateSong = (songTaskStore as any).updateSong;
+    const originalMockTaskId = process.env.KIE_SUNO_MOCK_TASK_ID;
+    const originalMockVersions = process.env.KIE_SUNO_MOCK_VERSIONS_JSON;
+    const task = {
+      songId: "song-mock-ready",
+      externalId: "mock-task",
+      status: "processing" as const,
+      mockMode: true,
+      mockReadyAt: Date.now() - 1,
+      isSubscriber: true,
+      title: "Ready Mock Song",
+      lyrics: "[Verse]\nHello",
+      genre: "Pop",
+      occasion: "birthday",
+      recipientNames: ["Maya"],
+      story: "A birthday story",
+      vocalGender: "Female",
+      language: "English",
+      versions: [],
+      createdAt: Date.now() - 60_000,
+      updatedAt: Date.now() - 60_000,
+      expiresAt: Date.now() + 120_000,
+    };
+    let updatedStatus: string | undefined;
+
+    try {
+      process.env.KIE_SUNO_MOCK_TASK_ID = "mock-task";
+      delete process.env.KIE_SUNO_MOCK_VERSIONS_JSON;
+      (songTaskStore as any).getSong = async () => task;
+      (songTaskStore as any).updateSong = async (
+        _songId: string,
+        updates: { status?: string },
+      ) => {
+        updatedStatus = updates.status;
+        return { ...task, ...updates };
+      };
+
+      const result = await refreshSongGeneration(task.songId);
+      assert.equal(result?.status, "failed");
+      assert.equal(updatedStatus, "failed");
+    } finally {
+      (songTaskStore as any).getSong = originalGetSong;
+      (songTaskStore as any).updateSong = originalUpdateSong;
+      if (originalMockTaskId === undefined) {
+        delete process.env.KIE_SUNO_MOCK_TASK_ID;
+      } else {
+        process.env.KIE_SUNO_MOCK_TASK_ID = originalMockTaskId;
+      }
+      if (originalMockVersions === undefined) {
+        delete process.env.KIE_SUNO_MOCK_VERSIONS_JSON;
+      } else {
+        process.env.KIE_SUNO_MOCK_VERSIONS_JSON = originalMockVersions;
+      }
+    }
+  });
 });
 
 describe("song lyrics line editing", () => {
   test("keeps shared safety and formatting rules in English", () => {
     assert.match(
       SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
-      /Core Safety & Compliance Guidelines/i
+      /Core Safety & Compliance Guidelines/i,
     );
     assert.match(
       SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
-      /Do not directly copy, splice, paraphrase, or rewrite/i
+      /Do not directly copy, splice, paraphrase, or rewrite/i,
     );
     assert.match(
       SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
-      /recognizable public figure/i
+      /recognizable public figure/i,
     );
     assert.match(
       SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
-      /standard English bracketed section tags/i
+      /standard English bracketed section tags/i,
     );
     assert.match(
       SONG_LYRICS_SAFETY_AND_FORMATTING_GUIDELINES,
-      /抱歉，您输入的内容包含敏感信息或可能引发版权争议，请调整提示词后重试。/
+      /抱歉，您输入的内容包含敏感信息或可能引发版权争议，请调整提示词后重试。/,
     );
   });
 
@@ -238,7 +475,11 @@ Brave little hands, brave little dream`);
       { id: "line-1", kind: "blank", text: "" },
       { id: "line-2", kind: "section", text: "[Verse 1]" },
       { id: "line-3", kind: "lyric", text: "She sang above the Sunday steam" },
-      { id: "line-4", kind: "lyric", text: "Brave little hands, brave little dream" },
+      {
+        id: "line-4",
+        kind: "lyric",
+        text: "Brave little hands, brave little dream",
+      },
     ]);
   });
 
@@ -252,7 +493,7 @@ Brave little hands, brave little dream`);
 
     assert.equal(
       text,
-      "[Chorus]\nKeep the porch light burning\n\nI am finding my way home"
+      "[Chorus]\nKeep the porch light burning\n\nI am finding my way home",
     );
   });
 
@@ -262,14 +503,15 @@ Original first line
 Original second line
 Original third line`);
 
-    const updated = applyLyricsLineRewrite(lines, ["line-1", "line-2"], [
-      "Rewritten first line",
-      "Rewritten second line",
-    ]);
+    const updated = applyLyricsLineRewrite(
+      lines,
+      ["line-1", "line-2"],
+      ["Rewritten first line", "Rewritten second line"],
+    );
 
     assert.equal(
       composeLyricsText(updated),
-      "[Verse 1]\nRewritten first line\nRewritten second line\nOriginal third line"
+      "[Verse 1]\nRewritten first line\nRewritten second line\nOriginal third line",
     );
   });
 
@@ -281,7 +523,7 @@ Original second line`);
     const suggestions = createLyricsLineRewriteSuggestions(
       lines,
       ["line-1", "line-2"],
-      ["New first line", "New second line"]
+      ["New first line", "New second line"],
     );
 
     assert.deepEqual(suggestions, [
@@ -298,7 +540,7 @@ Original second line`);
     ]);
     assert.equal(
       composeLyricsText(lines),
-      "[Verse 1]\nOriginal first line\nOriginal second line"
+      "[Verse 1]\nOriginal first line\nOriginal second line",
     );
   });
 
@@ -316,7 +558,10 @@ Original second line`);
     assert.match(prompt, /rewrite only the selected lyric lines/i);
     assert.match(prompt, /Core Safety & Compliance Guidelines/i);
     assert.match(prompt, /copyright/i);
-    assert.match(prompt, /抱歉，您输入的内容包含敏感信息或可能引发版权争议，请调整提示词后重试。/);
+    assert.match(
+      prompt,
+      /抱歉，您输入的内容包含敏感信息或可能引发版权争议，请调整提示词后重试。/,
+    );
     assert.match(prompt, /Keep exactly 1 non-empty line/i);
     assert.match(prompt, /Make it more tender/);
     assert.match(prompt, /Occasion: Mothers Day/);
@@ -324,7 +569,10 @@ Original second line`);
     assert.match(prompt, /read the entire song first/i);
     assert.match(prompt, /global continuity/i);
     assert.match(prompt, /repetition can be valid songwriting/i);
-    assert.match(prompt, /Do not return two adjacent lyric lines that are identical/i);
+    assert.match(
+      prompt,
+      /Do not return two adjacent lyric lines that are identical/i,
+    );
     assert.doesNotMatch(prompt, /Do not copy or repeat any unchanged line/i);
     assert.match(prompt, /A line that can repeat later/);
   });
@@ -352,16 +600,13 @@ describe("song samples", () => {
         updatedAt: createdAt,
         expiresAt: createdAt + 1000,
       },
-      createdAt
+      createdAt,
     );
 
     assert.equal(sample.songId, "song-1");
     assert.equal(sample.externalId, "kie-1");
     assert.equal(sample.previewLimitSeconds, 60);
-    assert.equal(
-      sample.accessExpiresAt,
-      createdAt + 3 * 24 * 60 * 60 * 1000
-    );
+    assert.equal(sample.accessExpiresAt, createdAt + 3 * 24 * 60 * 60 * 1000);
     assert.deepEqual(sample.recipientNames, ["Sdf"]);
   });
 
@@ -395,7 +640,7 @@ describe("song samples", () => {
         updatedAt: createdAt,
         expiresAt: createdAt + 1000,
       },
-      createdAt
+      createdAt,
     );
 
     assert.deepEqual(sample.versions[0]?.timestampedLyrics?.alignedWords, [
@@ -403,7 +648,7 @@ describe("song samples", () => {
     ]);
   });
 
-  test("creates full-preview sample records for subscribers without unlocking versions", () => {
+  test("keeps subscriber samples limited until a song entitlement is deducted", () => {
     const createdAt = new Date("2026-06-10T00:00:00Z").getTime();
     const sample = createSongSampleFromTask(
       {
@@ -428,15 +673,93 @@ describe("song samples", () => {
         updatedAt: createdAt,
         expiresAt: createdAt + 1000,
       },
-      createdAt
+      createdAt,
     );
 
-    assert.equal(sample.previewLimitSeconds, null);
-    assert.equal(
-      sample.accessExpiresAt,
-      createdAt + 3 * 24 * 60 * 60 * 1000
-    );
+    assert.equal(sample.previewLimitSeconds, 60);
+    assert.equal(sample.accessExpiresAt, createdAt + 3 * 24 * 60 * 60 * 1000);
     assert.equal("unlockedVersionIds" in sample, false);
+  });
+
+  test("does not expose private full-version URLs in the default sample view", () => {
+    const createdAt = new Date("2026-06-10T00:00:00Z").getTime();
+    const sample = createSongSampleView(
+      {
+        songId: "song-1",
+        externalId: "kie-1",
+        userId: "user-1",
+        title: "Birthday Melody",
+        lyrics: "[Verse 1]\nHello",
+        genre: "Pop",
+        occasion: "birthday",
+        language: "English",
+        vocalGender: "Female",
+        recipientNames: ["Sdf"],
+        story: "A birthday story",
+        versions: [
+          {
+            id: "a",
+            title: "A",
+            audioUrl: "https://cdn.test/a-preview.mp3",
+          },
+        ],
+        fullVersions: [
+          {
+            id: "a",
+            title: "A",
+            audioUrl: "https://cdn.test/a-full.mp3",
+          },
+        ],
+        previewLimitSeconds: 60,
+        createdAt,
+        updatedAt: createdAt,
+        accessExpiresAt: createdAt + 1000,
+      },
+      createdAt,
+    );
+
+    assert.equal(
+      sample.versions[0]?.audioUrl,
+      "https://cdn.test/a-preview.mp3",
+    );
+    assert.equal(sample.fullVersions, undefined);
+  });
+
+  test("includes private full versions only for server-side finalization", () => {
+    const createdAt = new Date("2026-06-10T00:00:00Z").getTime();
+    const sample = createSongSampleView(
+      {
+        songId: "song-1",
+        externalId: "kie-1",
+        title: "Birthday Melody",
+        lyrics: "[Verse 1]\nHello",
+        genre: "Pop",
+        occasion: "birthday",
+        language: "English",
+        vocalGender: "Female",
+        recipientNames: ["Sdf"],
+        story: "A birthday story",
+        versions: [],
+        fullVersions: [
+          {
+            id: "a",
+            title: "A",
+            audioUrl: "https://cdn.test/a-full.mp3",
+          },
+        ],
+        previewLimitSeconds: 60,
+        createdAt,
+        updatedAt: createdAt,
+        accessExpiresAt: createdAt + 1000,
+      },
+      createdAt,
+      { includeFullVersions: true },
+    );
+
+    assert.equal(
+      sample.fullVersions?.[0]?.audioUrl,
+      "https://cdn.test/a-full.mp3",
+    );
   });
 
   test("derives an access expiry for historical permanent samples", () => {
@@ -447,7 +770,7 @@ describe("song samples", () => {
         accessExpiresAt: null,
         createdAt,
       }),
-      createdAt + 3 * 24 * 60 * 60 * 1000
+      createdAt + 3 * 24 * 60 * 60 * 1000,
     );
   });
 });

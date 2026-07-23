@@ -1,9 +1,7 @@
-import {
-  SharedSongFullscreenPlayer,
-} from "@/components/song/SharedSongFullscreenPlayer";
+import { SharedSongFullscreenPlayer } from "@/components/song/SharedSongFullscreenPlayer";
 import type { FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
 import { Locale } from "@/i18n/routing";
-import { getSharedSong } from "@/lib/ai/final-song";
+import { getSharedSong, getSongPersonalNote } from "@/lib/ai/final-song";
 import { constructMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -57,6 +55,7 @@ function toPlayerData(
           (value): value is string => typeof value === "string",
         )
       : [],
+    personalNote: getSongPersonalNote(song.metadataJsonb),
     story: song.story,
     audioUrl: song.audioUrl,
     imageUrl: song.imageUrl,
@@ -81,11 +80,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function SharedSongPage({
-  params,
-}: {
-  params: Params;
-}) {
+export default async function SharedSongPage({ params }: { params: Params }) {
   const { shareToken } = await params;
   const song = await getSharedSong(shareToken);
 

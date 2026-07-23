@@ -442,6 +442,18 @@
             {
               "href": "/samples",
               "name": "My Samples"
+            },
+            {
+              "isSubTitle": true,
+              "name": "Resources"
+            },
+            {
+              "href": "/blog",
+              "name": "All articles"
+            },
+            {
+              "href": "/glossary",
+              "name": "Glossary"
             }
           ]
         },
@@ -459,6 +471,38 @@
             {
               "name": "Anniversary song gifts",
               "href": "/occasions/anniversary"
+            },
+            {
+              "name": "Mother's Day song gifts",
+              "href": "/occasions/mothers-day"
+            },
+            {
+              "name": "Father's Day song gifts",
+              "href": "/occasions/fathers-day"
+            },
+            {
+              "name": "Valentine's Day song gifts",
+              "href": "/occasions/valentines-day"
+            },
+            {
+              "name": "Congratulations song gifts",
+              "href": "/occasions/congratulations"
+            },
+            {
+              "name": "Wedding song gifts",
+              "href": "/occasions/wedding"
+            },
+            {
+              "name": "Memorial song gifts",
+              "href": "/occasions/in-memoriam"
+            },
+            {
+              "name": "Thank you song gifts",
+              "href": "/occasions/thank-you"
+            },
+            {
+              "name": "Get well soon song gifts",
+              "href": "/occasions/get-well-soon"
             },
             {
               "name": "Music personalized gifts",
@@ -480,19 +524,6 @@
             {
               "href": "/blog",
               "name": "Blog"
-            }
-          ]
-        },
-        {
-          "title": "Resources",
-          "links": [
-            {
-              "href": "/blog",
-              "name": "All articles"
-            },
-            {
-              "href": "/glossary",
-              "name": "Glossary"
             }
           ]
         }

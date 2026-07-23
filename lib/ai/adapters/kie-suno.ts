@@ -10,6 +10,12 @@ export type KieSongVersion = {
   imageUrl?: string;
   duration?: number;
   timestampedLyrics?: KieTimestampedLyrics;
+  spokenIntro?: {
+    audioUrl: string;
+    durationSeconds: number;
+    songStartOffsetSeconds: number;
+    transcript: string;
+  };
 };
 
 export type KieAlignedWord = {
@@ -77,14 +83,17 @@ export function buildKieSunoCallbackUrl(): string {
   const baseUrl = process.env.WEBHOOK_BASE_URL?.trim().replace(/\/+$/, "");
   if (!baseUrl) {
     throw new Error(
-      "WEBHOOK_BASE_URL is not configured. KIE Suno music generation requires a public callback URL."
+      "WEBHOOK_BASE_URL is not configured. KIE Suno music generation requires a public callback URL.",
     );
   }
 
   return `${baseUrl}/api/webhooks/kie/suno`;
 }
 
-function logKieRequest(endpoint: string, payload: Record<string, unknown>): void {
+function logKieRequest(
+  endpoint: string,
+  payload: Record<string, unknown>,
+): void {
   if (process.env.KIE_DEBUG_LOGS === "false") return;
 
   console.log("[KIE Suno] Request", {
@@ -94,14 +103,17 @@ function logKieRequest(endpoint: string, payload: Record<string, unknown>): void
 }
 
 const SUNO_LYRIC_METADATA_LINE = /^(?:title)\s*:/i;
-const SUNO_INTRO_TAG_LINE = /^\[(?:instrumental\s+intro|intro)\]$/i;
+const SUNO_INTRO_TAG_LINE =
+  /^\[(?:instrumental\s+intro|spoken\s+intro(?:\s*\/\s*narration)?|intro)\]$/i;
 
 export function buildKieSunoMusicPrompt(lyrics: string): string {
   const lines = lyrics
     .split(/\r?\n/)
     .map((line) => line.trimEnd())
     .filter((line) => !SUNO_LYRIC_METADATA_LINE.test(line.trim()));
-  const hasIntroTag = lines.some((line) => SUNO_INTRO_TAG_LINE.test(line.trim()));
+  const hasIntroTag = lines.some((line) =>
+    SUNO_INTRO_TAG_LINE.test(line.trim()),
+  );
 
   if (hasIntroTag) {
     return lines.join("\n").trim();
@@ -120,6 +132,12 @@ export function getMockKieSunoTaskId(): string | null {
   const configuredTaskId = process.env.KIE_SUNO_MOCK_TASK_ID?.trim();
   if (configuredTaskId === "false") return null;
   return configuredTaskId || null;
+}
+
+export function getMockKieSunoDelayMs(): number {
+  const configuredDelay = Number(process.env.KIE_SUNO_MOCK_DELAY_MS?.trim());
+  if (!Number.isFinite(configuredDelay) || configuredDelay <= 0) return 0;
+  return Math.min(Math.floor(configuredDelay), 10 * 60 * 1000);
 }
 
 function escapeControlCharactersInsideJsonStrings(input: string): string {
@@ -176,12 +194,13 @@ function escapeControlCharactersInsideJsonStrings(input: string): string {
 function insertMissingCommasBetweenJsonStringProperties(input: string): string {
   return input.replace(
     /("(?:\\.|[^"\\])*")(\s+)(?="(?:\\.|[^"\\])*"\s*:)/g,
-    "$1,$2"
+    "$1,$2",
   );
 }
 
 function parseMockJson(value: string): unknown {
-  const escapedControlCharacters = escapeControlCharactersInsideJsonStrings(value);
+  const escapedControlCharacters =
+    escapeControlCharactersInsideJsonStrings(value);
   const candidates = [
     value,
     escapedControlCharacters,
@@ -219,7 +238,9 @@ function getMockVersionsFromSimpleEnv(): KieSongVersion[] {
   ].filter((version) => /^https?:\/\//i.test(version.audioUrl));
 }
 
-export function getMockKieSunoMusicResult(taskId: string): MusicTaskResult | null {
+export function getMockKieSunoMusicResult(
+  taskId: string,
+): MusicTaskResult | null {
   const mockTaskId = getMockKieSunoTaskId();
   if (!mockTaskId || taskId !== mockTaskId) {
     return null;
@@ -236,7 +257,9 @@ export function getMockKieSunoMusicResult(taskId: string): MusicTaskResult | nul
   const rawResult = process.env.KIE_SUNO_MOCK_RESULT_JSON?.trim();
   if (rawResult) {
     try {
-      return normalizeKieMusicRecord(parseMockJson(rawResult) as KieApiResponse);
+      return normalizeKieMusicRecord(
+        parseMockJson(rawResult) as KieApiResponse,
+      );
     } catch (error) {
       return {
         status: "failed",
@@ -297,11 +320,15 @@ async function parseKieResponse(response: Response): Promise<KieApiResponse> {
   try {
     json = JSON.parse(text);
   } catch {
-    throw new Error(`KIE API returned non-JSON response: ${text.slice(0, 240)}`);
+    throw new Error(
+      `KIE API returned non-JSON response: ${text.slice(0, 240)}`,
+    );
   }
 
   if (!response.ok) {
-    throw new Error(`KIE API error: ${response.status} - ${json.msg || json.message || text}`);
+    throw new Error(
+      `KIE API error: ${response.status} - ${json.msg || json.message || text}`,
+    );
   }
 
   if (json.code !== undefined && json.code !== 200) {
@@ -334,7 +361,7 @@ function valuesDeep(input: unknown, seen = new Set<unknown>()): unknown[] {
   }
 
   return Object.values(input as Record<string, unknown>).flatMap((item) =>
-    valuesDeep(maybeParseJson(item), seen)
+    valuesDeep(maybeParseJson(item), seen),
   );
 }
 
@@ -371,9 +398,13 @@ function firstStringAtKeys(input: unknown, keys: string[]): string | undefined {
   return undefined;
 }
 
-function directStringAtKeys(input: unknown, keys: string[]): string | undefined {
+function directStringAtKeys(
+  input: unknown,
+  keys: string[],
+): string | undefined {
   const parsed = maybeParseJson(input);
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return undefined;
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+    return undefined;
 
   const record = parsed as Record<string, unknown>;
   for (const key of keys) {
@@ -398,7 +429,10 @@ function extractTitle(record: unknown): string | undefined {
   return firstStringAtKeys(record, ["title", "name"]);
 }
 
-function normalizeStatus(rawStatus: unknown, successStatuses: string[]): SongTaskStatus {
+function normalizeStatus(
+  rawStatus: unknown,
+  successStatuses: string[],
+): SongTaskStatus {
   const status = String(rawStatus || "").toUpperCase();
   if (status === "COMPLETE") return "succeeded";
   if (successStatuses.includes(status)) return "succeeded";
@@ -417,10 +451,20 @@ function getRecordStatus(data: any): string | undefined {
   );
 }
 
-export function normalizeKieLyricsRecord(record: KieApiResponse): LyricsTaskResult {
+export function normalizeKieLyricsRecord(
+  record: KieApiResponse,
+): LyricsTaskResult {
   const data = maybeParseJson(record.data);
-  const status = normalizeStatus(getRecordStatus(data), ["SUCCESS", "SUCCEEDED"]);
-  const error = data?.failMsg || data?.errorMessage || data?.error || record.msg || record.message;
+  const status = normalizeStatus(getRecordStatus(data), [
+    "SUCCESS",
+    "SUCCEEDED",
+  ]);
+  const error =
+    data?.failMsg ||
+    data?.errorMessage ||
+    data?.error ||
+    record.msg ||
+    record.message;
   const lyrics = extractLyricsText(data);
 
   return {
@@ -453,7 +497,7 @@ function collectCandidateTracks(input: unknown): any[] {
               "streamAudioUrl",
               "stream_audio_url",
               "url",
-            ])
+            ]),
         )
       ) {
         candidates.push(...current);
@@ -487,7 +531,11 @@ function collectCandidateTracks(input: unknown): any[] {
 
 function asNumber(value: unknown): number | undefined {
   if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim() && Number.isFinite(Number(value))) {
+  if (
+    typeof value === "string" &&
+    value.trim() &&
+    Number.isFinite(Number(value))
+  ) {
     return Number(value);
   }
   return undefined;
@@ -566,7 +614,8 @@ function normalizeTrack(track: any, index: number): KieSongVersion | null {
   ]);
   if (!audioUrl || !/^https?:\/\//i.test(audioUrl)) return null;
 
-  const title = firstStringAtKeys(track, ["title", "name"]) || `Version ${index + 1}`;
+  const title =
+    firstStringAtKeys(track, ["title", "name"]) || `Version ${index + 1}`;
   const id = firstStringAtKeys(track, ["id", "taskId"]) || `${index + 1}`;
   const audioId = firstStringAtKeys(track, [
     "audioId",
@@ -595,11 +644,18 @@ function normalizeTrack(track: any, index: number): KieSongVersion | null {
   };
 }
 
-export function normalizeKieMusicRecord(record: KieApiResponse): MusicTaskResult {
+export function normalizeKieMusicRecord(
+  record: KieApiResponse,
+): MusicTaskResult {
   const data = maybeParseJson(record.data);
   const rawStatus = getRecordStatus(data);
   const status = normalizeStatus(rawStatus, ["SUCCESS", "SUCCEEDED"]);
-  const error = data?.failMsg || data?.errorMessage || data?.error || record.msg || record.message;
+  const error =
+    data?.failMsg ||
+    data?.errorMessage ||
+    data?.error ||
+    record.msg ||
+    record.message;
 
   const versions = collectCandidateTracks(data)
     .map((track, index) => normalizeTrack(track, index))
@@ -614,7 +670,7 @@ export function normalizeKieMusicRecord(record: KieApiResponse): MusicTaskResult
 }
 
 export function normalizeKieTimestampedLyricsRecord(
-  record: KieApiResponse
+  record: KieApiResponse,
 ): TimestampedLyricsResult {
   const data = maybeParseJson(record.data);
   const rawStatus = getRecordStatus(data);
@@ -622,9 +678,16 @@ export function normalizeKieTimestampedLyricsRecord(
   const status = alignedWords.length
     ? "succeeded"
     : normalizeStatus(rawStatus, ["SUCCESS", "SUCCEEDED"]);
-  const error = data?.failMsg || data?.errorMessage || data?.error || record.msg || record.message;
+  const error =
+    data?.failMsg ||
+    data?.errorMessage ||
+    data?.error ||
+    record.msg ||
+    record.message;
   const waveformData = Array.isArray(data?.waveformData)
-    ? data.waveformData.map(Number).filter((value: number) => Number.isFinite(value))
+    ? data.waveformData
+        .map(Number)
+        .filter((value: number) => Number.isFinite(value))
     : undefined;
 
   return {
@@ -639,7 +702,7 @@ export function normalizeKieTimestampedLyricsRecord(
 
 export async function submitLyricsTask(
   prompt: string,
-  callBackUrl: string
+  callBackUrl: string,
 ): Promise<string> {
   const payload = { prompt, callBackUrl };
   logKieRequest("/api/v1/lyrics", {
@@ -672,13 +735,15 @@ export async function getLyricsTask(taskId: string): Promise<LyricsTaskResult> {
       headers: {
         Authorization: `Bearer ${getApiKey()}`,
       },
-    }
+    },
   );
 
   return normalizeKieLyricsRecord(await parseKieResponse(response));
 }
 
-export async function submitMusicTask(input: SubmitMusicInput): Promise<string> {
+export async function submitMusicTask(
+  input: SubmitMusicInput,
+): Promise<string> {
   const mockTaskId = getMockKieSunoTaskId();
   if (mockTaskId) {
     console.log("[KIE Suno] Mock music generation enabled", {
@@ -742,14 +807,17 @@ export async function submitTimestampedLyricsTask({
   const payload = { taskId, audioId };
   logKieRequest("/api/v1/generate/get-timestamped-lyrics", payload);
 
-  const response = await fetch(`${KIE_BASE_URL}/api/v1/generate/get-timestamped-lyrics`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${getApiKey()}`,
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${KIE_BASE_URL}/api/v1/generate/get-timestamped-lyrics`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${getApiKey()}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   return normalizeKieTimestampedLyricsRecord(await parseKieResponse(response));
 }
@@ -762,7 +830,7 @@ export async function getMusicTask(taskId: string): Promise<MusicTaskResult> {
       headers: {
         Authorization: `Bearer ${getApiKey()}`,
       },
-    }
+    },
   );
 
   return normalizeKieMusicRecord(await parseKieResponse(response));

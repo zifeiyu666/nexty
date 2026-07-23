@@ -8,6 +8,7 @@ import { Locale } from "@/i18n/routing";
 import {
   buildSongShareUrl,
   getFinalSongsForOwner,
+  getSongPersonalNote,
   getSongForOwner,
 } from "@/lib/ai/final-song";
 import { getSession } from "@/lib/auth/server";
@@ -67,6 +68,7 @@ function toPlayerData(
           (value): value is string => typeof value === "string",
         )
       : [],
+    personalNote: getSongPersonalNote(song.metadataJsonb),
     story: song.story,
     audioUrl: song.audioUrl,
     imageUrl: song.imageUrl,

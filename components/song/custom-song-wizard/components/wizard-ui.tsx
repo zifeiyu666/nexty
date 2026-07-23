@@ -12,6 +12,7 @@ import {
   Check,
   ChevronDown,
   Clock3,
+  FlaskConical,
   Gift,
   ImageIcon,
   Loader2,
@@ -27,7 +28,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import type { PointerEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -127,12 +128,8 @@ export function MagneticChoiceCard({
 
     rotateX.set(clampMagnetOffset(normalizedY * -8, 8));
     rotateY.set(clampMagnetOffset(normalizedX * 8, 8));
-    contentX.set(
-      hasCenteredArt ? 0 : clampMagnetOffset(normalizedX * 5, 5),
-    );
-    contentY.set(
-      hasCenteredArt ? 0 : clampMagnetOffset(normalizedY * 4, 4),
-    );
+    contentX.set(hasCenteredArt ? 0 : clampMagnetOffset(normalizedX * 5, 5));
+    contentY.set(hasCenteredArt ? 0 : clampMagnetOffset(normalizedY * 4, 4));
     artX.set(
       hasCenteredArt
         ? clampMagnetOffset(normalizedX * 8, 8)
@@ -404,9 +401,13 @@ export function SongGenerationPage({
   coverImageUrl,
   coverPrompt,
   isGeneratingCover,
+  isUploadingCover,
+  isMockMode,
   note,
   onGenerateCover,
+  onUploadCover,
   onNoteChange,
+  onSaveNote,
   progress,
   recipientLabel,
 }: {
@@ -414,12 +415,18 @@ export function SongGenerationPage({
   coverImageUrl: string;
   coverPrompt: string;
   isGeneratingCover: boolean;
+  isUploadingCover: boolean;
+  isMockMode: boolean;
   note: string;
   onGenerateCover: () => void;
+  onUploadCover: (file: File) => void;
   onNoteChange: (value: string) => void;
+  onSaveNote: () => void;
   progress: number;
   recipientLabel: string;
 }) {
+  const coverUploadInputRef = useRef<HTMLInputElement>(null);
+
   return (
     <div className="mx-auto mt-10 max-w-5xl pb-10">
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-foreground via-primary to-accent p-7 text-primary-foreground shadow-2xl shadow-primary/20 md:p-9">
@@ -449,6 +456,21 @@ export function SongGenerationPage({
             </span>
           </div>
         </div>
+        {isMockMode && (
+          <div
+            className="relative mt-6 flex items-start gap-3 border-t border-amber-200/30 pt-5 text-amber-50"
+            role="status"
+          >
+            <FlaskConical className="mt-0.5 size-5 shrink-0" />
+            <div>
+              <p className="text-sm font-black uppercase">Mock mode</p>
+              <p className="mt-1 text-sm leading-6 text-amber-50/80">
+                This is a UI test using configured sample tracks. No new music
+                is being generated.
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="mt-10 text-center">
@@ -478,15 +500,19 @@ export function SongGenerationPage({
           <div className="mx-auto flex aspect-square w-full max-w-56 flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-muted text-muted-foreground">
             {coverImageUrl ? (
               <img
-                alt="Generated album cover"
+                alt="Album cover"
                 className="size-full object-cover"
                 src={coverImageUrl}
                 title={coverPrompt || undefined}
               />
-            ) : isGeneratingCover ? (
+            ) : isGeneratingCover || isUploadingCover ? (
               <>
                 <Loader2 className="size-9 animate-spin text-primary" />
-                <p className="mt-4 text-sm font-medium">Dreaming up a cover...</p>
+                <p className="mt-4 text-sm font-medium">
+                  {isUploadingCover
+                    ? "Uploading your cover..."
+                    : "Dreaming up a cover..."}
+                </p>
               </>
             ) : (
               <>
@@ -503,7 +529,7 @@ export function SongGenerationPage({
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <Button
               className="h-11 flex-1 rounded-full bg-foreground text-sm font-bold text-primary-foreground hover:bg-foreground/90"
-              disabled={isGeneratingCover}
+              disabled={isGeneratingCover || isUploadingCover}
               type="button"
               onClick={onGenerateCover}
             >
@@ -516,13 +542,29 @@ export function SongGenerationPage({
             </Button>
             <Button
               className="h-11 rounded-full text-sm font-bold text-muted-foreground hover:text-foreground"
-              disabled
+              disabled={isGeneratingCover || isUploadingCover}
               type="button"
               variant="ghost"
+              onClick={() => coverUploadInputRef.current?.click()}
             >
-              <Upload className="size-4" />
-              Upload
+              {isUploadingCover ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Upload className="size-4" />
+              )}
+              {isUploadingCover ? "Uploading..." : "Upload"}
             </Button>
+            <input
+              ref={coverUploadInputRef}
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              type="file"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) onUploadCover(file);
+                event.target.value = "";
+              }}
+            />
           </div>
         </section>
 
@@ -553,6 +595,7 @@ export function SongGenerationPage({
           <Button
             className="mt-5 h-11 w-full rounded-full bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90"
             type="button"
+            onClick={onSaveNote}
           >
             <Mail className="size-4" />
             Save note
@@ -707,7 +750,9 @@ export function StoryHelperModal({
           {isCreating ? (
             <div className="flex min-h-[240px] flex-col items-center justify-center text-center">
               <Loader2 className="mb-6 size-10 animate-spin text-primary" />
-              <h3 className="text-xl font-black">AI is writing your story...</h3>
+              <h3 className="text-xl font-black">
+                AI is writing your story...
+              </h3>
               <p className="mt-3 text-sm text-muted-foreground">
                 Turning your answers into a lyric-ready story brief.
               </p>

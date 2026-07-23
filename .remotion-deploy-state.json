@@ -1,0 +1,12 @@
+{
+  "deployedAt": "2026-07-22T16:23:45.968Z",
+  "envFiles": [
+    ".env",
+    ".env.local"
+  ],
+  "fileCount": 46,
+  "hash": "9a64670d82c0f22d3868464ae75a9f7a8171f4128ee62dc088afb12f92d418e7",
+  "region": "us-east-1",
+  "serveUrl": "https://remotionlambda-useast1-7lw6m83kvk.s3.us-east-1.amazonaws.com/sites/17u8pxn9dk/index.html",
+  "siteName": "17u8pxn9dk"
+}

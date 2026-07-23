@@ -7,6 +7,7 @@ import { posts as postsSchema } from '@/lib/db/schema'
 import { getAllPlaylistPaths } from '@/lib/playlists/catalog'
 import { eq, max } from 'drizzle-orm'
 import { MetadataRoute } from 'next'
+import { getAllOccasionLandingConfigs } from '@/lib/occasion-landing-pages'
 
 const siteUrl = siteConfig.url
 
@@ -54,6 +55,12 @@ const staticPages: {
     changeFrequency: 'weekly',
     priority: 0.8,
   },
+  ...getAllOccasionLandingConfigs().map((occasion) => ({
+    path: `/occasions/${occasion.slug}`,
+    lastModified: '2026-07-14',
+    changeFrequency: 'weekly' as ChangeFrequency,
+    priority: 0.8,
+  })),
   {
     path: '/music/personalized-gift',
     lastModified: '2026-07-08',
@@ -90,6 +97,9 @@ const englishOnlyStaticPaths = new Set([
   '/privacy-policy',
   '/terms-of-service',
   '/refund-policy',
+  ...getAllOccasionLandingConfigs().map(
+    (occasion) => `/occasions/${occasion.slug}`,
+  ),
 ]);
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

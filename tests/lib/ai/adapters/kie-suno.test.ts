@@ -23,6 +23,7 @@ describe("KIE Suno adapter normalization", () => {
     delete process.env.WEBHOOK_BASE_URL;
     delete process.env.KIE_SUNO_CALLBACK_URL;
     delete process.env.KIE_SUNO_MOCK_TASK_ID;
+    delete process.env.KIE_SUNO_MOCK_DELAY_MS;
     delete process.env.KIE_SUNO_MOCK_RESULT_JSON;
     delete process.env.KIE_SUNO_MOCK_VERSIONS_JSON;
     delete process.env.KIE_SUNO_MOCK_AUDIO_ID_A;
@@ -43,7 +44,7 @@ describe("KIE Suno adapter normalization", () => {
 
     assert.equal(
       buildKieSunoCallbackUrl(),
-      "https://onecustomsong.com/api/webhooks/kie/suno"
+      "https://onecustomsong.com/api/webhooks/kie/suno",
     );
   });
 
@@ -60,7 +61,7 @@ describe("KIE Suno adapter normalization", () => {
           code: 200,
           data: { taskId: "kie-music-task" },
         }),
-        { status: 200 }
+        { status: 200 },
       );
     }) as typeof fetch;
 
@@ -73,7 +74,10 @@ describe("KIE Suno adapter normalization", () => {
     });
 
     assert.equal(taskId, "kie-music-task");
-    assert.equal(payload.callBackUrl, "https://onecustomsong.com/api/webhooks/kie/suno");
+    assert.equal(
+      payload.callBackUrl,
+      "https://onecustomsong.com/api/webhooks/kie/suno",
+    );
   });
 
   test("prepares Suno music prompts with an instrumental intro before vocal sections", () => {
@@ -94,6 +98,15 @@ describe("KIE Suno adapter normalization", () => {
     );
   });
 
+  test("keeps a spoken intro at the start of the Suno prompt", () => {
+    assert.equal(
+      buildKieSunoMusicPrompt(
+        "[Spoken Intro / Narration]\nHappy birthday\n\n[Verse 1]\nA lyric",
+      ),
+      "[Spoken Intro / Narration]\nHappy birthday\n\n[Verse 1]\nA lyric",
+    );
+  });
+
   test("submits sanitized music prompts to KIE without changing local lyrics", async () => {
     process.env.KIE_API_KEY = "test-key";
     process.env.WEBHOOK_BASE_URL = "https://onecustomsong.com";
@@ -107,7 +120,7 @@ describe("KIE Suno adapter normalization", () => {
           code: 200,
           data: { taskId: "kie-music-task" },
         }),
-        { status: 200 }
+        { status: 200 },
       );
     }) as typeof fetch;
 
@@ -131,7 +144,9 @@ describe("KIE Suno adapter normalization", () => {
     process.env.KIE_SUNO_MOCK_TASK_ID = "mock-task-id";
 
     globalThis.fetch = (async () => {
-      throw new Error("submitMusicTask should not call KIE while mock is enabled");
+      throw new Error(
+        "submitMusicTask should not call KIE while mock is enabled",
+      );
     }) as typeof fetch;
 
     const taskId = await submitMusicTask({
@@ -143,6 +158,21 @@ describe("KIE Suno adapter normalization", () => {
     });
 
     assert.equal(taskId, "mock-task-id");
+  });
+
+  test("reads a bounded mock completion delay from the environment", async () => {
+    const { getMockKieSunoDelayMs } = await import(
+      "../../../../lib/ai/adapters/kie-suno"
+    );
+
+    process.env.KIE_SUNO_MOCK_DELAY_MS = "30000";
+    assert.equal(getMockKieSunoDelayMs(), 30_000);
+
+    process.env.KIE_SUNO_MOCK_DELAY_MS = "invalid";
+    assert.equal(getMockKieSunoDelayMs(), 0);
+
+    process.env.KIE_SUNO_MOCK_DELAY_MS = "9999999";
+    assert.equal(getMockKieSunoDelayMs(), 600_000);
   });
 
   test("builds offline mock music results without fetching KIE", () => {
@@ -182,7 +212,8 @@ describe("KIE Suno adapter normalization", () => {
     process.env.KIE_SUNO_MOCK_IMAGE_URL_A = "https://cdn.example.com/a.jpg";
     process.env.KIE_SUNO_MOCK_AUDIO_ID_B = "track-b";
     process.env.KIE_SUNO_MOCK_AUDIO_URL_B = "https://cdn.example.com/b.mp3";
-    process.env.KIE_SUNO_MOCK_VERSIONS_JSON = "{ this is intentionally invalid json";
+    process.env.KIE_SUNO_MOCK_VERSIONS_JSON =
+      "{ this is intentionally invalid json";
 
     globalThis.fetch = (async () => {
       throw new Error("getMockKieSunoMusicResult should not call KIE");
@@ -276,7 +307,7 @@ describe("KIE Suno adapter normalization", () => {
           },
         },
       }),
-      "[Verse]\nHello from the song"
+      "[Verse]\nHello from the song",
     );
 
     assert.equal(
@@ -285,7 +316,7 @@ describe("KIE Suno adapter normalization", () => {
           result: JSON.stringify({ text: "Generated lyric text" }),
         },
       }),
-      "Generated lyric text"
+      "Generated lyric text",
     );
   });
 
@@ -328,7 +359,10 @@ describe("KIE Suno adapter normalization", () => {
 
     assert.equal(firstSuccess.status, "processing");
     assert.equal(firstSuccess.versions.length, 1);
-    assert.equal(firstSuccess.versions[0]?.audioUrl, "https://cdn.kie.ai/one.mp3");
+    assert.equal(
+      firstSuccess.versions[0]?.audioUrl,
+      "https://cdn.kie.ai/one.mp3",
+    );
   });
 
   test("normalizes completed music records and limits to two versions", () => {
@@ -356,7 +390,7 @@ describe("KIE Suno adapter normalization", () => {
     assert.equal(normalized.versions.length, 2);
     assert.deepEqual(
       normalized.versions.map((version) => version.audioUrl),
-      ["https://cdn.kie.ai/a.mp3", "https://cdn.kie.ai/b.mp3"]
+      ["https://cdn.kie.ai/a.mp3", "https://cdn.kie.ai/b.mp3"],
     );
     assert.equal(normalized.versions[0]?.audioId, "audio-a");
   });
@@ -411,20 +445,23 @@ describe("KIE Suno adapter normalization", () => {
       },
     });
 
-    assert.deepEqual(new Set(calls.map((call) => JSON.stringify(call))), new Set([
-      JSON.stringify({
-        key: "songs/generated/song-1/kie-task/track-a/audio.mp3",
-        url: "https://cdn.kie.ai/a.mp3",
-      }),
-      JSON.stringify({
-        key: "songs/generated/song-1/kie-task/track-a/cover.jpg",
-        url: "https://cdn.kie.ai/a.jpg",
-      }),
-      JSON.stringify({
-        key: "songs/generated/song-1/kie-task/track-b/audio.mp3",
-        url: "https://cdn.kie.ai/b.mp3",
-      }),
-    ]));
+    assert.deepEqual(
+      new Set(calls.map((call) => JSON.stringify(call))),
+      new Set([
+        JSON.stringify({
+          key: "songs/generated/song-1/kie-task/track-a/audio.mp3",
+          url: "https://cdn.kie.ai/a.mp3",
+        }),
+        JSON.stringify({
+          key: "songs/generated/song-1/kie-task/track-a/cover.jpg",
+          url: "https://cdn.kie.ai/a.jpg",
+        }),
+        JSON.stringify({
+          key: "songs/generated/song-1/kie-task/track-b/audio.mp3",
+          url: "https://cdn.kie.ai/b.mp3",
+        }),
+      ]),
+    );
     assert.equal(calls.length, 3);
     assert.deepEqual(calls.slice(0, 2), [
       {
@@ -523,7 +560,7 @@ describe("KIE Suno adapter normalization", () => {
           code: 200,
           data: { alignedWords: [{ word: "Hi", startS: 1, endS: 1.4 }] },
         }),
-        { status: 200 }
+        { status: 200 },
       );
     }) as typeof fetch;
 
