@@ -141,7 +141,7 @@ export default function OccasionLandingPage({
             : "bg-white dark:bg-[#292625]",
     }),
   );
-  const relatedPages = getAllOccasionLandingConfigs().filter(
+  const relatedPages = getAllOccasionLandingConfigs(config.locale).filter(
     (item) => item.slug !== config.slug,
   );
   const pageStyle = {
@@ -169,7 +169,7 @@ export default function OccasionLandingPage({
             <div className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-full bg-white/75 px-4 py-2 text-sm text-[#695851] shadow-[0_18px_40px_rgba(70,45,32,0.08)] backdrop-blur-xl">
               <Stars />
               <span className="font-bold text-[var(--occasion-ink)]">
-                Excellent
+                {config.ui.excellent}
               </span>
               <span className="text-[#d8c6bd]">/</span>
               <span>{config.hero.badge}</span>
@@ -199,7 +199,7 @@ export default function OccasionLandingPage({
                 className="border-black/10 bg-white px-6 font-bold text-[var(--occasion-accent-dark)] shadow-[0_14px_30px_rgba(70,45,32,0.1)] hover:bg-[var(--occasion-soft)]"
               >
                 <PlayCircle className="size-4" />
-                See examples
+                {config.ui.seeExamples}
               </MagneticButton>
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function OccasionLandingPage({
       <section className="bg-white px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
         <div className="mx-auto max-w-6xl">
           <SectionHeader
-            eyebrow="Why it works"
+            eyebrow={config.ui.whyItWorks}
             title={config.why.title}
             description={config.why.description}
           />
@@ -230,7 +230,7 @@ export default function OccasionLandingPage({
       </section>
 
       <HowItWorksSection
-        eyebrow="How it works"
+        eyebrow={config.ui.howItWorks}
         title={config.how.title}
         description={config.how.description}
         steps={config.how.steps}
@@ -242,7 +242,7 @@ export default function OccasionLandingPage({
       <section className="bg-white px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
         <div className="mx-auto max-w-6xl">
           <SectionHeader
-            eyebrow={`${config.shortName} moments`}
+            eyebrow={config.ui.moments}
             title={config.moments.title}
             description={config.moments.description}
           />
@@ -257,7 +257,7 @@ export default function OccasionLandingPage({
       <section className="bg-[var(--occasion-soft)] px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
         <div className="mx-auto max-w-6xl">
           <SectionHeader
-            eyebrow="Search-led ideas"
+            eyebrow={config.ui.searchIdeas}
             title={config.topics.title}
             description={config.topics.description}
           />
@@ -275,7 +275,7 @@ export default function OccasionLandingPage({
                     </div>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--occasion-accent)]">
-                        Topic cluster
+                        {config.ui.topicCluster}
                       </p>
                       <h3 className="mt-2 text-2xl font-black leading-tight text-[var(--occasion-ink)]">
                         {topic.title}
@@ -297,7 +297,7 @@ export default function OccasionLandingPage({
                   </div>
                   <div className="mt-5 border-t border-black/10 pt-5">
                     <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--occasion-accent)]">
-                      Prompt direction
+                      {config.ui.promptDirection}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#6e5d56]">
                       {topic.prompt}
@@ -309,7 +309,7 @@ export default function OccasionLandingPage({
                     className="mt-5 h-auto px-0 text-sm font-black text-[var(--occasion-accent-dark)] hover:bg-transparent hover:text-[var(--occasion-accent)]"
                   >
                     <I18nLink href={createHref}>
-                      Create this custom song <ArrowRight className="size-4" />
+                      {config.ui.createThisSong} <ArrowRight className="size-4" />
                     </I18nLink>
                   </Button>
                 </article>
@@ -326,7 +326,7 @@ export default function OccasionLandingPage({
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--occasion-soft)]">
-              Example briefs
+              {config.ui.exampleBriefs}
             </p>
             <h2 className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
               {config.examples.title}
@@ -339,7 +339,7 @@ export default function OccasionLandingPage({
               className="mt-7 h-12 rounded-full bg-[var(--occasion-accent)] px-7 text-base font-black text-white hover:bg-[var(--occasion-accent-dark)]"
             >
               <I18nLink href={createHref}>
-                Try your own brief <ArrowRight className="size-4" />
+                {config.ui.tryYourBrief} <ArrowRight className="size-4" />
               </I18nLink>
             </Button>
           </div>
@@ -382,9 +382,9 @@ export default function OccasionLandingPage({
       <section className="bg-white px-6 py-16 sm:px-8 md:py-20 lg:px-12 xl:px-16">
         <div className="mx-auto max-w-6xl">
           <SectionHeader
-            eyebrow="More occasions"
-            title="Create a personal song for the next meaningful moment"
-            description="Explore other occasion pages, or start with any story and choose the matching song style."
+            eyebrow={config.ui.moreOccasions}
+            title={config.ui.moreOccasionsTitle}
+            description={config.ui.moreOccasionsDescription}
           />
           <nav
             aria-label="Related custom song occasions"
@@ -394,13 +394,13 @@ export default function OccasionLandingPage({
               href="/occasions/custom-happy-birthday-song"
               className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-bold text-[#4f4039] transition hover:border-[var(--occasion-accent)] hover:text-[var(--occasion-accent-dark)]"
             >
-              Birthday songs
+              {config.ui.birthdaySongs}
             </I18nLink>
             <I18nLink
               href="/occasions/anniversary"
               className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-bold text-[#4f4039] transition hover:border-[var(--occasion-accent)] hover:text-[var(--occasion-accent-dark)]"
             >
-              Anniversary songs
+              {config.ui.anniversarySongs}
             </I18nLink>
             {relatedPages.map((page) => (
               <I18nLink
@@ -408,7 +408,9 @@ export default function OccasionLandingPage({
                 href={`/occasions/${page.slug}`}
                 className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-bold text-[#4f4039] transition hover:border-[var(--occasion-accent)] hover:text-[var(--occasion-accent-dark)]"
               >
-                {page.shortName} songs
+                {config.locale === "ja"
+                  ? `${page.shortName}${config.ui.songSuffix}`
+                  : `${config.ui.songSuffix} de ${page.shortName}`}
               </I18nLink>
             ))}
           </nav>

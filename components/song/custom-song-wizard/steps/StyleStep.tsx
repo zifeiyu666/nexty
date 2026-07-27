@@ -13,6 +13,11 @@ import {
   vocalGenderOptions,
 } from "../constants";
 import type { GenreOption, Occasion } from "../types";
+import {
+  localizedGenreLabel,
+  useWizardCopy,
+  useWizardLocale,
+} from "../i18n";
 
 type StyleStepProps = {
   genre: string;
@@ -45,6 +50,8 @@ export function StyleStep({
   onShowAllLanguagesChange,
   onVocalGenderChange,
 }: StyleStepProps) {
+  const copy = useWizardCopy();
+  const locale = useWizardLocale();
   const [showMoreGenres, setShowMoreGenres] = useState(false);
   const recommendedGenres = occasion
     ? sortedGenres.filter((item) => recommendedGenreSet.has(item.value))
@@ -69,17 +76,19 @@ export function StyleStep({
         <div>
           <div className="flex items-center gap-2 text-base font-bold">
             <Music2 className="size-5 text-accent-foreground" />
-            Genre
+            {copy.genre}
           </div>
         </div>
-        <p className="text-sm font-medium text-muted-foreground">Pick one</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          {copy.pickOne}
+        </p>
       </div>
 
       {occasion && recommendedGenres.length > 0 && (
         <section className="mb-5 rounded-3xl border border-primary/15 bg-primary/5 p-4 shadow-sm">
           <div className="mb-3 text-center">
             <h3 className="text-base font-black text-foreground">
-              {selectedOccasionTitle} Recommendations
+              {selectedOccasionTitle} · {copy.recommended}
             </h3>
           </div>
           <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-5">
@@ -90,7 +99,7 @@ export function StyleStep({
                 <MagneticChoiceCard
                   key={item.value}
                   icon={<span className={item.accent}>{item.icon}</span>}
-                  label={item.label}
+                  label={localizedGenreLabel(locale, item.value, item.label)}
                   recommended
                   selected={selected}
                   onClick={() => onGenreSelect(item)}
@@ -114,7 +123,7 @@ export function StyleStep({
               !showOtherGenres && "-rotate-90",
             )}
           />
-          More styles
+          {showOtherGenres ? copy.showFewerLanguages : copy.showMoreLanguages}
         </button>
       )}
       {showOtherGenres && (
@@ -126,7 +135,7 @@ export function StyleStep({
               <MagneticChoiceCard
                 key={item.value}
                 icon={<span className={item.accent}>{item.icon}</span>}
-                label={item.label}
+                label={localizedGenreLabel(locale, item.value, item.label)}
                 muted={Boolean(occasion)}
                 selected={selected}
                 onClick={() => onGenreSelect(item)}
@@ -139,7 +148,7 @@ export function StyleStep({
       <div className="mt-9">
         <div className="mb-4 flex items-center gap-2 text-base font-bold">
           <Mic2 className="size-5 text-accent-foreground" />
-          Vocal gender
+          {copy.voice}
         </div>
         <div className="flex flex-wrap gap-3">
           {vocalGenderOptions.map((option) => {
@@ -160,7 +169,19 @@ export function StyleStep({
                 type="button"
                 onClick={() => onVocalGenderChange(option)}
               >
-                {option}
+                {locale === "es"
+                  ? option === "Pick for me"
+                    ? "Elegir por mí"
+                    : option === "Male"
+                      ? "Masculina"
+                      : "Femenina"
+                  : locale === "ja"
+                    ? option === "Pick for me"
+                      ? "おまかせ"
+                      : option === "Male"
+                        ? "男性"
+                        : "女性"
+                    : option}
               </button>
             );
           })}
@@ -170,7 +191,7 @@ export function StyleStep({
       <div className="mt-9">
         <div className="mb-4 flex items-center gap-2 text-base font-bold">
           <Globe2 className="size-5 text-accent-foreground" />
-          Language
+          {copy.language}
         </div>
         <div className="flex flex-wrap gap-3">
           {featuredLanguages.map((item) => (
@@ -193,7 +214,9 @@ export function StyleStep({
               !showAllLanguages && "-rotate-90",
             )}
           />
-          More languages
+          {showAllLanguages
+            ? copy.showFewerLanguages
+            : copy.showMoreLanguages}
         </button>
         {showAllLanguages && (
           <div className="mt-5 flex flex-wrap gap-3">

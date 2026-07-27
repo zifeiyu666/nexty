@@ -1,10 +1,12 @@
 import AnniversarySongsPage from "@/components/occasions/AnniversarySongsPage";
+import OccasionLandingPage from "@/components/occasions/OccasionLandingPage";
 import { type FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
 import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
 import { Locale } from "@/i18n/routing";
 import { buildSongShareUrl, getFinalSongsForOwner } from "@/lib/ai/final-song";
 import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
+import { getOccasionLandingConfig } from "@/lib/occasion-landing-pages";
 import { Metadata } from "next";
 
 type Params = Promise<{ locale: string }>;
@@ -65,7 +67,12 @@ export async function generateMetadata({
   });
 }
 
-export default async function AnniversaryOccasionPage() {
+export default async function AnniversaryOccasionPage({
+  params,
+}: {
+  params: Params;
+}) {
+  const { locale } = await params;
   const session = await getSession();
   const isAuthenticated = Boolean(session?.user);
   const finalSongs = session?.user
@@ -104,6 +111,18 @@ export default async function AnniversaryOccasionPage() {
       shareUrl: song.shareUrl,
     }),
   );
+
+  const localizedConfig = getOccasionLandingConfig("anniversary", locale);
+  if (locale !== "en" && localizedConfig) {
+    return (
+      <OccasionLandingPage
+        config={localizedConfig}
+        isAuthenticated={isAuthenticated}
+        musicVideoSongOptions={musicVideoSongOptions}
+        wallArtSongOptions={wallArtSongOptions}
+      />
+    );
+  }
 
   return (
     <AnniversarySongsPage

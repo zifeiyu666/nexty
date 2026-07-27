@@ -1,4 +1,8 @@
+import { localizeOccasionLandingConfig } from "./occasion-landing-localization";
+
 export const OCCASION_LANDING_SLUGS = [
+  "anniversary",
+  "birthday",
   "mothers-day",
   "fathers-day",
   "valentines-day",
@@ -54,6 +58,7 @@ export type OccasionFaq = {
 };
 
 export type OccasionLandingConfig = {
+  locale: string;
   slug: OccasionLandingSlug;
   occasion: string;
   shortName: string;
@@ -117,9 +122,31 @@ export type OccasionLandingConfig = {
     ctaDescription: string;
     items: OccasionFaq[];
   };
+  ui: {
+    excellent: string;
+    seeExamples: string;
+    whyItWorks: string;
+    howItWorks: string;
+    moments: string;
+    searchIdeas: string;
+    topicCluster: string;
+    promptDirection: string;
+    createThisSong: string;
+    exampleBriefs: string;
+    tryYourBrief: string;
+    moreOccasions: string;
+    moreOccasionsTitle: string;
+    moreOccasionsDescription: string;
+    birthdaySongs: string;
+    anniversarySongs: string;
+    songSuffix: string;
+  };
 };
 
-type ConfigInput = Omit<OccasionLandingConfig, "why" | "how"> & {
+type ConfigInput = Omit<
+  OccasionLandingConfig,
+  "why" | "how" | "locale" | "ui"
+> & {
   storyDetails: string;
   styleOptions: string;
   deliveryIdeas: string;
@@ -128,6 +155,7 @@ type ConfigInput = Omit<OccasionLandingConfig, "why" | "how"> & {
 function createConfig(input: ConfigInput): OccasionLandingConfig {
   return {
     ...input,
+    locale: "en",
     hero: { ...input.hero, cta: input.hero.cta },
     why: {
       title: `Why a ${input.primaryKeyword} feels different`,
@@ -182,10 +210,31 @@ function createConfig(input: ConfigInput): OccasionLandingConfig {
         },
       ],
     },
+    ui: {
+      excellent: "Excellent",
+      seeExamples: "See examples",
+      whyItWorks: "Why it works",
+      howItWorks: "How it works",
+      moments: `${input.shortName} moments`,
+      searchIdeas: "Search-led ideas",
+      topicCluster: "Topic cluster",
+      promptDirection: "Prompt direction",
+      createThisSong: "Create this custom song",
+      exampleBriefs: "Example briefs",
+      tryYourBrief: "Try your own brief",
+      moreOccasions: "More occasions",
+      moreOccasionsTitle:
+        "Create a personal song for the next meaningful moment",
+      moreOccasionsDescription:
+        "Explore other occasion pages, or start with any story and choose the matching song style.",
+      birthdaySongs: "Birthday songs",
+      anniversarySongs: "Anniversary songs",
+      songSuffix: "songs",
+    },
   };
 }
 
-const configs: Record<OccasionLandingSlug, OccasionLandingConfig> = {
+const configs: Partial<Record<OccasionLandingSlug, OccasionLandingConfig>> = {
   "mothers-day": createConfig({
     slug: "mothers-day",
     occasion: "mothers-day",
@@ -1974,12 +2023,58 @@ const configs: Record<OccasionLandingSlug, OccasionLandingConfig> = {
 
 export function getOccasionLandingConfig(
   slug: string,
+  locale = "en",
 ): OccasionLandingConfig | undefined {
-  return configs[slug as OccasionLandingSlug];
+  const typedSlug = slug as OccasionLandingSlug;
+  let config = configs[typedSlug];
+  if (!config && typedSlug === "anniversary") {
+    config = {
+      ...configs["valentines-day"]!,
+      slug: typedSlug,
+      occasion: "Anniversary",
+      shortName: "Anniversary",
+      primaryKeyword: "personalized anniversary song",
+      metadata: {
+        title: "Anniversary Songs for Couples",
+        description:
+          "Create a personalized anniversary song from your names, memories, milestones, and shared story.",
+      },
+      hero: {
+        ...configs["valentines-day"]!.hero,
+        title: "A Personalized Anniversary Song for Your Story",
+        image: "/images/occasions/anniversary-songs-hero.webp",
+      },
+    };
+  }
+  if (!config && typedSlug === "birthday") {
+    config = {
+      ...configs["mothers-day"]!,
+      slug: typedSlug,
+      occasion: "Birthday",
+      shortName: "Birthday",
+      primaryKeyword: "personalized birthday song",
+      metadata: {
+        title: "Custom Happy Birthday Song",
+        description:
+          "Create a personalized birthday song with their name, favorite memories, and a message made just for them.",
+      },
+      hero: {
+        ...configs["mothers-day"]!.hero,
+        title: "A Custom Happy Birthday Song Made for Them",
+        image: "/images/occasions/birthday-custom-song-hero.webp",
+      },
+    };
+  }
+  if (!config || locale === "en") return config;
+  return localizeOccasionLandingConfig(config, locale);
 }
 
-export function getAllOccasionLandingConfigs(): OccasionLandingConfig[] {
-  return OCCASION_LANDING_SLUGS.map((slug) => configs[slug]);
+export function getAllOccasionLandingConfigs(
+  locale = "en",
+): OccasionLandingConfig[] {
+  return OCCASION_LANDING_SLUGS.map(
+    (slug) => getOccasionLandingConfig(slug, locale)!,
+  );
 }
 
 export function getOccasionCreateHref(config: OccasionLandingConfig): string {

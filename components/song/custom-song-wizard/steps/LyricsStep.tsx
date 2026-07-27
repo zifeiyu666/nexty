@@ -15,6 +15,7 @@ import {
   LyricsGenerationView,
   LyricsLineEditor,
 } from "../components/wizard-ui";
+import { useWizardCopy } from "../i18n";
 
 type LyricsStepProps = {
   editableLyricLines: EditableLyricLine[];
@@ -61,6 +62,7 @@ export function LyricsStep({
   onRewriteSelectedLyricLines,
   onSongTitleChange,
 }: LyricsStepProps) {
+  const copy = useWizardCopy();
   if (lyricsStage === "loading") {
     return (
       <LyricsGenerationView
@@ -74,7 +76,7 @@ export function LyricsStep({
     <div className="mx-auto mt-14 max-w-5xl space-y-4">
       {lyricsError && (
         <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-          <p className="font-bold text-foreground">Lyrics generation failed</p>
+          <p className="font-bold text-foreground">{copy.lyricsFailed}</p>
           <p className="mt-1 leading-6">{lyricsError}</p>
           <Button
             className="mt-3 h-9 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground hover:bg-primary/90"
@@ -82,14 +84,14 @@ export function LyricsStep({
             onClick={onRewriteLyrics}
           >
             <RefreshCw className="size-4" />
-            Try again
+            {copy.tryAgain}
           </Button>
         </div>
       )}
       <EditableBlock
-        actionText="You can edit"
+        actionText={copy.editable}
         icon={<span className="text-primary">Aa</span>}
-        label="Song Title"
+        label={copy.songTitle}
       >
         <Input
           className="h-auto rounded-xl border-0 bg-muted px-3.5 py-3 text-base font-bold text-foreground shadow-none focus-visible:ring-primary/25 md:text-xl"
@@ -99,9 +101,9 @@ export function LyricsStep({
       </EditableBlock>
 
       <EditableBlock
-        actionText="Write a new version"
+        actionText={copy.newVersion}
         icon={<Edit3 className="size-4 text-primary" />}
-        label="Lyrics"
+        label={copy.lyrics}
         onAction={onOpenNewLyricsVersionDialog}
       >
         <LyricsLineEditor

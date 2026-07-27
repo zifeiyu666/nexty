@@ -47,7 +47,7 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const config = getOccasionLandingConfig(slug);
+  const config = getOccasionLandingConfig(slug, locale);
   if (!config) return {};
 
   return constructMetadata({
@@ -63,8 +63,8 @@ export async function generateMetadata({
 }
 
 export default async function OccasionPage({ params }: { params: Params }) {
-  const { slug } = await params;
-  const config = getOccasionLandingConfig(slug);
+  const { locale, slug } = await params;
+  const config = getOccasionLandingConfig(slug, locale);
   if (!config) notFound();
 
   const session = await getSession();

@@ -92,10 +92,18 @@ import type {
   StoredDraft,
   WizardStep,
 } from "@/components/song/custom-song-wizard/types";
+import {
+  localizedOccasionLabel,
+  localizedWizardMessage,
+  useWizardCopy,
+  useWizardLocale,
+} from "@/components/song/custom-song-wizard/i18n";
 
 const CREATE_SONG_LYRICS_PATH = "/create-song?step=lyrics";
 
 export function CustomSongWizard() {
+  const copy = useWizardCopy();
+  const wizardLocale = useWizardLocale();
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -195,9 +203,19 @@ export function CustomSongWizard() {
       value: occasion as Occasion,
       icon: <Plus className="size-6" />,
       title: occasion as string,
-      subtitle: "A custom reason for this song.",
+      subtitle: copy.customReason,
     };
-  }, [occasion]);
+  }, [copy.customReason, occasion]);
+  const localizedSelectedOccasion = selectedOccasion
+    ? {
+        ...selectedOccasion,
+        title: localizedOccasionLabel(
+          wizardLocale,
+          selectedOccasion.value,
+          selectedOccasion.title,
+        ),
+      }
+    : undefined;
   const showCustomOccasionInput =
     occasion === customOccasionValue || isCustomOccasion(occasion);
   const cleanRecipientList = useMemo(
@@ -800,7 +818,7 @@ export function CustomSongWizard() {
           setPreviewTime(0);
           setIsPlaying(false);
           setActiveVersion("A");
-          toast.success("Your song preview is ready.");
+          toast.success(localizedWizardMessage(wizardLocale, "Your song preview is ready."));
           return;
         }
 
@@ -822,7 +840,7 @@ export function CustomSongWizard() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [router, session?.user, songStage, songTaskId]);
+  }, [router, session?.user, songStage, songTaskId, wizardLocale]);
 
   useAudioPreview({
     audioRef,
@@ -882,7 +900,7 @@ export function CustomSongWizard() {
 
       setCoverImageUrl(result.imageUrl);
       setCoverPrompt(result.prompt);
-      toast.success("Your album cover is ready.");
+      toast.success(localizedWizardMessage(wizardLocale, "Your album cover is ready."));
     } catch (error) {
       setCoverError(
         error instanceof Error
@@ -930,7 +948,7 @@ export function CustomSongWizard() {
 
       setCoverImageUrl(upload.publicObjectUrl);
       setCoverPrompt("");
-      toast.success("Your album cover was uploaded.");
+      toast.success(localizedWizardMessage(wizardLocale, "Your album cover was uploaded."));
     } catch (error) {
       setCoverError(
         error instanceof Error
@@ -945,12 +963,12 @@ export function CustomSongWizard() {
   function savePersonalNote() {
     const note = personalNote.trim();
     if (!note) {
-      toast.info("Write a personal note before saving.");
+      toast.info(localizedWizardMessage(wizardLocale, "Write a personal note before saving."));
       return;
     }
 
     if (note !== personalNote) setPersonalNote(note);
-    toast.success("Personal note saved to your draft.");
+    toast.success(localizedWizardMessage(wizardLocale, "Personal note saved to your draft."));
   }
 
   function appendHelperText(text: string) {
@@ -1052,11 +1070,11 @@ export function CustomSongWizard() {
 
       if (generatedStory.story.trim()) {
         setStory(generatedStory.story);
-        toast.success("AI polished your story.");
+        toast.success(localizedWizardMessage(wizardLocale, "AI polished your story."));
       }
     } catch (error) {
       console.error("[Story Helper] Failed to polish story:", error);
-      toast.info("AI story polishing is unavailable right now.");
+      toast.info(localizedWizardMessage(wizardLocale, "AI story polishing is unavailable right now."));
     } finally {
       setIsPolishingStory(false);
       window.requestAnimationFrame(() => storyTextareaRef.current?.focus());
@@ -1127,7 +1145,7 @@ export function CustomSongWizard() {
       (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      toast.info("Speech recognition is not available in this browser.");
+      toast.info(localizedWizardMessage(wizardLocale, "Speech recognition is not available in this browser."));
       return;
     }
 
@@ -1155,7 +1173,7 @@ export function CustomSongWizard() {
       if (transcript) insertStoryText(transcript);
     };
     recognition.onerror = () => {
-      toast.error("Recording stopped before we could capture speech.");
+      toast.error(localizedWizardMessage(wizardLocale, "Recording stopped before we could capture speech."));
       setIsRecording(false);
     };
     recognition.onend = () => setIsRecording(false);
@@ -1168,11 +1186,11 @@ export function CustomSongWizard() {
   async function uploadAndTranscribeBlessing(file: File) {
     const contentType = normalizeSpokenIntroContentType(file.type);
     if (!contentType) {
-      toast.error("Please choose a WebM, MP3, MP4, WAV, or OGG recording.");
+      toast.error(localizedWizardMessage(wizardLocale, "Please choose a WebM, MP3, MP4, WAV, or OGG recording."));
       return;
     }
     if (file.size > 12 * 1024 * 1024) {
-      toast.error("Keep your recording under 12MB.");
+      toast.error(localizedWizardMessage(wizardLocale, "Keep your recording under 12MB."));
       return;
     }
     setIsUploadingBlessing(true);
@@ -1200,7 +1218,7 @@ export function CustomSongWizard() {
         ...transcription,
       });
       setSpokenBlessing(transcription.transcript);
-      toast.success("Your voice blessing is ready.");
+      toast.success(localizedWizardMessage(wizardLocale, "Your voice blessing is ready."));
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -1221,7 +1239,7 @@ export function CustomSongWizard() {
       !navigator.mediaDevices?.getUserMedia ||
       typeof MediaRecorder === "undefined"
     ) {
-      toast.error("Audio recording is not supported in this browser.");
+      toast.error(localizedWizardMessage(wizardLocale, "Audio recording is not supported in this browser."));
       return;
     }
     try {
@@ -1255,7 +1273,7 @@ export function CustomSongWizard() {
         45000,
       );
     } catch {
-      toast.error("Microphone access is required to record your blessing.");
+      toast.error(localizedWizardMessage(wizardLocale, "Microphone access is required to record your blessing."));
     }
   }
 
@@ -1389,7 +1407,7 @@ export function CustomSongWizard() {
     setLyricRewriteInstruction("");
     setLyricRewriteError("");
     resetCoverGeneration();
-    toast.success("New lyrics version applied.");
+    toast.success(localizedWizardMessage(wizardLocale, "New lyrics version applied."));
   }
 
   function updateLyricLine(lineId: string, text: string) {
@@ -1452,7 +1470,7 @@ export function CustomSongWizard() {
         ),
       );
       setSelectedLyricLineIds([]);
-      toast.success("Rewrite suggestions are ready.");
+      toast.success(localizedWizardMessage(wizardLocale, "Rewrite suggestions are ready."));
     } catch (error) {
       setLyricRewriteError(
         error instanceof Error
@@ -1579,7 +1597,7 @@ export function CustomSongWizard() {
       });
 
       if (checkout.unauthorized) {
-        toast.info("Please sign in to continue checkout.", {
+        toast.info(localizedWizardMessage(wizardLocale, "Please sign in to continue checkout."), {
           description: "Your song preview is saved to your account.",
         });
         return;
@@ -1587,7 +1605,7 @@ export function CustomSongWizard() {
 
       router.push(checkout.url);
     } catch (error) {
-      toast.error("Checkout could not be started.", {
+      toast.error(localizedWizardMessage(wizardLocale, "Checkout could not be started."), {
         description:
           error instanceof Error ? error.message : "Please try again shortly.",
       });
@@ -1598,7 +1616,7 @@ export function CustomSongWizard() {
 
   function toggleSongPlayback(version: string, audioUrl: string) {
     if (!audioUrl) {
-      toast.error("This song version is not ready yet.");
+      toast.error(localizedWizardMessage(wizardLocale, "This song version is not ready yet."));
       return;
     }
 
@@ -1628,7 +1646,7 @@ export function CustomSongWizard() {
       .then(() => setIsPlaying(true))
       .catch(() => {
         setIsPlaying(false);
-        toast.error("Unable to play this song preview.");
+        toast.error(localizedWizardMessage(wizardLocale, "Unable to play this song preview."));
       });
   }
 
@@ -1662,7 +1680,7 @@ export function CustomSongWizard() {
         songId: leadData?.songId,
         hasAudioUrl: Boolean(songVersion?.audioUrl),
       });
-      toast.error("This song version is not ready yet.");
+      toast.error(localizedWizardMessage(wizardLocale, "This song version is not ready yet."));
       return;
     }
 
@@ -1689,7 +1707,7 @@ export function CustomSongWizard() {
       });
 
       if (result.status === 401) {
-        toast.info("Please sign in to save this song.");
+        toast.info(localizedWizardMessage(wizardLocale, "Please sign in to save this song."));
         return;
       }
 
@@ -1711,7 +1729,7 @@ export function CustomSongWizard() {
         songId: leadData.songId,
         error,
       });
-      toast.error("Unable to save this song.", {
+      toast.error(localizedWizardMessage(wizardLocale, "Unable to save this song."), {
         description:
           error instanceof Error ? error.message : "Please try again shortly.",
       });
@@ -1740,8 +1758,8 @@ export function CustomSongWizard() {
           {step === 1 && (
             <StepFrame key="recipient">
               <StepHeading
-                title="Who's this song for?"
-                description="Tell us the names and the occasion so we can make it personal."
+                title={copy.recipientHeading}
+                description={copy.recipientDescription}
               />
               <RecipientStep
                 customOccasionInput={customOccasionInput}
@@ -1761,8 +1779,8 @@ export function CustomSongWizard() {
           {step === 2 && (
             <StepFrame key="style">
               <StepHeading
-                title="Choose the music style"
-                description="Pick the genre, voice, and language for this custom song."
+                title={copy.styleHeading}
+                description={copy.styleDescription}
               />
               <StyleStep
                 genre={genre}
@@ -1863,7 +1881,7 @@ export function CustomSongWizard() {
                 previewTime={previewTime}
                 progress={progress}
                 recipientLabel={recipientLabel}
-                selectedOccasion={selectedOccasion}
+                selectedOccasion={localizedSelectedOccasion}
                 songError={songError}
                 songStage={songStage}
                 songTitle={songTitle}
@@ -1903,7 +1921,7 @@ export function CustomSongWizard() {
               onClick={goBack}
             >
               <ArrowLeft className="size-4" />
-              Back
+              {copy.back}
             </Button>
             <Button
               className="h-12 flex-1 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90 disabled:bg-primary/30"
@@ -1911,7 +1929,7 @@ export function CustomSongWizard() {
               type="button"
               onClick={goForward}
             >
-              {step === 4 ? "Create my song" : "Continue"}
+              {step === 4 ? copy.createSong : copy.continue}
               <ArrowRight className="size-4" />
             </Button>
           </div>
@@ -1978,7 +1996,7 @@ export function CustomSongWizard() {
               if (isCheckoutLoading) return;
 
               if (!leadData?.songId) {
-                toast.error("This song preview is not ready yet.");
+                toast.error(localizedWizardMessage(wizardLocale, "This song preview is not ready yet."));
                 return;
               }
 

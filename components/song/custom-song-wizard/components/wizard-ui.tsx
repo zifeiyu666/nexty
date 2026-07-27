@@ -62,6 +62,11 @@ import {
   storyHelperSteps,
 } from "../constants";
 import type { LanguageOption, WizardStep } from "../types";
+import {
+  localizedRelationshipLabel,
+  useWizardCopy,
+  useWizardLocale,
+} from "../i18n";
 
 export function clampMagnetOffset(value: number, limit: number) {
   return Math.max(-limit, Math.min(limit, value));
@@ -303,6 +308,7 @@ export function PaywallModal({
   songTitle: string;
   version: string;
 }) {
+  const copy = useWizardCopy();
   return (
     <motion.div
       animate={{ opacity: 1 }}
@@ -325,12 +331,12 @@ export function PaywallModal({
             <div>
               <h2 className="text-lg font-black leading-tight">{songTitle}</h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                Version · {version} · for {recipientLabel}
+                Version · {version} · {copy.versionFor} {recipientLabel}
               </p>
             </div>
           </div>
           <button
-            aria-label="Close paywall"
+            aria-label={copy.close}
             className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
             disabled={isLoading}
             type="button"
@@ -342,27 +348,25 @@ export function PaywallModal({
 
         <div className="p-5 text-center sm:p-6">
           <p className="font-[cursive] text-base text-primary">
-            one more step...
+            {copy.oneMoreStep}
           </p>
           <h3 className="mt-1.5 text-xl font-black text-foreground">
-            Choose how to unlock
+            {copy.unlockHeading}
           </h3>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-            Pick a one-off unlock, a bundle, or a subscription plan on the next
-            screen.
+            {copy.unlockDescription}
           </p>
 
           <div className="mx-auto mt-5 flex max-w-lg gap-3 rounded-xl border border-border bg-muted p-3.5 text-left text-sm leading-6 text-muted-foreground">
             <Gift className="mt-1 size-4 shrink-0 text-primary" />
             <p>
-              You don&apos;t have a subscription or song credits yet. We&apos;ll
-              take you to secure checkout to pick the right option for you.
+              {copy.unlockNotice}
             </p>
           </div>
 
           <p className="mt-5 inline-flex items-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="size-4 text-primary" />
-            Secure checkout
+            {copy.secureCheckout}
           </p>
         </div>
 
@@ -374,7 +378,7 @@ export function PaywallModal({
             variant="ghost"
             onClick={onClose}
           >
-            Not yet
+            {copy.notYet}
           </Button>
           <Button
             className="h-10 flex-1 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
@@ -388,7 +392,7 @@ export function PaywallModal({
             ) : (
               <LockKeyhole className="size-4" />
             )}
-            {isLoading ? "Opening checkout..." : "Continue to checkout"}
+            {isLoading ? copy.openingCheckout : copy.continueCheckout}
           </Button>
         </div>
       </motion.div>
@@ -425,6 +429,7 @@ export function SongGenerationPage({
   progress: number;
   recipientLabel: string;
 }) {
+  const copy = useWizardCopy();
   const coverUploadInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -441,18 +446,17 @@ export function SongGenerationPage({
           </div>
           <div>
             <p className="mb-2 font-[cursive] text-lg text-primary-foreground/80">
-              almost there...
+              {copy.almostThere}
             </p>
             <h1 className="text-2xl font-black leading-tight md:text-3xl">
-              We&apos;re recording {recipientLabel}&apos;s song
+              {copy.recordingSong.replace("{name}", recipientLabel)}
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-primary-foreground/75 md:text-base">
-              Our studio is stitching the lyrics, vocals and music together.
-              You&apos;ll get an email the moment it&apos;s ready.
+              {copy.recordingDescription}
             </p>
             <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-bold">
               <Clock3 className="size-4" />
-              {Math.max(5, Math.min(99, Math.round(progress)))}% complete
+              {Math.max(5, Math.min(99, Math.round(progress)))}% {copy.complete}
             </span>
           </div>
         </div>
@@ -463,10 +467,9 @@ export function SongGenerationPage({
           >
             <FlaskConical className="mt-0.5 size-5 shrink-0" />
             <div>
-              <p className="text-sm font-black uppercase">Mock mode</p>
+              <p className="text-sm font-black uppercase">{copy.mockMode}</p>
               <p className="mt-1 text-sm leading-6 text-amber-50/80">
-                This is a UI test using configured sample tracks. No new music
-                is being generated.
+                {copy.mockDescription}
               </p>
             </div>
           </div>
@@ -475,14 +478,13 @@ export function SongGenerationPage({
 
       <section className="mt-10 text-center">
         <p className="font-[cursive] text-base text-primary">
-          while you wait...
+          {copy.whileYouWait}
         </p>
         <h2 className="mt-2 text-2xl font-black text-foreground md:text-3xl">
-          Make it even more personal
+          {copy.personalizeHeading}
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground md:text-base">
-          Add an album cover and a note. These will be saved with the song and
-          shown whenever it&apos;s played or shared.
+          {copy.personalizeDescription}
         </p>
       </section>
 
@@ -491,16 +493,16 @@ export function SongGenerationPage({
           <div className="mb-4">
             <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">
               <ImageIcon className="size-4 text-primary" />
-              Album Cover
+              {copy.albumCover}
             </p>
             <p className="mt-3 text-sm text-muted-foreground">
-              Upload your own photo or let us dream one up.
+              {copy.albumCoverHelp}
             </p>
           </div>
           <div className="mx-auto flex aspect-square w-full max-w-56 flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-muted text-muted-foreground">
             {coverImageUrl ? (
               <img
-                alt="Album cover"
+                alt={copy.albumCover}
                 className="size-full object-cover"
                 src={coverImageUrl}
                 title={coverPrompt || undefined}
@@ -510,14 +512,14 @@ export function SongGenerationPage({
                 <Loader2 className="size-9 animate-spin text-primary" />
                 <p className="mt-4 text-sm font-medium">
                   {isUploadingCover
-                    ? "Uploading your cover..."
-                    : "Dreaming up a cover..."}
+                    ? copy.uploadingCover
+                    : copy.generatingCover}
                 </p>
               </>
             ) : (
               <>
                 <ImageIcon className="size-9" />
-                <p className="mt-4 text-sm font-medium">Pick a cover below</p>
+                <p className="mt-4 text-sm font-medium">{copy.pickCover}</p>
               </>
             )}
           </div>
@@ -538,7 +540,7 @@ export function SongGenerationPage({
               ) : (
                 <Wand2 className="size-4" />
               )}
-              {coverImageUrl ? "Regenerate with AI" : "Generate with AI"}
+              {coverImageUrl ? copy.regenerateAi : copy.generateAi}
             </Button>
             <Button
               className="h-11 rounded-full text-sm font-bold text-muted-foreground hover:text-foreground"
@@ -552,7 +554,7 @@ export function SongGenerationPage({
               ) : (
                 <Upload className="size-4" />
               )}
-              {isUploadingCover ? "Uploading..." : "Upload"}
+              {isUploadingCover ? copy.uploading : copy.upload}
             </Button>
             <input
               ref={coverUploadInputRef}
@@ -572,16 +574,16 @@ export function SongGenerationPage({
           <div className="mb-4">
             <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">
               <Mail className="size-4 text-primary" />
-              Personal Note
+              {copy.personalNote}
             </p>
             <p className="mt-3 text-sm text-muted-foreground">
-              A little card that sits alongside the song.
+              {copy.personalNoteHelp}
             </p>
           </div>
           <Textarea
             className="min-h-44 resize-none rounded-2xl border-0 bg-muted p-4 text-sm leading-6 text-foreground shadow-none placeholder:text-muted-foreground focus-visible:ring-primary/20"
             maxLength={500}
-            placeholder={`Write something special for ${recipientLabel}...`}
+            placeholder={copy.notePlaceholder.replace("{name}", recipientLabel)}
             value={note}
             onChange={(event) => onNoteChange(event.target.value)}
           />
@@ -589,7 +591,7 @@ export function SongGenerationPage({
             <span>{note.length} / 500</span>
             <span className="inline-flex items-center gap-1.5">
               <LockKeyhole className="size-3.5" />
-              Only {recipientLabel} will see this
+              {copy.onlyRecipient.replace("{name}", recipientLabel)}
             </span>
           </div>
           <Button
@@ -598,7 +600,7 @@ export function SongGenerationPage({
             onClick={onSaveNote}
           >
             <Mail className="size-4" />
-            Save note
+            {copy.saveNote}
           </Button>
         </section>
       </div>
@@ -613,6 +615,7 @@ export function LyricsGenerationView({
   activeStep: number;
   names: string[];
 }) {
+  const copy = useWizardCopy();
   const recipientLabel =
     names
       .map((name) => name.trim())
@@ -628,15 +631,14 @@ export function LyricsGenerationView({
       </div>
 
       <h1 className="text-3xl font-black leading-tight text-foreground md:text-4xl">
-        Writing {recipientLabel}&apos;s song...
+        {copy.writingSong.replace("{name}", recipientLabel)}
       </h1>
       <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
-        Our songwriters are turning your story into lyrics. This usually takes
-        about 20 seconds.
+        {copy.writingDescription}
       </p>
 
       <div className="mt-10 w-full max-w-md space-y-5 text-left">
-        {lyricGenerationSteps.map((item, index) => {
+        {copy.lyricProgress.map((item, index) => {
           const complete = index < activeStep;
           const active = index === activeStep;
 
@@ -692,7 +694,11 @@ export function StoryHelperModal({
   onNext: () => void;
   step: number;
 }) {
-  const helperStep = storyHelperSteps[step];
+  const copy = useWizardCopy();
+  const helperStep = {
+    ...storyHelperSteps[step],
+    question: copy.storyQuestions[step] || storyHelperSteps[step].question,
+  };
   const isFirstStep = step === 0;
   const isLastStep = step === storyHelperSteps.length - 1;
   const questionNumber =
@@ -721,14 +727,16 @@ export function StoryHelperModal({
               <Wand2 className="size-5" />
             </span>
             <div>
-              <h2 className="text-xl font-black leading-tight">Story Helper</h2>
+              <h2 className="text-xl font-black leading-tight">
+                {copy.storyHelper}
+              </h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
-                Question {questionNumber} of 3
+                {copy.questionOf.replace("{number}", questionNumber)}
               </p>
             </div>
           </div>
           <button
-            aria-label="Close story helper"
+            aria-label={copy.close}
             className="rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
             type="button"
             onClick={onClose}
@@ -751,10 +759,10 @@ export function StoryHelperModal({
             <div className="flex min-h-[240px] flex-col items-center justify-center text-center">
               <Loader2 className="mb-6 size-10 animate-spin text-primary" />
               <h3 className="text-xl font-black">
-                AI is writing your story...
+                {copy.aiPolishing}
               </h3>
               <p className="mt-3 text-sm text-muted-foreground">
-                Turning your answers into a lyric-ready story brief.
+                {copy.storyCreating}
               </p>
             </div>
           ) : (
@@ -797,7 +805,7 @@ export function StoryHelperModal({
                       </p>
                       <Textarea
                         className="min-h-24 resize-none rounded-2xl border-border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
-                        placeholder="Type your answer here..."
+                        placeholder={copy.storyPlaceholder}
                         value={
                           helperStep.options?.includes(answer) ? "" : answer
                         }
@@ -811,7 +819,7 @@ export function StoryHelperModal({
                   <Textarea
                     autoFocus
                     className="mt-6 min-h-36 resize-none rounded-2xl border-primary bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
-                    placeholder="Type your answer here..."
+                    placeholder={copy.storyPlaceholder}
                     value={answer}
                     onChange={(event) => onAnswerChange(event.target.value)}
                   />
@@ -831,14 +839,14 @@ export function StoryHelperModal({
               onClick={onBack}
             >
               <ArrowLeft className="size-5" />
-              Back
+              {copy.back}
             </Button>
             <Button
               className="h-10 rounded-full bg-primary px-7 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
               type="button"
               onClick={onNext}
             >
-              {isLastStep ? "Create Story" : "Next"}
+              {isLastStep ? copy.createSong : copy.continue}
               {!isLastStep && <ArrowRight className="size-5" />}
             </Button>
           </div>
@@ -849,6 +857,7 @@ export function StoryHelperModal({
 }
 
 export function StepProgress({ currentStep }: { currentStep: WizardStep }) {
+  const copy = useWizardCopy();
   return (
     <div className="mx-auto grid w-full max-w-2xl grid-cols-5 items-start justify-center">
       {steps.map((item, index) => {
@@ -879,7 +888,7 @@ export function StepProgress({ currentStep }: { currentStep: WizardStep }) {
                   active ? "text-foreground" : "text-muted-foreground",
                 )}
               >
-                {item.label}
+                {copy.steps[index]}
               </div>
             </div>
           </div>
@@ -935,6 +944,7 @@ export function LyricsLineEditor({
   onRewriteSelected: () => void;
   onSelectionChange: (lineId: string, selected: boolean) => void;
 }) {
+  const copy = useWizardCopy();
   const selectedCount = selectedLineIds.length;
   const suggestionsByLineId = new Map(
     suggestions.map((suggestion) => [suggestion.lineId, suggestion]),
@@ -1010,7 +1020,7 @@ export function LyricsLineEditor({
                       <div className="grid gap-2 text-sm sm:grid-cols-2">
                         <div>
                           <p className="text-[11px] font-black uppercase tracking-[0.14em] text-muted-foreground">
-                            Original
+                            {copy.original}
                           </p>
                           <p className="mt-1 leading-6 text-muted-foreground">
                             {suggestion.originalText}
@@ -1018,7 +1028,7 @@ export function LyricsLineEditor({
                         </div>
                         <div>
                           <p className="text-[11px] font-black uppercase tracking-[0.14em] text-primary">
-                            New
+                            {copy.new}
                           </p>
                           <p className="mt-1 leading-6 font-semibold text-foreground">
                             {suggestion.rewrittenText}
@@ -1033,7 +1043,7 @@ export function LyricsLineEditor({
                           variant="ghost"
                           onClick={() => onKeepOriginal(line.id)}
                         >
-                          Use original
+                          {copy.useOriginal}
                         </Button>
                         <Button
                           className="h-8 rounded-lg bg-primary px-3 text-xs font-bold text-primary-foreground hover:bg-primary/90"
@@ -1041,7 +1051,7 @@ export function LyricsLineEditor({
                           type="button"
                           onClick={() => onAcceptSuggestion(line.id)}
                         >
-                          Use new
+                          {copy.useNew}
                         </Button>
                       </div>
                     </div>
@@ -1057,7 +1067,7 @@ export function LyricsLineEditor({
         <Input
           className="h-9 rounded-lg border-0 bg-background text-sm shadow-none focus-visible:ring-primary/20"
           disabled={isRewriting}
-          placeholder="Optional direction, e.g. make selected lines more tender"
+          placeholder={copy.rewriteDirection}
           value={instruction}
           onChange={(event) => onInstructionChange(event.target.value)}
         />
@@ -1072,7 +1082,7 @@ export function LyricsLineEditor({
           ) : (
             <Wand2 className="size-4" />
           )}
-          Rewrite {selectedCount ? selectedCount : ""}
+          {copy.rewrite} {selectedCount ? selectedCount : ""}
         </Button>
       </div>
 
@@ -1094,6 +1104,7 @@ export function LyricsVersionPanel({
   lyrics: string;
   title: string;
 }) {
+  const copy = useWizardCopy();
   return (
     <section className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <div className="border-b border-border bg-muted/60 px-4 py-3">
@@ -1101,12 +1112,12 @@ export function LyricsVersionPanel({
           {label}
         </p>
         <h3 className="mt-1 line-clamp-2 text-base font-black leading-6 text-foreground">
-          {title || "Your Custom Song"}
+          {title || copy.customSong}
         </h3>
       </div>
       <ScrollArea className="min-h-0 flex-1">
         <pre className="whitespace-pre-wrap break-words px-4 py-4 font-sans text-sm font-medium leading-7 text-foreground">
-          {lyrics || "No lyrics generated."}
+          {lyrics || copy.noLyrics}
         </pre>
       </ScrollArea>
     </section>
@@ -1122,6 +1133,8 @@ export function RelationshipCreatableSelect({
   placeholder: string;
   value: string;
 }) {
+  const copy = useWizardCopy();
+  const locale = useWizardLocale();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const trimmedQuery = query.trim();
@@ -1169,13 +1182,13 @@ export function RelationshipCreatableSelect({
       >
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Search or type a relationship..."
+            placeholder={copy.selectRelationship}
             value={query}
             onValueChange={setQuery}
           />
           <CommandList>
             {!filteredOptions.length && !canCreate && (
-              <CommandEmpty>No relationship found.</CommandEmpty>
+              <CommandEmpty>{copy.noRelationship}</CommandEmpty>
             )}
             {canCreate && (
               <CommandGroup>
@@ -1185,7 +1198,7 @@ export function RelationshipCreatableSelect({
                 </CommandItem>
               </CommandGroup>
             )}
-            <CommandGroup heading="Common relationships">
+            <CommandGroup heading={copy.commonRelationships}>
               {filteredOptions.map((option) => (
                 <CommandItem
                   key={option}
@@ -1200,7 +1213,7 @@ export function RelationshipCreatableSelect({
                         : "opacity-0",
                     )}
                   />
-                  {option}
+                  {localizedRelationshipLabel(locale, option, option)}
                 </CommandItem>
               ))}
             </CommandGroup>

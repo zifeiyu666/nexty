@@ -7,7 +7,10 @@ import dayjs from 'dayjs';
 import fs from 'fs';
 import matter from 'gray-matter';
 import path from 'path';
-import { getLocaleFallbackChain } from './locale-fallback';
+import {
+  getLocaleFallbackChain,
+  mergePostsWithLocaleFallback,
+} from './locale-fallback';
 
 const POSTS_BATCH_SIZE = 10;
 const LOCAL_DIRECTORY_READERS: Partial<Record<PostType, (locale: string) => string>> = {
@@ -195,12 +198,8 @@ export function createCmsModule(postType: PostType) {
       }
     }
 
-    allPosts = Array.from(
-      new Map(
-        allPosts
-          .filter(post => post.status === 'published')
-          .map(post => [post.slug.replace(/^\//, '').replace(/\/$/, ''), post])
-      ).values()
+    allPosts = mergePostsWithLocaleFallback(
+      allPosts.filter(post => post.status === 'published')
     );
 
     // Sort posts by isPinned and publishedAt

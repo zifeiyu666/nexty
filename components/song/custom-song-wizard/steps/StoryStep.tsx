@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 import { storyPlaceholders } from "../constants";
 import type { Occasion, SpokenIntroDraft } from "../types";
+import { useWizardCopy, useWizardLocale } from "../i18n";
 
 const detailTemplates = [
   { label: "Nickname", text: "[Nickname: ]" },
@@ -72,6 +73,8 @@ export function StoryStep({
   onUploadBlessing,
   onToggleBlessingPlayback,
 }: StoryStepProps) {
+  const copy = useWizardCopy();
+  const locale = useWizardLocale();
   function insertTemplate(template: string) {
     const textarea = storyTextareaRef.current;
 
@@ -102,10 +105,10 @@ export function StoryStep({
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3 text-lg font-black text-foreground">
           <Edit3 className="size-5 text-primary" />
-          Your story
+          {copy.storyHeading}
         </div>
         <span className="text-sm font-semibold text-muted-foreground">
-          100-200 words works best
+          100–200 {copy.words}
         </span>
       </div>
       <div className="mb-4 flex flex-nowrap items-center gap-2 sm:gap-3">
@@ -116,7 +119,7 @@ export function StoryStep({
           onClick={onOpenHelper}
         >
           <Wand2 className="hidden size-5 text-primary sm:block" />
-          Help me write
+          {copy.storyHelper}
         </Button>
         <Button
           className={cn(
@@ -134,7 +137,7 @@ export function StoryStep({
           ) : (
             <Mic2 className="hidden size-5 text-primary sm:block" />
           )}
-          {isRecording ? "Stop recording" : "Speak"}
+          {isRecording ? copy.stop : copy.record}
         </Button>
         {isRecording && (
           <span className="hidden text-sm font-semibold text-primary/70 sm:inline">
@@ -153,17 +156,17 @@ export function StoryStep({
           ) : (
             <Sparkles className="hidden size-5 text-primary sm:block" />
           )}
-          {isPolishingStory ? "AI polishing..." : "AI polish story"}
+          {isPolishingStory ? copy.aiPolishing : copy.aiPolish}
         </Button>
       </div>
       <section className="mb-8 overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 px-5 py-4">
           <div>
             <div className="flex items-center gap-2 text-sm font-black text-foreground">
-              <Mic2 className="size-4 text-primary" /> Opening blessing
+              <Mic2 className="size-4 text-primary" /> {copy.openingBlessing}
             </div>
             <p className="mt-1 text-sm font-medium text-muted-foreground">
-              Optional: begin with your own voice or an AI narration.
+              {copy.optional}
             </p>
           </div>
           <div
@@ -183,7 +186,7 @@ export function StoryStep({
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                {mode === "recording" ? "My voice" : "AI narration"}
+                {mode === "recording" ? copy.record : copy.typeMessage}
               </button>
             ))}
           </div>
@@ -193,7 +196,7 @@ export function StoryStep({
             <Textarea
               className="min-h-[100px] resize-y rounded-xl border-border bg-background text-base leading-7"
               maxLength={1000}
-              placeholder="e.g. Happy birthday, Mom. I hope this song makes you smile today..."
+              placeholder={copy.messagePlaceholder}
               value={spokenBlessing}
               onChange={(event) => onSpokenBlessingChange(event.target.value)}
             />
@@ -215,10 +218,10 @@ export function StoryStep({
                 ) : (
                   <Mic2 className="size-4" />
                 )}
-                {isRecordingBlessing ? "Stop recording" : "Record my blessing"}
+                {isRecordingBlessing ? copy.stop : copy.record}
               </Button>
               <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-muted hover:text-foreground">
-                <Upload className="size-4" /> Upload audio
+                <Upload className="size-4" /> {copy.uploadAudio}
                 <input
                   className="sr-only"
                   type="file"
@@ -232,7 +235,7 @@ export function StoryStep({
               </label>
               {isUploadingBlessing ? (
                 <span className="text-sm font-semibold text-primary">
-                  Transcribing your blessing...
+                  {copy.transcribing}
                 </span>
               ) : null}
               {spokenIntro ? (
@@ -253,7 +256,7 @@ export function StoryStep({
                 </div>
               ) : (
                 <span className="text-sm font-medium text-muted-foreground">
-                  10-30 seconds works best
+                  {copy.recordingLength}
                 </span>
               )}
             </div>
@@ -271,21 +274,22 @@ export function StoryStep({
         ref={storyTextareaRef}
         className="min-h-[230px] resize-y rounded-2xl border-border bg-card p-5 text-base leading-8 text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
         placeholder={
-          occasion
+          occasion && locale === "en"
             ? storyPlaceholders[occasion]
-            : "e.g., Tell us about the person, the moment, and the details that should become lyrics..."
+            : copy.storyPlaceholder
         }
         value={story}
         onChange={(event) => onStoryChange(event.target.value)}
       />
       <div className="-mt-9 mr-4 flex justify-end text-sm text-muted-foreground">
-        {storyWordCount} words
+        {storyWordCount} {copy.words}
       </div>
       <div className="mt-8 flex gap-4 rounded-2xl border border-primary/20 bg-primary/10 p-5 text-muted-foreground">
         <Lightbulb className="mt-1 size-5 shrink-0 text-primary" />
         <div className="text-base leading-7">
           <p>
-            <span className="font-black text-foreground">Tip:</span> Add a{" "}
+            <span className="font-black text-foreground">{copy.tip}</span>{" "}
+            {copy.tipIntro}{" "}
             {detailTemplates.map((template, index) => (
               <span key={template.label}>
                 <button
@@ -302,10 +306,10 @@ export function StoryStep({
                     : ""}
               </span>
             ))}{" "}
-            to make the lyrics truly one-of-a-kind.
+            {copy.tipOutro}
           </p>
           <p className="mt-1 text-sm font-semibold text-muted-foreground/85">
-            Click words to use templates.
+            {copy.clickTemplates}
           </p>
         </div>
       </div>

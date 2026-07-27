@@ -29,7 +29,41 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import type { GenreOption, LyricsVersionComparison } from "../types";
+import { useWizardLocale } from "../i18n";
 import { LyricsVersionPanel } from "./wizard-ui";
+
+const dialogCopy = {
+  en: {
+    genreTitle: "This style may not match the occasion",
+    genreDescription: "This genre can still work, but it may feel less natural for the occasion you selected.",
+    recommended: "Choose a recommended style", useGenre: "Use this genre anyway",
+    newTitle: "Write a new version", newDescription: "Add optional direction for the next lyrics draft.",
+    placeholder: "e.g., Add the name to the title and make the song more romantic...",
+    blank: "Leave it blank for a fresh take.", cancel: "Cancel", generate: "Generate version",
+    compare: "Compare lyrics versions", compareDescription: "Review both drafts before choosing which one to keep.",
+    original: "Original", newVersion: "New version", useOriginal: "Use original", useNew: "Use new version",
+  },
+  es: {
+    genreTitle: "Este estilo quizá no encaje con la ocasión",
+    genreDescription: "Puede funcionar, pero podría sonar menos natural para la ocasión elegida.",
+    recommended: "Elegir un estilo recomendado", useGenre: "Usar este género",
+    newTitle: "Escribir otra versión", newDescription: "Añade una indicación opcional para la siguiente letra.",
+    placeholder: "Ej.: añade el nombre al título y haz la canción más romántica...",
+    blank: "Déjalo en blanco para obtener una versión completamente nueva.", cancel: "Cancelar", generate: "Generar versión",
+    compare: "Comparar versiones de la letra", compareDescription: "Revisa ambas propuestas antes de elegir cuál conservar.",
+    original: "Original", newVersion: "Nueva versión", useOriginal: "Usar original", useNew: "Usar nueva versión",
+  },
+  ja: {
+    genreTitle: "このスタイルは用途に合わない可能性があります",
+    genreDescription: "選択した用途でも使えますが、曲調がやや不自然に感じられる場合があります。",
+    recommended: "おすすめを選ぶ", useGenre: "このジャンルを使う",
+    newTitle: "別の歌詞を作る", newDescription: "次の歌詞に反映したい内容があれば入力してください。",
+    placeholder: "例：曲名に名前を入れ、全体をもっとロマンチックにする...",
+    blank: "空欄のままなら、自由な新バージョンを作ります。", cancel: "キャンセル", generate: "新しい歌詞を作る",
+    compare: "歌詞を比較", compareDescription: "2つの歌詞を確認し、残すほうを選んでください。",
+    original: "元の歌詞", newVersion: "新しい歌詞", useOriginal: "元の歌詞を使う", useNew: "新しい歌詞を使う",
+  },
+} as const;
 
 export function GenreWarningDialog({
   pendingGenre,
@@ -40,27 +74,27 @@ export function GenreWarningDialog({
   onConfirm: () => void;
   onOpenChange: (open: boolean) => void;
 }) {
+  const copy = dialogCopy[useWizardLocale()];
   return (
     <AlertDialog open={Boolean(pendingGenre)} onOpenChange={onOpenChange}>
       <AlertDialogContent className="rounded-2xl border-border">
         <AlertDialogHeader>
           <AlertDialogTitle>
-            This style may not match the occasion
+            {copy.genreTitle}
           </AlertDialogTitle>
           <AlertDialogDescription className="leading-6">
-            This genre can still work, but it may feel less natural for the
-            occasion you selected.
+            {copy.genreDescription}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="rounded-full">
-            Choose a recommended style
+            {copy.recommended}
           </AlertDialogCancel>
           <AlertDialogAction
             className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={onConfirm}
           >
-            Use this genre anyway
+            {copy.useGenre}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -81,16 +115,17 @@ export function NewLyricsVersionDialog({
   onInstructionChange: (value: string) => void;
   onOpenChange: (open: boolean) => void;
 }) {
+  const copy = dialogCopy[useWizardLocale()];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="rounded-2xl border-border p-0 sm:max-w-xl">
         <DialogHeader className="border-b border-border px-5 pb-4 pt-5 text-left sm:px-6">
           <DialogTitle className="flex items-center gap-2 text-xl font-black">
             <Sparkles className="size-5 text-primary" />
-            Write a new version
+            {copy.newTitle}
           </DialogTitle>
           <DialogDescription className="leading-6">
-            Add optional direction for the next lyrics draft.
+            {copy.newDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -99,13 +134,13 @@ export function NewLyricsVersionDialog({
             autoFocus
             className="min-h-32 resize-none rounded-2xl border-border bg-muted p-4 text-sm leading-6 text-foreground shadow-none placeholder:text-muted-foreground focus-visible:border-primary/60 focus-visible:ring-primary/20"
             maxLength={500}
-            placeholder="e.g., Add the main character's name to the title, make the whole song more romantic..."
+            placeholder={copy.placeholder}
             value={instruction}
             onChange={(event) => onInstructionChange(event.target.value)}
           />
           <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
             <span>{instruction.length} / 500</span>
-            <span>Leave it blank for a fresh take.</span>
+            <span>{copy.blank}</span>
           </div>
         </div>
 
@@ -116,7 +151,7 @@ export function NewLyricsVersionDialog({
             variant="ghost"
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            {copy.cancel}
           </Button>
           <Button
             className="h-10 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
@@ -124,7 +159,7 @@ export function NewLyricsVersionDialog({
             onClick={onGenerate}
           >
             <RefreshCw className="size-4" />
-            Generate version
+            {copy.generate}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -141,6 +176,7 @@ export function LyricsVersionComparisonDialog({
   onKeepOriginal: () => void;
   onUseNew: () => void;
 }) {
+  const copy = dialogCopy[useWizardLocale()];
   return (
     <Dialog
       open={Boolean(comparison)}
@@ -152,10 +188,10 @@ export function LyricsVersionComparisonDialog({
         <DialogHeader className="border-b border-border px-5 pb-4 pt-5 text-left sm:px-6">
           <DialogTitle className="flex items-center gap-2 text-xl font-black">
             <Edit3 className="size-5 text-primary" />
-            Compare lyrics versions
+            {copy.compare}
           </DialogTitle>
           <DialogDescription className="leading-6">
-            Review both drafts before choosing which one to keep.
+            {copy.compareDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -163,12 +199,12 @@ export function LyricsVersionComparisonDialog({
           <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6">
             <div className="grid gap-4 md:grid-cols-2">
               <LyricsVersionPanel
-                label="Original"
+                label={copy.original}
                 lyrics={comparison.originalLyrics}
                 title={comparison.originalTitle}
               />
               <LyricsVersionPanel
-                label="New version"
+                label={copy.newVersion}
                 lyrics={comparison.newLyrics}
                 title={comparison.newTitle}
               />
@@ -183,7 +219,7 @@ export function LyricsVersionComparisonDialog({
             variant="ghost"
             onClick={onKeepOriginal}
           >
-            Use original
+            {copy.useOriginal}
           </Button>
           <Button
             className="h-10 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90"
@@ -191,7 +227,7 @@ export function LyricsVersionComparisonDialog({
             onClick={onUseNew}
           >
             <Check className="size-4" />
-            Use new version
+            {copy.useNew}
           </Button>
         </DialogFooter>
       </DialogContent>

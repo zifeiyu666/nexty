@@ -18,6 +18,11 @@ import {
   MagneticChoiceCard,
   RelationshipCreatableSelect,
 } from "../components/wizard-ui";
+import {
+  localizedOccasionLabel,
+  useWizardCopy,
+  useWizardLocale,
+} from "../i18n";
 
 type RecipientStepProps = {
   customOccasionInput: string;
@@ -48,16 +53,18 @@ export function RecipientStep({
   onSelectCustomOccasion,
   onSelectOccasion,
 }: RecipientStepProps) {
+  const copy = useWizardCopy();
+  const locale = useWizardLocale();
   return (
     <div className="mx-auto mt-8 max-w-5xl space-y-8">
       <div>
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm font-bold text-foreground">
             <UserRound className="size-5 text-primary" />
-            Who&apos;s this song for?
+            {copy.recipientLabel}
           </div>
           <p className="text-sm font-medium text-muted-foreground">
-            Up to 3 names
+            {copy.upToNames}
           </p>
         </div>
         <div className="space-y-3">
@@ -66,7 +73,9 @@ export function RecipientStep({
               <div className="grid flex-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
                 <Input
                   className="h-12 rounded-xl border-border bg-card px-4 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-primary/20"
-                  placeholder={index === 0 ? "Recipient name" : "Another name"}
+                  placeholder={
+                    index === 0 ? copy.recipientName : copy.anotherName
+                  }
                   value={recipient.name}
                   onChange={(event) =>
                     onRecipientChange(index, "name", event.target.value)
@@ -74,7 +83,7 @@ export function RecipientStep({
                 />
                 <RelationshipCreatableSelect
                   placeholder={
-                    index === 0 ? "Relationship" : "Their relationship"
+                    index === 0 ? copy.relationship : copy.theirRelationship
                   }
                   value={recipient.relationship}
                   onChange={(value) =>
@@ -83,7 +92,7 @@ export function RecipientStep({
                 />
               </div>
               <Button
-                aria-label="Remove name"
+                aria-label={copy.removeName}
                 className="h-12 w-12 shrink-0 rounded-xl bg-card text-muted-foreground shadow-sm hover:bg-muted hover:text-foreground"
                 disabled={
                   recipients.length === 1 &&
@@ -106,11 +115,11 @@ export function RecipientStep({
             onClick={onAddRecipient}
           >
             <Plus className="size-4 text-primary" />
-            Add another name
+            {copy.addName}
           </button>
         )}
         <p className="mt-3 text-sm text-muted-foreground">
-          Adding more than one name? The song will mention each of them.
+          {copy.multipleNames}
         </p>
       </div>
 
@@ -118,9 +127,11 @@ export function RecipientStep({
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm font-bold text-foreground">
             <PartyPopper className="size-5 text-primary" />
-            Occasion
+            {copy.occasion}
           </div>
-          <p className="text-sm font-medium text-muted-foreground">Pick one</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            {copy.pickOne}
+          </p>
         </div>
         <div className="grid grid-cols-2 gap-x-2 gap-y-6 pt-2 sm:gap-x-3 lg:grid-cols-5">
           {occasions.map((item) => {
@@ -135,7 +146,7 @@ export function RecipientStep({
                 art={item.art}
                 artPlacement="center"
                 icon={item.icon}
-                label={item.title}
+                label={localizedOccasionLabel(locale, item.value, item.title)}
                 selected={selected}
                 showIcon={false}
                 showSelectedCheck={false}
@@ -177,7 +188,7 @@ export function RecipientStep({
               <Input
                 ref={customOccasionInputRef}
                 className="h-14 rounded-xl border-primary bg-card px-5 text-base text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
-                placeholder="e.g. Retirement, Housewarming..."
+                placeholder={copy.customOccasionPlaceholder}
                 value={customOccasionInput}
                 onChange={(event) => onSelectCustomOccasion(event.target.value)}
               />

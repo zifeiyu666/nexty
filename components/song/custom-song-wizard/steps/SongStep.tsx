@@ -26,6 +26,7 @@ import type {
   SongStage,
   SongVersion,
 } from "../types";
+import { useWizardCopy } from "../i18n";
 
 type SelectedOccasionLike =
   | {
@@ -108,6 +109,7 @@ export function SongStep({
   onRespin,
   onRetryGeneration,
 }: SongStepProps) {
+  const copy = useWizardCopy();
   if (songStage === "loading") {
     if (songError) {
       return (
@@ -116,7 +118,7 @@ export function SongStep({
             <RefreshCw className="size-5" />
           </div>
           <h2 className="text-xl font-black text-foreground">
-            Song generation needs another try
+            {copy.songFailed}
           </h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             {songError}
@@ -127,7 +129,7 @@ export function SongStep({
             onClick={onRetryGeneration}
           >
             <RefreshCw className="size-4" />
-            Try again
+            {copy.tryAgain}
           </Button>
         </div>
       );
@@ -152,17 +154,17 @@ export function SongStep({
     );
   }
 
-  const displayTitle = songTitle || "Your Custom Song";
+  const displayTitle = songTitle || copy.customSong;
   const resultCoverImageUrl =
     coverImageUrl || currentVersion?.imageUrl || songVersions[0]?.imageUrl;
   const metadataPills: SongResultMetadataPill[] = [
     {
       icon: <Heart className="size-4" />,
-      label: selectedOccasion?.title || "For someone special",
+      label: selectedOccasion?.title || copy.specialPerson,
     },
     {
       icon: <Cake className="size-4" />,
-      label: selectedOccasion?.title.split("/")[0].trim() || "Birthday",
+      label: selectedOccasion?.title.split("/")[0].trim() || copy.birthday,
     },
     { icon: <Gift className="size-4" />, label: genre },
     { icon: <Mic2 className="size-4" />, label: vocalGender },
@@ -176,7 +178,7 @@ export function SongStep({
         activeVersion={activeVersion}
         coverImageUrl={resultCoverImageUrl}
         displayDuration={displayDuration}
-        heroEyebrow="Ta-da! Congratulation!"
+        heroEyebrow={copy.resultEyebrow}
         isPlaying={isPlaying}
         lyrics={generatedLyrics}
         lyricsOccasionLabel={
@@ -195,7 +197,7 @@ export function SongStep({
             providerVersionId: songVersion?.id || version,
           };
         })}
-        versionsHeading="Two takes. Pick the one that feels right."
+        versionsHeading={copy.versionsHeading}
         onPlaybackToggle={onPlaybackToggle}
         renderVersionAction={({ index, version }) => (
           <ChooseButton
@@ -213,8 +215,8 @@ export function SongStep({
               <Gift className="size-4" />
             )}
             {finalizingVersion === version.displayId
-              ? "Saving..."
-              : "Choose this one"}
+              ? copy.saving
+              : copy.chooseVersion}
           </ChooseButton>
         )}
         bottomCta={
@@ -229,19 +231,19 @@ export function SongStep({
               </span>
               <span>
                 <span className="block font-[cursive] text-base text-accent-foreground">
-                  not quite right?
+                  {copy.notQuite}
                 </span>
                 <span className="block text-base font-black text-foreground">
-                  Try fresh takes
+                  {copy.freshTakes}
                 </span>
                 <span className="block text-sm text-muted-foreground">
-                  Generate two fresh takes with the same lyrics and style.
+                  {copy.freshDescription}
                 </span>
               </span>
             </span>
             <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-black text-primary-foreground shadow-[0_12px_28px_rgba(239,62,53,0.24)] transition-[transform,box-shadow,background-color] duration-200 ease-out group-hover:rotate-3 group-hover:scale-105">
               <RefreshCw className="size-4" />
-              Respin
+              {copy.respin}
             </span>
           </button>
         }
