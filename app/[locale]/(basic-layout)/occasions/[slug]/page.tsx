@@ -5,20 +5,11 @@ import { Locale } from "@/i18n/routing";
 import { buildSongShareUrl, getFinalSongsForOwner } from "@/lib/ai/final-song";
 import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
-import {
-  getOccasionLandingConfig,
-  OCCASION_LANDING_SLUGS,
-} from "@/lib/occasion-landing-pages";
+import { getOccasionLandingConfig } from "@/lib/occasion-landing-pages";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 type Params = Promise<{ locale: string; slug: string }>;
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return OCCASION_LANDING_SLUGS.map((slug) => ({ slug }));
-}
 
 function getTimestampedLyrics(
   metadata: unknown,

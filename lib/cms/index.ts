@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import fs from 'fs';
 import matter from 'gray-matter';
 import path from 'path';
+import { getLocaleFallbackChain } from './locale-fallback';
 
 const POSTS_BATCH_SIZE = 10;
 const LOCAL_DIRECTORY_READERS: Partial<Record<PostType, (locale: string) => string>> = {
@@ -117,48 +118,52 @@ export function createCmsModule(postType: PostType) {
     slug: string,
     locale: string = DEFAULT_LOCALE
   ): Promise<GetBySlugResult> {
-    // Try local filesystem first if localDirectory is configured
-    if (localDirectory) {
-      const localFiles = await readLocalMarkdownFiles(postType, localDirectory, locale);
-      if (localFiles) {
-        const { filenames, postsDirectory } = localFiles;
-        for (const filename of filenames) {
-          const fullPath = path.join(postsDirectory, filename);
-          try {
-            const fileContents = await fs.promises.readFile(fullPath, 'utf8');
-            const { data, content } = matter(fileContents);
+    for (const sourceLocale of getLocaleFallbackChain(locale)) {
+      if (localDirectory) {
+        const localFiles = await readLocalMarkdownFiles(postType, localDirectory, sourceLocale);
+        if (localFiles) {
+          const { filenames, postsDirectory } = localFiles;
+          for (const filename of filenames) {
+            const fullPath = path.join(postsDirectory, filename);
+            try {
+              const fileContents = await fs.promises.readFile(fullPath, 'utf8');
+              const { data, content } = matter(fileContents);
 
-            const localSlug = (data.slug || '').replace(/^\//, '').replace(/\/$/, '');
-            const targetSlug = slug.replace(/^\//, '').replace(/\/$/, '');
+              const localSlug = (data.slug || '').replace(/^\//, '').replace(/\/$/, '');
+              const targetSlug = slug.replace(/^\//, '').replace(/\/$/, '');
 
-            if (localSlug === targetSlug && data.status !== 'draft') {
-              return {
-                post: mapLocalFileToPostBase(data, content, locale),
-                error: undefined,
-                errorCode: undefined,
-              };
+              if (localSlug === targetSlug && data.status !== 'draft') {
+                return {
+                  post: mapLocalFileToPostBase(data, content, sourceLocale),
+                  error: undefined,
+                  errorCode: undefined,
+                };
+              }
+            } catch (error) {
+              console.error(`Error processing local file ${filename}:`, error);
             }
-          } catch (error) {
-            console.error(`Error processing local file ${filename}:`, error);
           }
         }
       }
     }
 
-    // Fall back to server
-    const serverResult = await getPublishedPostBySlugAction({ slug, locale, postType });
+    for (const sourceLocale of getLocaleFallbackChain(locale)) {
+      const serverResult = await getPublishedPostBySlugAction({
+        slug,
+        locale: sourceLocale,
+        postType,
+      });
 
-    if (serverResult.success && serverResult.data?.post) {
-      return {
-        post: mapServerPostToPostBase(serverResult.data.post, locale),
-        error: undefined,
-        errorCode: serverResult.customCode,
-      };
-    } else if (!serverResult.success) {
-      return { post: null, error: serverResult.error, errorCode: serverResult.customCode };
-    } else {
-      return { post: null, error: `${postType} not found (unexpected server response).`, errorCode: undefined };
+      if (serverResult.success && serverResult.data?.post) {
+        return {
+          post: mapServerPostToPostBase(serverResult.data.post, sourceLocale),
+          error: undefined,
+          errorCode: serverResult.customCode,
+        };
+      }
     }
+
+    return { post: null, error: `${postType} not found.`, errorCode: undefined };
   }
 
   /**
@@ -170,34 +175,33 @@ export function createCmsModule(postType: PostType) {
       return { posts: [] };
     }
 
-    const localFiles = await readLocalMarkdownFiles(postType, localDirectory, locale);
-
-    if (!localFiles) {
-      return { posts: [] };
-    }
-
-    const { filenames, postsDirectory } = localFiles;
-
     let allPosts: PostBase[] = [];
+    for (const sourceLocale of getLocaleFallbackChain(locale)) {
+      const localFiles = await readLocalMarkdownFiles(postType, localDirectory, sourceLocale);
+      if (!localFiles) continue;
 
-    // Read files in batches
-    for (let i = 0; i < filenames.length; i += POSTS_BATCH_SIZE) {
-      const batchFilenames = filenames.slice(i, i + POSTS_BATCH_SIZE);
-
-      const batchPosts: PostBase[] = await Promise.all(
-        batchFilenames.map(async (filename) => {
-          const fullPath = path.join(postsDirectory, filename);
-          const fileContents = await fs.promises.readFile(fullPath, 'utf8');
-          const { data, content } = matter(fileContents);
-          return mapLocalFileToPostBase(data, content, locale);
-        })
-      );
-
-      allPosts.push(...batchPosts);
+      const { filenames, postsDirectory } = localFiles;
+      for (let i = 0; i < filenames.length; i += POSTS_BATCH_SIZE) {
+        const batchFilenames = filenames.slice(i, i + POSTS_BATCH_SIZE);
+        const batchPosts = await Promise.all(
+          batchFilenames.map(async (filename) => {
+            const fullPath = path.join(postsDirectory, filename);
+            const fileContents = await fs.promises.readFile(fullPath, 'utf8');
+            const { data, content } = matter(fileContents);
+            return mapLocalFileToPostBase(data, content, sourceLocale);
+          })
+        );
+        allPosts.push(...batchPosts);
+      }
     }
 
-    // Filter out non-published articles
-    allPosts = allPosts.filter(post => post.status === 'published');
+    allPosts = Array.from(
+      new Map(
+        allPosts
+          .filter(post => post.status === 'published')
+          .map(post => [post.slug.replace(/^\//, '').replace(/\/$/, ''), post])
+      ).values()
+    );
 
     // Sort posts by isPinned and publishedAt
     allPosts = allPosts.sort((a, b) => {
@@ -249,44 +253,50 @@ export function createCmsModule(postType: PostType) {
     slug: string,
     locale: string = DEFAULT_LOCALE
   ): Promise<GetMetadataResult> {
-    // Try local filesystem first if localDirectory is configured
-    if (localDirectory) {
-      const localFiles = await readLocalMarkdownFiles(postType, localDirectory, locale);
-      if (localFiles) {
-        const { filenames, postsDirectory } = localFiles;
-        for (const filename of filenames) {
-          const fullPath = path.join(postsDirectory, filename);
-          try {
-            const fileContents = await fs.promises.readFile(fullPath, 'utf8');
-            const { data } = matter(fileContents);
+    for (const sourceLocale of getLocaleFallbackChain(locale)) {
+      if (localDirectory) {
+        const localFiles = await readLocalMarkdownFiles(postType, localDirectory, sourceLocale);
+        if (localFiles) {
+          const { filenames, postsDirectory } = localFiles;
+          for (const filename of filenames) {
+            const fullPath = path.join(postsDirectory, filename);
+            try {
+              const fileContents = await fs.promises.readFile(fullPath, 'utf8');
+              const { data } = matter(fileContents);
 
-            const localSlug = (data.slug || '').replace(/^\//, '').replace(/\/$/, '');
-            const targetSlug = slug.replace(/^\//, '').replace(/\/$/, '');
+              const localSlug = (data.slug || '').replace(/^\//, '').replace(/\/$/, '');
+              const targetSlug = slug.replace(/^\//, '').replace(/\/$/, '');
 
-            if (localSlug === targetSlug && data.status !== 'draft') {
-              return {
-                metadata: {
-                  title: data.title,
-                  description: data.description || null,
-                  featuredImageUrl: data.featuredImageUrl || null,
-                  visibility: data.visibility || 'public',
-                },
-              };
+              if (localSlug === targetSlug && data.status !== 'draft') {
+                return {
+                  metadata: {
+                    title: data.title,
+                    description: data.description || null,
+                    featuredImageUrl: data.featuredImageUrl || null,
+                    visibility: data.visibility || 'public',
+                  },
+                };
+              }
+            } catch (error) {
+              console.error(`Error processing local file ${filename}:`, error);
             }
-          } catch (error) {
-            console.error(`Error processing local file ${filename}:`, error);
           }
         }
       }
     }
 
-    // Fall back to server
-    const serverResult = await getPostMetadataAction({ slug, locale, postType });
+    for (const sourceLocale of getLocaleFallbackChain(locale)) {
+      const serverResult = await getPostMetadataAction({
+        slug,
+        locale: sourceLocale,
+        postType,
+      });
 
-    if (serverResult.success && serverResult.data?.metadata) {
-      return {
-        metadata: serverResult.data.metadata,
-      };
+      if (serverResult.success && serverResult.data?.metadata) {
+        return {
+          metadata: serverResult.data.metadata,
+        };
+      }
     }
 
     return { metadata: null };

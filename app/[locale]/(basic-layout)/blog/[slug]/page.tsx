@@ -333,6 +333,7 @@ const BlogPostCard = ({ post }: { post: PostBase }) => (
 
 export async function generateStaticParams() {
   const allParams: { locale: string; slug: string }[] = [];
+  const allSlugs = new Set<string>();
 
   for (const locale of LOCALES) {
     const { posts: localPosts } = await blogCms.getLocalList(locale);
@@ -341,6 +342,7 @@ export async function generateStaticParams() {
       .forEach((post) => {
         const slugPart = post.slug.replace(/^\//, "").replace(/^blogs\//, "");
         if (slugPart) {
+          allSlugs.add(slugPart);
           allParams.push({ locale, slug: slugPart });
         }
       });
@@ -356,9 +358,16 @@ export async function generateStaticParams() {
       serverResult.data.posts.forEach((post) => {
         const slugPart = post.slug?.replace(/^\//, "").replace(/^blogs\//, "");
         if (slugPart) {
+          allSlugs.add(slugPart);
           allParams.push({ locale, slug: slugPart });
         }
       });
+    }
+  }
+
+  for (const slug of allSlugs) {
+    for (const locale of LOCALES) {
+      allParams.push({ locale, slug });
     }
   }
 
