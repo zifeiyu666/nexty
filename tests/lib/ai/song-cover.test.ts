@@ -36,10 +36,12 @@ describe("song cover generation helpers", () => {
     assert.doesNotMatch(prompt, /Mia's Birthday Song/);
     assert.doesNotMatch(prompt, /Mia dances under kitchen lights/);
     assert.match(prompt, /hand-painted gouache/i);
-    assert.match(prompt, /treasured handmade keepsake/i);
-    assert.match(prompt, /"For Mia"/);
-    assert.match(prompt, /no other readable text/i);
+    assert.doesNotMatch(prompt, /treasured handmade keepsake/i);
+    assert.doesNotMatch(prompt, /"For Mia"/);
+    assert.match(prompt, /one clear central subject/i);
+    assert.match(prompt, /no text, logo, or watermark/i);
     assert.match(prompt, /square album cover/i);
+    assert.ok(prompt.length < 500);
   });
 
   test("normalizes plain prompt text and rejects empty output", () => {
@@ -89,7 +91,7 @@ describe("song cover generation helpers", () => {
         {
           async generateImage(prompt) {
             assert.match(prompt, /red balloons/i);
-            assert.match(prompt, /no other readable text/i);
+            assert.match(prompt, /no text, logo, or watermark/i);
             return "https://replicate.delivery/generated.webp";
           },
           async uploadImage(_externalUrl, key) {

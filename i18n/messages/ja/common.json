@@ -83,6 +83,7 @@
     "heroTitleLine1": "大切な人に贈る歌の",
     "heroTitleLine2": "アイデアとガイド",
     "emptyMessage": "記事が見つかりません。",
+    "allArticles": "すべての記事を見る >",
     "BlogDetail": {
       "featured": "注目の記事",
       "viewCount": "{count}回閲覧",
@@ -194,11 +195,11 @@
             "href": "/music/personalized-gift",
             "description": "オリジナルソング、動画、歌詞アートを組み合わせた贈り物。"
           },
-          {
-            "name": "歌詞アート",
-            "href": "/lyricwallart",
-            "description": "オリジナル歌詞を印刷できるアート作品に。"
-          }
+        {
+          "name": "オリジナル歌詞ギフト",
+          "href": "/free-custom-song-lyric-gifts",
+          "description": "オリジナル歌詞を印刷できるアートや記念品に。"
+        }
         ]
       }
     ]
@@ -243,6 +244,7 @@
     "Links": {
       "groups": [
         {
+          "id": "products",
           "title": "サービス",
           "links": [
             { "href": "/#features", "name": "ギフト機能" },
@@ -255,6 +257,7 @@
           ]
         },
         {
+          "id": "gift-ideas",
           "title": "ギフトアイデア",
           "links": [
             { "name": "AIソング試聴ツール", "href": "/create-song" },
@@ -288,10 +291,17 @@
               "href": "/music/personalized-gift"
             },
             { "name": "ギフト用プレイリスト", "href": "/playlists" },
-            { "name": "歌詞アート", "href": "/lyricwallart" }
+            {
+              "name": "オリジナル歌詞ギフト",
+              "href": "/free-custom-song-lyric-gifts"
+            }
           ]
         },
-        { "title": "記事", "links": [{ "href": "/blog", "name": "ブログ" }] }
+        {
+          "id": "articles",
+          "title": "記事",
+          "links": [{ "href": "/blog", "name": "ブログ" }]
+        }
       ]
     }
   },

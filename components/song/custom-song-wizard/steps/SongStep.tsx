@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { SongGenerationPage } from "../components/wizard-ui";
+import { getLanguageDisplayName } from "../constants";
 import type {
   CaptureLeadResponse,
   Occasion,
@@ -168,7 +169,10 @@ export function SongStep({
     },
     { icon: <Gift className="size-4" />, label: genre },
     { icon: <Mic2 className="size-4" />, label: vocalGender },
-    { icon: <Languages className="size-4" />, label: language },
+    {
+      icon: <Languages className="size-4" />,
+      label: getLanguageDisplayName(language),
+    },
   ];
 
   return (

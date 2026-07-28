@@ -306,7 +306,7 @@ Recommend one painting or visual-art direction that turns the user's story into 
 - dreamy-watercolor: luminous washes, gentle transitions, and poetic emotional imagery
 - vintage-photo-album: refined analog-photo character with subtle archival texture
 
-Derive the subject, mood, palette, lighting, composition, and gift feeling from the user's real story. Do not mention a living artist, brand, copyrighted character, existing artwork, album title, lettering, or typography. Reserve subtle visual breathing room in the lower-right area for a short personal dedication that will be added later.
+Create a deliberately simple visual direction for an image model with limited instruction-following. Use short English phrases only: one concrete subject (up to 16 words), then mood, palette, and lighting (up to 8 words each). Keep one clear central subject and avoid lists, multiple scenes, tiny details, text, lettering, logos, watermarks, or a dedication.
 
 [Required Output]
 Return only one valid JSON object with exactly this structure. Do not use markdown fences or add commentary:
@@ -315,13 +315,13 @@ Return only one valid JSON object with exactly this structure. Do not use markdo
   "lyrics": "complete lyrics using \\n for line breaks and English section tags such as [Verse 1]",
   "coverArt": {
     "style": "one curated style identifier",
-    "styleDescription": "specific English description of the selected visual medium and texture",
-    "subject": "specific symbolic scene derived only from the user's story",
-    "mood": "emotional atmosphere",
-    "palette": "cohesive color palette",
-    "lighting": "lighting direction",
-    "composition": "square album-cover composition with dedication space",
-    "giftFeeling": "how the artwork should feel personal, handmade, premium, and gift-ready"
+    "styleDescription": "short visual-medium phrase",
+    "subject": "one concrete scene or object, 16 words maximum",
+    "mood": "short mood phrase, 8 words maximum",
+    "palette": "short color phrase, 8 words maximum",
+    "lighting": "short lighting phrase, 8 words maximum",
+    "composition": "simple central-subject composition",
+    "giftFeeling": "three short feeling adjectives"
   }
 }`;
 }

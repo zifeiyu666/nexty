@@ -55,14 +55,13 @@ import type {
 import { cn } from "@/lib/utils";
 
 import {
-  lyricGenerationSteps,
-  relationshipOptions,
   stepVariants,
   steps,
   storyHelperSteps,
 } from "../constants";
 import type { LanguageOption, WizardStep } from "../types";
 import {
+  getLocalizedRelationshipOptions,
   localizedRelationshipLabel,
   useWizardCopy,
   useWizardLocale,
@@ -1139,13 +1138,19 @@ export function RelationshipCreatableSelect({
   const [query, setQuery] = useState("");
   const trimmedQuery = query.trim();
   const selectedValue = value.trim();
-  const filteredOptions = relationshipOptions.filter((option) =>
-    option.toLowerCase().includes(trimmedQuery.toLowerCase()),
+  const selectedLabel = localizedRelationshipLabel(
+    locale,
+    selectedValue,
+    selectedValue,
   );
+  const filteredOptions = getLocalizedRelationshipOptions(locale, trimmedQuery);
   const canCreate =
     trimmedQuery &&
-    !relationshipOptions.some(
-      (option) => option.toLowerCase() === trimmedQuery.toLowerCase(),
+    !getLocalizedRelationshipOptions(locale).some(
+      ({ label, value: optionValue }) =>
+        label.toLocaleLowerCase(locale) ===
+          trimmedQuery.toLocaleLowerCase(locale) ||
+        optionValue.toLowerCase() === trimmedQuery.toLowerCase(),
     );
 
   function selectRelationship(nextValue: string) {
@@ -1159,7 +1164,7 @@ export function RelationshipCreatableSelect({
       open={open}
       onOpenChange={(nextOpen) => {
         setOpen(nextOpen);
-        setQuery(nextOpen ? selectedValue : "");
+        setQuery(nextOpen ? selectedLabel : "");
       }}
     >
       <PopoverTrigger asChild>
@@ -1171,7 +1176,7 @@ export function RelationshipCreatableSelect({
           type="button"
         >
           <span className="min-w-0 flex-1 truncate">
-            {selectedValue || placeholder}
+            {selectedLabel || placeholder}
           </span>
           <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
         </button>
@@ -1194,26 +1199,26 @@ export function RelationshipCreatableSelect({
               <CommandGroup>
                 <CommandItem onSelect={() => selectRelationship(trimmedQuery)}>
                   <Plus className="size-4 text-primary" />
-                  Use &quot;{trimmedQuery}&quot;
+                  {copy.useRelationship} &quot;{trimmedQuery}&quot;
                 </CommandItem>
               </CommandGroup>
             )}
             <CommandGroup heading={copy.commonRelationships}>
               {filteredOptions.map((option) => (
                 <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={() => selectRelationship(option)}
+                  key={option.value}
+                  value={option.label}
+                  onSelect={() => selectRelationship(option.value)}
                 >
                   <Check
                     className={cn(
                       "size-4 text-primary",
-                      selectedValue.toLowerCase() === option.toLowerCase()
+                      selectedValue.toLowerCase() === option.value.toLowerCase()
                         ? "opacity-100"
                         : "opacity-0",
                     )}
                   />
-                  {localizedRelationshipLabel(locale, option, option)}
+                  {option.label}
                 </CommandItem>
               ))}
             </CommandGroup>

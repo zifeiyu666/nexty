@@ -1,18 +1,16 @@
 import "server-only";
 
 import { blogCms } from "@/lib/cms";
+import {
+  isArticlesFooterGroup,
+  isArticlesHeaderLink,
+} from "@/lib/cms/article-navigation-utils";
 import type { FooterLink, HeaderLink } from "@/types/common";
 import type { PostBase, PublicPost } from "@/types/cms";
 import { getTranslations } from "next-intl/server";
 import { cache } from "react";
 
 const ARTICLE_LINK_LIMIT = 6;
-const ALL_ARTICLES_LINK: HeaderLink = {
-  id: "all-articles",
-  name: "all articles >",
-  href: "/blog",
-};
-
 type NavigationPost = Pick<
   PostBase,
   "title" | "slug" | "status" | "isPinned" | "publishedAt"
@@ -36,14 +34,6 @@ function toTime(value: Date | string | null | undefined) {
 
 function postTime(post: NavigationPost) {
   return toTime(post.publishedAt) || toTime(post.createdAt);
-}
-
-function isArticlesHeaderLink(link: HeaderLink) {
-  return link.id === "articles" || link.name === "Articles";
-}
-
-function isArticlesFooterGroup(group: FooterLink) {
-  return group.title === "Articles";
 }
 
 function withPricingPath<T extends { id?: string; href?: string; items?: T[] }>(
@@ -113,6 +103,13 @@ export const getArticleNavigationLinks = cache(
     locale: string,
     limit: number = ARTICLE_LINK_LIMIT
   ): Promise<HeaderLink[]> => {
+    const tBlogs = await getTranslations({ locale, namespace: "Blogs" });
+    const allArticlesLink: HeaderLink = {
+      id: "all-articles",
+      name: tBlogs("allArticles"),
+      href: "/blog",
+    };
+
     try {
       const [{ posts: localPosts }, { posts: serverPosts }] =
         await Promise.all([
@@ -154,10 +151,10 @@ export const getArticleNavigationLinks = cache(
           href: `/blog/${slug}`,
         }));
 
-      return [...articleLinks, ALL_ARTICLES_LINK];
+      return [...articleLinks, allArticlesLink];
     } catch (error) {
       console.error("Failed to build article navigation links:", error);
-      return [ALL_ARTICLES_LINK];
+      return [allArticlesLink];
     }
   }
 );

@@ -127,6 +127,7 @@
     "heroTitleLine1": "Ideas, guides, and stories",
     "heroTitleLine2": "for meaningful song gifts",
     "emptyMessage": "No posts found.",
+    "allArticles": "All articles >",
     "BlogDetail": {
       "featured": "Featured Post",
       "viewCount": "{count} views",
@@ -424,6 +425,7 @@
     "Links": {
       "groups": [
         {
+          "id": "products",
           "title": "Products",
           "links": [
             {
@@ -458,6 +460,7 @@
           ]
         },
         {
+          "id": "gift-ideas",
           "title": "Gift Ideas",
           "links": [
             {
@@ -519,6 +522,7 @@
           ]
         },
         {
+          "id": "articles",
           "title": "Articles",
           "links": [
             {

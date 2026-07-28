@@ -54,6 +54,7 @@ export type GenreOption = {
 
 export type LanguageOption = {
   code: string;
+  value: string;
   label: string;
 };
 

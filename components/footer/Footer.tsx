@@ -166,7 +166,7 @@ export default async function Footer() {
             </div>
 
             {footerLinks.map((section) => {
-              const isArticlesSection = section.title === "Articles";
+              const isArticlesSection = section.id === "articles";
               const linkClassName = cn(
                 "text-white/62 transition-colors hover:text-white",
                 isArticlesSection && "block max-w-sm line-clamp-2 leading-5"

@@ -47,23 +47,6 @@ type GenerateSongCoverDependencies = {
 };
 
 export function buildSongCoverPromptRequest(input: SongCoverGenerationInput) {
-  const recipientNames = input.recipientNames
-    .map((name) =>
-      name
-        .replace(/[\r\n"\\]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 40),
-    )
-    .filter(Boolean)
-    .slice(0, 3);
-  const recipientLabel =
-    recipientNames.length <= 1
-      ? recipientNames[0] || "Someone Special"
-      : recipientNames.length === 2
-        ? recipientNames.join(" & ")
-        : `${recipientNames.slice(0, -1).join(", ")} & ${recipientNames.at(-1)}`;
-  const dedication = `For ${recipientLabel}`;
   const art: SongCoverArtDirection = input.coverArt ?? {
     style: "cinematic-keepsake",
     styleDescription:
@@ -78,26 +61,14 @@ export function buildSongCoverPromptRequest(input: SongCoverGenerationInput) {
   };
 
   return [
-    "Create a premium square album cover designed as a deeply personal gift.",
-    "",
-    "Personal dedication:",
-    `- Include exactly one small, elegant handwritten inscription reading "${dedication}".`,
-    "- Spell the dedication exactly as written, preserving capitalization.",
-    "- Integrate it naturally into the lower-right area like a tasteful personal signature on a keepsake.",
-    "- Include no other readable text, letters, words, title, logo, caption, watermark, or signature.",
-    "",
-    `Selected visual style: ${art.style}.`,
-    `Medium and texture: ${art.styleDescription}.`,
-    `Subject: ${art.subject}.`,
-    `Mood: ${art.mood}.`,
-    `Color palette: ${art.palette}.`,
-    `Lighting: ${art.lighting}.`,
-    `Composition: ${art.composition}.`,
-    `Gift feeling: ${art.giftFeeling}.`,
-    "",
-    "Use no celebrity, living artist style, brand, copyrighted character, or imitation of existing artwork.",
-    "Keep the result emotionally specific, polished, cohesive, and framed for a 1:1 album cover.",
-  ].join("\n");
+    "Square album cover.",
+    art.styleDescription,
+    art.subject,
+    art.mood,
+    art.palette,
+    art.lighting,
+    "One clear central subject, simple composition, no text, logo, or watermark.",
+  ].join(" ");
 }
 
 export function normalizeSongCoverPrompt(value: string) {

@@ -4,6 +4,31 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 
 describe("CustomSongWizard lyric version comparison", () => {
+  test("keeps a server-authenticated user signed in while the client session loads", () => {
+    const wizardSource = readFileSync(
+      join(process.cwd(), "components/song/CustomSongWizard.tsx"),
+      "utf8",
+    );
+    const pageSource = readFileSync(
+      join(
+        process.cwd(),
+        "app/[locale]/(basic-layout)/create-song/page.tsx",
+      ),
+      "utf8",
+    );
+
+    assert.match(pageSource, /import \{ getSession \} from "@\/lib\/auth\/server"/);
+    assert.match(pageSource, /const \[t, session\] = await Promise\.all\(/);
+    assert.match(pageSource, /getSession\(\)/);
+    assert.match(pageSource, /initialIsAuthenticated=\{Boolean\(session\?\.user\)\}/);
+    assert.match(wizardSource, /isPending: isSessionPending/);
+    assert.match(wizardSource, /const isLoggedIn = Boolean\(session\?\.user\) \|\| initialIsAuthenticated/);
+    assert.match(
+      wizardSource,
+      /disabled=\{!canContinue \|\| \(isSessionPending && !initialIsAuthenticated\)\}/,
+    );
+  });
+
   test("saves a personal note with visible feedback and finalizes it with the song", () => {
     const wizardSource = readFileSync(
       join(process.cwd(), "components/song/CustomSongWizard.tsx"),
@@ -468,7 +493,7 @@ describe("CustomSongWizard lyric version comparison", () => {
     assert.match(storyStepSource, /underline decoration-primary/);
   });
 
-  test("story actions stay on one row and hide decorative icons on mobile", () => {
+  test("story controls stay visually grouped and voice intro playback is enhanced", () => {
     const storyStepSource = readFileSync(
       join(
         process.cwd(),
@@ -479,13 +504,17 @@ describe("CustomSongWizard lyric version comparison", () => {
 
     assert.match(
       storyStepSource,
-      /flex flex-nowrap items-center gap-2 sm:gap-3/,
+      /mb-2 flex flex-wrap items-center gap-2 sm:gap-3/,
     );
     assert.equal(
       storyStepSource.match(/hidden size-5[^\"]*sm:block/g)?.length,
       5,
     );
     assert.match(storyStepSource, /hidden text-sm[^\"]*sm:inline/);
+    assert.match(storyStepSource, /Playing your intro/);
+    assert.match(storyStepSource, /Voice intro ready/);
+    assert.match(storyStepSource, /activeTranscriptSegmentIndex/);
+    assert.match(storyStepSource, /translateY\(-\$\{activeTranscriptSegmentIndex \* 1\.9\}rem\)/);
   });
 
   test("story helper generates a GPT story with local fallback", () => {

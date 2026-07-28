@@ -121,16 +121,29 @@ function createLyricBlocks(lyrics: string) {
 
   pushBlock();
 
-  const columns: LyricBlock[][] = [[], []];
-  const columnWeights = [0, 0];
+  if (blocks.length < 2) return [blocks, []];
 
-  blocks.forEach((block) => {
-    const columnIndex = columnWeights[0] <= columnWeights[1] ? 0 : 1;
-    columns[columnIndex].push(block);
-    columnWeights[columnIndex] += block.weight;
-  });
+  const targetWeight =
+    blocks.reduce((total, block) => total + block.weight, 0) / 2;
+  let firstColumnWeight = 0;
+  let splitIndex = 1;
 
-  return columns;
+  // Keep the song's reading order intact: fill the left column before continuing on the right.
+  for (let index = 0; index < blocks.length - 1; index += 1) {
+    const nextWeight = firstColumnWeight + blocks[index].weight;
+
+    if (
+      Math.abs(nextWeight - targetWeight) <=
+      Math.abs(firstColumnWeight - targetWeight)
+    ) {
+      firstColumnWeight = nextWeight;
+      splitIndex = index + 1;
+    } else {
+      break;
+    }
+  }
+
+  return [blocks.slice(0, splitIndex), blocks.slice(splitIndex)];
 }
 
 function formatPlaybackTime(seconds: number) {

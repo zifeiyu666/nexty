@@ -9,6 +9,7 @@ export interface HeaderLink {
 }
 
 export interface FooterLink {
+  id?: string;
   title: string;
   links: Link[];
 };

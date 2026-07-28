@@ -62,6 +62,7 @@
     "heroTitleLine1": "Ideas, guías e historias",
     "heroTitleLine2": "para regalar canciones con significado",
     "emptyMessage": "No se encontraron artículos.",
+    "allArticles": "Ver todos los artículos >",
     "BlogDetail": {
       "featured": "Artículo destacado", "viewCount": "{count} visualizaciones", "accessRestricted": "Acceso restringido",
       "unauthorized": "Este artículo solo está disponible para usuarios con sesión iniciada", "premium": "Contenido premium",
@@ -103,7 +104,7 @@
         {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song", "description": "Crea una canción de cumpleaños con nombres, historias y recuerdos."},
         {"name": "Canciones de aniversario", "href": "/occasions/anniversary", "description": "Convierte vuestra historia en una canción de aniversario para escuchar una y otra vez."},
         {"name": "Regalos musicales personalizados", "href": "/music/personalized-gift", "description": "Descubre canciones, vídeos y recuerdos personalizados para amantes de la música."},
-        {"name": "Láminas con letras", "href": "/lyricwallart", "description": "Convierte tu letra personalizada en una lámina lista para imprimir."}
+        {"name": "Regalos con letras personalizadas", "href": "/free-custom-song-lyric-gifts", "description": "Convierte letras personalizadas en láminas imprimibles y recuerdos únicos."}
       ]}
     ]
   },
@@ -114,6 +115,48 @@
       "title": "Recibe nuestras novedades", "description": "Ideas de regalo y novedades de One Custom Song directamente en tu correo.",
       "subscribe": {"invalidEmail": "Introduce un correo válido", "defaultErrorMessage": "No pudimos completar la suscripción. Inténtalo más tarde", "successMessage": "Te has suscrito correctamente", "multipleSubmissions": "Demasiados intentos. Vuelve a probar mañana"},
       "unsubscribe": {"title": "Cancelar suscripción", "success": "Has cancelado tu suscripción a los correos de One Custom Song.", "emailPrefix": "Correo:", "regretMessage": "Puedes volver a suscribirte cuando quieras.", "errorGeneric": "No pudimos procesar la solicitud", "errorNoToken": "Falta el código de cancelación", "errorMessage": "Comprueba que has usado el enlace correcto. Si el problema continúa, contacta con soporte.", "contactPrefix": "Escríbenos a:", "contactPrefixSuccess": "Si tienes alguna pregunta, escríbenos a:"}
+    },
+    "Links": {
+      "groups": [
+        {
+          "id": "products",
+          "title": "Productos",
+          "links": [
+            {"href": "/#features", "name": "Funciones para regalos"},
+            {"id": "pricing", "href": "/#pricing", "name": "Precios"},
+            {"href": "/songs", "name": "Mis canciones"},
+            {"href": "/samples", "name": "Mis muestras"},
+            {"isSubTitle": true, "name": "Recursos"},
+            {"href": "/blog", "name": "Todos los artículos"},
+            {"href": "/glossary", "name": "Glosario"}
+          ]
+        },
+        {
+          "id": "gift-ideas",
+          "title": "Ideas de regalo",
+          "links": [
+            {"name": "Herramienta de muestra con IA", "href": "/create-song"},
+            {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song"},
+            {"name": "Canciones de aniversario", "href": "/occasions/anniversary"},
+            {"name": "Canciones para el Día de la Madre", "href": "/occasions/mothers-day"},
+            {"name": "Canciones para el Día del Padre", "href": "/occasions/fathers-day"},
+            {"name": "Canciones de San Valentín", "href": "/occasions/valentines-day"},
+            {"name": "Canciones de felicitación", "href": "/occasions/congratulations"},
+            {"name": "Canciones para bodas", "href": "/occasions/wedding"},
+            {"name": "Canciones en memoria", "href": "/occasions/in-memoriam"},
+            {"name": "Canciones de agradecimiento", "href": "/occasions/thank-you"},
+            {"name": "Canciones para desear una pronta recuperación", "href": "/occasions/get-well-soon"},
+            {"name": "Regalos musicales personalizados", "href": "/music/personalized-gift"},
+            {"name": "Listas de reproducción para regalar", "href": "/playlists"},
+            {"name": "Regalos con letras personalizadas", "href": "/free-custom-song-lyric-gifts"}
+          ]
+        },
+        {
+          "id": "articles",
+          "title": "Artículos",
+          "links": [{"href": "/blog", "name": "Blog"}]
+        }
+      ]
     }
   },
   "CreateSong": {

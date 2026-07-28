@@ -198,8 +198,8 @@ export function StyleStep({
             <LanguageChip
               key={item.code}
               language={item}
-              selected={language === item.label}
-              onClick={() => onLanguageChange(item.label)}
+              selected={language === item.value}
+              onClick={() => onLanguageChange(item.value)}
             />
           ))}
         </div>
@@ -224,9 +224,9 @@ export function StyleStep({
               <LanguageChip
                 key={item.code}
                 language={item}
-                selected={language === item.label}
+                selected={language === item.value}
                 showCode
-                onClick={() => onLanguageChange(item.label)}
+                onClick={() => onLanguageChange(item.value)}
               />
             ))}
           </div>

@@ -101,11 +101,15 @@ import {
 
 const CREATE_SONG_LYRICS_PATH = "/create-song?step=lyrics";
 
-export function CustomSongWizard() {
+export function CustomSongWizard({
+  initialIsAuthenticated = false,
+}: {
+  initialIsAuthenticated?: boolean;
+}) {
   const copy = useWizardCopy();
   const wizardLocale = useWizardLocale();
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: isSessionPending } = authClient.useSession();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const storyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const speechRecognitionRef = useRef<any>(null);
@@ -132,6 +136,8 @@ export function CustomSongWizard() {
   const [spokenIntro, setSpokenIntro] = useState<SpokenIntroDraft | null>(null);
   const [isRecordingBlessing, setIsRecordingBlessing] = useState(false);
   const [isUploadingBlessing, setIsUploadingBlessing] = useState(false);
+  const [isBlessingPlaying, setIsBlessingPlaying] = useState(false);
+  const [blessingPlaybackTime, setBlessingPlaybackTime] = useState(0);
   const [songTitle, setSongTitle] = useState("");
   const [generatedLyrics, setGeneratedLyrics] = useState("");
   const [isNewLyricsVersionDialogOpen, setIsNewLyricsVersionDialogOpen] =
@@ -231,7 +237,7 @@ export function CustomSongWizard() {
     [cleanRecipientList],
   );
   const recipientLabel = recipientNameList.join(" and ") || "your";
-  const isLoggedIn = Boolean(session?.user);
+  const isLoggedIn = Boolean(session?.user) || initialIsAuthenticated;
   const lyrics = leadData?.lyrics?.length ? leadData.lyrics : fallbackLyrics;
   const songVersions = leadData?.versions?.length
     ? leadData.versions
@@ -859,6 +865,32 @@ export function CustomSongWizard() {
 
   useStopSpeechRecognitionOnUnmount({ speechRecognitionRef });
 
+  useEffect(() => {
+    const audio = blessingAudioRef.current;
+    if (!audio) return;
+
+    const handleTimeUpdate = () =>
+      setBlessingPlaybackTime(Number(audio.currentTime.toFixed(2)));
+    const handlePlay = () => setIsBlessingPlaying(true);
+    const handlePause = () => setIsBlessingPlaying(false);
+    const handleEnded = () => {
+      setIsBlessingPlaying(false);
+      setBlessingPlaybackTime(0);
+    };
+
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [spokenIntro?.audioUrl]);
+
   const activeLyricIndex = lyrics.reduce((activeIndex, lyric, index) => {
     return previewTime >= lyric.time ? index : activeIndex;
   }, 0);
@@ -1217,6 +1249,8 @@ export function CustomSongWizard() {
         audioUrl: upload.publicObjectUrl,
         ...transcription,
       });
+      setBlessingPlaybackTime(0);
+      setIsBlessingPlaying(false);
       setSpokenBlessing(transcription.transcript);
       toast.success(localizedWizardMessage(wizardLocale, "Your voice blessing is ready."));
     } catch (error) {
@@ -1281,8 +1315,16 @@ export function CustomSongWizard() {
     if (!spokenIntro) return;
     const audio = blessingAudioRef.current;
     if (!audio) return;
-    if (audio.paused) void audio.play();
-    else audio.pause();
+    if (audio.paused) {
+      audio.currentTime = Math.min(audio.currentTime, spokenIntro.durationSeconds);
+      void audio.play().catch(() => {
+        setIsBlessingPlaying(false);
+        toast.error(localizedWizardMessage(wizardLocale, "Unable to play your voice intro."));
+      });
+      return;
+    }
+
+    audio.pause();
   }
 
   function updateSpokenBlessing(value: string) {
@@ -1803,7 +1845,9 @@ export function CustomSongWizard() {
           {step === 3 && (
             <StepFrame key="story">
               <StoryStep
+                blessingPlaybackTime={blessingPlaybackTime}
                 isRecording={isRecording}
+                isBlessingPlaying={isBlessingPlaying}
                 isRecordingBlessing={isRecordingBlessing}
                 isUploadingBlessing={isUploadingBlessing}
                 isPolishingStory={isPolishingStory}
@@ -1828,6 +1872,10 @@ export function CustomSongWizard() {
                 ref={blessingAudioRef}
                 preload="metadata"
                 src={spokenIntro?.audioUrl}
+                onEmptied={() => {
+                  setIsBlessingPlaying(false);
+                  setBlessingPlaybackTime(0);
+                }}
               />
             </StepFrame>
           )}
@@ -1925,7 +1973,7 @@ export function CustomSongWizard() {
             </Button>
             <Button
               className="h-12 flex-1 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-xl shadow-primary/20 hover:bg-primary/90 disabled:bg-primary/30"
-              disabled={!canContinue}
+              disabled={!canContinue || (isSessionPending && !initialIsAuthenticated)}
               type="button"
               onClick={goForward}
             >

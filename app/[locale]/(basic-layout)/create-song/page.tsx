@@ -1,5 +1,6 @@
 import CustomSongWizard from "@/components/song/CustomSongWizard";
 import { Locale } from "@/i18n/routing";
+import { getSession } from "@/lib/auth/server";
 import { constructMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -23,7 +24,10 @@ export async function generateMetadata({
 }
 
 export default async function CreateSongPage() {
-  const t = await getTranslations("CreateSong");
+  const [t, session] = await Promise.all([
+    getTranslations("CreateSong"),
+    getSession(),
+  ]);
 
   return (
     <div className="w-full min-h-screen bg-background">
@@ -31,7 +35,7 @@ export default async function CreateSongPage() {
         <h1 id="create-song-title">{t("srTitle")}</h1>
         <p>{t("srDescription")}</p>
       </section>
-      <CustomSongWizard />
+      <CustomSongWizard initialIsAuthenticated={Boolean(session?.user)} />
     </div>
   );
 }

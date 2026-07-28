@@ -63,6 +63,9 @@ describe("song lyrics prompt", () => {
     assert.match(prompt, /heirloom-storybook/);
     assert.match(prompt, /hand-painted-gouache/);
     assert.match(prompt, /coverArt/);
+    assert.match(prompt, /limited instruction-following/i);
+    assert.match(prompt, /16 words maximum/i);
+    assert.doesNotMatch(prompt, /lower-right area/i);
     assert.match(prompt, /valid JSON/i);
   });
 

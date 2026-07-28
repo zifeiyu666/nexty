@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { relationshipOptions } from "./constants";
 
 const english = {
   steps: ["RECIPIENT", "STYLE", "STORY", "LYRICS", "SONG"],
@@ -33,6 +34,8 @@ const english = {
   storyDescription:
     "Share the memories, people, and details that should become lyrics.",
   openingBlessing: "Opening voice message",
+  openingBlessingHelp:
+    "Make the song even more personal in two heartfelt ways: add your own voice at the beginning, or switch to Type a message and let the AI singer turn your written blessing into a tender spoken intro.",
   optional: "Optional",
   record: "Record",
   stop: "Stop",
@@ -78,6 +81,7 @@ const english = {
   selectRelationship: "Search or type a relationship...",
   noRelationship: "No relationship found.",
   commonRelationships: "Common relationships",
+  useRelationship: "Use",
   versionFor: "for",
   close: "Close",
   oneMoreStep: "one more step...",
@@ -164,6 +168,8 @@ const spanish: WizardCopy = {
   storyDescription:
     "Comparte los recuerdos, las personas y los detalles que deben convertirse en letra.",
   openingBlessing: "Mensaje de voz inicial",
+  openingBlessingHelp:
+    "Haz que la canción sea aún más personal de dos formas muy emotivas: añade tu propia voz al comienzo, o cambia a Escribir un mensaje y deja que la voz de la IA convierta tu dedicatoria en una introducción hablada y llena de cariño.",
   optional: "Opcional",
   record: "Grabar",
   stop: "Detener",
@@ -209,6 +215,7 @@ const spanish: WizardCopy = {
   selectRelationship: "Busca o escribe una relación...",
   noRelationship: "No se encontró esa relación.",
   commonRelationships: "Relaciones habituales",
+  useRelationship: "Usar",
   versionFor: "para", close: "Cerrar", oneMoreStep: "un último paso...",
   unlockHeading: "Elige cómo desbloquearla",
   unlockDescription: "En la siguiente pantalla podrás elegir una compra única, un paquete o una suscripción.",
@@ -270,6 +277,8 @@ const japanese: WizardCopy = {
   storyDescription:
     "歌詞にしたい思い出、人物、具体的な出来事を書いてください。",
   openingBlessing: "冒頭のボイスメッセージ",
+  openingBlessingHelp:
+    "この曲をもっと心に残る贈り物にする方法は2つあります。あなた自身の声を冒頭に添えることも、「文章で入力」に切り替えて、書いた祝福の言葉をAIシンガーのやさしい語りで届けることもできます。",
   optional: "任意",
   record: "録音",
   stop: "停止",
@@ -314,6 +323,7 @@ const japanese: WizardCopy = {
   selectRelationship: "関係を検索または入力...",
   noRelationship: "該当する関係がありません。",
   commonRelationships: "よく使う関係",
+  useRelationship: "使用",
   versionFor: "宛先", close: "閉じる", oneMoreStep: "あと一歩です...",
   unlockHeading: "受け取り方法を選ぶ",
   unlockDescription: "次の画面で、1曲購入、セット、サブスクリプションから選べます。",
@@ -494,6 +504,24 @@ export function localizedRelationshipLabel(
   fallback: string,
 ) {
   return relationshipLabels[locale]?.[value] || fallback;
+}
+
+export function getLocalizedRelationshipOptions(locale: string, query = "") {
+  const normalizedQuery = query.trim().toLocaleLowerCase(locale);
+
+  return relationshipOptions
+    .map((value) => ({
+      value,
+      label: localizedRelationshipLabel(locale, value, value),
+    }))
+    .filter(({ label, value }) => {
+      if (!normalizedQuery) return true;
+
+      return (
+        label.toLocaleLowerCase(locale).includes(normalizedQuery) ||
+        value.toLocaleLowerCase("en").includes(normalizedQuery)
+      );
+    });
 }
 
 const wizardMessages: Record<string, Record<string, string>> = {
