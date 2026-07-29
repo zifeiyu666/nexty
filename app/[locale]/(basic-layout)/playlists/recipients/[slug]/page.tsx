@@ -1,5 +1,5 @@
 import { PlaylistDetailPage } from "@/components/playlists/PlaylistDetailPage";
-import { Locale } from "@/i18n/routing";
+import { Locale, LOCALES } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
 import {
   getPlaylistByDimensionAndSlug,
@@ -11,9 +11,12 @@ import { notFound } from "next/navigation";
 type Params = Promise<{ locale: string; slug: string }>;
 
 export function generateStaticParams() {
-  return getPlaylistsByDimension("recipient").map((playlist) => ({
-    slug: playlist.slug,
-  }));
+  return LOCALES.flatMap((locale) =>
+    getPlaylistsByDimension("recipient").map((playlist) => ({
+      locale,
+      slug: playlist.slug,
+    })),
+  );
 }
 
 export async function generateMetadata({
