@@ -339,6 +339,50 @@ export const usage = pgTable('usage', {
     .$onUpdate(() => new Date()),
 })
 
+export const customVoiceStatusEnum = pgEnum('custom_voice_status', [
+  'draft',
+  'preparing_verification',
+  'awaiting_recording',
+  'creating',
+  'ready',
+  'failed',
+])
+
+export type CustomVoiceStatus = (typeof customVoiceStatusEnum.enumValues)[number]
+
+export const customVoices = pgTable(
+  'custom_voices',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
+    name: varchar('name', { length: 100 }).notNull(),
+    description: text('description'),
+    style: varchar('style', { length: 300 }),
+    imageUrl: text('image_url'),
+    imageKey: text('image_key'),
+    sourceAudioUrl: text('source_audio_url'),
+    sourceAudioKey: text('source_audio_key'),
+    verificationAudioUrl: text('verification_audio_url'),
+    verificationAudioKey: text('verification_audio_key'),
+    verificationTaskId: text('verification_task_id'),
+    creationTaskId: text('creation_task_id'),
+    verifyText: text('verify_text'),
+    verifyUrl: text('verify_url'),
+    voiceId: text('voice_id'),
+    status: customVoiceStatusEnum('status').default('draft').notNull(),
+    error: text('error'),
+    consentedAt: timestamp('consented_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull().$onUpdate(() => new Date()),
+  },
+  (table) => ({
+    userIdx: index('idx_custom_voices_user_id').on(table.userId),
+    statusIdx: index('idx_custom_voices_status').on(table.status),
+    verificationTaskIdx: index('idx_custom_voices_verification_task_id').on(table.verificationTaskId),
+    creationTaskIdx: index('idx_custom_voices_creation_task_id').on(table.creationTaskId),
+  }),
+)
+
 export const songs = pgTable(
   'songs',
   {

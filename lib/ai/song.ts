@@ -56,6 +56,7 @@ export type SongGenerationInput = SongInputContext & {
   title: string;
   lyrics: string;
   spokenIntro?: SpokenIntro;
+  customVoiceId?: string;
   sessionUser: {
     id: string;
     email: string;
@@ -529,6 +530,7 @@ export async function createSongGeneration(
     story: input.story,
     vocalGender: input.vocalGender,
     language: input.language,
+    customVoiceId: input.customVoiceId,
     spokenIntro: input.spokenIntro,
     mockMode,
     mockReadyAt: mockMode ? now + mockDelayMs : undefined,

@@ -1,6 +1,9 @@
 import { createSongGeneration } from "@/lib/ai/song";
 import { apiResponse } from "@/lib/api-response";
 import { getSession } from "@/lib/auth/server";
+import { db } from "@/lib/db";
+import { customVoices } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 const generateSchema = z.object({
@@ -22,6 +25,7 @@ const generateSchema = z.object({
   title: z.string().trim().min(1).max(120),
   lyrics: z.string().trim().min(20).max(5000),
   vocalGender: z.string().trim().min(1).max(80),
+  customVoiceId: z.string().uuid().optional(),
   spokenIntro: z
     .object({
       alignedWords: z
@@ -71,9 +75,22 @@ export async function POST(req: Request) {
     );
   }
 
+  let customVoiceId: string | undefined;
+  if (input.customVoiceId) {
+    const [voice] = await db.select({ voiceId: customVoices.voiceId, status: customVoices.status })
+      .from(customVoices)
+      .where(and(eq(customVoices.id, input.customVoiceId), eq(customVoices.userId, session.user.id)))
+      .limit(1);
+    if (!voice || voice.status !== "ready" || !voice.voiceId) {
+      return apiResponse.forbidden("This custom voice is not ready to use.");
+    }
+    customVoiceId = voice.voiceId;
+  }
+
   try {
     const task = await createSongGeneration({
       ...input,
+      customVoiceId,
       sessionUser: {
         id: session.user.id,
         email: session.user.email,

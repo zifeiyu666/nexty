@@ -82,4 +82,5 @@ export type StoredDraft = {
   spokenIntro?: SpokenIntroDraft;
   spokenMode?: "recording" | "text";
   vocalGender?: string;
+  customVoiceId?: string;
 };

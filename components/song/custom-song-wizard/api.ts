@@ -13,6 +13,7 @@ type SongWizardInput = {
   spokenIntro?: SpokenIntroDraft;
   spokenMode?: "recording" | "text";
   vocalGender: string;
+  customVoiceId?: string;
 };
 
 type LyricsGenerationInput = SongWizardInput & {

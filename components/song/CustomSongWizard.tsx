@@ -121,6 +121,7 @@ export function CustomSongWizard({
   const [step, setStep] = useState<WizardStep>(1);
   const [genre, setGenre] = useState(defaultGenre);
   const [vocalGender, setVocalGender] = useState(defaultVocalGender);
+  const [customVoiceId, setCustomVoiceId] = useState<string | undefined>();
   const [language, setLanguage] = useState(defaultLanguage);
   const [showAllLanguages, setShowAllLanguages] = useState(false);
   const [occasion, setOccasion] = useState<Occasion | null>(null);
@@ -305,6 +306,7 @@ export function CustomSongWizard({
     spokenBlessing: spokenMode === "text" ? spokenBlessing : "",
     spokenMode,
     vocalGender,
+    customVoiceId,
   });
   const editableLyricLines = useMemo(
     () => parseLyricsText(generatedLyrics),
@@ -338,6 +340,7 @@ export function CustomSongWizard({
 
         if (draftGenre) setGenre(draftGenre);
         if (draftVocalGender) setVocalGender(draftVocalGender);
+        if (draft.customVoiceId) setCustomVoiceId(draft.customVoiceId);
         setLanguage(draftLanguage);
         if (draft.occasion !== undefined) {
           const draftOccasion = draft.occasion || null;
@@ -405,6 +408,7 @@ export function CustomSongWizard({
 
       setGenre(params.get("genre") || defaultGenre);
       setVocalGender(params.get("vocalGender") || defaultVocalGender);
+      setCustomVoiceId(params.get("customVoice") || undefined);
       setLanguage(params.get("language") || defaultLanguage);
       setOccasion(queryOccasion || null);
       if (queryOccasion && isCustomOccasion(queryOccasion)) {
@@ -473,6 +477,7 @@ export function CustomSongWizard({
       spokenIntro: spokenIntro || undefined,
       spokenMode,
       vocalGender,
+      customVoiceId,
     };
 
     window.localStorage.setItem(draftStorageKey, JSON.stringify(draft));
@@ -762,6 +767,7 @@ export function CustomSongWizard({
         spokenIntro:
           spokenMode === "recording" ? spokenIntro || undefined : undefined,
         vocalGender,
+        customVoiceId,
       });
       setSongTaskId(data.songId);
       setIsMockMode(data.mockMode);
@@ -787,6 +793,7 @@ export function CustomSongWizard({
     spokenMode,
     story,
     vocalGender,
+    customVoiceId,
   ]);
 
   useEffect(() => {
@@ -1834,10 +1841,12 @@ export function CustomSongWizard({
                 showAllLanguages={showAllLanguages}
                 sortedGenres={sortedGenres}
                 vocalGender={vocalGender}
+                customVoiceId={customVoiceId}
                 onGenreSelect={selectGenreOption}
                 onLanguageChange={setLanguage}
                 onShowAllLanguagesChange={setShowAllLanguages}
                 onVocalGenderChange={setVocalGender}
+                onCustomVoiceChange={setCustomVoiceId}
               />
             </StepFrame>
           )}

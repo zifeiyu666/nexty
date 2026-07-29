@@ -1,0 +1,2 @@
+import { completeCustomVoiceTask } from "@/lib/ai/custom-voices";
+export async function POST(request: Request) { try { const body = await request.json(); const taskId = body?.data?.taskId || body?.data?.task_id || body?.taskId || body?.task_id; if (taskId) await completeCustomVoiceTask(taskId, body); } catch (error) { console.error("[KIE Voice Callback]", error); } return Response.json({ ok: true }); }

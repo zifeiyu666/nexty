@@ -1,8 +1,8 @@
 "use client";
 
-import { ChevronDown, Globe2, Mic2, Music2 } from "lucide-react";
+import { ChevronDown, Globe2, Mic2, Music2, Plus } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -29,10 +29,12 @@ type StyleStepProps = {
   showAllLanguages: boolean;
   sortedGenres: GenreOption[];
   vocalGender: string;
+  customVoiceId?: string;
   onGenreSelect: (genre: GenreOption) => void;
   onLanguageChange: (value: string) => void;
   onShowAllLanguagesChange: Dispatch<SetStateAction<boolean>>;
   onVocalGenderChange: (value: string) => void;
+  onCustomVoiceChange: (value?: string) => void;
 };
 
 export function StyleStep({
@@ -45,14 +47,18 @@ export function StyleStep({
   showAllLanguages,
   sortedGenres,
   vocalGender,
+  customVoiceId,
   onGenreSelect,
   onLanguageChange,
   onShowAllLanguagesChange,
   onVocalGenderChange,
+  onCustomVoiceChange,
 }: StyleStepProps) {
   const copy = useWizardCopy();
   const locale = useWizardLocale();
   const [showMoreGenres, setShowMoreGenres] = useState(false);
+  const [customVoices, setCustomVoices] = useState<Array<{ id: string; name: string }>>([]);
+  useEffect(() => { fetch("/api/voices").then((response) => response.json()).then((result) => { if (result.success) setCustomVoices(result.data.filter((voice: { status: string }) => voice.status === "ready")); }).catch(() => undefined); }, []);
   const recommendedGenres = occasion
     ? sortedGenres.filter((item) => recommendedGenreSet.has(item.value))
     : [];
@@ -185,6 +191,11 @@ export function StyleStep({
               </button>
             );
           })}
+        </div>
+        <div className="mt-4 rounded-lg border bg-white p-3">
+          <div className="flex items-center justify-between gap-3"><p className="text-sm font-semibold">Use my custom voice</p><a className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="/voices?create=1"><Plus className="size-3.5" /> Add voice</a></div>
+          <div className="mt-3 flex flex-wrap gap-2"><button className={cn("rounded-full border px-3 py-1.5 text-sm", !customVoiceId && "border-primary bg-primary/10 text-primary")} type="button" onClick={() => onCustomVoiceChange(undefined)}>Default voice</button>{customVoices.map((voice) => <button key={voice.id} className={cn("rounded-full border px-3 py-1.5 text-sm", customVoiceId === voice.id && "border-primary bg-primary/10 text-primary")} type="button" onClick={() => onCustomVoiceChange(voice.id)}>{voice.name}</button>)}</div>
+          {!customVoices.length && <p className="mt-2 text-xs text-muted-foreground">Add and verify a voice to use it in this song.</p>}
         </div>
       </div>
 
