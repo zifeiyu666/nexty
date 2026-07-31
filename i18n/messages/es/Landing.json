@@ -114,6 +114,45 @@
       }
     }
   },
+  "VoicePersonalization": {
+    "eyebrow": "Que suene a ti",
+    "title": "Añade la voz que solo esa persona reconocería",
+    "description": "Lleva más de ti a los primeros segundos de una canción personalizada y deja que la música cuente el resto de la historia.",
+    "items": {
+      "voiceClone": {
+        "title": "Tu voz de canto con IA",
+        "description": "Crea un perfil de voz verificado y usa un carácter vocal familiar en las canciones que hagas.",
+        "highlights": [
+          "Crea una voz de canto personal para tus próximas canciones",
+          "Elígela junto al estilo y el idioma de la canción",
+          "Mantén una sensación familiar sin tener que cantar"
+        ],
+        "consent": "Solo puedes clonar una voz que tengas autorización para usar. Es necesario completar una verificación antes de utilizarla.",
+        "cta": "Crear mi voz",
+        "imageAlt": "Persona grabando una muestra de voz para una voz de canto personalizada con IA"
+      },
+      "spokenIntro": {
+        "title": "Una apertura con tus propias palabras",
+        "description": "Empieza la canción con un saludo breve para que la sorpresa se sienta personal desde el primer segundo.",
+        "highlights": [
+          "Graba tu propio mensaje de voz al inicio de la canción",
+          "O escribe una dedicatoria para que la diga la voz de IA",
+          "Deja que el momento hablado fluya de forma natural hacia la música"
+        ],
+        "demo": {
+          "eyebrow": "Escucha una apertura real",
+          "title": "Steady Light, May",
+          "label": "Un mensaje inicial personalizado",
+          "play": "Reproducir demostración de apertura",
+          "pause": "Pausar demostración de apertura",
+          "introPlaying": "El mensaje hablado se está reproduciendo",
+          "songStarts": "A partir de aquí empieza la canción"
+        },
+        "cta": "Añadir un mensaje inicial",
+        "imageAlt": "Mensaje de voz grabándose antes de que empiece una canción personalizada"
+      }
+    }
+  },
   "OurProducts": {
     "eyebrow": "Qué puedes crear",
     "title": "El regalo personalizado completo",

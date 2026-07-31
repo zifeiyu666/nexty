@@ -10,7 +10,11 @@
     "titleAccent": "Cherish Forever",
     "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI turns your memories into a studio-quality <strong>custom song</strong> you can preview, refine, and send as a <strong>personalized music gift</strong>.</p>",
     "trustBadge": "Custom song gifts · Free preview first",
-    "trustItems": ["Free to preview", "Ready in minutes", "Edit before you unlock"],
+    "trustItems": [
+      "Free to preview",
+      "Ready in minutes",
+      "Edit before you unlock"
+    ],
     "getStarted": "Start a Free Preview",
     "getStartedLink": "/create-song",
     "howItWorksCta": "How It Works",
@@ -35,11 +39,7 @@
     "description": "<p>Grab some tissues before you watch. Hover to preview quietly, then click to hear how a <strong>custom song</strong> creates a lifetime memory.</p>",
     "playLabel": "Play {title} with sound",
     "muteLabel": "Mute {title}",
-    "trustItems": [
-      "Free to preview",
-      "Ready in minutes",
-      "Just for you"
-    ],
+    "trustItems": ["Free to preview", "Ready in minutes", "Just for you"],
     "videos": [
       {
         "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-2.mp4",
@@ -114,6 +114,45 @@
       "deliver": {
         "title": "Share the Surprise Anywhere",
         "description": "Send the finished song privately, pair it with a <strong>music video</strong>, or print <strong>wall art</strong> lyrics to turn one memory into a gift they can replay and keep."
+      }
+    }
+  },
+  "VoicePersonalization": {
+    "eyebrow": "Make It Sound Like You",
+    "title": "Add the voice only they would recognize",
+    "description": "Bring more of yourself into the first moments of a custom song, then let the music carry the rest of the story.",
+    "items": {
+      "voiceClone": {
+        "title": "Your AI Singing Voice",
+        "description": "Create a verified voice profile and use your own familiar vocal character in the songs you make.",
+        "highlights": [
+          "Create a personal singing voice for future songs",
+          "Choose it alongside your song's genre and language",
+          "Keep the feeling familiar without needing to perform"
+        ],
+        "consent": "Only clone a voice you are authorized to use. A verification step is required before it can be used.",
+        "cta": "Create my voice",
+        "imageAlt": "Person recording a voice sample for a custom AI singing voice"
+      },
+      "spokenIntro": {
+        "title": "An Opening in Your Own Words & Voice",
+        "description": "Start the song with a short greeting that makes the surprise feel personal from the very first second.",
+        "highlights": [
+          "Record your own voice message to open the song",
+          "Or write a blessing for the AI singer to deliver",
+          "Let the spoken moment flow naturally into the music"
+        ],
+        "demo": {
+          "eyebrow": "Hear a real opening",
+          "title": "Steady Light, May",
+          "label": "A custom opening message",
+          "play": "Play opening demo",
+          "pause": "Pause opening demo",
+          "introPlaying": "The spoken message is playing",
+          "songStarts": "The song begins from here"
+        },
+        "cta": "Add an opening message",
+        "imageAlt": "Voice message being recorded before a personalized song begins"
       }
     }
   },

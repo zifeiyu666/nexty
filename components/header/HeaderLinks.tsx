@@ -58,10 +58,7 @@ const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
                 <NavigationMenuContent>
                   <ul className="w-[320px] max-w-[calc(100vw-2rem)] gap-1">
                     {link.items.map((child) => (
-                      <li
-                        key={child.href}
-                        className="hover:bg-accent-foreground/10"
-                      >
+                      <li key={child.href}>
                         <NavigationMenuLink asChild>
                           <I18nLink
                             href={child.href}
@@ -73,7 +70,7 @@ const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
                             }
                             target={child.target || "_self"}
                             rel={child.rel || undefined}
-                            className="flex flex-col gap-y-1 text-sm text-muted-foreground hover:text-accent-foreground"
+                            className="flex flex-col gap-y-1 text-sm font-medium text-popover-foreground hover:!bg-transparent hover:text-popover-foreground focus:!bg-transparent focus:text-popover-foreground data-[active=true]:!bg-transparent data-[active=true]:text-popover-foreground"
                           >
                             <div className="flex min-w-0 items-start gap-x-1 leading-snug">
                               <span className="min-w-0 whitespace-normal break-words">
@@ -86,7 +83,7 @@ const HeaderLinks = ({ links, variant = "default" }: HeaderLinksProps) => {
                               )}
                             </div>
                             {child.description && (
-                              <div className="text-xs text-muted-foreground">
+                              <div className="text-xs font-normal text-popover-foreground/80">
                                 {child.description}
                               </div>
                             )}

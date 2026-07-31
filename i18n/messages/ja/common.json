@@ -171,6 +171,7 @@
     "links": [
       { "name": "マイソング", "href": "/songs" },
       { "name": "サンプル", "href": "/samples" },
+      { "name": "マイボイス", "href": "/voices" },
       {
         "name": "ギフトアイデア",
         "href": "/music/personalized-gift",
@@ -250,6 +251,7 @@
             { "href": "/#features", "name": "ギフト機能" },
             { "id": "pricing", "href": "/#pricing", "name": "料金" },
             { "href": "/songs", "name": "マイソング" },
+            { "href": "/voices", "name": "マイボイス" },
             { "href": "/samples", "name": "サンプル" },
             { "isSubTitle": true, "name": "資料" },
             { "href": "/blog", "name": "すべての記事" },

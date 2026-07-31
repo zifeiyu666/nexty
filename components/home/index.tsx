@@ -4,6 +4,7 @@ import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
 import OccasionShowcase from "@/components/home/OccasionShowcase";
 import OurProducts from "@/components/home/OurProducts";
+import VoicePersonalization from "@/components/home/VoicePersonalization";
 
 import SongfinchComparison from "@/components/home/SongfinchComparison";
 import Testimonials from "@/components/home/Testimonials";
@@ -99,6 +100,8 @@ export default async function HomeComponent() {
       )}
 
       {messages.Landing.HowItWorks && <HowItWorks />}
+
+      {messages.Landing.VoicePersonalization && <VoicePersonalization />}
 
       {messages.Landing.OurProducts && (
         <OurProducts

@@ -38,6 +38,12 @@ const staticPages: {
     priority: 0.8,
   },
   {
+    path: '/voice-clone',
+    lastModified: '2026-07-30',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
     path: '/free-custom-song-lyric-gifts',
     lastModified: '2026-07-13',
     changeFrequency: 'weekly',
@@ -97,6 +103,7 @@ const englishOnlyStaticPaths = new Set([
   '/privacy-policy',
   '/terms-of-service',
   '/refund-policy',
+  '/voice-clone',
   ...getAllOccasionLandingConfigs().map(
     (occasion) => `/occasions/${occasion.slug}`,
   ),

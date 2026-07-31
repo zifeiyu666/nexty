@@ -16,6 +16,7 @@ export function createLyricsInputKey({
   spokenBlessing = "",
   spokenMode = "recording",
   vocalGender,
+  customVoiceId,
 }: {
   genre: string;
   language: string;
@@ -25,6 +26,7 @@ export function createLyricsInputKey({
   spokenBlessing?: string;
   spokenMode?: "recording" | "text";
   vocalGender: string;
+  customVoiceId?: string;
 }) {
   return JSON.stringify({
     genre,
@@ -35,6 +37,7 @@ export function createLyricsInputKey({
     spokenBlessing: spokenMode === "text" ? spokenBlessing.trim() : "",
     spokenMode,
     vocalGender,
+    customVoiceId,
   });
 }
 
