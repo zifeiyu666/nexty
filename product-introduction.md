@@ -8,7 +8,7 @@ Turn any memory, love note, or celebration into a personalized AI song, lyric po
 
 ### Detailed Introduction
 
-One Custom Song is an AI-powered music gift platform designed for people who want to celebrate meaningful moments in a more personal way. Users can describe a relationship, memory, occasion, or message, then generate a custom song that captures the emotion and story behind it. The product supports a complete creative workflow, from writing lyrics and generating music to creating personalized lyric posters, shareable music videos, and downloadable keepsakes from a user account dashboard. It is especially suited for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and other moments where a custom music gift can feel more memorable than a standard gift.
+One Custom Song is an AI-powered music gift platform designed for people who want to celebrate meaningful moments in a more personal way. Users can describe a relationship, memory, occasion, or message, then generate a custom song that captures the emotion and story behind it. They can also use their own voice to create the song, making the gift feel even more intimate and recognizable, and add a personal spoken greeting at the beginning for a heartfelt introduction. The product supports a complete creative workflow, from writing lyrics and generating music to creating personalized lyric posters, shareable music videos, and downloadable keepsakes from a user account dashboard. It is especially suited for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and other moments where a custom music gift can feel more memorable than a standard gift.
 
 ### Why I built it
 The idea came from a simple problem: traditional gifts often say "I remembered the day," but not "I remembered us." I wanted a creative process where a person could stay involved while making something meaningful, change a line, hear a new direction, and keep the result rooted in real memories instead of generic romantic language. One Custom Song exists to make personal stories the starting point, to let people experiment with lyrics and music without paying for every attempt, and to turn a song into a gift people can feel confident giving.
@@ -25,7 +25,7 @@ Gift-givers, couples, families, friends, wedding guests, event organizers, creat
 
 ### 详细介绍
 
-One Custom Song 是一个面向个性化音乐礼物场景的 AI 创作平台，帮助用户用更有温度的方式表达情感和纪念重要时刻。用户只需要输入一段关系背景、回忆故事、节日祝福或想传达的信息，就可以生成贴合情绪与主题的定制歌曲，并进一步制作专属歌词海报、可分享的音乐视频和可下载的纪念内容。产品覆盖从歌词创作、音乐生成到视觉内容制作和成品下载管理的完整流程，让这份礼物不仅可以被聆听，也可以被分享、展示和收藏。它特别适合生日、纪念日、婚礼、节日、异地关系、家庭回忆等需要独特表达的场景，让礼物从普通祝福变成一段真正属于收礼人的音乐记忆。
+One Custom Song 是一个面向个性化音乐礼物场景的 AI 创作平台，帮助用户用更有温度的方式表达情感和纪念重要时刻。用户只需要输入一段关系背景、回忆故事、节日祝福或想传达的信息，就可以生成贴合情绪与主题的定制歌曲；还可以使用自己的声音演唱歌曲，让作品更亲切、更具辨识度，并在歌曲开头加入一段专属口播祝福，为收礼人带来更有仪式感的惊喜。用户还可进一步制作专属歌词海报、可分享的音乐视频和可下载的纪念内容。产品覆盖从歌词创作、音乐生成到视觉内容制作和成品下载管理的完整流程，让这份礼物不仅可以被聆听，也可以被分享、展示和收藏。它特别适合生日、纪念日、婚礼、节日、异地关系、家庭回忆等需要独特表达的场景，让礼物从普通祝福变成一段真正属于收礼人的音乐记忆。
 
 ### 创作动机
 这个项目源于一个简单却强烈的感受：很多礼物只能表达“我记得今天”，却无法说“我记得我们”。我希望找到一种创作方式，让送礼的人可以参与其中，随时调整一句歌词、试听新的音乐方向，并且始终让作品扎根于真实的回忆，而不是泛泛的浪漫表述。One Custom Song 的目标是让故事成为起点，在不限次数的试听里逐步打磨歌词和音乐，并把歌曲做成一份真正可以放心送出的礼物。
@@ -104,6 +104,50 @@ ZH: One Custom Song 面向那些希望礼物更私人、更有情绪、更容易
 它特别适合生日、纪念日、婚礼、节日、异地关系、家庭回忆、感谢礼物和纪念逝者等需要真诚表达的场景。
 
 ## 3. First Maker Comment
+
+### Short Version (Under 200 Words)
+
+#### English
+
+Hey Product Hunt! I built One Custom Song to help people turn meaningful memories into gifts that feel truly personal.
+
+Describe a relationship, memory, occasion, or message, and One Custom Song creates a custom AI song around it. You can refine the lyrics and style, use your own voice for the song, and add a personal spoken greeting at the beginning to make the moment even more special.
+
+Start with unlimited free 60-second previews—no credit card required. When it feels right, unlock the full song and turn it into a shareable music video or printable lyric wall art.
+
+It is made for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and every moment that deserves more than a generic card.
+
+I would love your feedback on the creation flow, the voice feature, and what would make a custom song feel even more giftable. Thanks for checking it out!
+
+#### 中文
+
+大家好，Product Hunt 的朋友们！我做 One Custom Song，是希望帮助大家把重要回忆变成真正有个人意义的礼物。
+
+输入一段关系背景、回忆、场景或想说的话，就能生成一首专属 AI 歌曲。你可以调整歌词和风格、使用自己的声音生成歌曲，也可以在开头加入一段专属口播祝福，让礼物更有温度。
+
+无需信用卡，即可无限次免费试听 60 秒预览；满意后再解锁完整歌曲，并制作成可分享的音乐视频或可打印的歌词海报。
+
+它适合生日、纪念日、婚礼、节日、异地关系和家庭回忆等值得认真表达的时刻。
+
+欢迎告诉我们：创作流程是否足够简单？声音功能是否有吸引力？怎样能让这份礼物更特别？谢谢体验！
+
+### Very Short Version
+
+#### English
+
+Hey Product Hunt! I made One Custom Song for people who want to give something more personal than a card or a playlist.
+
+I would love your honest feedback: does the idea feel meaningful, and what would make a custom song gift feel truly special to you?
+
+Thanks for checking it out!
+
+#### 中文
+
+大家好，Product Hunt 的朋友们！我做 One Custom Song，是希望让大家能送出一份比贺卡或歌单更有个人意义的礼物。
+
+很想听听你的真实反馈：这个想法是否足够打动你？怎样才能让一首定制歌曲更像一份特别的礼物？
+
+谢谢体验！
 
 ### English
 

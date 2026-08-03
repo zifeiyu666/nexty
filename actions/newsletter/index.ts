@@ -1,5 +1,5 @@
 'use server';
-import { removeUserFromContacts, sendEmail } from '@/actions/resend';
+import { removeUserFromContacts, sendEmail } from '@/actions/usesend';
 import { siteConfig } from '@/config/site';
 import { NewsletterWelcomeEmail } from '@/emails/newsletter-welcome';
 import { DEFAULT_LOCALE } from '@/i18n/routing';
@@ -45,7 +45,8 @@ export async function subscribeToNewsletter(email: string, locale = DEFAULT_LOCA
         email: normalizedEmail,
         unsubscribeLink: unsubscribeLink
       },
-      isAddContacts: true
+      isAddContacts: true,
+      hasUnsubscribeLink: true,
     })
 
     return actionResponse.success({ email: normalizedEmail });

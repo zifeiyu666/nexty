@@ -339,6 +339,50 @@ export const usage = pgTable('usage', {
     .$onUpdate(() => new Date()),
 })
 
+export const customVoiceStatusEnum = pgEnum('custom_voice_status', [
+  'draft',
+  'preparing_verification',
+  'awaiting_recording',
+  'creating',
+  'ready',
+  'failed',
+])
+
+export type CustomVoiceStatus = (typeof customVoiceStatusEnum.enumValues)[number]
+
+export const customVoices = pgTable(
+  'custom_voices',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
+    name: varchar('name', { length: 100 }).notNull(),
+    description: text('description'),
+    style: varchar('style', { length: 300 }),
+    imageUrl: text('image_url'),
+    imageKey: text('image_key'),
+    sourceAudioUrl: text('source_audio_url'),
+    sourceAudioKey: text('source_audio_key'),
+    verificationAudioUrl: text('verification_audio_url'),
+    verificationAudioKey: text('verification_audio_key'),
+    verificationTaskId: text('verification_task_id'),
+    creationTaskId: text('creation_task_id'),
+    verifyText: text('verify_text'),
+    verifyUrl: text('verify_url'),
+    voiceId: text('voice_id'),
+    status: customVoiceStatusEnum('status').default('draft').notNull(),
+    error: text('error'),
+    consentedAt: timestamp('consented_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull().$onUpdate(() => new Date()),
+  },
+  (table) => ({
+    userIdx: index('idx_custom_voices_user_id').on(table.userId),
+    statusIdx: index('idx_custom_voices_status').on(table.status),
+    verificationTaskIdx: index('idx_custom_voices_verification_task_id').on(table.verificationTaskId),
+    creationTaskIdx: index('idx_custom_voices_creation_task_id').on(table.creationTaskId),
+  }),
+)
+
 export const songs = pgTable(
   'songs',
   {
@@ -478,6 +522,29 @@ export const creditLogs = pgTable(
       ),
     }
   }
+)
+
+export const userActivityEvents = pgTable(
+  'user_activity_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => user.id, { onDelete: 'set null' }),
+    feature: varchar('feature', { length: 80 }).notNull(),
+    action: varchar('action', { length: 100 }).notNull(),
+    outcome: varchar('outcome', { length: 24 }).notNull(),
+    resourceType: varchar('resource_type', { length: 80 }),
+    resourceId: text('resource_id'),
+    durationMs: integer('duration_ms'),
+    issueFingerprint: varchar('issue_fingerprint', { length: 80 }),
+    metadataJsonb: jsonb('metadata_jsonb').default('{}').notNull(),
+    occurredAt: timestamp('occurred_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userOccurredAtIdx: index('idx_user_activity_events_user_occurred_at').on(table.userId, table.occurredAt),
+    featureOccurredAtIdx: index('idx_user_activity_events_feature_occurred_at').on(table.feature, table.occurredAt),
+    outcomeOccurredAtIdx: index('idx_user_activity_events_outcome_occurred_at').on(table.outcome, table.occurredAt),
+    issueFingerprintIdx: index('idx_user_activity_events_issue_fingerprint').on(table.issueFingerprint),
+  }),
 )
 
 export const postTypeEnum = pgEnum('post_type', [

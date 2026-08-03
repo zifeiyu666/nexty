@@ -1,4 +1,5 @@
 import { getLogger } from "@/lib/logger";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 import {
   getMusicVideoById,
   type MusicVideoRender,
@@ -73,6 +74,7 @@ async function handleSuccess(payload: WebhookSuccessPayload) {
     outputUrl: payload.outputUrl ?? payload.outputFile,
     video,
   });
+  await recordUserActivity({ userId: video.userId, feature: "music_video", action: "render_complete", outcome: "succeeded", resourceType: "music_video", resourceId: video.id });
 }
 
 async function handleError(payload: WebhookErrorPayload) {
@@ -93,6 +95,7 @@ async function handleError(payload: WebhookErrorPayload) {
     temporaryVideoUrl: video.temporaryVideoUrl,
     videoId: video.id,
   });
+  await recordUserIssueSignal({ userId: video.userId, feature: "music_video", action: "render_complete", error: message, resourceType: "music_video", resourceId: video.id });
 }
 
 async function handleTimeout(payload: WebhookTimeoutPayload) {
@@ -109,6 +112,7 @@ async function handleTimeout(payload: WebhookTimeoutPayload) {
     temporaryVideoUrl: video.temporaryVideoUrl,
     videoId: video.id,
   });
+  await recordUserIssueSignal({ userId: video.userId, feature: "music_video", action: "render_complete", outcome: "timed_out", error: "Remotion Lambda render timed out.", resourceType: "music_video", resourceId: video.id });
 }
 
 function createWebhookHandler() {

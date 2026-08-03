@@ -330,7 +330,7 @@ export default function CustomerReactions({
     <section
       ref={sectionRef}
       id={sectionId}
-      className="home-section"
+      className="home-section-soft"
     >
       <div className="home-container">
         <div className="home-section-header">

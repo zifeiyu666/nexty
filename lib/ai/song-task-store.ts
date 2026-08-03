@@ -36,6 +36,7 @@ export type SongGenerationTask = {
   story: string;
   vocalGender: string;
   language: string;
+  customVoiceId?: string;
   spokenIntro?: SpokenIntro;
   spokenIntroRenders?: SpokenIntroRender[];
   songPreviewRenders?: SongPreviewRender[];

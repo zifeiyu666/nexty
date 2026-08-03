@@ -189,7 +189,7 @@ export const occasionCards = [
     title: "Father's Day",
     tagline: "For His Quiet Strength",
     description:
-      "For the man of few words—tell him exactly what he means to you.",
+      "For the man of few words, tell him exactly what he means to you.",
     href: "/music/personalized-gift",
     cta: "Make a personalized music gift",
     image: "/occasion-generated/avif/06-fathers-day.avif",
@@ -397,7 +397,7 @@ export const occasionCards = [
     title: "Valentine's Day",
     tagline: "Better Than Flowers or Chocolate",
     description:
-      "A song woven from your midnight talks—a romance that never fades.",
+      "A song woven from your midnight talks, a romance that never fades.",
     href: "/occasions/anniversary",
     cta: "Create a romantic song",
     image: "/occasion-generated/avif/20-valentines-day.avif",

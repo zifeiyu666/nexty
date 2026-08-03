@@ -4,6 +4,14 @@
     "tagLine": "<strong>思い出から作る、世界にひとつのAIソング。</strong><br></br>誕生日や記念日に、心に残る音楽の贈り物を。",
     "description": "大切な思い出を、スタジオ品質のオリジナルソングに。誕生日、結婚式、記念日に贈れるパーソナルな楽曲を数分で作れます。"
   },
+  "Activity": {
+    "title": "ユーザーアクティビティ",
+    "description": "ユーザーの機能利用状況と処理結果を確認します。"
+  },
+  "Issues": {
+    "title": "問題モニター",
+    "description": "ユーザーに影響する失敗とタイムアウトを確認します。"
+  },
   "Login": {
     "title": "おかえりなさい",
     "description": "ログイン方法を選択してください",
@@ -171,6 +179,7 @@
     "links": [
       { "name": "マイソング", "href": "/songs" },
       { "name": "サンプル", "href": "/samples" },
+      { "name": "マイボイス", "href": "/voices" },
       {
         "name": "ギフトアイデア",
         "href": "/music/personalized-gift",
@@ -250,6 +259,7 @@
             { "href": "/#features", "name": "ギフト機能" },
             { "id": "pricing", "href": "/#pricing", "name": "料金" },
             { "href": "/songs", "name": "マイソング" },
+            { "href": "/voices", "name": "マイボイス" },
             { "href": "/samples", "name": "サンプル" },
             { "isSubTitle": true, "name": "資料" },
             { "href": "/blog", "name": "すべての記事" },

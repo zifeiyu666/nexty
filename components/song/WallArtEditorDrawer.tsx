@@ -84,6 +84,7 @@ import {
   Download,
   Image as ImageIcon,
   ImagePlus,
+  LoaderCircle,
   Palette,
   Plus,
   QrCode as QrCodeIcon,
@@ -804,6 +805,7 @@ export function WallArtStudio({
     [activeLyrics, activeSongTitle],
   );
   const [isStudioOpen, setIsStudioOpen] = useState(surface === "page");
+  const [isExporting, setIsExporting] = useState(false);
   const [activeTarget, setActiveTarget] = useState<ActiveTarget>("lyrics");
   const [activeTemplate, setActiveTemplate] =
     useState<WallArtTemplateKey>("template2");
@@ -1879,100 +1881,119 @@ export function WallArtStudio({
   }
 
   async function downloadPoster() {
+    if (isExporting) return;
+
     const svg = svgRef.current;
     if (!svg) return;
 
-    const { width, height } = calculatePrintPixelSize({
-      widthCm: posterWidthCm,
-      heightCm: posterHeightCm,
-      dpi: 300,
-    });
-    const clone = svg.cloneNode(true) as SVGSVGElement;
-    clone.setAttribute("width", String(width));
-    clone.setAttribute("height", String(height));
-    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    if (activeTemplate === "imageLyrics" && imageLyricSourceImage) {
-      const imageLyricMask = clone.querySelector(
-        "[data-image-lyric-mask]",
-      ) as SVGImageElement | null;
-      if (imageLyricMask) {
-        const highResolutionMask = await renderImageLyricMask({
-          source: imageLyricSourceImage,
-          width,
-          height,
-          baseWidth: BASE_POSTER_WIDTH,
-          baseHeight: posterViewBoxHeight,
-          lyricText,
-          fontFamily: styles.lyrics.fontFamily,
-          fontSize: styles.lyrics.fontSize,
-          fontWeight: styles.lyrics.fontWeight,
-          density: imageLyricDensity,
-          contrast: imageLyricContrast,
-          opacity: imageLyricOpacity,
-          invert: imageLyricInvert,
-          mode: imageLyricMode,
-        });
-        imageLyricMask.setAttribute("href", highResolutionMask);
-        imageLyricMask.setAttributeNS(
-          "http://www.w3.org/1999/xlink",
-          "href",
-          highResolutionMask,
-        );
+    setIsExporting(true);
+    try {
+      const { width, height } = calculatePrintPixelSize({
+        widthCm: posterWidthCm,
+        heightCm: posterHeightCm,
+        dpi: 300,
+      });
+      const clone = svg.cloneNode(true) as SVGSVGElement;
+      clone.setAttribute("width", String(width));
+      clone.setAttribute("height", String(height));
+      clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      if (activeTemplate === "imageLyrics" && imageLyricSourceImage) {
+        const imageLyricMask = clone.querySelector(
+          "[data-image-lyric-mask]",
+        ) as SVGImageElement | null;
+        if (imageLyricMask) {
+          const highResolutionMask = await renderImageLyricMask({
+            source: imageLyricSourceImage,
+            width,
+            height,
+            baseWidth: BASE_POSTER_WIDTH,
+            baseHeight: posterViewBoxHeight,
+            lyricText,
+            fontFamily: styles.lyrics.fontFamily,
+            fontSize: styles.lyrics.fontSize,
+            fontWeight: styles.lyrics.fontWeight,
+            density: imageLyricDensity,
+            contrast: imageLyricContrast,
+            opacity: imageLyricOpacity,
+            invert: imageLyricInvert,
+            mode: imageLyricMode,
+          });
+          imageLyricMask.setAttribute("href", highResolutionMask);
+          imageLyricMask.setAttributeNS(
+            "http://www.w3.org/1999/xlink",
+            "href",
+            highResolutionMask,
+          );
+        }
       }
-    }
-    await inlineSvgFontFaces(clone);
-    await inlineSvgImages(clone);
-    clone.querySelectorAll("foreignObject").forEach((node) => node.remove());
-    clone
-      .querySelectorAll("[data-preview-frame]")
-      .forEach((node) => node.remove());
-    clone
-      .querySelectorAll("[data-export-content]")
-      .forEach((node) => node.removeAttribute("clip-path"));
+      await inlineSvgFontFaces(clone);
+      await inlineSvgImages(clone);
+      clone.querySelectorAll("foreignObject").forEach((node) => node.remove());
+      clone
+        .querySelectorAll("[data-preview-frame]")
+        .forEach((node) => node.remove());
+      clone
+        .querySelectorAll("[data-export-content]")
+        .forEach((node) => node.removeAttribute("clip-path"));
 
-    const svgText = new XMLSerializer().serializeToString(clone);
-    const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+      const svgText = new XMLSerializer().serializeToString(clone);
+      const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
 
-    await new Promise<void>((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const context = canvas.getContext("2d");
-        if (!context) {
-          reject(new Error("Canvas is not available."));
-          return;
-        }
-        context.fillStyle = posterBackground;
-        context.fillRect(0, 0, width, height);
-        context.drawImage(image, 0, 0, width, height);
-        try {
-          canvas.toBlob((pngBlob) => {
+      await new Promise<void>((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext("2d");
+          if (!context) {
+            reject(new Error("Canvas is not available."));
+            return;
+          }
+          context.fillStyle = posterBackground;
+          context.fillRect(0, 0, width, height);
+          context.drawImage(image, 0, 0, width, height);
+          try {
+            canvas.toBlob((pngBlob) => {
+              URL.revokeObjectURL(url);
+              if (!pngBlob) {
+                reject(new Error("Unable to create poster image."));
+                return;
+              }
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(pngBlob);
+              link.download = `${title || "wall-art"}-${width}x${height}-300dpi.png`;
+              link.click();
+              URL.revokeObjectURL(link.href);
+              resolve();
+            }, "image/png");
+          } catch (error) {
             URL.revokeObjectURL(url);
-            if (!pngBlob) {
-              reject(new Error("Unable to create poster image."));
-              return;
-            }
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(pngBlob);
-            link.download = `${title || "wall-art"}-${width}x${height}-300dpi.png`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            resolve();
-          }, "image/png");
-        } catch (error) {
+            reject(error);
+          }
+        };
+        image.onerror = () => {
           URL.revokeObjectURL(url);
-          reject(error);
-        }
-      };
-      image.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error("Unable to render poster image."));
-      };
-      image.src = url;
-    });
+          reject(new Error("Unable to render poster image."));
+        };
+        image.src = url;
+      });
+      void fetch("/api/activity/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feature: "wall_art", action: "export", outcome: "succeeded", resourceId: selectedSong?.id }),
+      });
+    } catch (error) {
+      void fetch("/api/activity/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feature: "wall_art", action: "export", outcome: "failed", resourceId: selectedSong?.id }),
+      });
+      throw error;
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   const templatePresetPanel =
@@ -2411,12 +2432,18 @@ export function WallArtStudio({
           <section className="relative z-0 min-h-0 overflow-visible py-0.5">
             <div className={cn(wallArtGlassPanelClassName, "relative z-0 flex h-full min-h-0 flex-col items-center justify-center px-2.5 py-2.5 md:px-3")}>
               <Button
-                className={wallArtFloatingActionClassName}
+                aria-busy={isExporting}
+                className={cn(wallArtFloatingActionClassName, "min-w-[136px]")}
+                disabled={isExporting}
                 type="button"
                 onClick={downloadPoster}
               >
-                <Download className="size-3.5 transition-transform duration-300 group-hover:[animation:wallArtDownloadIconDrift_0.7s_ease]" />
-                Export
+                {isExporting ? (
+                  <LoaderCircle className="size-3.5 animate-spin" />
+                ) : (
+                  <Download className="size-3.5 transition-transform duration-300 group-hover:[animation:wallArtDownloadIconDrift_0.7s_ease]" />
+                )}
+                {isExporting ? "Exporting" : "Export"}
               </Button>
               <div
                 className="w-auto max-w-full flex-1 overflow-hidden rounded-[4px] shadow-[0_20px_48px_rgba(34,26,20,0.22)]"

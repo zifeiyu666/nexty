@@ -264,7 +264,7 @@ async function main() {
     }
 
     const preferredAdmin =
-      admins.find((admin) => admin.email === "support@onecustomsong.com") ?? admins[0];
+      admins.find((admin) => admin.email === "support@mail.onecustomsong.com") ?? admins[0];
 
     const livePlans = await db
       .select({
@@ -407,7 +407,7 @@ async function main() {
           slug: SLUG,
           language: LANGUAGE,
           authorEmail: preferredAdmin.email,
-          usedFallbackAdmin: preferredAdmin.email !== "support@onecustomsong.com",
+          usedFallbackAdmin: preferredAdmin.email !== "support@mail.onecustomsong.com",
           pricing: {
             singlePrice,
             proPrice,

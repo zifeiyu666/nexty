@@ -8,8 +8,13 @@ import { headers } from "next/headers";
 import { redirect } from 'next/navigation';
 
 export const getSession = async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
-  return session;
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    return session;
+  } catch (error) {
+    console.error('Failed to resolve auth session. Treating request as signed out.', error);
+    return null;
+  }
 };
 
 export const isAdmin = async (): Promise<boolean> => {

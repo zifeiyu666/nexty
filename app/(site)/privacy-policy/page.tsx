@@ -168,7 +168,7 @@ export default function PrivacyPolicyPage() {
                   <strong>Service Providers</strong>: With third-party service
                   providers who perform services on our behalf, such as payment
                   processing (Stripe), cloud storage (Supabase, Cloudflare R2),
-                  and email services (Resend)
+                  and email services (UseSend)
                 </li>
                 <li>
                   <strong>Compliance and Legal Requirements</strong>: When we

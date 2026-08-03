@@ -21,7 +21,7 @@ import { taskStore } from "@/lib/ai/task-store";
 //     .where(eq(aiVideoTasks.taskId, taskId));
 
 // TODO [Notify User]: Optionally send an email or push notification when the video
-//   is ready. Use Resend (lib/resend.ts or nexty-email skill) for email notifications.
+//   is ready. Use the shared UseSend sender for email notifications.
 
 export async function POST(request: Request) {
   try {

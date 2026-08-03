@@ -20,6 +20,22 @@ describe("WallArtEditorDrawer", () => {
     assert.doesNotMatch(source, /selectableSongs\.length > 1/);
   });
 
+  test("disables the export action while poster generation is in progress", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/WallArtEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const \[isExporting, setIsExporting\] = useState\(false\);/);
+    assert.match(source, /if \(isExporting\) return;/);
+    assert.match(source, /setIsExporting\(true\);/);
+    assert.match(source, /finally \{\s*setIsExporting\(false\);\s*\}/);
+    assert.match(source, /disabled=\{isExporting\}/);
+    assert.match(source, /aria-busy=\{isExporting\}/);
+    assert.match(source, /<LoaderCircle className="size-3\.5 animate-spin" \/>/);
+    assert.match(source, /isExporting \? "Exporting" : "Export"/);
+  });
+
   test("rebuilds template settings when selecting a different song", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/WallArtEditorDrawer.tsx"),

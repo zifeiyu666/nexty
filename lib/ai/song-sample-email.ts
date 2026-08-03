@@ -1,10 +1,9 @@
+import { sendEmail } from "@/actions/usesend";
 import { siteConfig } from "@/config/site";
 import SongSampleReadyEmail from "@/emails/song-sample-ready";
 import { db } from "@/lib/db";
 import { user as userSchema } from "@/lib/db/schema";
-import resend from "@/lib/resend";
 import { eq } from "drizzle-orm";
-import React from "react";
 import type { SongSample } from "./song-sample-store";
 
 function buildSampleReadyUrl(sample: SongSample): string {
@@ -16,18 +15,11 @@ function buildSampleReadyUrl(sample: SongSample): string {
 
 export async function sendSongSampleReadyEmail(sample: SongSample): Promise<void> {
   if (!sample.userId) return;
-  if (!resend) {
-    console.warn("[Song Sample Email] Resend is not configured.");
+  if (!process.env.USESEND_API_KEY) {
+    console.warn("[Song Sample Email] UseSend is not configured.");
     return;
   }
 
-  const senderEmail = process.env.ADMIN_EMAIL;
-  if (!senderEmail) {
-    console.warn("[Song Sample Email] ADMIN_EMAIL is not configured.");
-    return;
-  }
-
-  const senderName = process.env.ADMIN_NAME || siteConfig.name;
   const sampleUrl = buildSampleReadyUrl(sample);
   const [user] = await db
     .select({ email: userSchema.email })
@@ -38,15 +30,15 @@ export async function sendSongSampleReadyEmail(sample: SongSample): Promise<void
   if (!user?.email) return;
 
   try {
-    await resend.emails.send({
-      from: `${senderName} <${senderEmail}>`,
-      to: user.email,
+    await sendEmail({
+      email: user.email,
       subject: `Your song sample is ready: ${sample.title}`,
-      react: React.createElement(SongSampleReadyEmail, {
+      react: SongSampleReadyEmail,
+      reactProps: {
         title: sample.title,
         sampleUrl,
         recipientLabel: sample.recipientNames.join(" and ") || "someone special",
-      }),
+      },
     });
   } catch (error) {
     console.error("[Song Sample Email] Failed to send ready email:", error);

@@ -159,7 +159,7 @@ export default function OurProducts({
   };
 
   return (
-    <section id="our-products" className="home-section">
+    <section id="our-products" className="home-section-muted">
       <div className="home-container">
         <div className="home-section-header">
           <p className="home-eyebrow">{t("eyebrow")}</p>

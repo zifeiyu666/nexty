@@ -1,5 +1,7 @@
 import { apiResponse } from "@/lib/api-response";
 import { createLyricsGeneration } from "@/lib/ai/song";
+import { getSession } from "@/lib/auth/server";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 import { z } from "zod";
 
 const lyricsSchema = z.object({
@@ -23,6 +25,8 @@ const lyricsSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
+  const session = await getSession();
   let input: z.infer<typeof lyricsSchema>;
 
   try {
@@ -36,10 +40,12 @@ export async function POST(req: Request) {
   }
 
   try {
+    await recordUserActivity({ userId: session?.user.id, feature: "lyrics", action: "generate", outcome: "started" });
     const task = await createLyricsGeneration({
       ...input,
       userRevisionInstruction: input.revisionInstruction,
     });
+    await recordUserActivity({ userId: session?.user.id, feature: "lyrics", action: "generate", outcome: "succeeded", resourceType: "lyrics_task", resourceId: task.taskId, durationMs: Date.now() - startedAt });
     return apiResponse.success({
       taskId: task.taskId,
       status: task.status,
@@ -50,6 +56,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("[songs/lyrics] Failed to submit lyrics task:", error);
+    await recordUserIssueSignal({ userId: session?.user.id, feature: "lyrics", action: "generate", error, durationMs: Date.now() - startedAt });
     return apiResponse.serverError(
       error instanceof Error ? error.message : "Failed to generate lyrics.",
     );

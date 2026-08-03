@@ -1,6 +1,10 @@
 import { createSongGeneration } from "@/lib/ai/song";
 import { apiResponse } from "@/lib/api-response";
 import { getSession } from "@/lib/auth/server";
+import { db } from "@/lib/db";
+import { customVoices } from "@/lib/db/schema";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 const generateSchema = z.object({
@@ -22,6 +26,7 @@ const generateSchema = z.object({
   title: z.string().trim().min(1).max(120),
   lyrics: z.string().trim().min(20).max(5000),
   vocalGender: z.string().trim().min(1).max(80),
+  customVoiceId: z.string().uuid().optional(),
   spokenIntro: z
     .object({
       alignedWords: z
@@ -43,6 +48,7 @@ const generateSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
   let input: z.infer<typeof generateSchema>;
 
   try {
@@ -71,9 +77,23 @@ export async function POST(req: Request) {
     );
   }
 
+  let customVoiceId: string | undefined;
+  if (input.customVoiceId) {
+    const [voice] = await db.select({ voiceId: customVoices.voiceId, status: customVoices.status })
+      .from(customVoices)
+      .where(and(eq(customVoices.id, input.customVoiceId), eq(customVoices.userId, session.user.id)))
+      .limit(1);
+    if (!voice || voice.status !== "ready" || !voice.voiceId) {
+      return apiResponse.forbidden("This custom voice is not ready to use.");
+    }
+    customVoiceId = voice.voiceId;
+  }
+
   try {
+    await recordUserActivity({ userId: session.user.id, feature: "song", action: "generate", outcome: "started" });
     const task = await createSongGeneration({
       ...input,
+      customVoiceId,
       sessionUser: {
         id: session.user.id,
         email: session.user.email,
@@ -87,6 +107,7 @@ export async function POST(req: Request) {
       status: task.status,
       isSubscriber: task.isSubscriber,
     });
+    await recordUserActivity({ userId: session.user.id, feature: "song", action: "generate", outcome: "succeeded", resourceType: "song_task", resourceId: task.songId, durationMs: Date.now() - startedAt, metadata: { status: task.status, customVoice: Boolean(customVoiceId) } });
 
     return apiResponse.success({
       songId: task.songId,
@@ -97,6 +118,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("[songs/generate] Failed to submit song task:", error);
+    await recordUserIssueSignal({ userId: session.user.id, feature: "song", action: "generate", error, durationMs: Date.now() - startedAt });
     return apiResponse.serverError(
       error instanceof Error ? error.message : "Failed to generate song.",
     );

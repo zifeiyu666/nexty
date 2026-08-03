@@ -90,6 +90,16 @@
         "icon": "ShoppingCart"
       },
       {
+        "name": "User Activity",
+        "href": "/dashboard/activity",
+        "icon": "Activity"
+      },
+      {
+        "name": "Issue Monitor",
+        "href": "/dashboard/issues",
+        "icon": "ShieldAlert"
+      },
+      {
         "name": "Prices",
         "href": "/dashboard/prices",
         "icon": "DollarSign"
@@ -353,9 +363,18 @@
         "href": "/samples"
       },
       {
+        "name": "My Voices",
+        "href": "/voices"
+      },
+      {
         "name": "Gift Ideas",
         "href": "/music/personalized-gift",
         "items": [
+          {
+            "name": "AI Voice Cloning",
+            "href": "/voice-clone",
+            "description": "Create a verified voice clone from a recording you own or are authorized to use."
+          },
           {
             "name": "AI song preview tool",
             "href": "/create-song",
@@ -440,6 +459,14 @@
             {
               "href": "/songs",
               "name": "My Songs"
+            },
+            {
+              "href": "/voices",
+              "name": "My Voices"
+            },
+            {
+              "href": "/voice-clone",
+              "name": "AI Voice Cloning"
             },
             {
               "href": "/samples",

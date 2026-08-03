@@ -1,5 +1,7 @@
 import { apiResponse } from "@/lib/api-response";
 import { rewriteSongLyricsLines } from "@/lib/ai/song";
+import { getSession } from "@/lib/auth/server";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 import { z } from "zod";
 
 const rewriteSchema = z.object({
@@ -26,6 +28,8 @@ const rewriteSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
+  const session = await getSession();
   let input: z.infer<typeof rewriteSchema>;
 
   try {
@@ -39,10 +43,13 @@ export async function POST(req: Request) {
   }
 
   try {
+    await recordUserActivity({ userId: session?.user.id, feature: "lyrics", action: "rewrite", outcome: "started" });
     const result = await rewriteSongLyricsLines(input);
+    await recordUserActivity({ userId: session?.user.id, feature: "lyrics", action: "rewrite", outcome: "succeeded", durationMs: Date.now() - startedAt });
     return apiResponse.success(result);
   } catch (error) {
     console.error("[songs/lyrics/rewrite] Failed to rewrite lyric lines:", error);
+    await recordUserIssueSignal({ userId: session?.user.id, feature: "lyrics", action: "rewrite", error, durationMs: Date.now() - startedAt });
     return apiResponse.serverError(
       error instanceof Error ? error.message : "Failed to rewrite lyric lines."
     );

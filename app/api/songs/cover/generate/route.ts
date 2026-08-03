@@ -5,6 +5,7 @@ import { checkRateLimit, getClientIPFromRequest } from "@/lib/upstash";
 import { REDIS_RATE_LIMIT_CONFIGS } from "@/lib/upstash/redis-rate-limit-configs";
 import { z } from "zod";
 import { SONG_COVER_STYLES } from "@/types/song-cover";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 
 const coverArtSchema = z.object({
   style: z.enum(SONG_COVER_STYLES),
@@ -31,6 +32,7 @@ const coverSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
   const session = await getSession();
   const shouldApplyAnonymousLimit =
     !session?.user ||
@@ -63,10 +65,13 @@ export async function POST(req: Request) {
   }
 
   try {
+    await recordUserActivity({ userId: session?.user.id, feature: "cover", action: "generate", outcome: "started", resourceType: input.songId ? "song_task" : undefined, resourceId: input.songId });
     const result = await generateSongCover(input);
+    await recordUserActivity({ userId: session?.user.id, feature: "cover", action: "generate", outcome: "succeeded", resourceType: input.songId ? "song_task" : undefined, resourceId: input.songId, durationMs: Date.now() - startedAt });
     return apiResponse.success(result);
   } catch (error) {
     console.error("[songs/cover/generate] Failed to generate cover:", error);
+    await recordUserIssueSignal({ userId: session?.user.id, feature: "cover", action: "generate", error, resourceType: input.songId ? "song_task" : undefined, resourceId: input.songId, durationMs: Date.now() - startedAt });
     return apiResponse.serverError(
       error instanceof Error
         ? error.message

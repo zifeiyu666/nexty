@@ -1,6 +1,6 @@
 'use server';
 
-import { sendEmail } from '@/actions/resend';
+import { sendEmail } from '@/actions/usesend';
 import { siteConfig } from '@/config/site';
 import { CreditUpgradeFailedEmail } from '@/emails/credit-upgrade-failed';
 import { FraudRefundUserEmail } from '@/emails/fraud-refund-user';
@@ -419,7 +419,7 @@ export async function sendCreditUpgradeFailedEmail({
 }
 
 /**
- * Sends a notification email using the configured email provider (Resend).
+ * Sends a notification email using the configured email provider.
  */
 export async function sendInvoicePaymentFailedEmail({
   invoice,
@@ -432,8 +432,8 @@ export async function sendInvoicePaymentFailedEmail({
   customerId: string;
   invoiceId: string
 }): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
-    console.error('Resend API Key is not configured. Skipping email send.');
+  if (!process.env.USESEND_API_KEY) {
+    console.error('UseSend API key is not configured. Skipping email send.');
     return;
   }
   if (!process.env.ADMIN_EMAIL) {
@@ -560,8 +560,8 @@ export async function sendFraudWarningAdminEmail({
     return;
   }
 
-  if (!process.env.RESEND_API_KEY) {
-    console.error('Resend API Key is not configured. Skipping email send.');
+  if (!process.env.USESEND_API_KEY) {
+    console.error('UseSend API key is not configured. Skipping email send.');
     return;
   }
 
@@ -604,8 +604,8 @@ export async function sendFraudRefundUserEmail({
   charge: Stripe.Charge;
   refundAmount: number;
 }): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
-    console.error('Resend API Key is not configured. Skipping email send.');
+  if (!process.env.USESEND_API_KEY) {
+    console.error('UseSend API key is not configured. Skipping email send.');
     return;
   }
 

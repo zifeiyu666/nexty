@@ -99,6 +99,7 @@
     "links": [
       {"name": "Mis canciones", "href": "/songs"},
       {"name": "Mis muestras", "href": "/samples"},
+      {"name": "Mis voces", "href": "/voices"},
       {"name": "Ideas de regalo", "href": "/music/personalized-gift", "items": [
         {"name": "Crear una canción", "href": "/create-song", "description": "Convierte una historia en una muestra gratuita antes de desbloquear la canción completa."},
         {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song", "description": "Crea una canción de cumpleaños con nombres, historias y recuerdos."},
@@ -125,6 +126,7 @@
             {"href": "/#features", "name": "Funciones para regalos"},
             {"id": "pricing", "href": "/#pricing", "name": "Precios"},
             {"href": "/songs", "name": "Mis canciones"},
+            {"href": "/voices", "name": "Mis voces"},
             {"href": "/samples", "name": "Mis muestras"},
             {"isSubTitle": true, "name": "Recursos"},
             {"href": "/blog", "name": "Todos los artículos"},

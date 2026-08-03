@@ -59,6 +59,7 @@ export type SubmitMusicInput = {
   genre: string;
   vocalGender: string;
   language: string;
+  customVoiceId?: string;
 };
 
 type KieApiResponse = {
@@ -771,6 +772,9 @@ export async function submitMusicTask(
     style,
     title: input.title,
     model: process.env.KIE_SUNO_MODEL || "V5_5",
+    ...(input.customVoiceId
+      ? { personaId: input.customVoiceId, personaModel: "voice_persona" }
+      : {}),
   };
   logKieRequest("/api/v1/generate", {
     ...payload,

@@ -1,4 +1,4 @@
-import { sendEmail } from "@/actions/resend";
+import { sendEmail } from "@/actions/usesend";
 import { siteConfig } from "@/config/site";
 import MagicLinkEmail from '@/emails/magic-link-email';
 import OTPCodeEmail from '@/emails/otp-code-email';
@@ -143,7 +143,8 @@ export const auth = betterAuth({
                   email: createdUser.email,
                   unsubscribeLink: unsubscribeLink,
                 },
-                isAddContacts: true
+                isAddContacts: true,
+                hasUnsubscribeLink: true,
               });
               console.log(`Welcome email sent to ${createdUser.email}`);
             } catch (error) {

@@ -4,8 +4,10 @@ import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
 import OccasionShowcase from "@/components/home/OccasionShowcase";
 import OurProducts from "@/components/home/OurProducts";
+import VoicePersonalization from "@/components/home/VoicePersonalization";
 
 import SongfinchComparison from "@/components/home/SongfinchComparison";
+import ScrollReveal from "@/components/home/ScrollReveal";
 import Testimonials from "@/components/home/Testimonials";
 import { BG1 } from "@/components/shared/BGs";
 import { type FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
@@ -92,37 +94,63 @@ export default async function HomeComponent() {
       {/* <DiagonalCounterflowShowcase /> */}
 
       {messages.Landing.CustomerReactions && (
-        <>
+        <ScrollReveal>
           {/* <CustomerReactionCollage /> */}
           <CustomerReactions sectionId="customer-reactions-grid" />
-        </>
+        </ScrollReveal>
       )}
 
-      {messages.Landing.HowItWorks && <HowItWorks />}
+      {messages.Landing.HowItWorks && (
+        <ScrollReveal>
+          <HowItWorks />
+        </ScrollReveal>
+      )}
+
+      {messages.Landing.VoicePersonalization && (
+        <ScrollReveal>
+          <VoicePersonalization />
+        </ScrollReveal>
+      )}
 
       {messages.Landing.OurProducts && (
-        <OurProducts
-          isAuthenticated={isAuthenticated}
-          musicVideoSongOptions={musicVideoSongOptions}
-          wallArtSongOptions={wallArtSongOptions}
-        />
+        <ScrollReveal>
+          <OurProducts
+            isAuthenticated={isAuthenticated}
+            musicVideoSongOptions={musicVideoSongOptions}
+            wallArtSongOptions={wallArtSongOptions}
+          />
+        </ScrollReveal>
       )}
 
-      <OccasionShowcase />
+      <ScrollReveal>
+        <OccasionShowcase />
+      </ScrollReveal>
 
       {/* {messages.Landing.Features && <Features />} */}
 
       {/* {messages.Landing.UseCases && <UseCases />} */}
 
-      {messages.Landing.SongfinchComparison && <SongfinchComparison />}
+      {messages.Landing.SongfinchComparison && (
+        <ScrollReveal>
+          <SongfinchComparison />
+        </ScrollReveal>
+      )}
 
       {/* {messages.Pricing && <PricingByGroup />}
       {messages.Pricing && <PricingAll />}
       {messages.Pricing && <PricingByPaymentType />} */}
 
-      {messages.Landing.Testimonials && <Testimonials />}
+      {messages.Landing.Testimonials && (
+        <ScrollReveal>
+          <Testimonials />
+        </ScrollReveal>
+      )}
 
-      {messages.Landing.FAQ && <FAQ />}
+      {messages.Landing.FAQ && (
+        <ScrollReveal>
+          <FAQ />
+        </ScrollReveal>
+      )}
     </div>
   );
 }

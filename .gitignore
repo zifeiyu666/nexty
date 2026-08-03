@@ -133,4 +133,7 @@ dist
 
 .backup/
 
+# Locally prepared Pinterest publishing assets
+/pinterest/
+
 docs/

@@ -375,6 +375,18 @@
   }
 }
 
+@keyframes voice-processing-wave {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleY(0.55);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.2);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-how-it-works-card] {
     transition: none;
@@ -390,6 +402,10 @@
   .how-it-works-wave span,
   .how-it-works-lyrics {
     animation: none;
+  }
+
+  [style*="voice-processing-wave"] {
+    animation: none !important;
   }
 }
 
@@ -600,26 +616,26 @@
 :root {
   color-scheme: light;
 
-  --background: rgb(255, 255, 255);
-  --foreground: rgb(37, 26, 20);
-  --card: rgb(255, 255, 255);
+  --background: rgb(255, 252, 248);
+  --foreground: rgb(43, 27, 20);
+  --card: rgb(255, 253, 250);
   --card-foreground: rgb(59, 55, 53);
-  --popover: rgb(255, 255, 255);
+  --popover: rgb(255, 253, 250);
   --popover-foreground: rgb(59, 55, 53);
   --primary: rgb(224, 65, 50);
   --primary-foreground: rgb(255, 255, 255);
   --secondary: rgb(255, 255, 255);
   --secondary-foreground: rgb(59, 55, 53);
-  --muted: rgb(249, 243, 241);
-  --muted-foreground: rgb(127, 112, 104);
+  --muted: rgb(248, 241, 237);
+  --muted-foreground: rgb(119, 101, 93);
   --accent: rgb(255, 219, 228);
   --accent-foreground: rgb(179, 62, 93);
   --destructive: rgb(229, 72, 77);
   --destructive-foreground: rgb(253, 252, 253);
-  --border: rgb(235, 224, 218);
-  --input: rgb(235, 224, 218);
-  --ring: rgb(255, 126, 165);
-  --chart-1: rgb(255, 126, 165);
+  --border: rgb(235, 222, 215);
+  --input: rgb(235, 222, 215);
+  --ring: rgb(224, 65, 50);
+  --chart-1: rgb(224, 65, 50);
   --chart-2: rgb(179, 62, 93);
   --chart-3: rgb(212, 165, 154);
   --chart-4: rgb(244, 196, 194);
