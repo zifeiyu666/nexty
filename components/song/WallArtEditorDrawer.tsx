@@ -1979,6 +1979,18 @@ export function WallArtStudio({
         };
         image.src = url;
       });
+      void fetch("/api/activity/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feature: "wall_art", action: "export", outcome: "succeeded", resourceId: selectedSong?.id }),
+      });
+    } catch (error) {
+      void fetch("/api/activity/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feature: "wall_art", action: "export", outcome: "failed", resourceId: selectedSong?.id }),
+      });
+      throw error;
     } finally {
       setIsExporting(false);
     }

@@ -2,7 +2,8 @@
 
 import { usePathname } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useMotionValueEvent, useScroll } from "motion/react";
+import { useState } from "react";
 
 type HeaderShellProps = {
   children: React.ReactNode;
@@ -12,22 +13,17 @@ const TOP_LIGHT_HEADER_PATHS = ["/"];
 
 export default function HeaderShell({ children }: HeaderShellProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { scrollY } = useScroll();
   const pathname = usePathname();
   const canUseTopLightMode = TOP_LIGHT_HEADER_PATHS.includes(pathname);
   const isTopLightMode = canUseTopLightMode && !isScrolled;
 
-  useEffect(() => {
-    const updateScrolledState = () => {
-      setIsScrolled(window.scrollY > 8);
-    };
-
-    updateScrolledState();
-    window.addEventListener("scroll", updateScrolledState, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", updateScrolledState);
-    };
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const nextIsScrolled = latest > 8;
+    setIsScrolled((current) =>
+      current === nextIsScrolled ? current : nextIsScrolled,
+    );
+  });
 
   return (
     <header

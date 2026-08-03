@@ -2,6 +2,7 @@ import { apiResponse } from "@/lib/api-response";
 import { getSongForOwner } from "@/lib/ai/final-song";
 import { getSession } from "@/lib/auth/server";
 import { getLogger } from "@/lib/logger";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 import {
   createMusicVideoRender,
   markMusicVideoFailed,
@@ -169,6 +170,7 @@ function summarizeTimelineMedia(timeline: MusicVideoTimeline) {
 }
 
 export async function POST(request: Request, { params }: { params: Params }) {
+  const startedAt = Date.now();
   const session = await getSession();
   const user = session?.user;
   if (!user) return apiResponse.unauthorized();
@@ -197,6 +199,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
     song,
     timeline: parsed.data,
   });
+  await recordUserActivity({ userId: user.id, feature: "music_video", action: "render", outcome: "started", resourceType: "music_video", resourceId: video.id });
 
   try {
     const inputProps = video.inputPropsJsonb as Parameters<
@@ -223,6 +226,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
       renderId: lambda.renderId,
       videoId: video.id,
     });
+    await recordUserActivity({ userId: user.id, feature: "music_video", action: "render", outcome: "succeeded", resourceType: "music_video", resourceId: video.id, durationMs: Date.now() - startedAt, metadata: { status: "rendering" } });
 
     return apiResponse.success(updated ?? video, 202);
   } catch (error) {
@@ -240,6 +244,7 @@ export async function POST(request: Request, { params }: { params: Params }) {
       error: message,
       videoId: video.id,
     });
+    await recordUserIssueSignal({ userId: user.id, feature: "music_video", action: "render", error, resourceType: "music_video", resourceId: video.id, durationMs: Date.now() - startedAt });
 
     return apiResponse.error(message, 500);
   }

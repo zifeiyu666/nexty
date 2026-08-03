@@ -67,7 +67,7 @@ The product is designed for birthdays, anniversaries, weddings, holidays, long-d
 - Payments: Stripe, Creem, PayPal
 - AI: AI SDK, OpenAI, Anthropic, Google, DeepSeek, xAI, OpenRouter, Replicate, fal.ai
 - Media: Remotion, Cloudflare R2 / S3-compatible storage
-- Email: Resend, React Email
+- Email: UseSend, React Email
 - Observability: Sentry, PostHog, Microsoft Clarity, Vercel Analytics
 - Content: MDX, TipTap, blog/glossary management
 - i18n: next-intl

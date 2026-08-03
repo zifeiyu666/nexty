@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import LoginDialog from "@/components/auth/LoginDialog";
 import { Button } from "@/components/ui/button";
+import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import {
   applyLyricsLineRewrite,
   composeLyricsText,
@@ -114,8 +115,6 @@ export function CustomSongWizard({
   const storyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const speechRecognitionRef = useRef<any>(null);
   const blessingAudioRef = useRef<HTMLAudioElement | null>(null);
-  const blessingRecorderRef = useRef<MediaRecorder | null>(null);
-  const blessingChunksRef = useRef<Blob[]>([]);
   const customOccasionInputRef = useRef<HTMLInputElement | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [step, setStep] = useState<WizardStep>(1);
@@ -135,7 +134,6 @@ export function CustomSongWizard({
   );
   const [spokenBlessing, setSpokenBlessing] = useState("");
   const [spokenIntro, setSpokenIntro] = useState<SpokenIntroDraft | null>(null);
-  const [isRecordingBlessing, setIsRecordingBlessing] = useState(false);
   const [isUploadingBlessing, setIsUploadingBlessing] = useState(false);
   const [isBlessingPlaying, setIsBlessingPlaying] = useState(false);
   const [blessingPlaybackTime, setBlessingPlaybackTime] = useState(0);
@@ -200,6 +198,21 @@ export function CustomSongWizard({
   const [isPolishingStory, setIsPolishingStory] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [pendingGenre, setPendingGenre] = useState<GenreOption | null>(null);
+  const blessingRecorder = useAudioRecorder({
+    fileName: "voice-blessing.webm",
+    maxDurationMs: 45000,
+    onComplete: (file) => {
+      void uploadAndTranscribeBlessing(file);
+    },
+    onError: () => {
+      toast.error(
+        localizedWizardMessage(
+          wizardLocale,
+          "Microphone access is required to record your blessing.",
+        ),
+      );
+    },
+  });
 
   const selectedOccasion = useMemo(() => {
     const matchedOccasion = occasions.find((item) => item.value === occasion);
@@ -483,6 +496,7 @@ export function CustomSongWizard({
     window.localStorage.setItem(draftStorageKey, JSON.stringify(draft));
   }, [
     coverArt,
+    customVoiceId,
     generatedLyrics,
     genre,
     isHydrated,
@@ -1272,50 +1286,11 @@ export function CustomSongWizard({
   }
 
   async function toggleBlessingRecording() {
-    if (isRecordingBlessing) {
-      blessingRecorderRef.current?.stop();
+    if (blessingRecorder.isRecording) {
+      blessingRecorder.stop();
       return;
     }
-    if (
-      !navigator.mediaDevices?.getUserMedia ||
-      typeof MediaRecorder === "undefined"
-    ) {
-      toast.error(localizedWizardMessage(wizardLocale, "Audio recording is not supported in this browser."));
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(
-        stream,
-        MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-          ? { mimeType: "audio/webm;codecs=opus" }
-          : undefined,
-      );
-      blessingChunksRef.current = [];
-      recorder.ondataavailable = (event) => {
-        if (event.data.size) blessingChunksRef.current.push(event.data);
-      };
-      recorder.onstop = () => {
-        stream.getTracks().forEach((track) => track.stop());
-        setIsRecordingBlessing(false);
-        const blob = new Blob(blessingChunksRef.current, {
-          type: recorder.mimeType || "audio/webm",
-        });
-        if (blob.size)
-          void uploadAndTranscribeBlessing(
-            new File([blob], "voice-blessing.webm", { type: blob.type }),
-          );
-      };
-      recorder.start();
-      blessingRecorderRef.current = recorder;
-      setIsRecordingBlessing(true);
-      window.setTimeout(
-        () => recorder.state === "recording" && recorder.stop(),
-        45000,
-      );
-    } catch {
-      toast.error(localizedWizardMessage(wizardLocale, "Microphone access is required to record your blessing."));
-    }
+    await blessingRecorder.start();
   }
 
   function toggleBlessingPlayback() {
@@ -1857,7 +1832,10 @@ export function CustomSongWizard({
                 blessingPlaybackTime={blessingPlaybackTime}
                 isRecording={isRecording}
                 isBlessingPlaying={isBlessingPlaying}
-                isRecordingBlessing={isRecordingBlessing}
+                isRecordingBlessing={blessingRecorder.isRecording}
+                blessingAnalyser={blessingRecorder.analyser}
+                blessingElapsedSeconds={blessingRecorder.elapsedSeconds}
+                blessingMaxDurationSeconds={blessingRecorder.maxDurationSeconds}
                 isUploadingBlessing={isUploadingBlessing}
                 isPolishingStory={isPolishingStory}
                 occasion={occasion}

@@ -1,5 +1,6 @@
 import type { Occasion, RecipientInput, SpokenIntroDraft } from "./types";
 import type { SongCoverArtDirection } from "@/types/song-cover";
+import posthog from "posthog-js";
 
 type SongWizardInput = {
   genre: string;
@@ -53,19 +54,33 @@ type StoryHelperGenerationInput = Omit<
 async function parseApiResponse<T>(
   response: Response,
   fallbackError: string,
+  tracking?: { feature: string; action: string },
 ): Promise<T> {
   const result = await response.json();
 
   if (!response.ok || !result.success) {
+    if (tracking) captureFunnel(tracking.feature, tracking.action, "failed");
     throw new Error(result.error || fallbackError);
   }
 
+  if (tracking) captureFunnel(tracking.feature, tracking.action, "succeeded");
   return result.data as T;
+}
+
+function captureFunnel(
+  feature: string,
+  action: string,
+  outcome: "started" | "succeeded" | "failed",
+) {
+  if (typeof window !== "undefined") {
+    posthog.capture("product_funnel", { feature, action, outcome });
+  }
 }
 
 export async function generateStoryFromHelper(
   input: StoryHelperGenerationInput,
 ) {
+  captureFunnel("story", "generate", "started");
   const response = await fetch("/api/songs/story", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -75,10 +90,12 @@ export async function generateStoryFromHelper(
   return parseApiResponse<{ story: string }>(
     response,
     "Unable to generate story.",
+    { feature: "story", action: "generate" },
   );
 }
 
 export async function startLyricsGeneration(input: LyricsGenerationInput) {
+  captureFunnel("lyrics", "generate", "started");
   const response = await fetch("/api/songs/lyrics", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -91,7 +108,7 @@ export async function startLyricsGeneration(input: LyricsGenerationInput) {
     status: "succeeded" | "processing" | "failed";
     taskId: string;
     title?: string;
-  }>(response, "Unable to start lyrics generation.");
+  }>(response, "Unable to start lyrics generation.", { feature: "lyrics", action: "generate" });
 }
 
 export async function getLyricsGenerationStatus(taskId: string) {
@@ -109,6 +126,7 @@ export async function getLyricsGenerationStatus(taskId: string) {
 }
 
 export async function rewriteLyricsLines(input: LyricsRewriteInput) {
+  captureFunnel("lyrics", "rewrite", "started");
   const response = await fetch("/api/songs/lyrics/rewrite", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -118,10 +136,12 @@ export async function rewriteLyricsLines(input: LyricsRewriteInput) {
   return parseApiResponse<{ lines?: string[] }>(
     response,
     "Unable to rewrite selected lines.",
+    { feature: "lyrics", action: "rewrite" },
   );
 }
 
 export async function startSongGeneration(input: SongGenerationInput) {
+  captureFunnel("song", "generate", "started");
   const response = await fetch("/api/songs/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -131,6 +151,7 @@ export async function startSongGeneration(input: SongGenerationInput) {
   return parseApiResponse<{ mockMode: boolean; songId: string }>(
     response,
     "Unable to start song generation.",
+    { feature: "song", action: "generate" },
   );
 }
 
@@ -191,6 +212,7 @@ export async function getSongGenerationStatus(songId: string) {
 }
 
 export async function generateSongCover(input: SongCoverGenerationInput) {
+  captureFunnel("cover", "generate", "started");
   const response = await fetch("/api/songs/cover/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -200,7 +222,7 @@ export async function generateSongCover(input: SongCoverGenerationInput) {
   return parseApiResponse<{
     imageUrl: string;
     prompt: string;
-  }>(response, "Unable to generate cover image.");
+  }>(response, "Unable to generate cover image.", { feature: "cover", action: "generate" });
 }
 
 export async function createSongCoverUpload(input: {
@@ -208,6 +230,7 @@ export async function createSongCoverUpload(input: {
   fileName: string;
   size: number;
 }) {
+  captureFunnel("song", "finalize", "started");
   const response = await fetch("/api/songs/cover/presign", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -241,6 +264,8 @@ export async function createCheckoutSession({
     }),
   });
   const result = await response.json();
+
+  captureFunnel("song", "finalize", response.ok && result.success ? "succeeded" : "failed");
 
   if (response.status === 401) {
     return { unauthorized: true as const, url: "" };

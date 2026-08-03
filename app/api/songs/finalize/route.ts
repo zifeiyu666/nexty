@@ -2,6 +2,7 @@ import { finalizeSongFromSample } from "@/lib/ai/final-song";
 import { songSampleStore } from "@/lib/ai/song-sample-store";
 import { apiResponse } from "@/lib/api-response";
 import { getSession } from "@/lib/auth/server";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 import { z } from "zod";
 
 const finalizeSchema = z.object({
@@ -12,6 +13,7 @@ const finalizeSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
   const session = await getSession();
   if (!session?.user) {
     return apiResponse.unauthorized("Please sign in to save this song.");
@@ -78,6 +80,7 @@ export async function POST(req: Request) {
       status: result.status,
       error: result.error,
     });
+    await recordUserIssueSignal({ userId: session.user.id, feature: "song", action: "finalize", error: result.error, resourceType: "song_task", resourceId: input.songId, durationMs: Date.now() - startedAt });
     return apiResponse.error(result.error, result.status);
   }
 
@@ -88,6 +91,7 @@ export async function POST(req: Request) {
     songId: result.song.id,
     alreadyFinalized: result.alreadyFinalized,
   });
+  await recordUserActivity({ userId: session.user.id, feature: "song", action: "finalize", outcome: "succeeded", resourceType: "song", resourceId: result.song.id, durationMs: Date.now() - startedAt, metadata: { alreadyFinalized: result.alreadyFinalized } });
 
   return apiResponse.success({
     songId: result.song.id,

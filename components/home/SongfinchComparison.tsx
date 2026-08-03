@@ -37,7 +37,7 @@ export default function SongfinchComparison() {
   return (
     <section
       id="songfinch-comparison"
-      className="home-section-muted"
+      className="home-section-soft"
     >
       <div className="home-container">
         <div className="home-section-header">

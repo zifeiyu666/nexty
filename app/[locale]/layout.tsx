@@ -4,6 +4,7 @@ import { GlobalMusicController } from "@/components/music/GlobalMusicController"
 import ConsentBanner from "@/components/shared/CookieConsent/ConsentBanner";
 import ConsentGate from "@/components/shared/CookieConsent/ConsentGate";
 import CrispChat from "@/components/support/CrispChat";
+import { ReportIssueButton } from "@/components/support/ReportIssueButton";
 import { TailwindIndicator } from "@/components/TailwindIndicator";
 import GoogleAdsense from "@/components/tracking/GoogleAdsense";
 import GoogleAnalytics from "@/components/tracking/GoogleAnalytics";
@@ -112,6 +113,7 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
         <GoogleOneTap />
         <CrispChat />
+        <ReportIssueButton />
         <Toaster richColors />
         <TailwindIndicator />
         <>

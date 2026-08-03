@@ -10,7 +10,7 @@ One Custom Song 是一个用于生成个性化 AI 歌曲礼物的 Next.js 16 项
 - Better Auth
 - Drizzle ORM 与 PostgreSQL
 - Stripe、Creem、PayPal 支付集成
-- Resend 邮件
+- UseSend 邮件
 - Cloudflare R2/S3 兼容存储
 - AI 歌词、音乐、图片、视频工作流
 

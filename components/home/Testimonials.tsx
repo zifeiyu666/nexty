@@ -49,7 +49,7 @@ const testimonials: TestimonialItem[] = [
   {
     badge: "👴 Father's Day",
     quote:
-      "My kids generated a personalized song for me. Not cheesy at all—actually beautiful. Will cherish forever.",
+      "My kids generated a personalized song for me. Not cheesy at all. Actually beautiful. Will cherish forever.",
     author: "Robert H. 🇦🇺",
     avatar: "/avatar/avatar5.jpg",
     cardClassName: "bg-white",
@@ -81,8 +81,6 @@ const testimonials: TestimonialItem[] = [
 ];
 
 const BASE_MARQUEE_DURATION = 48;
-const SCROLL_FOLLOW_MULTIPLIER = 1.4;
-const IDLE_SCROLL_DELAY = 160;
 
 const RatingStars = () => {
   return (
@@ -155,13 +153,10 @@ export default function Testimonials({
   const sectionTestimonials = items ?? testimonials;
   const marqueeTestimonials = [...sectionTestimonials, ...sectionTestimonials];
   const marqueeRef = useRef<HTMLUListElement | null>(null);
-  const lastScrollYRef = useRef(0);
   const positionRef = useRef(0);
   const loopWidthRef = useRef(0);
   const baseVelocityRef = useRef(0);
-  const isPageScrollingRef = useRef(false);
   const isMarqueeHoveredRef = useRef(false);
-  const idleTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const marquee = marqueeRef.current;
@@ -209,38 +204,11 @@ export default function Testimonials({
       };
 
       updateLoopWidth();
-      lastScrollYRef.current = window.scrollY;
-
-      const handleScroll = () => {
-        const scrollY = window.scrollY;
-
-        if (scrollY === lastScrollYRef.current) return;
-
-        const scrollDelta = scrollY - lastScrollYRef.current;
-        lastScrollYRef.current = scrollY;
-
-        if (isMarqueeHoveredRef.current) return;
-
-        isPageScrollingRef.current = true;
-        positionRef.current -= scrollDelta * SCROLL_FOLLOW_MULTIPLIER;
-        normalizePosition();
-        setX(positionRef.current);
-
-        if (idleTimeoutRef.current) {
-          window.clearTimeout(idleTimeoutRef.current);
-        }
-
-        idleTimeoutRef.current = window.setTimeout(() => {
-          isPageScrollingRef.current = false;
-        }, IDLE_SCROLL_DELAY);
-      };
-
       const tick = (_time: number, deltaTime: number) => {
         const loopWidth = loopWidthRef.current;
 
         if (loopWidth <= 0) return;
         if (isMarqueeHoveredRef.current) return;
-        if (isPageScrollingRef.current) return;
 
         positionRef.current -= baseVelocityRef.current * (deltaTime / 1000);
         normalizePosition();
@@ -248,17 +216,11 @@ export default function Testimonials({
       };
 
       window.addEventListener("resize", updateLoopWidth);
-      window.addEventListener("scroll", handleScroll, { passive: true });
       gsap.ticker.add(tick);
 
       cleanup = () => {
         gsap.ticker.remove(tick);
         window.removeEventListener("resize", updateLoopWidth);
-        window.removeEventListener("scroll", handleScroll);
-
-        if (idleTimeoutRef.current) {
-          window.clearTimeout(idleTimeoutRef.current);
-        }
       };
     });
 
@@ -274,7 +236,6 @@ export default function Testimonials({
 
   const handleMarqueeMouseLeave = () => {
     isMarqueeHoveredRef.current = false;
-    lastScrollYRef.current = window.scrollY;
   };
 
   return (

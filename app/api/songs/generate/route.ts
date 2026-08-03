@@ -3,6 +3,7 @@ import { apiResponse } from "@/lib/api-response";
 import { getSession } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 import { customVoices } from "@/lib/db/schema";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -47,6 +48,7 @@ const generateSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
   let input: z.infer<typeof generateSchema>;
 
   try {
@@ -88,6 +90,7 @@ export async function POST(req: Request) {
   }
 
   try {
+    await recordUserActivity({ userId: session.user.id, feature: "song", action: "generate", outcome: "started" });
     const task = await createSongGeneration({
       ...input,
       customVoiceId,
@@ -104,6 +107,7 @@ export async function POST(req: Request) {
       status: task.status,
       isSubscriber: task.isSubscriber,
     });
+    await recordUserActivity({ userId: session.user.id, feature: "song", action: "generate", outcome: "succeeded", resourceType: "song_task", resourceId: task.songId, durationMs: Date.now() - startedAt, metadata: { status: task.status, customVoice: Boolean(customVoiceId) } });
 
     return apiResponse.success({
       songId: task.songId,
@@ -114,6 +118,7 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("[songs/generate] Failed to submit song task:", error);
+    await recordUserIssueSignal({ userId: session.user.id, feature: "song", action: "generate", error, durationMs: Date.now() - startedAt });
     return apiResponse.serverError(
       error instanceof Error ? error.message : "Failed to generate song.",
     );

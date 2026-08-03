@@ -108,6 +108,80 @@ export async function listCustomVoices(userId: string) {
   return voices;
 }
 
+export async function getCustomVoice(userId: string, voiceId: string) {
+  const [voice] = await db
+    .select()
+    .from(customVoices)
+    .where(and(eq(customVoices.id, voiceId), eq(customVoices.userId, userId)))
+    .limit(1);
+
+  return voice || null;
+}
+
+export async function updateCustomVoiceDetails(input: {
+  userId: string;
+  voiceId: string;
+  name: string;
+  description?: string;
+  style?: string;
+  imageUrl?: string;
+  imageKey?: string;
+}) {
+  const [voice] = await db
+    .update(customVoices)
+    .set({
+      name: input.name,
+      description: input.description || null,
+      style: input.style || null,
+      ...(input.imageUrl ? { imageUrl: input.imageUrl } : {}),
+      ...(input.imageKey ? { imageKey: input.imageKey } : {}),
+    })
+    .where(and(eq(customVoices.id, input.voiceId), eq(customVoices.userId, input.userId)))
+    .returning();
+
+  if (!voice) throw new Error("Voice not found.");
+
+  logger.info({ userId: input.userId, voiceId: input.voiceId, hasImage: Boolean(input.imageUrl) }, "Updated custom voice details");
+  return voice;
+}
+
+async function refreshPendingVoice(voice: typeof customVoices.$inferSelect) {
+  if (
+    voice.verificationTaskId &&
+    (voice.status === "preparing_verification" ||
+      (voice.status === "awaiting_recording" && !voice.verifyText))
+  ) {
+    try {
+      const data = await kieGet(
+        `/api/v1/voice/validate-info?taskId=${encodeURIComponent(voice.verificationTaskId)}`,
+      );
+      await completeCustomVoiceTask(voice.verificationTaskId, data);
+    } catch (error) {
+      logger.warn({ voiceId: voice.id, taskId: voice.verificationTaskId, status: voice.status, error: errorMessage(error) }, "Unable to refresh pending voice verification; keeping it pending for retry");
+    }
+    return;
+  }
+
+  if (voice.status === "creating" && voice.creationTaskId) {
+    try {
+      const data = await kieGet(
+        `/api/v1/voice/record-info?taskId=${encodeURIComponent(voice.creationTaskId)}`,
+      );
+      await completeCustomVoiceTask(voice.creationTaskId, data);
+    } catch (error) {
+      logger.warn({ voiceId: voice.id, taskId: voice.creationTaskId, status: voice.status, error: errorMessage(error) }, "Unable to refresh pending custom voice generation; keeping it pending for retry");
+    }
+  }
+}
+
+export async function refreshCustomVoiceStatus(userId: string, voiceId: string) {
+  const voice = await getCustomVoice(userId, voiceId);
+  if (!voice) return null;
+
+  await refreshPendingVoice(voice);
+  return getCustomVoice(userId, voiceId);
+}
+
 export async function refreshPendingVoiceVerifications(userId: string) {
   const voices = await listCustomVoices(userId);
   const pendingVerifications = voices.filter(
@@ -122,31 +196,7 @@ export async function refreshPendingVoiceVerifications(userId: string) {
 
   logger.debug({ userId, pendingVerificationCount: pendingVerifications.length, pendingGenerationCount: pendingGenerations.length, pendingVerifications: pendingVerifications.map((voice) => ({ voiceId: voice.id, status: voice.status, taskId: voice.verificationTaskId })), pendingGenerations: pendingGenerations.map((voice) => ({ voiceId: voice.id, status: voice.status, taskId: voice.creationTaskId })) }, "Refreshing pending custom voice tasks");
 
-  await Promise.all(
-    pendingVerifications.map(async (voice) => {
-      try {
-        const data = await kieGet(
-          `/api/v1/voice/validate-info?taskId=${encodeURIComponent(voice.verificationTaskId!)}`,
-        );
-        await completeCustomVoiceTask(voice.verificationTaskId!, data);
-      } catch (error) {
-        logger.warn({ voiceId: voice.id, taskId: voice.verificationTaskId, status: voice.status, error: errorMessage(error) }, "Unable to refresh pending voice verification; keeping it pending for retry");
-      }
-    }),
-  );
-
-  await Promise.all(
-    pendingGenerations.map(async (voice) => {
-      try {
-        const data = await kieGet(
-          `/api/v1/voice/record-info?taskId=${encodeURIComponent(voice.creationTaskId!)}`,
-        );
-        await completeCustomVoiceTask(voice.creationTaskId!, data);
-      } catch (error) {
-        logger.warn({ voiceId: voice.id, taskId: voice.creationTaskId, status: voice.status, error: errorMessage(error) }, "Unable to refresh pending custom voice generation; keeping it pending for retry");
-      }
-    }),
-  );
+  await Promise.all([...pendingVerifications, ...pendingGenerations].map(refreshPendingVoice));
 }
 
 export async function canCreateCustomVoice(userId: string) {

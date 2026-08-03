@@ -90,6 +90,16 @@
         "icon": "ShoppingCart"
       },
       {
+        "name": "User Activity",
+        "href": "/dashboard/activity",
+        "icon": "Activity"
+      },
+      {
+        "name": "Issue Monitor",
+        "href": "/dashboard/issues",
+        "icon": "ShieldAlert"
+      },
+      {
         "name": "Prices",
         "href": "/dashboard/prices",
         "icon": "DollarSign"

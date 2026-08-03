@@ -228,6 +228,7 @@ export default async function Footer() {
             {messages.Footer.Newsletter && (
               <div className="w-full lg:col-span-1 xl:col-span-3">
                 <Newsletter
+                  contactEmail={siteConfig.socialLinks.email}
                   labels={{
                     defaultErrorMessage: tFooter(
                       "Newsletter.subscribe.defaultErrorMessage"
@@ -245,14 +246,23 @@ export default async function Footer() {
             )}
           </div>
 
-          <div className="flex flex-col items-center justify-between border-t border-white/10 py-6 md:flex-row">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 md:flex-row">
             <p className="text-sm text-white/52">
               {tFooter("Copyright", {
                 year: new Date().getFullYear(),
                 name: siteConfig.name,
               })}
             </p>
-            <div className="mt-4 flex space-x-6 md:mt-0">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:justify-end">
+              <Link
+                href={`mailto:${siteConfig.socialLinks.email}`}
+                title={siteConfig.socialLinks.email}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-sm text-white/52 transition-colors hover:text-white"
+              >
+                Contact us: {siteConfig.socialLinks.email}
+              </Link>
               <I18nLink
                 href="/about"
                 title={tFooter("About")}

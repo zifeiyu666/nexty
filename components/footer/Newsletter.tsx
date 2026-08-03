@@ -15,11 +15,12 @@ type NewsletterLabels = {
 };
 
 type NewsletterProps = {
+  contactEmail: string;
   labels: NewsletterLabels;
   locale: string;
 };
 
-export function Newsletter({ labels, locale }: NewsletterProps) {
+export function Newsletter({ contactEmail, labels, locale }: NewsletterProps) {
   const [email, setEmail] = useState("");
   const [subscribeStatus, setSubscribeStatus] = useState<
     "idle" | "loading" | "success" | "error"
@@ -104,6 +105,17 @@ export function Newsletter({ labels, locale }: NewsletterProps) {
           <p className="mt-1 text-xs text-primary">{errorMessage}</p>
         )}
       </form>
+      <div className="mt-4">
+        <p className="text-sm text-white/62">Contact us</p>
+        <a
+          href={`mailto:${contactEmail}`}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="mt-1 inline-block text-sm text-white/78 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white hover:decoration-white"
+        >
+          {contactEmail}
+        </a>
+      </div>
     </div>
   );
 }

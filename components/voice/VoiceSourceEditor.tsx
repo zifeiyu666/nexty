@@ -170,17 +170,17 @@ export function VoiceSourceEditor({
   const selectionIsValid = end - start >= MIN_VOICE_SAMPLE_SECONDS;
 
   return (
-    <section className="rounded-xl border border-[#33292c] bg-[#1f1d1f] p-4 text-white shadow-[0_16px_34px_rgba(49,27,30,0.22)]">
+    <section className="rounded-2xl border border-[#eadbd3] bg-[#fffdfa] p-4 text-[#3d241b] shadow-[0_16px_34px_rgba(74,45,32,0.08)] sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Scissors className="size-4 text-[#ff419c]" /> Trim your best take
+          <Scissors className="size-4 text-primary" /> Trim your best take
         </div>
-        <span className="rounded-full bg-[#302c30] px-2.5 py-1 text-xs font-bold text-[#ff70b3] shadow-sm">
+        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary shadow-sm">
           {formatTime(end - start)} selected
         </span>
       </div>
-      <p className="mt-1 text-xs leading-5 text-white/58">
-        Choose a clean {MIN_VOICE_SAMPLE_SECONDS}-{MAX_VOICE_SAMPLE_SECONDS} second section. We will create and upload a new trimmed audio file from this selection.
+      <p className="mt-1 text-sm leading-6 text-[#80685e]">
+        Choose a clean {MIN_VOICE_SAMPLE_SECONDS}-{MAX_VOICE_SAMPLE_SECONDS} second section for your voice sample.
       </p>
 
       <div
@@ -190,15 +190,15 @@ export function VoiceSourceEditor({
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
       >
-        <div className="relative h-7 overflow-hidden rounded-lg bg-[repeating-linear-gradient(-45deg,#2d2b2e_0,#2d2b2e_5px,#242225_5px,#242225_10px)]">
-          <span className="absolute left-0 top-0 flex h-full items-center pl-3 text-[11px] font-black tracking-[0.14em] text-white/55">
+        <div className="relative h-7 overflow-hidden rounded-lg bg-[repeating-linear-gradient(-45deg,#f6ede8_0,#f6ede8_5px,#eee1da_5px,#eee1da_10px)]">
+          <span className="absolute left-0 top-0 flex h-full items-center pl-3 text-[11px] font-black tracking-[0.14em] text-[#80685e]">
             REMOVE
           </span>
-          <span className="absolute right-0 top-0 flex h-full items-center pr-3 text-[11px] font-black tracking-[0.14em] text-white/55">
+          <span className="absolute right-0 top-0 flex h-full items-center pr-3 text-[11px] font-black tracking-[0.14em] text-[#80685e]">
             REMOVE
           </span>
           <div
-            className="absolute top-0 h-full rounded-md bg-[#ff419c] shadow-[0_5px_14px_rgba(255,65,156,0.35)]"
+            className="absolute top-0 h-full rounded-md bg-primary shadow-[0_5px_14px_rgba(224,65,50,0.25)]"
             style={{ left: `${startPercent}%`, width: `${selectionWidth}%` }}
           >
             <div
@@ -225,21 +225,21 @@ export function VoiceSourceEditor({
           </div>
         </div>
 
-        <div className="relative mt-1 overflow-hidden rounded-[22px] border border-white/20 bg-[#242225] p-1">
+        <div className="relative mt-1 overflow-hidden rounded-[22px] border border-[#eadbd3] bg-[#f8efea] p-1">
           <canvas ref={canvasRef} className="h-28 w-full rounded-[18px]" aria-label="Audio waveform with selected clip" />
           <div
-            className="pointer-events-none absolute bottom-1 top-1 rounded-[18px] border-2 border-[#ff419c] bg-[#ff419c]/[0.08]"
+            className="pointer-events-none absolute bottom-1 top-1 rounded-[18px] border-2 border-primary bg-primary/[0.08]"
             style={{ left: `calc(${startPercent}% + 4px)`, width: `calc(${selectionWidth}% - 8px)` }}
           />
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-white/[0.06] px-3 py-2.5 text-sm">
-        <span className="text-white/55">Keep</span>
-        <span className={selectionIsValid ? "font-bold tabular-nums text-white" : "font-bold tabular-nums text-[#ff879a]"}>
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-[#f8efea] px-3 py-2.5 text-sm">
+        <span className="text-[#80685e]">Keep</span>
+        <span className={selectionIsValid ? "font-bold tabular-nums text-[#3d241b]" : "font-bold tabular-nums text-destructive"}>
           {formatTime(start)} - {formatTime(end)}
         </span>
-        <span className="text-xs font-semibold text-white/45">{formatTime(end - start)}</span>
+        <span className="text-xs font-semibold text-[#80685e]">{formatTime(end - start)}</span>
       </div>
 
       <audio
@@ -255,65 +255,10 @@ export function VoiceSourceEditor({
           }
         }}
       />
-      <Button className="mt-4 gap-2 border-white/20 bg-white/[0.06] text-white hover:bg-white/[0.12] hover:text-white" size="sm" type="button" variant="outline" onClick={() => void togglePreview()}>
+      <Button className="mt-4 gap-2 border-[#eadbd3] bg-white text-[#3d241b] hover:bg-primary/5 hover:text-primary" size="sm" type="button" variant="outline" onClick={() => void togglePreview()}>
         {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
         {isPlaying ? "Pause selection" : "Preview selection"}
       </Button>
     </section>
-  );
-}
-
-type RecordingSpectrumProps = { active: boolean; analyser: AnalyserNode | null };
-
-export function RecordingSpectrum({ active, analyser }: RecordingSpectrumProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !active || !analyser) return;
-
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    let frame = 0;
-
-    const draw = () => {
-      const bounds = canvas.getBoundingClientRect();
-      const pixelRatio = window.devicePixelRatio || 1;
-      const width = Math.max(1, Math.round(bounds.width * pixelRatio));
-      const height = Math.max(1, Math.round(bounds.height * pixelRatio));
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
-      }
-      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      analyser.getByteFrequencyData(data);
-      context.clearRect(0, 0, bounds.width, bounds.height);
-      const count = 36;
-      const step = Math.max(1, Math.floor(data.length / count));
-      const barWidth = (bounds.width - (count - 1) * 3) / count;
-      for (let index = 0; index < count; index += 1) {
-        const level = data[index * step] / 255;
-        const barHeight = Math.max(5, level * (bounds.height - 8));
-        const x = index * (barWidth + 3);
-        context.fillStyle = `rgba(232, 67, 53, ${0.45 + level * 0.55})`;
-        context.fillRect(x, (bounds.height - barHeight) / 2, barWidth, barHeight);
-      }
-      frame = requestAnimationFrame(draw);
-    };
-
-    draw();
-    return () => cancelAnimationFrame(frame);
-  }, [active, analyser]);
-
-  if (!active) return null;
-
-  return (
-    <div className="mt-4 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5">
-      <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-destructive">
-        <span className="size-2 animate-pulse rounded-full bg-destructive" /> Recording live
-      </div>
-      <canvas ref={canvasRef} className="h-12 w-full" aria-label="Live recording audio spectrum" />
-    </div>
   );
 }

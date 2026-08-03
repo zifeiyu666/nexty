@@ -128,11 +128,18 @@
 }
 
 @utility home-section {
-  @apply bg-[#fffdf9] py-20 text-[#2b1710] md:py-24;
+  @apply bg-[#fffaf6] py-20 text-[#2b1710] md:py-24;
 }
 
 @utility home-section-muted {
-  @apply bg-[#f8f2ee] py-20 text-[#2b1710] md:py-24;
+  @apply bg-[#f7efea] py-20 text-[#2b1710] md:py-24;
+}
+
+@utility home-section-soft {
+  background:
+    radial-gradient(circle at 12% 6%, rgba(255, 221, 214, 0.42), transparent 27rem),
+    linear-gradient(180deg, #fffaf6 0%, #fcf3ee 100%);
+  @apply py-20 text-[#2b1710] md:py-24;
 }
 
 @utility home-section-deep {
@@ -225,11 +232,11 @@
 }
 
 @utility home-eyebrow {
-  @apply text-xs font-bold uppercase tracking-[0.22em] text-primary;
+  @apply text-xs font-semibold uppercase tracking-[0.16em] text-primary/85;
 }
 
 @utility home-title {
-  @apply mt-3 text-balance bg-gradient-to-br from-[#2b1710] via-[#351a12] to-[#5a2a18] bg-clip-text font-sans text-3xl font-black leading-tight tracking-normal text-transparent sm:text-4xl md:text-5xl;
+  @apply mt-3 text-balance font-sans text-3xl font-black leading-tight tracking-normal text-[#2b1710] sm:text-4xl md:text-5xl;
 }
 
 @utility home-title-on-deep {
@@ -249,7 +256,7 @@
 }
 
 @utility home-card {
-  @apply rounded-2xl border border-[#eadbd3] bg-white shadow-[0_18px_52px_rgba(54,38,27,0.08)];
+  @apply rounded-2xl border border-[#eadbd3] bg-[#fffdfa] shadow-[0_18px_52px_rgba(74,45,32,0.08)];
 }
 
 @utility home-card-hover {

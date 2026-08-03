@@ -283,7 +283,7 @@ async function main() {
     }
 
     const preferredAdmin =
-      admins.find((admin) => admin.email === "support@onecustomsong.com") ?? admins[0];
+      admins.find((admin) => admin.email === "support@mail.onecustomsong.com") ?? admins[0];
 
     const { url: featuredImageUrl } = await uploadCoverImage();
     const content = buildContent();

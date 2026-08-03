@@ -1,5 +1,7 @@
 import dashboardBlogs from './messages/en/Dashboard/Admin/Blogs.json';
+import activity from './messages/en/Dashboard/Admin/Activity.json';
 import dashboardGlossary from './messages/en/Dashboard/Admin/Glossary.json';
+import issues from './messages/en/Dashboard/Admin/Issues.json';
 import orders from './messages/en/Dashboard/Admin/Orders.json';
 import overview from './messages/en/Dashboard/Admin/Overview.json';
 import prices from './messages/en/Dashboard/Admin/Prices.json';
@@ -41,8 +43,10 @@ import japaneseGlossary from './messages/ja/Glossary.json';
  * this explicit inventory with i18n/messages/en to prevent silent omissions.
  */
 export const englishMessageFiles = {
+  'Dashboard/Admin/Activity.json': activity,
   'Dashboard/Admin/Blogs.json': dashboardBlogs,
   'Dashboard/Admin/Glossary.json': dashboardGlossary,
+  'Dashboard/Admin/Issues.json': issues,
   'Dashboard/Admin/Orders.json': orders,
   'Dashboard/Admin/Overview.json': overview,
   'Dashboard/Admin/Prices.json': prices,
@@ -65,6 +69,7 @@ export const englishMessageFiles = {
  * components already refer to them through next-intl.
  */
 export const englishMessageNamespaces = {
+  Activity: activity,
   Landing: landing,
   MusicVideos: musicVideos,
   Pricing: pricing,
@@ -78,6 +83,7 @@ export const englishMessageNamespaces = {
   Users: users,
   DashboardBlogs: dashboardBlogs,
   DashboardGlossary: dashboardGlossary,
+  Issues: issues,
   Orders: orders,
   R2Files: r2Files,
   Prices: prices,

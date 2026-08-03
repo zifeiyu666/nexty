@@ -127,6 +127,21 @@
           "Elígela junto al estilo y el idioma de la canción",
           "Mantén una sensación familiar sin tener que cantar"
         ],
+        "demo": {
+          "eyebrow": "Escucha la transformación",
+          "title": "Una voz convertida en canción",
+          "source": {
+            "title": "Grabación de voz original",
+            "subtitle": "La muestra vocal en seco usada para crear la voz"
+          },
+          "song": {
+            "title": "Canción creada con esa voz",
+            "subtitle": "La voz de canto generada dentro de una canción terminada",
+            "startsAt": "La vista previa empieza en 0:04"
+          },
+          "play": "Reproducir {title}",
+          "pause": "Pausar {title}"
+        },
         "consent": "Solo puedes clonar una voz que tengas autorización para usar. Es necesario completar una verificación antes de utilizarla.",
         "cta": "Crear mi voz",
         "imageAlt": "Persona grabando una muestra de voz para una voz de canto personalizada con IA"

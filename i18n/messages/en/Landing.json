@@ -130,6 +130,21 @@
           "Choose it alongside your song's genre and language",
           "Keep the feeling familiar without needing to perform"
         ],
+        "demo": {
+          "eyebrow": "Hear the transformation",
+          "title": "One voice, made into a song",
+          "source": {
+            "title": "Original voice recording",
+            "subtitle": "The dry vocal sample used to create the voice"
+          },
+          "song": {
+            "title": "Song created with that voice",
+            "subtitle": "The generated singing voice in a finished song",
+            "startsAt": "Song preview starts at 0:04"
+          },
+          "play": "Play {title}",
+          "pause": "Pause {title}"
+        },
         "consent": "Only clone a voice you are authorized to use. A verification step is required before it can be used.",
         "cta": "Create my voice",
         "imageAlt": "Person recording a voice sample for a custom AI singing voice"

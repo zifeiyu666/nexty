@@ -1,5 +1,7 @@
 import { apiResponse } from "@/lib/api-response";
 import { generateSongStory } from "@/lib/ai/song";
+import { getSession } from "@/lib/auth/server";
+import { recordUserActivity, recordUserIssueSignal } from "@/lib/observability/user-activity";
 import { z } from "zod";
 
 const storySchema = z.object({
@@ -41,6 +43,8 @@ const storySchema = z.object({
 );
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
+  const session = await getSession();
   let input: z.infer<typeof storySchema>;
 
   try {
@@ -54,10 +58,13 @@ export async function POST(req: Request) {
   }
 
   try {
+    await recordUserActivity({ userId: session?.user.id, feature: "story", action: "generate", outcome: "started" });
     const story = await generateSongStory(input);
+    await recordUserActivity({ userId: session?.user.id, feature: "story", action: "generate", outcome: "succeeded", durationMs: Date.now() - startedAt });
     return apiResponse.success(story);
   } catch (error) {
     console.error("[songs/story] Failed to generate story:", error);
+    await recordUserIssueSignal({ userId: session?.user.id, feature: "story", action: "generate", error, durationMs: Date.now() - startedAt });
     return apiResponse.serverError(
       error instanceof Error ? error.message : "Failed to generate story.",
     );

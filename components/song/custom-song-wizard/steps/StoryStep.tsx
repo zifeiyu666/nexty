@@ -16,6 +16,7 @@ import { useMemo } from "react";
 import type { RefObject } from "react";
 
 import { Button } from "@/components/ui/button";
+import { LiveRecordingPanel } from "@/components/voice/LiveRecordingPanel";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,9 @@ const detailTemplates = [
 type StoryStepProps = {
   isRecording: boolean;
   isRecordingBlessing: boolean;
+  blessingAnalyser: AnalyserNode | null;
+  blessingElapsedSeconds: number;
+  blessingMaxDurationSeconds: number | null;
   isUploadingBlessing: boolean;
   isPolishingStory: boolean;
   occasion: Occasion | null;
@@ -58,6 +62,9 @@ type StoryStepProps = {
 export function StoryStep({
   isRecording,
   isRecordingBlessing,
+  blessingAnalyser,
+  blessingElapsedSeconds,
+  blessingMaxDurationSeconds,
   isUploadingBlessing,
   isPolishingStory,
   occasion,
@@ -86,7 +93,7 @@ export function StoryStep({
 
     const transcriptWords = spokenIntro.transcript.trim().split(/\s+/);
     return transcriptWords.slice(0, 6).join(" ");
-  }, [spokenIntro?.transcript]);
+  }, [spokenIntro]);
   const transcriptSegments = useMemo(() => {
     if (!spokenIntro?.alignedWords?.length) return [];
 
@@ -104,7 +111,7 @@ export function StoryStep({
     }
 
     return segments;
-  }, [spokenIntro?.alignedWords]);
+  }, [spokenIntro]);
   const activeTranscriptSegmentIndex = useMemo(() => {
     if (!transcriptSegments.length) return 0;
 
@@ -153,7 +160,7 @@ export function StoryStep({
           {copy.storyHeading}
         </div>
         <span className="text-sm font-semibold text-muted-foreground">
-          100–200 {copy.words}
+          100-200 {copy.words}
         </span>
       </div>
       <section className="mb-8 overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-sm">
@@ -201,31 +208,32 @@ export function StoryStep({
               onChange={(event) => onSpokenBlessingChange(event.target.value)}
             />
           ) : (
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button
-                type="button"
-                variant="outline"
-                className={cn(
-                  "shrink-0 rounded-full font-bold",
-                  isRecordingBlessing &&
-                    "border-primary bg-primary/10 text-primary",
-                )}
-                onClick={onToggleBlessingRecording}
-                disabled={isUploadingBlessing}
-              >
-                {isRecordingBlessing ? (
-                  <MicOff className="size-4" />
-                ) : (
+            <>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              {!isRecordingBlessing && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0 rounded-full font-bold"
+                  onClick={onToggleBlessingRecording}
+                  disabled={isUploadingBlessing}
+                >
                   <Mic2 className="size-4" />
+                  {copy.record}
+                </Button>
+              )}
+              <label
+                className={cn(
+                  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-muted hover:text-foreground",
+                  isRecordingBlessing && "pointer-events-none opacity-50",
                 )}
-                {isRecordingBlessing ? copy.stop : copy.record}
-              </Button>
-              <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-muted hover:text-foreground">
+              >
                 <Upload className="size-4" /> {copy.uploadAudio}
                 <input
                   className="sr-only"
                   type="file"
                   accept="audio/webm,audio/mpeg,audio/mp4,audio/wav,audio/ogg"
+                  disabled={isRecordingBlessing}
                   onChange={(event) => {
                     const file = event.target.files?.[0];
                     if (file) onUploadBlessing(file);
@@ -323,7 +331,18 @@ export function StoryStep({
                   {copy.recordingLength}
                 </span>
               )}
-            </div>
+              </div>
+              {isRecordingBlessing && (
+                <LiveRecordingPanel
+                  analyser={blessingAnalyser}
+                  description="Recording in progress. Speak your opening blessing now."
+                  elapsedSeconds={blessingElapsedSeconds}
+                  maxDurationSeconds={blessingMaxDurationSeconds}
+                  onStop={onToggleBlessingRecording}
+                  stopLabel={copy.stop}
+                />
+              )}
+            </>
           )}
         </div>
       </section>
