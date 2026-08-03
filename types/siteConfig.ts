@@ -13,7 +13,8 @@ export type SiteConfig = {
   description?: string
   url: string
   authors: AuthorsConfig[]
-  socialLinks?: {
+  socialLinks: {
+    email: string
     [key: string]: string | undefined
   }
   creator: string

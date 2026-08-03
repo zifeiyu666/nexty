@@ -18,7 +18,7 @@ function formatTime(seconds: number) {
 }
 
 export default function VoiceCloneDemo() {
-  const t = useTranslations("Landing.VoicePersonalization.items.voiceClone.demo");
+  const t = useTranslations("Landing.VoicePersonalization");
   const sourceAudioRef = useRef<HTMLAudioElement>(null);
   const songAudioRef = useRef<HTMLAudioElement>(null);
   const [activeTrack, setActiveTrack] = useState<TrackId | null>(null);
@@ -92,14 +92,14 @@ export default function VoiceCloneDemo() {
     {
       id: "source",
       icon: Waves,
-      title: t("source.title"),
-      subtitle: t("source.subtitle"),
+      title: t("items.voiceClone.demo.source.title"),
+      subtitle: t("items.voiceClone.demo.source.subtitle"),
     },
     {
       id: "song",
       icon: Sparkles,
-      title: t("song.title"),
-      subtitle: t("song.subtitle"),
+      title: t("items.voiceClone.demo.song.title"),
+      subtitle: t("items.voiceClone.demo.song.subtitle"),
     },
   ];
 
@@ -130,9 +130,11 @@ export default function VoiceCloneDemo() {
 
       <div className="border-b border-[#eadbd3] bg-[#2a1711] px-4 py-3 text-white sm:px-5">
         <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#ffad9d]">
-          {t("eyebrow")}
+          {t("items.voiceClone.demo.eyebrow")}
         </p>
-        <p className="mt-1 text-sm font-bold">{t("title")}</p>
+        <p className="mt-1 text-sm font-bold">
+          {t("items.voiceClone.demo.title")}
+        </p>
       </div>
 
       <div className="divide-y divide-[#eadbd3]">
@@ -154,8 +156,16 @@ export default function VoiceCloneDemo() {
                 </span>
                 <button
                   type="button"
-                  aria-label={isPlaying ? t("pause", { title }) : t("play", { title })}
-                  title={isPlaying ? t("pause", { title }) : t("play", { title })}
+                  aria-label={
+                    isPlaying
+                      ? t("items.voiceClone.demo.pause", { title })
+                      : t("items.voiceClone.demo.play", { title })
+                  }
+                  title={
+                    isPlaying
+                      ? t("items.voiceClone.demo.pause", { title })
+                      : t("items.voiceClone.demo.play", { title })
+                  }
                   onClick={() => void toggleTrack(id)}
                   className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-white shadow-[0_7px_16px_rgba(224,65,50,0.25)] transition hover:scale-105 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
@@ -173,7 +183,7 @@ export default function VoiceCloneDemo() {
 
       <p className="flex items-center gap-2 border-t border-[#eadbd3] px-4 py-2.5 text-xs text-[#80685e] sm:px-5">
         <Volume2 className="size-3.5 text-primary" aria-hidden="true" />
-        {t("song.startsAt")}
+        {t("items.voiceClone.demo.song.startsAt")}
       </p>
     </div>
   );
