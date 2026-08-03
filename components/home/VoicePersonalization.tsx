@@ -9,7 +9,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 
 const featureKeys = ["voiceClone", "spokenIntro"] as const;
 
@@ -59,7 +58,7 @@ export default function VoicePersonalization() {
                 key={featureKey}
                 className="home-card home-card-hover group flex h-full flex-col overflow-hidden lg:min-h-[570px]"
               >
-                {image ? (
+                {/* {image ? (
                   <div className="relative h-40 overflow-hidden bg-[#281915] sm:h-44 lg:h-48">
                     <Image
                       src={image}
@@ -73,7 +72,7 @@ export default function VoicePersonalization() {
                       <Icon className="size-[1.1rem]" aria-hidden="true" />
                     </div>
                   </div>
-                ) : null}
+                ) : null} */}
 
                 <div className="flex flex-1 flex-col px-6 py-7 sm:px-8 sm:py-8">
 
