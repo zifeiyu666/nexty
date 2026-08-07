@@ -112,6 +112,25 @@ describe("UseSend adapter", () => {
     );
   });
 
+  test("serializes structured API error details instead of [object Object]", async () => {
+    global.fetch = async () =>
+      mockResponse(
+        { message: { from: ["Sender address is not verified"] } },
+        400,
+      );
+
+    await assert.rejects(
+      sendUseSendEmail({
+        to: "recipient@example.com",
+        from: "One Custom Song <support@mail.onecustomsong.com>",
+        replyTo: "support@mail.onecustomsong.com",
+        subject: "Rejected",
+        html: "<p>Hello</p>",
+      }),
+      /UseSend API request failed \(400\): \{"from":\["Sender address is not verified"\]\}/,
+    );
+  });
+
   test("adds a missing contact to the configured contact book", async () => {
     const requests: Request[] = [];
     global.fetch = async (input, init) => {

@@ -56,6 +56,12 @@ const staticPages: {
     priority: 0.8,
   },
   {
+    path: '/occasions/custom-song-for-wife',
+    lastModified: '2026-08-05',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  },
+  {
     path: '/occasions/anniversary',
     lastModified: '2026-07-08',
     changeFrequency: 'weekly',
@@ -104,6 +110,7 @@ const englishOnlyStaticPaths = new Set([
   '/terms-of-service',
   '/refund-policy',
   '/voice-clone',
+  '/occasions/custom-song-for-wife',
   ...getAllOccasionLandingConfigs().map(
     (occasion) => `/occasions/${occasion.slug}`,
   ),

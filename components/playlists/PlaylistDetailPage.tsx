@@ -159,6 +159,8 @@ export function PlaylistDetailPage({
         </div>
 
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+          {playlist.slug === "wife" && <WifeSpotifyPlaylistEmbed />}
+
           <div className="rounded-lg bg-stone-950 p-5 text-white shadow-[0_18px_54px_rgba(41,37,36,0.2)]">
             <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-amber-200">
               <Gift className="size-4" />
@@ -248,6 +250,36 @@ export function PlaylistDetailPage({
         </section>
       )}
     </main>
+  );
+}
+
+function WifeSpotifyPlaylistEmbed() {
+  return (
+    <section
+      aria-labelledby="wife-spotify-playlist-title"
+      className="rounded-lg bg-white p-5 shadow-[0_16px_44px_rgba(41,37,36,0.08)] ring-1 ring-stone-200/70"
+    >
+      <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-primary">
+        <Music2 className="size-4" />
+        Listen on Spotify
+      </p>
+      <h2 className="mt-2 text-xl font-black" id="wife-spotify-playlist-title">
+        Romantic songs for your wife
+      </h2>
+      <iframe
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        allowFullScreen
+        className="mt-4 w-full border-0"
+        data-testid="embed-iframe"
+        frameBorder="0"
+        height="352"
+        loading="lazy"
+        src="https://open.spotify.com/embed/playlist/73pIDuawrp39hT6kuwqeqW?utm_source=generator&theme=0&si=5f6eee249e3d4701"
+        style={{ borderRadius: 12 }}
+        title="Spotify playlist of romantic songs for wife"
+        width="100%"
+      />
+    </section>
   );
 }
 

@@ -1,8 +1,8 @@
 const DEFAULT_USESEND_BASE_URL = "https://app.usesend.com";
 
 type UseSendErrorResponse = {
-  error?: string;
-  message?: string;
+  error?: unknown;
+  message?: unknown;
 };
 
 type UseSendContact = {
@@ -24,6 +24,22 @@ export type SendUseSendEmailInput = {
 type UseSendEmailResponse = {
   emailId: string;
 };
+
+function formatErrorDetail(value: unknown): string | undefined {
+  if (value == null) {
+    return undefined;
+  }
+
+  if (typeof value === "string") {
+    return value;
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
 
 function getApiKey(): string {
   const apiKey = process.env.USESEND_API_KEY?.trim();
@@ -78,12 +94,13 @@ async function request<T>(
   }
 
   if (!response.ok) {
-    const message =
+    const message = formatErrorDetail(
       data && typeof data === "object" && "message" in data
         ? data.message
         : data && typeof data === "object" && "error" in data
           ? data.error
-          : body || response.statusText;
+          : body || response.statusText,
+    );
 
     throw new Error(`UseSend API request failed (${response.status}): ${message}`);
   }
