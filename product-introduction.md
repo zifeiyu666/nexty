@@ -66,6 +66,10 @@ Product Hunt official launch guide reference: https://www.producthunt.com/launch
 | Twitter/X | https://x.com/XinpengYu38540 |
 | GitHub | https://github.com/zifeyu666/nexty |
 | YouTube | https://www.youtube.com/@onecustomsong |
+https://youtu.be/q_yo8ntLAM8?si=jHDC1-MobjM4zOJC
+https://youtu.be/GV1LXLsSaVQ?si=kMgNKeiDdvFZK6Vu
+https://youtu.be/hpjS8dlfaW4?si=DmojTuNaNydiUarX
+https://youtu.be/Tl2se8CNf-o?si=LGYSKxHyNybTtUyX
 
 ### Field Notes / 字段说明
 
@@ -109,15 +113,15 @@ ZH: One Custom Song 面向那些希望礼物更私人、更有情绪、更容易
 
 #### English
 
-Hey Product Hunt! I built One Custom Song to help people turn meaningful memories into gifts that feel truly personal.
+  Hey Product Hunt! I built One Custom Song to help people turn meaningful memories into gifts that feel truly personal.
 
-Describe a relationship, memory, occasion, or message, and One Custom Song creates a custom AI song around it. You can refine the lyrics and style, use your own voice for the song, and add a personal spoken greeting at the beginning to make the moment even more special.
+  Describe a relationship, memory, occasion, or message, and One Custom Song creates a custom AI song around it. You can refine the lyrics and style, use your own voice for the song, and add a personal spoken greeting at the beginning to make the moment even more special.
 
-Start with unlimited free 60-second previews—no credit card required. When it feels right, unlock the full song and turn it into a shareable music video or printable lyric wall art.
+  Start with unlimited free 60-second previews—no credit card required. When it feels right, unlock the full song and turn it into a shareable music video or printable lyric wall art.
 
-It is made for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and every moment that deserves more than a generic card.
+  It is made for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and every moment that deserves more than a generic card.
 
-I would love your feedback on the creation flow, the voice feature, and what would make a custom song feel even more giftable. Thanks for checking it out!
+  I would love your feedback on the creation flow, the voice feature, and what would make a custom song feel even more giftable. Thanks for checking it out!
 
 #### 中文
 

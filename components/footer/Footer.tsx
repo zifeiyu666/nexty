@@ -161,9 +161,13 @@ export default async function Footer() {
                 <div className="pt-2">
                   <LocaleSwitcher variant="footer" />
                 </div>
-                <div>
-                  <a href="https://fazier.com/launches/onecustomsong.com" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark" width={80} alt="Fazier badge" /></a>
+                <div >
+                  <a href="https://fazier.com/launches/onecustomsong.com" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark" width={100} alt="Fazier badge" /></a>
+                  <a href="https://buildvoyage.com/products/onecustomsong?ref=badge" target="_blank" >
+                    <img src="https://buildvoyage.com/images/featured_badge.png" alt="Featured on BuildVoyage" width="120" />
+                  </a>
                 </div>
+
               </div>
             </div>
 
