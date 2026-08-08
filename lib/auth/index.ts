@@ -143,7 +143,9 @@ export const auth = betterAuth({
                   email: createdUser.email,
                   unsubscribeLink: unsubscribeLink,
                 },
-                isAddContacts: true,
+                // Adding a user to UseSend's contact book triggers its configured
+                // double-opt-in email, which uses UseSend's default sender. This
+                // transactional welcome email must only use the shared support sender.
                 hasUnsubscribeLink: true,
               });
               console.log(`Welcome email sent to ${createdUser.email}`);

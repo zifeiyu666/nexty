@@ -6,12 +6,10 @@ import {
   removeUseSendContact,
   sendUseSendEmail,
 } from '@/lib/usesend';
+import { getTransactionalEmailSender } from '@/lib/email-sender';
 import { render } from '@react-email/render';
 import * as React from 'react';
 
-const SENDER_NAME = 'One Custom Song';
-const SENDER_EMAIL = process.env.ADMIN_EMAIL?.trim() || 'support@mail.onecustomsong.com';
-const SENDER = `${SENDER_NAME} <${SENDER_EMAIL}>`;
 
 interface SendEmailProps {
   email: string;
@@ -66,8 +64,8 @@ export async function sendEmail({
 
   const result = await sendUseSendEmail({
     to: email,
-    from: SENDER,
-    replyTo: SENDER_EMAIL,
+    from: getTransactionalEmailSender().from,
+    replyTo: getTransactionalEmailSender().email,
     subject,
     html: await renderEmail(react, reactProps),
     headers,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play, Sparkles, Volume2, Waves } from "lucide-react";
+import { Pause, Play, Sparkles, Waves } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 
@@ -181,10 +181,10 @@ export default function VoiceCloneDemo() {
         })}
       </div>
 
-      <p className="flex items-center gap-2 border-t border-[#eadbd3] px-4 py-2.5 text-xs text-[#80685e] sm:px-5">
+      {/* <p className="flex items-center gap-2 border-t border-[#eadbd3] px-4 py-2.5 text-xs text-[#80685e] sm:px-5">
         <Volume2 className="size-3.5 text-primary" aria-hidden="true" />
         {t("items.voiceClone.demo.song.startsAt")}
-      </p>
+      </p> */}
     </div>
   );
 }
