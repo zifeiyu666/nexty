@@ -130,7 +130,8 @@
             {"href": "/samples", "name": "Mis muestras"},
             {"isSubTitle": true, "name": "Recursos"},
             {"href": "/blog", "name": "Todos los artículos"},
-            {"href": "/glossary", "name": "Glosario"}
+            {"href": "/glossary", "name": "Glosario"},
+            {"href": "https://aihustle.tools", "name": "AI Hustle Tools", "target": "_blank", "rel": "noopener nofollow"}
           ]
         },
         {

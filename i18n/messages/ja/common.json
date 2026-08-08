@@ -263,7 +263,8 @@
             { "href": "/samples", "name": "サンプル" },
             { "isSubTitle": true, "name": "資料" },
             { "href": "/blog", "name": "すべての記事" },
-            { "href": "/glossary", "name": "用語集" }
+            { "href": "/glossary", "name": "用語集" },
+            { "href": "https://aihustle.tools", "name": "AI Hustle Tools", "target": "_blank", "rel": "noopener nofollow" }
           ]
         },
         {

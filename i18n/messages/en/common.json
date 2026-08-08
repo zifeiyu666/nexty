@@ -483,6 +483,12 @@
             {
               "href": "/glossary",
               "name": "Glossary"
+            },
+            {
+              "href": "https://aihustle.tools",
+              "name": "AI Hustle Tools",
+              "target": "_blank",
+              "rel": "noopener nofollow"
             }
           ]
         },
