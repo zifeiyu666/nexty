@@ -66,10 +66,21 @@ Product Hunt official launch guide reference: https://www.producthunt.com/launch
 | Twitter/X | https://x.com/XinpengYu38540 |
 | GitHub | https://github.com/zifeyu666/nexty |
 | YouTube | https://www.youtube.com/@onecustomsong |
-https://youtu.be/q_yo8ntLAM8?si=jHDC1-MobjM4zOJC
-https://youtu.be/GV1LXLsSaVQ?si=kMgNKeiDdvFZK6Vu
-https://youtu.be/hpjS8dlfaW4?si=DmojTuNaNydiUarX
-https://youtu.be/Tl2se8CNf-o?si=LGYSKxHyNybTtUyX
+
+<!-- 主视频 -->
+https://youtu.be/q_yo8ntLAM8
+<!-- 步骤 -->
+https://youtu.be/GV1LXLsSaVQ
+<!-- demo1 -->
+https://youtu.be/hpjS8dlfaW4
+<!-- demo2 -->
+https://youtu.be/Tl2se8CNf-o
+
+- Fast generation: create a personalized song in minutes from a memory, story, or occasion
+- Voice cloning: turn a personal voice into the final song or match a chosen vocal style
+- Lyrics customization: refine the wording, tone, and emotional details to fit the moment
+- Lyric wall art: transform the finished lyrics into a printable keepsake for gifting or display
+- Music video: generate a shareable visual story to accompany the song and extend the gift experience
 
 ### Field Notes / 字段说明
 
