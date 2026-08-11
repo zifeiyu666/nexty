@@ -31,52 +31,52 @@
     "trustItems": ["無料で試せます", "数分で完成", "音楽経験は不要です"],
     "videos": [
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-2.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
         "label": "One Custom Song",
         "title": "お母さんが初めて聴いた瞬間"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
         "label": "One Custom Song",
         "title": "うれし涙"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
         "label": "One Custom Song",
         "title": "最高のサプライズ"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
         "label": "One Custom Song",
         "title": "結婚式の思い出をもう一度"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-12.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
         "label": "One Custom Song",
         "title": "記念日のサプライズ"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-5.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
         "label": "One Custom Song",
         "title": "ふたりの歌"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
         "label": "One Custom Song",
         "title": "驚きが笑顔に変わる瞬間"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-20.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
         "label": "One Custom Song",
         "title": "もう一度聴きたい"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
         "label": "One Custom Song",
         "title": "お父さんが初めて聴いた瞬間"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
         "label": "One Custom Song",
         "title": "喜びの涙"
       }

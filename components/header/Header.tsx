@@ -37,7 +37,7 @@ const Header = async () => {
             className="absolute left-1/2 flex -translate-x-1/2 items-center space-x-1 lg:static lg:translate-x-0"
           >
             <Image
-              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
+              src="/generated-logos/send-the-song-rounder-logo-1.png"
               alt={t("title")}
               width={2017}
               height={337}

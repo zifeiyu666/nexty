@@ -1,3 +1,5 @@
+import { r2PublicUrl } from "@/lib/cloudflare/public-url";
+
 export type OccasionCard = {
   id: string;
   index: string;
@@ -32,63 +34,63 @@ const occasionDemoSongs = {
     title: "Ten Years, Ava",
     sourcePrefix: "anniversary",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/anniversary-ten-years-ava.mp3",
+      r2PublicUrl("/audio/occasion-demos/anniversary-ten-years-ava.mp3"),
   },
   apology: {
     id: "occasion-demo-apology",
     title: "James I’m Sorry",
     sourcePrefix: "apology",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/apology-james-im-sorry.mp3",
+      r2PublicUrl("/audio/occasion-demos/apology-james-im-sorry.mp3"),
   },
   christmas: {
     id: "occasion-demo-christmas",
     title: "Carter Family Christmas",
     sourcePrefix: "christmas",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/carter-family-christmas.mp3",
+      r2PublicUrl("/audio/occasion-demos/carter-family-christmas.mp3"),
   },
   fathersDay: {
     id: "occasion-demo-fathers-day",
     title: "Seatbelt and Wrenches",
     sourcePrefix: "father’s day",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/fathers-day-seatbelt-and-wrenches.mp3",
+      r2PublicUrl("/audio/occasion-demos/fathers-day-seatbelt-and-wrenches.mp3"),
   },
   getWellSoon: {
     id: "occasion-demo-get-well-soon",
     title: "Sky Photos for Lily",
     sourcePrefix: "get well soon",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/get-well-soon-sky-photos-for-lily.mp3",
+      r2PublicUrl("/audio/occasion-demos/get-well-soon-sky-photos-for-lily.mp3"),
   },
   mothersDay: {
     id: "occasion-demo-mothers-day",
     title: "Linda My Mom",
     sourcePrefix: "mother’s day",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/mothers-day-linda-my-mom.mp3",
+      r2PublicUrl("/audio/occasion-demos/mothers-day-linda-my-mom.mp3"),
   },
   proposal: {
     id: "occasion-demo-proposal",
     title: "Final Page Forever",
     sourcePrefix: "proposal",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/proposal-final-page-forever.mp3",
+      r2PublicUrl("/audio/occasion-demos/proposal-final-page-forever.mp3"),
   },
   sweetestDay: {
     id: "occasion-demo-sweetest-day",
     title: "Cart and Umbrella",
     sourcePrefix: "sweetest day",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/sweetest-day-cart-and-umbrella.mp3",
+      r2PublicUrl("/audio/occasion-demos/sweetest-day-cart-and-umbrella.mp3"),
   },
   thankYou: {
     id: "occasion-demo-thankyou",
     title: "Ms Country",
     sourcePrefix: "thankyou",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/thankyou-ms-country.mp3",
+      r2PublicUrl("/audio/occasion-demos/thankyou-ms-country.mp3"),
   },
 } satisfies Record<string, OccasionSampleSong>;
 

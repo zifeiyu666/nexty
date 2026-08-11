@@ -60,10 +60,12 @@ const nextConfig = {
       process.env.NEXT_PUBLIC_OPTIMIZED_IMAGES &&
       process.env.NEXT_PUBLIC_OPTIMIZED_IMAGES === "false",
     remotePatterns: [
-      ...(process.env.R2_PUBLIC_URL
+      ...((process.env.NEXT_PUBLIC_R2_PUBLIC_URL || process.env.R2_PUBLIC_URL)
         ? [
             {
-              hostname: process.env.R2_PUBLIC_URL.replace("https://", ""),
+              hostname: (process.env.NEXT_PUBLIC_R2_PUBLIC_URL || process.env.R2_PUBLIC_URL)
+                .replace(/^https?:\/\//, "")
+                .replace(/\/+$/, ""),
             },
           ]
         : []),

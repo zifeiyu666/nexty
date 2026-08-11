@@ -17,6 +17,7 @@ import notFound from './messages/en/NotFound.json';
 import pricing from './messages/en/Pricing.json';
 import samples from './messages/en/Samples.json';
 import songs from './messages/en/Songs.json';
+import { resolveR2AssetPaths } from '../lib/cloudflare/public-url';
 import spanishCommon from './messages/es/common.json';
 import spanishLanding from './messages/es/Landing.json';
 import spanishMusicVideos from './messages/es/MusicVideos.json';
@@ -55,7 +56,7 @@ export const englishMessageFiles = {
   'Dashboard/User/CreditHistory.json': creditHistory,
   'Dashboard/User/Settings.json': settings,
   'Glossary.json': glossary,
-  'Landing.json': landing,
+  'Landing.json': resolveR2AssetPaths(landing),
   'MusicVideos.json': musicVideos,
   'NotFound.json': notFound,
   'Pricing.json': pricing,
@@ -70,7 +71,7 @@ export const englishMessageFiles = {
  */
 export const englishMessageNamespaces = {
   Activity: activity,
-  Landing: landing,
+  Landing: resolveR2AssetPaths(landing),
   MusicVideos: musicVideos,
   Pricing: pricing,
   NotFound: notFound,
@@ -121,7 +122,7 @@ function mergeMessages<T>(base: T, localized: unknown): T {
 
 export const spanishMessages = mergeMessages(englishMessages, {
   ...spanishCommon,
-  Landing: spanishLanding,
+  Landing: resolveR2AssetPaths(spanishLanding),
   MusicVideos: spanishMusicVideos,
   Pricing: spanishPricing,
   NotFound: spanishNotFound,
@@ -134,7 +135,7 @@ export const spanishMessages = mergeMessages(englishMessages, {
 
 export const japaneseMessages = mergeMessages(englishMessages, {
   ...japaneseCommon,
-  Landing: japaneseLanding,
+  Landing: resolveR2AssetPaths(japaneseLanding),
   Pricing: japanesePricing,
   Songs: japaneseSongs,
   Samples: japaneseSamples,

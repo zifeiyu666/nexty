@@ -3,9 +3,10 @@
 import { Pause, Play, Volume2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
+import { r2PublicUrl } from "@/lib/cloudflare/public-url";
 
 const AUDIO_URL =
-  "https://cdn.customsong.top/songs/generated/8de2cf6c-75ea-4205-9a60-b9d2ed6fb42c/d4f673f296340a201910fa3434ed42bf/0c5904f4-bad2-4018-8a60-785a75cc7ba2/audio.mp3";
+  r2PublicUrl("/songs/generated/8de2cf6c-75ea-4205-9a60-b9d2ed6fb42c/d4f673f296340a201910fa3434ed42bf/0c5904f4-bad2-4018-8a60-785a75cc7ba2/audio.mp3");
 const INTRO_END_SECONDS = 12.06;
 
 const introLines = [

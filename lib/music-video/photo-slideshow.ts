@@ -1,3 +1,5 @@
+import { r2PublicUrl } from "@/lib/cloudflare/public-url";
+
 export const DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR = 10;
 export const DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY = {
   color: "#020408",
@@ -175,8 +177,7 @@ export type AlignedLyricWord = {
 };
 
 const DEFAULT_DURATION = 30;
-const OVERLAY_CDN_BASE_URL = "https://cdn.onecustomsong.com/overlay";
-const overlayCdnSrc = (path: string) => `${OVERLAY_CDN_BASE_URL}/${path}`;
+const overlayCdnSrc = (path: string) => r2PublicUrl(`/overlay/${path}`);
 const DEFAULT_RENDER_DIMENSIONS: MusicVideoRenderDimensions = {
   width: 1080,
   height: 1920,

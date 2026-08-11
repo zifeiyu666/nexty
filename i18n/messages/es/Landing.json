@@ -39,52 +39,52 @@
     ],
     "videos": [
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-2.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
         "label": "One Custom Song",
         "title": "La primera vez que mamá la escucha"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
         "label": "One Custom Song",
         "title": "Lágrimas de felicidad"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
         "label": "One Custom Song",
         "title": "La mejor sorpresa"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
         "label": "One Custom Song",
         "title": "Volver a vivir la boda"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-12.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
         "label": "One Custom Song",
         "title": "Sorpresa de aniversario"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-5.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
         "label": "One Custom Song",
         "title": "La canción de la pareja"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
         "label": "One Custom Song",
         "title": "De la sorpresa a la alegría"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-20.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
         "label": "One Custom Song",
         "title": "Escucharla una vez más"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
         "label": "One Custom Song",
         "title": "La primera escucha de papá"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
         "label": "One Custom Song",
         "title": "Llorar de alegría"
       }

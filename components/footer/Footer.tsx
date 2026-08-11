@@ -44,7 +44,7 @@ export default async function Footer() {
                 <div className="items-center space-x-2 flex">
                   <div className="flex items-center gap-2 text-xl font-medium text-white">
                     <Image
-                      src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
+                      src="/generated-logos/send-the-song-rounder-logo-1.png"
                       alt={t("title")}
                       width={2017}
                       height={337}

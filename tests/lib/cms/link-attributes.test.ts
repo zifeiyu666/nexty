@@ -5,7 +5,6 @@ import {
   EXTERNAL_MARKDOWN_LINK_CLASS,
   getMarkdownLinkAttributes,
   INTERNAL_MARKDOWN_LINK_CLASS,
-  isCompetitorHref,
 } from "../../../lib/cms/link-attributes";
 
 describe("markdown link attributes", () => {
@@ -22,26 +21,20 @@ describe("markdown link attributes", () => {
     );
   });
 
-  test("keeps ordinary external links neutral", () => {
+  test("adds nofollow to ordinary external links", () => {
     const attributes = getMarkdownLinkAttributes("https://example.com");
 
     assert.equal(attributes.target, "_blank");
     assert.equal(attributes.className, EXTERNAL_MARKDOWN_LINK_CLASS);
     assert.match(String(attributes.rel), /\bnoopener\b/);
     assert.match(String(attributes.rel), /\bnoreferrer\b/);
-    assert.doesNotMatch(String(attributes.rel), /\bnofollow\b/);
+    assert.match(String(attributes.rel), /\bnofollow\b/);
     assert.equal(String(attributes.className).includes("text-primary"), false);
   });
 
-  test("adds nofollow to competitor domains and subdomains", () => {
-    assert.equal(isCompetitorHref("https://www.songfinch.com/store"), true);
-    assert.equal(
-      isCompetitorHref("https://support.songfinch.com/hc/en-us"),
-      true,
-    );
-
+  test("preserves existing external-link rel tokens", () => {
     const attributes = getMarkdownLinkAttributes(
-      "https://support.songfinch.com/hc/en-us",
+      "https://example.com",
       "sponsored",
     );
 

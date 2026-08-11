@@ -46,9 +46,7 @@ describe("occasion showcase", () => {
     assert.ok(occasionCards.every((occasion) => occasion.sampleTrack));
     assert.ok(
       occasionCards.every((occasion) =>
-        occasion.sampleTrack.audioUrl.startsWith(
-          "https://cdn.onecustomsong.com/audio/occasion-demos/",
-        ),
+        occasion.sampleTrack.audioUrl.includes("/audio/occasion-demos/"),
       ),
     );
     assert.ok(

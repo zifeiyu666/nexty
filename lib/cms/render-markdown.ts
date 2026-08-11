@@ -91,7 +91,7 @@ function buildFigure(img: {
           properties: {
             href: img.link,
             target: "_blank",
-            rel: "noopener noreferrer",
+            rel: "noopener noreferrer nofollow",
           },
           children: [imageWrapper],
         }

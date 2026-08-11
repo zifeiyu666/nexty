@@ -3,9 +3,10 @@
 import { Pause, Play, Sparkles, Waves } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
+import { r2PublicUrl } from "@/lib/cloudflare/public-url";
 
 const SOURCE_AUDIO_URL =
-  "https://cdn.onecustomsong.com/voices/source/4c36d75a-d3d6-416a-b8e3-685ee746830e/f88eed99-a7fe-453a-a653-3f81ff82807d.wav";
+  r2PublicUrl("/voices/source/4c36d75a-d3d6-416a-b8e3-685ee746830e/f88eed99-a7fe-453a-a653-3f81ff82807d.wav");
 const GENERATED_SONG_URL =
   "https://s3.us-east-1.amazonaws.com/remotionlambda-useast1-7lw6m83kvk/renders/kp4dawr87v/songs/generated/060a6db2-89e6-49b1-91ca-4e236c374ace/fe246607-fb10-45de-9f25-5f8fb356b969/with-intro.mp3";
 const GENERATED_SONG_START_SECONDS = 4;

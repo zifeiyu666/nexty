@@ -1,12 +1,6 @@
 const DEFAULT_SITE_URL = "https://onecustomsong.com";
 
 const OWN_SITE_HOSTS = ["onecustomsong.com"];
-const COMPETITOR_DOMAINS = [
-  "songfinch.com",
-  "songlorious.com",
-  "bringmysongtolife.com",
-];
-
 const ABSOLUTE_PROTOCOL_RE = /^[a-z][a-z\d+.-]*:/i;
 
 export const INTERNAL_MARKDOWN_LINK_CLASS =
@@ -17,16 +11,6 @@ export const EXTERNAL_MARKDOWN_LINK_CLASS =
 
 function normalizeHostname(hostname: string): string {
   return hostname.toLowerCase().replace(/^www\./, "");
-}
-
-function isSubdomainOrHost(hostname: string, domain: string): boolean {
-  const normalizedHostname = normalizeHostname(hostname);
-  const normalizedDomain = normalizeHostname(domain);
-
-  return (
-    normalizedHostname === normalizedDomain ||
-    normalizedHostname.endsWith(`.${normalizedDomain}`)
-  );
 }
 
 function parseHttpUrl(href: string, siteUrl = DEFAULT_SITE_URL): URL | null {
@@ -90,17 +74,6 @@ function isInternalHref(href: string, siteUrl?: string): boolean {
   return getOwnSiteHosts(siteUrl).has(normalizeHostname(url.hostname));
 }
 
-export function isCompetitorHref(href: string): boolean {
-  const url = parseHttpUrl(href);
-  if (!url) {
-    return false;
-  }
-
-  return COMPETITOR_DOMAINS.some((domain) =>
-    isSubdomainOrHost(url.hostname, domain),
-  );
-}
-
 function relTokens(rel: unknown): string[] {
   if (Array.isArray(rel)) {
     return rel.flatMap(relTokens);
@@ -146,7 +119,7 @@ export function getMarkdownLinkAttributes(
   const rel = mergeRel(existingRel, [
     "noopener",
     "noreferrer",
-    ...(isCompetitorHref(normalizedHref) ? ["nofollow"] : []),
+    "nofollow",
   ]);
 
   return {

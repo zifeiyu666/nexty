@@ -68,7 +68,7 @@ export default function MobileMenu({
           >
             <Image
               alt={t("title")}
-              src="/generated-logos/one-custom-song-rounder-logo-2-trimmed.png"
+              src="/generated-logos/send-the-song-rounder-logo-1.png"
               className="h-6 w-auto"
               width={2017}
               height={337}

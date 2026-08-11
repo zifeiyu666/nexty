@@ -47,7 +47,7 @@ const demoTracks = {
     id: "playlist-demo-birthday",
     title: "Cart and Umbrella",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/sweetest-day-cart-and-umbrella.mp3",
+      r2PublicUrl("/audio/occasion-demos/sweetest-day-cart-and-umbrella.mp3"),
     duration: "1:42",
     style: "Birthday Pop",
   },
@@ -55,7 +55,7 @@ const demoTracks = {
     id: "playlist-demo-anniversary",
     title: "Ten Years, Ava",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/anniversary-ten-years-ava.mp3",
+      r2PublicUrl("/audio/occasion-demos/anniversary-ten-years-ava.mp3"),
     duration: "2:05",
     style: "Romantic Ballad",
   },
@@ -63,7 +63,7 @@ const demoTracks = {
     id: "playlist-demo-mom",
     title: "Linda My Mom",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/mothers-day-linda-my-mom.mp3",
+      r2PublicUrl("/audio/occasion-demos/mothers-day-linda-my-mom.mp3"),
     duration: "2:12",
     style: "Acoustic",
   },
@@ -71,7 +71,7 @@ const demoTracks = {
     id: "playlist-demo-dad",
     title: "Seatbelt and Wrenches",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/fathers-day-seatbelt-and-wrenches.mp3",
+      r2PublicUrl("/audio/occasion-demos/fathers-day-seatbelt-and-wrenches.mp3"),
     duration: "1:39",
     style: "Country",
   },
@@ -79,7 +79,7 @@ const demoTracks = {
     id: "playlist-demo-wife",
     title: "Final Page Forever",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/proposal-final-page-forever.mp3",
+      r2PublicUrl("/audio/occasion-demos/proposal-final-page-forever.mp3"),
     duration: "2:18",
     style: "Romantic Ballad",
   },
@@ -87,7 +87,7 @@ const demoTracks = {
     id: "playlist-demo-thank-you",
     title: "Ms Country",
     audioUrl:
-      "https://cdn.onecustomsong.com/audio/occasion-demos/thankyou-ms-country.mp3",
+      r2PublicUrl("/audio/occasion-demos/thankyou-ms-country.mp3"),
     duration: "1:33",
     style: "Country",
   },
@@ -799,3 +799,4 @@ export function getAllPlaylistPaths(): string[] {
     ...giftPlaylists.map((playlist) => playlist.canonicalPath),
   ];
 }
+import { r2PublicUrl } from "@/lib/cloudflare/public-url";

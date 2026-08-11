@@ -42,52 +42,52 @@
     "trustItems": ["Free to preview", "Ready in minutes", "Just for you"],
     "videos": [
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-2.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
         "label": "One Custom Song",
         "title": "Mother's first listen"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
         "label": "One Custom Song",
         "title": "The happy tears"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
         "label": "One Custom Song",
         "title": "Best surprise ever"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
         "label": "One Custom Song",
         "title": "wedding replay"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-12.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
         "label": "One Custom Song",
         "title": "Anniversary Surprise"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-5.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
         "label": "One Custom Song",
         "title": "Couple's song"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
         "label": "One Custom Song",
         "title": "From shock to joy"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/giftsong-slide-20.mp4",
+        "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
         "label": "One Custom Song",
         "title": "One more listen"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
         "label": "One Custom Song",
         "title": "Father's first listen"
       },
       {
-        "src": "https://cdn.onecustomsong.com/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
+        "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
         "label": "One Custom Song",
         "title": "Cry tears of joy"
       }

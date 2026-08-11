@@ -6,6 +6,7 @@ import { Link } from "@/i18n/routing";
 import { useGlobalMusicPlayer } from "@/lib/music-player/global-player-store";
 import type { DemoTrack } from "@/lib/playlists/catalog";
 import { cn } from "@/lib/utils";
+import { r2PublicUrl } from "@/lib/cloudflare/public-url";
 import {
   ArrowRight,
   Check,
@@ -74,7 +75,7 @@ const demoTrack: DemoTrack = {
   id: "memory-proof-anniversary-demo",
   title: "Ten Years, Ava",
   audioUrl:
-    "https://cdn.onecustomsong.com/audio/occasion-demos/anniversary-ten-years-ava.mp3",
+    r2PublicUrl("/audio/occasion-demos/anniversary-ten-years-ava.mp3"),
   duration: "2:05",
   style: "Romantic Ballad",
 };
