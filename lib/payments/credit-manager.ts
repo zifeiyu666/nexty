@@ -417,6 +417,22 @@ async function applyEntitlementGrant(params: {
   });
 }
 
+/** Grants one-time entitlements from an administrator action. */
+export async function grantAdminEntitlements(params: {
+  userId: string;
+  entitlements: EntitlementMap;
+  notes?: string;
+}) {
+  return applyEntitlementGrant({
+    userId: params.userId,
+    bucket: 'oneTime',
+    entitlements: params.entitlements,
+    mode: 'add',
+    logType: 'admin_grant',
+    notes: params.notes ?? 'Entitlements granted by admin',
+  });
+}
+
 async function applyEntitlementRevocation(params: {
   userId: string;
   bucket: EntitlementBucket;

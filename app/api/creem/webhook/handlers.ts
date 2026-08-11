@@ -1,4 +1,5 @@
 import { syncCreemSubscriptionData } from '@/actions/creem';
+import { retrieveCreemTransaction } from '@/lib/creem/client';
 import {
   finalizeAndRecordOrderUnlockSong,
   parseUnlockSongMetadata,
@@ -11,8 +12,7 @@ import {
   CreemSubscriptionCanceledEvent,
   CreemSubscriptionExpiredEvent,
   CreemSubscriptionPaidEvent,
-  CreemSubscriptionUpdateEvent,
-  CreemTransaction
+  CreemSubscriptionUpdateEvent
 } from '@/lib/creem/types';
 import { db } from '@/lib/db';
 import {
@@ -34,6 +34,7 @@ import {
   updateOrderStatusAfterRefund,
 } from '@/lib/payments/webhook-helpers';
 import { eq, InferInsertModel } from 'drizzle-orm';
+import { getCreemSubscriptionPaymentDetails } from '@/lib/creem/subscription-payment';
 
 export async function handleCreemPaymentSucceeded(
   payload: CreemCheckoutCompletedEvent
@@ -133,8 +134,13 @@ export async function handleCreemInvoicePaid(
   const subscriptionId = subscription.id;
   const customerId = subscription.customer.id;
   const productId = subscription.product.id;
-  const lastTransaction = subscription.last_transaction as CreemTransaction;
-  const orderId = lastTransaction.order;
+  const transaction = subscription.last_transaction ?? (
+    subscription.last_transaction_id
+      ? await retrieveCreemTransaction(subscription.last_transaction_id)
+      : undefined
+  );
+  const paymentDetails = getCreemSubscriptionPaymentDetails(subscription, transaction);
+  const orderId = paymentDetails.orderId;
 
   let userId = metadata.userId
   let planId = metadata.planId
@@ -162,16 +168,16 @@ export async function handleCreemInvoicePaid(
     userId,
     provider: 'creem',
     providerOrderId: orderId,
-    status: lastTransaction.status === 'paid' ? 'succeeded' : lastTransaction.status,
+    status: paymentDetails.status === 'paid' ? 'succeeded' : paymentDetails.status,
     orderType: subscription.product.billing_type, // recurring
     planId: planId,
     priceId: productId,
     subscriptionId,
-    amountSubtotal: toCurrencyAmount(lastTransaction.amount),
-    amountDiscount: toCurrencyAmount(lastTransaction.discount_amount),
-    amountTax: toCurrencyAmount(lastTransaction.tax_amount),
-    amountTotal: toCurrencyAmount(lastTransaction.amount_paid),
-    currency: lastTransaction.currency,
+    amountSubtotal: toCurrencyAmount(paymentDetails.amount),
+    amountDiscount: toCurrencyAmount(paymentDetails.discountAmount),
+    amountTax: toCurrencyAmount(paymentDetails.taxAmount),
+    amountTotal: toCurrencyAmount(paymentDetails.amountPaid),
+    currency: paymentDetails.currency,
     metadata: {
       creemOrderId: orderId,
       creemSubscriptionId: subscriptionId,
@@ -203,7 +209,7 @@ export async function handleCreemInvoicePaid(
       userId,
       planId,
       insertedOrder.id,
-      lastTransaction.period_start
+      paymentDetails.periodStart
     );
     // --- End: [custom] Upgrade the user's benefits ---
   } catch (error) {

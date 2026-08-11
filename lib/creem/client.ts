@@ -5,7 +5,8 @@ import {
   CreemCustomer,
   CreemDiscount,
   CreemFullSubscription,
-  CreemProduct
+  CreemProduct,
+  CreemTransaction
 } from './types';
 
 const CREEM_API_BASE_URL =
@@ -181,6 +182,22 @@ export async function retrieveCreemSubscription(
     const message = getErrorMessage(error);
     throw new Error(
       `Failed to retrieve Creem subscription ${subscriptionId}: ${message}`
+    );
+  }
+}
+
+export async function retrieveCreemTransaction(
+  transactionId: string
+): Promise<CreemTransaction> {
+  try {
+    return await creemRequest<CreemTransaction>(
+      `/transactions?transaction_id=${encodeURIComponent(transactionId)}`,
+      { method: 'GET' }
+    );
+  } catch (error) {
+    const message = getErrorMessage(error);
+    throw new Error(
+      `Failed to retrieve Creem transaction ${transactionId}: ${message}`
     );
   }
 }

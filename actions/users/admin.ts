@@ -4,11 +4,14 @@ import type { ActionResult } from '@/lib/action-response';
 import { actionResponse } from '@/lib/action-response';
 import { isAdmin } from '@/lib/auth/server';
 import { db } from '@/lib/db';
-import { session as sessionSchema, user as userSchema, userSource as userSourceSchema } from '@/lib/db/schema';
+import { creditLogs as creditLogsSchema, session as sessionSchema, user as userSchema, userSource as userSourceSchema } from '@/lib/db/schema';
 import { getErrorMessage } from '@/lib/error-utils';
+import { grantAdminEntitlements } from '@/lib/payments/credit-manager';
 import { count, desc, eq, ilike, or } from 'drizzle-orm';
+import { z } from 'zod';
 
 type UserType = typeof userSchema.$inferSelect;
+export type AdminCreditLog = typeof creditLogsSchema.$inferSelect;
 
 // Extended user type with fields from userSource
 export type UserWithSource = UserType & {
@@ -193,6 +196,49 @@ export async function unbanUser({
 
     return actionResponse.success();
   } catch (error: any) {
+    return actionResponse.error(getErrorMessage(error));
+  }
+}
+
+const grantCreditsSchema = z.object({
+  userId: z.string().uuid(),
+  song: z.coerce.number().int().min(0).max(100000),
+  wallArt: z.coerce.number().int().min(0).max(100000),
+  mv: z.coerce.number().int().min(0).max(100000),
+  notes: z.string().trim().max(500).optional(),
+}).refine((value) => value.song + value.wallArt + value.mv > 0, {
+  message: 'Grant at least one entitlement.',
+});
+
+export async function grantUserCredits(input: z.input<typeof grantCreditsSchema>): Promise<ActionResult> {
+  if (!(await isAdmin())) return actionResponse.forbidden('Admin privileges required.');
+
+  const parsed = grantCreditsSchema.safeParse(input);
+  if (!parsed.success) return actionResponse.badRequest(parsed.error.issues[0]?.message ?? 'Invalid credit grant.');
+
+  try {
+    const [target] = await db.select({ id: userSchema.id }).from(userSchema).where(eq(userSchema.id, parsed.data.userId)).limit(1);
+    if (!target) return actionResponse.notFound('User not found.');
+    await grantAdminEntitlements({
+      userId: target.id,
+      entitlements: { song: parsed.data.song, wallArt: parsed.data.wallArt, mv: parsed.data.mv },
+      notes: parsed.data.notes || 'Entitlements granted by admin',
+    });
+    return actionResponse.success();
+  } catch (error) {
+    console.error('Error granting user credits:', error);
+    return actionResponse.error(getErrorMessage(error));
+  }
+}
+
+export async function getUserCreditLogs({ userId }: { userId: string }): Promise<ActionResult<AdminCreditLog[]>> {
+  if (!(await isAdmin())) return actionResponse.forbidden('Admin privileges required.');
+  if (!z.string().uuid().safeParse(userId).success) return actionResponse.badRequest('Invalid user ID.');
+  try {
+    const logs = await db.select().from(creditLogsSchema).where(eq(creditLogsSchema.userId, userId)).orderBy(desc(creditLogsSchema.createdAt)).limit(100);
+    return actionResponse.success(logs);
+  } catch (error) {
+    console.error('Error fetching user credit logs:', error);
     return actionResponse.error(getErrorMessage(error));
   }
 }

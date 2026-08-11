@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useUserBenefits } from "@/hooks/useUserBenefits";
-import { DEFAULT_LOCALE, Link as I18nLink, useRouter } from "@/i18n/routing";
+import { DEFAULT_LOCALE, Link as I18nLink } from "@/i18n/routing";
 import confetti from "canvas-confetti";
 import { motion, Variants } from "framer-motion";
 import {
@@ -22,6 +22,8 @@ import {
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+
+const verificationRetryDelays = [0, 1000, 2000, 4000, 6000];
 
 const buildVerifySuccessUrl = ({
   sessionId,
@@ -54,7 +56,6 @@ const buildVerifySuccessUrl = ({
 
 function SuccessContent() {
   const locale = useLocale();
-  const router = useRouter();
   const { mutate: revalidateBenefits } = useUserBenefits();
   const searchParams = useSearchParams();
 
@@ -69,6 +70,7 @@ function SuccessContent() {
   const [status, setStatus] = useState<
     "verifying" | "pending" | "success" | "error"
   >("verifying");
+  const [retryNonce, setRetryNonce] = useState(0);
   const [paymentData, setPaymentData] = useState<{
     message: string;
     orderId?: string;
@@ -149,54 +151,94 @@ function SuccessContent() {
       return;
     }
 
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+    const abortController = new AbortController();
+
     const verifySession = async () => {
+      let lastPendingMessage =
+        "Your payment was received and is still being finalized. We will update your account shortly.";
+
       try {
-        const url = buildVerifySuccessUrl({
-          sessionId: sessionId ?? "",
-          checkoutId: checkoutId ?? "",
-          subscriptionId: subscriptionId ?? "",
-          provider: provider ?? "",
-        });
-        const response = await fetch(url, {
-          headers: {
-            "Accept-Language": (locale || DEFAULT_LOCALE) as string,
-          },
-        });
-        const result = await response.json();
-        if (!response.ok) {
-          throw new Error(result.error || "Verification failed.");
+        for (let attempt = 0; attempt < verificationRetryDelays.length; attempt += 1) {
+          if (verificationRetryDelays[attempt] > 0) {
+            setStatus("pending");
+            setPaymentData({ message: lastPendingMessage });
+            await new Promise<void>((resolve) => {
+              timeoutId = setTimeout(resolve, verificationRetryDelays[attempt]);
+            });
+            if (cancelled) return;
+          }
+
+          const url = buildVerifySuccessUrl({
+            sessionId: sessionId ?? "",
+            checkoutId: checkoutId ?? "",
+            subscriptionId: subscriptionId ?? "",
+            provider: provider ?? "",
+          });
+          let response: Response;
+          let result: any;
+          try {
+            response = await fetch(url, {
+              headers: {
+                "Accept-Language": (locale || DEFAULT_LOCALE) as string,
+              },
+              signal: abortController.signal,
+            });
+            result = await response.json();
+          } catch (error) {
+            if (cancelled) return;
+            if (attempt === verificationRetryDelays.length - 1) throw error;
+            lastPendingMessage =
+              "We are still confirming your payment. Please keep this page open for a moment.";
+            continue;
+          }
+
+          if (!response.ok || !result.success) {
+            if (response.status >= 500 && attempt < verificationRetryDelays.length - 1) {
+              continue;
+            }
+            throw new Error(result.error || "Verification failed.");
+          }
+
+          if (result.data?.status === "pending") {
+            lastPendingMessage =
+              result.data.message || lastPendingMessage;
+            continue;
+          }
+
+          confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.6 },
+            colors: ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444"],
+          });
+
+          setStatus("success");
+          const unlockSong = result.data.unlockSong ?? null;
+          setPaymentData({
+            message:
+              unlockSong?.status === "completed"
+                ? "Payment received. Your selected song version has been saved."
+                : unlockSong?.status === "failed"
+                  ? "Payment received, but we could not finish saving your song automatically."
+                  : unlockSong
+                    ? "Payment received. We are finishing your song in the background."
+                    : result.data.message ||
+                      "Your payment has been confirmed. Your plan has been updated.",
+            orderId: result.data.orderId,
+            subscriptionId: result.data.subscriptionId,
+            planName: result.data.planName,
+            unlockSong,
+          });
+          revalidateBenefits();
+          return;
         }
 
-        if (!result.success) {
-          throw new Error(result.error || "Verification failed.");
-        }
-
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 },
-          colors: ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444"],
-        });
-
-        setStatus("success");
-        const unlockSong = result.data.unlockSong ?? null;
-        setPaymentData({
-          message:
-            unlockSong?.status === "completed"
-              ? "Payment received. Your selected song version has been saved."
-              : unlockSong?.status === "failed"
-                ? "Payment received, but we could not finish saving your song automatically."
-                : unlockSong
-                  ? "Payment received. We are finishing your song in the background."
-                  : result.data.message ||
-                    "Your payment has been confirmed. Your plan has been updated.",
-          orderId: result.data.orderId,
-          subscriptionId: result.data.subscriptionId,
-          planName: result.data.planName,
-          unlockSong,
-        });
-        revalidateBenefits();
+        setStatus("pending");
+        setPaymentData({ message: lastPendingMessage });
       } catch (error) {
+        if (cancelled) return;
         setStatus("error");
         setPaymentData({
           message:
@@ -208,6 +250,12 @@ function SuccessContent() {
     };
 
     verifySession();
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      abortController.abort();
+    };
   }, [
     sessionId,
     checkoutId,
@@ -215,8 +263,10 @@ function SuccessContent() {
     orderId,
     provider,
     locale,
+    oneTimeSongUrl,
     revalidateBenefits,
     searchParams,
+    retryNonce,
   ]);
 
   const fadeIn: Variants = {
@@ -450,7 +500,7 @@ function SuccessContent() {
               Back to Sample <ArrowRight className="w-4 h-4 ml-1" />
             </I18nLink>
           </Button>
-          <Button className="flex-1" onClick={() => router.refresh()}>
+          <Button className="flex-1" onClick={() => setRetryNonce((value) => value + 1)}>
             <RefreshCw className="w-4 h-4" /> Refresh Status
           </Button>
         </motion.div>
@@ -501,7 +551,7 @@ function SuccessContent() {
           </Button>
           <Button
             className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-            onClick={() => router.refresh()}
+            onClick={() => setRetryNonce((value) => value + 1)}
           >
             <RefreshCw className="w-4 h-4" /> Try Again
           </Button>
