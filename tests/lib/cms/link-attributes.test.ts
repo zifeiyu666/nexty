@@ -14,7 +14,7 @@ describe("markdown link attributes", () => {
     });
 
     assert.deepEqual(
-      getMarkdownLinkAttributes("https://onecustomsong.com/pricing"),
+      getMarkdownLinkAttributes("https://sendthesong.com/pricing"),
       {
         className: INTERNAL_MARKDOWN_LINK_CLASS,
       },

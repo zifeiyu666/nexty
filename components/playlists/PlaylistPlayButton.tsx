@@ -32,7 +32,7 @@ export function PlaylistPlayButton({
     playTrack({
       id: track.id,
       title: track.title,
-      artist: "One Custom Song",
+      artist: "Send the Song",
       audioUrl: track.audioUrl,
     });
   }

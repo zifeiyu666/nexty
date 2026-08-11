@@ -114,7 +114,7 @@ export const occasionCards = [
     description:
       'No date needed. Just a beautiful way to say, "I\'m thinking of you."',
     href: "/create-song?occasion=just-because",
-    cta: "Create a just-because song",
+    cta: "Send a just-because song",
     image: "/occasion-generated/avif/01-just-because.avif",
     rotate: -4.6,
     y: 10,
@@ -129,7 +129,7 @@ export const occasionCards = [
     tagline: "Your Love Story, Set to Music",
     description: "Turn your years of shared laughter into a forever melody.",
     href: "/occasions/anniversary",
-    cta: "Create an anniversary song",
+    cta: "Send an anniversary song",
     image: "/occasion-generated/avif/02-anniversary.avif",
     rotate: 2.8,
     y: 34,
@@ -145,7 +145,7 @@ export const occasionCards = [
     description:
       "Freeze the magic of your vows in a song you can relive forever.",
     href: "/music/personalized-gift",
-    cta: "Explore wedding music gifts",
+    cta: "Send a wedding song",
     image: "/occasion-generated/avif/03-wedding.avif",
     rotate: -1.8,
     y: 0,
@@ -161,7 +161,7 @@ export const occasionCards = [
     description:
       "Capture their fleeting childhood years in a melody they'll never outgrow.",
     href: "/occasions/custom-happy-birthday-song",
-    cta: "Make a birthday song gift",
+    cta: "Send a birthday song",
     image: "/occasion-generated/avif/04-birthday.avif",
     rotate: 3.6,
     y: 28,
@@ -177,7 +177,7 @@ export const occasionCards = [
     description:
       "Wrap your gratitude in a song she will replay with tears of joy.",
     href: "/music/personalized-gift",
-    cta: "Make a personalized music gift",
+    cta: "Send a song for Mom",
     image: "/occasion-generated/avif/05-mothers-day-mom.avif",
     rotate: -3.2,
     y: 12,
@@ -193,7 +193,7 @@ export const occasionCards = [
     description:
       "For the man of few words, tell him exactly what he means to you.",
     href: "/music/personalized-gift",
-    cta: "Make a personalized music gift",
+    cta: "Send a song for Dad",
     image: "/occasion-generated/avif/06-fathers-day.avif",
     rotate: 4.4,
     y: 40,
@@ -209,7 +209,7 @@ export const occasionCards = [
     description:
       "A cozy melody to bring the whole family closer around the fire.",
     href: "/music/personalized-gift",
-    cta: "Explore music gift ideas",
+    cta: "Send a holiday song",
     image: "/occasion-generated/avif/07-christmas-holidays.avif",
     rotate: -2.4,
     y: 4,
@@ -225,7 +225,7 @@ export const occasionCards = [
     description:
       'Ensure the perfect "Yes!" with a track that explains why she\'s your forever.',
     href: "/music/personalized-gift",
-    cta: "Create a proposal song",
+    cta: "Send a proposal song",
     image: "/occasion-generated/avif/08-proposal.avif",
     rotate: 2.2,
     y: 26,
@@ -241,7 +241,7 @@ export const occasionCards = [
     description:
       "Honor their big milestone with a song that keeps their roots close.",
     href: "/create-song?occasion=coming-of-age",
-    cta: "Create a milestone song",
+    cta: "Send a milestone song",
     image: "/occasion-generated/avif/09-mitzvah-coming-of-age.avif",
     rotate: -4,
     y: 18,
@@ -257,7 +257,7 @@ export const occasionCards = [
     description:
       "Celebrate the late nights and big dreams with an anthem for the road ahead.",
     href: "/create-song?occasion=graduation",
-    cta: "Create a graduation song",
+    cta: "Send a graduation song",
     image: "/occasion-generated/avif/10-graduation.avif",
     rotate: 3.2,
     y: 42,
@@ -273,7 +273,7 @@ export const occasionCards = [
     description:
       "Skip the generic card. Honor a legendary teammate with a song about their impact.",
     href: "/create-song?occasion=appreciation",
-    cta: "Create an appreciation song",
+    cta: "Send an appreciation song",
     image: "/occasion-generated/avif/11-coworker-appreciation.avif",
     rotate: -2.8,
     y: 8,
@@ -289,7 +289,7 @@ export const occasionCards = [
     description:
       "Send them off to their next chapter with a melody that feels like home.",
     href: "/music/personalized-gift",
-    cta: "Send a personalized music gift",
+    cta: "Send a goodbye song",
     image: "/occasion-generated/avif/12-moving-goodbye.avif",
     rotate: 4.8,
     y: 30,
@@ -305,7 +305,7 @@ export const occasionCards = [
     description:
       "When words feel too heavy, let a gentle song soften the distance between you.",
     href: "/create-song?occasion=apology",
-    cta: "Create a healing song",
+    cta: "Send a healing song",
     image: "/occasion-generated/avif/13-reconciliation-healing.avif",
     rotate: -3.8,
     y: 15,
@@ -321,7 +321,7 @@ export const occasionCards = [
     description:
       "Make their heart skip a beat with a spontaneous, sweet track.",
     href: "/occasions/anniversary",
-    cta: "Create a romantic song",
+    cta: "Send a romantic song",
     image: "/occasion-generated/avif/14-sweetest-day.avif",
     rotate: 2.7,
     y: 37,
@@ -337,7 +337,7 @@ export const occasionCards = [
     description:
       "Celebrate the joy of your soon-to-arrive baby with a heartfelt melody that welcomes them home before they even arrive.",
     href: "/music/personalized-gift",
-    cta: "Create a song for baby",
+    cta: "Send a song for baby",
     image: "/occasion-generated/avif/15-adoption-baby-on-the-way.avif",
     rotate: -1.5,
     y: 5,
@@ -353,7 +353,7 @@ export const occasionCards = [
     description:
       "Show her how beautiful she is as a mother with a soul-stirring ballad.",
     href: "/music/personalized-gift",
-    cta: "Make a personalized music gift",
+    cta: "Send a song for Mom",
     image: "/occasion-generated/avif/17-mothers-day-wife-mom.avif",
     rotate: -4.4,
     y: 38,
@@ -369,7 +369,7 @@ export const occasionCards = [
     description:
       "When miles separate you, give them a piece of your soul to hold onto.",
     href: "/music/personalized-gift",
-    cta: "Send a personalized music gift",
+    cta: "Send a long-distance love song",
     image: "/occasion-generated/avif/18-deployment-long-distance.avif",
     rotate: 2.4,
     y: 9,
@@ -385,7 +385,7 @@ export const occasionCards = [
     description:
       "Keep their light alive with a gentle, comforting acoustic tribute.",
     href: "/create-song?occasion=memorial",
-    cta: "Create a tribute song",
+    cta: "Send a tribute song",
     image: "/occasion-generated/avif/19-memorial.avif",
     rotate: -2,
     y: 27,
@@ -401,7 +401,7 @@ export const occasionCards = [
     description:
       "A song woven from your midnight talks, a romance that never fades.",
     href: "/occasions/anniversary",
-    cta: "Create a romantic song",
+    cta: "Send a love song",
     image: "/occasion-generated/avif/20-valentines-day.avif",
     rotate: 3.8,
     y: 14,
@@ -417,7 +417,7 @@ export const occasionCards = [
     description:
       "Reaffirm your commitment with a soulful track that honors the life you've built.",
     href: "/occasions/anniversary",
-    cta: "Create an anniversary song",
+    cta: "Send an anniversary song",
     image: "/occasion-generated/avif/21-vow-renewal.avif",
     rotate: -3.5,
     y: 33,
@@ -433,7 +433,7 @@ export const occasionCards = [
     description:
       "Speak straight from your soul with a melody that shows your true sincerity.",
     href: "/create-song?occasion=apology",
-    cta: "Create an apology song",
+    cta: "Send an apology song",
     image: "/occasion-generated/avif/23-apology.avif",
     rotate: -2.9,
     y: 22,

@@ -15,7 +15,7 @@ describe("transactional email sender", () => {
 
     assert.deepEqual(getTransactionalEmailSender(), {
       email: "support@mail.onecustomsong.com",
-      from: "One Custom Song <support@mail.onecustomsong.com>",
+      from: "Send the Song <support@mail.onecustomsong.com>",
     });
   });
 });

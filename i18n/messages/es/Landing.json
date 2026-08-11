@@ -40,52 +40,52 @@
     "videos": [
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "La primera vez que mamá la escucha"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "Lágrimas de felicidad"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "La mejor sorpresa"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "Volver a vivir la boda"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "Sorpresa de aniversario"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "La canción de la pareja"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "De la sorpresa a la alegría"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "Escucharla una vez más"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "La primera escucha de papá"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "Llorar de alegría"
       }
     ]
@@ -246,13 +246,13 @@
     ]
   },
   "SongfinchComparison": {
-    "eyebrow": "Por qué algunas personas eligen onecustomsong.com frente a Songfinch",
-    "title": "<us>onecustomsong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "eyebrow": "Por qué algunas personas eligen sendthesong.com frente a Songfinch",
+    "title": "<us>sendthesong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
     "subtitle": "No necesitas pagar <price>más de $200</price> por una sola canción. Consigue una <strong>producción con sonido de estudio</strong>, escucha primero una muestra y conserva el control <underline>por mucho menos.</underline>",
     "tableHeaders": {
       "feature": "Característica",
       "songfinch": "Songfinch",
-      "us": "onecustomsong.com"
+      "us": "sendthesong.com"
     },
     "rows": [
       {
@@ -290,7 +290,7 @@
       {
         "icon": "value",
         "title": "Un regalo personal a un precio razonable",
-        "description": "Songfinch parte de $199. En One Custom Song puedes escuchar una muestra antes de pagar y elegir el formato que mejor encaja con tu regalo."
+        "description": "Songfinch parte de $199. En Send the Song puedes escuchar una muestra antes de pagar y elegir el formato que mejor encaja con tu regalo."
       },
       {
         "icon": "speed",
@@ -319,11 +319,11 @@
     "description": "Lo esencial antes de crear y enviar tu regalo musical.",
     "items": [
       {
-        "question": "¿Cómo funciona onecustomsong.com?",
+        "question": "¿Cómo funciona sendthesong.com?",
         "answer": "Cuéntanos la historia, elige un estilo musical y nuestra IA preparará una canción personalizada. Primero recibirás una muestra gratuita de 60 segundos. Si te gusta, podrás desbloquear la canción completa y usar los editores de vídeo y láminas."
       },
       {
-        "question": "¿Qué diferencia a One Custom Song de otras plataformas?",
+        "question": "¿Qué diferencia a Send the Song de otras plataformas?",
         "answer": "Puedes escuchar una muestra antes de pagar, editar la letra y probar otros estilos. Además, la canción puede acompañarse con un vídeo personalizado y una lámina imprimible creada desde nuestros editores."
       },
       {

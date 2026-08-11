@@ -14,7 +14,7 @@ export default function BrandWordmark({
 }: BrandWordmarkProps) {
   const normalizedTitle = title.trim().toLowerCase();
 
-  if (normalizedTitle !== "one custom song") {
+  if (normalizedTitle !== "send the song") {
     return <span className={className}>{title}</span>;
   }
 

@@ -1,6 +1,6 @@
-# One Custom Song
+# Send the Song
 
-One Custom Song is a Next.js 16 app for personalized AI song gifts. The public site currently ships in English only, so Japanese and Chinese message JSON files have been removed to avoid stale translations.
+Send the Song is a Next.js 16 app for personalized AI song gifts. The public site currently ships in English only, so Japanese and Chinese message JSON files have been removed to avoid stale translations.
 
 ## Development
 

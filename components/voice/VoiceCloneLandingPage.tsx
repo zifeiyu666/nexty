@@ -89,7 +89,7 @@ const faqs = [
   {
     question: "What is an AI singing voice generator?",
     answer:
-      "An AI singing voice generator creates an authorized singing voice that can be selected when making an original song. At One Custom Song, it is designed for songs and personal gifts, not text-to-speech or celebrity imitation.",
+      "An AI singing voice generator creates an authorized singing voice that can be selected when making an original song. At Send the Song, it is designed for songs and personal gifts, not text-to-speech or celebrity imitation.",
   },
   {
     question: "Why do I need to read a verification phrase?",

@@ -30,7 +30,7 @@ describe("LRC lyrics export", () => {
       [
         "[ti:Our Song]",
         "[length:02:05]",
-        "[by:One Custom Song]",
+        "[by:Send the Song]",
         "[offset:0]",
         "",
         "[00:01.10]Hello world",

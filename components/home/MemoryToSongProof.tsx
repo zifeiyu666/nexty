@@ -175,7 +175,7 @@ function LyricsPanel() {
         </div>
         <div className="relative mt-9 min-h-[290px] flex-1 overflow-hidden rounded-lg border border-white/12 bg-[#f7eee8] shadow-[0_24px_64px_rgba(0,0,0,0.32)] lg:min-h-0">
           <Image
-            alt="Editable custom song lyrics in the One Custom Song editor"
+            alt="Editable custom song lyrics in the Send the Song editor"
             className="object-cover object-center"
             fill
             sizes="(max-width: 1024px) 100vw, 64vw"

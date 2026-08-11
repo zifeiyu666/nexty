@@ -37,12 +37,12 @@ const Header = async () => {
             className="absolute left-1/2 flex -translate-x-1/2 items-center space-x-1 lg:static lg:translate-x-0"
           >
             <Image
-              src="/generated-logos/send-the-song-rounder-logo-1.png"
+              src="/generated-logos/send-the-song-fredoka-logo.webp"
               alt={t("title")}
-              width={2017}
-              height={337}
+              width={1200}
+              height={238}
               priority
-              className="h-7 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-8"
+              className="h-9 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-10"
             />
           </I18nLink>
 

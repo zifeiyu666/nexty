@@ -1,17 +1,17 @@
-# One Custom Song
+# Send the Song
 
-One Custom Song is an AI-powered music gift platform for turning personal memories, love notes, family stories, and meaningful moments into custom songs. Users can create a personalized AI song, then turn it into a shareable music video, printable lyric poster, and downloadable keepsake.
+Send the Song is an AI-powered music gift platform for turning personal memories, love notes, family stories, and meaningful moments into custom songs. Users can create a personalized AI song, then turn it into a shareable music video, printable lyric poster, and downloadable keepsake.
 
 ## Live Demo
 
-- Live Demo: [https://onecustomsong.com](https://onecustomsong.com)
-- Create a Song: [https://onecustomsong.com/create-song](https://onecustomsong.com/create-song)
+- Live Demo: [https://sendthesong.com](https://sendthesong.com)
+- Create a Song: [https://sendthesong.com/create-song](https://sendthesong.com/create-song)
 
 ## Overview
 
-One Custom Song is built with Next.js 16 and focuses on productizing the process of making a song for someone special. Users do not need music skills or a blank-page songwriting process. They provide relationship context, story details, occasion, mood, and the message they want to express, then the app generates a gift-ready song preview.
+Send the Song is built with Next.js 16 and focuses on productizing the process of making a song for someone special. Users do not need music skills or a blank-page songwriting process. They provide relationship context, story details, occasion, mood, and the message they want to express, then the app generates a gift-ready song preview.
 
-One Custom Song is more than a single AI audio generator. It supports a complete personalized music gift workflow:
+Send the Song is more than a single AI audio generator. It supports a complete personalized music gift workflow:
 
 - Capture the story, recipient, occasion, and emotional direction.
 - Generate lyrics and a song preview.
@@ -144,7 +144,7 @@ pnpm remotion:function:deploy
 
 ## Launch And Assets
 
-- Official website: [https://onecustomsong.com](https://onecustomsong.com)
+- Official website: [https://sendthesong.com](https://sendthesong.com)
 - Product Hunt launch materials: `product-introduction.md`
 - Site configuration: `config/site.ts`
 - Product images: `public/images/products/`

@@ -1,7 +1,7 @@
 {
   "Home": {
-    "title": "One Custom Song",
-    "tagLine": "<strong>Canciones personalizadas con IA de One Custom Song.</strong><br></br> Un regalo inolvidable para cumpleaños, aniversarios o cualquier ocasión.",
+    "title": "Send the Song",
+    "tagLine": "<strong>Canciones personalizadas con IA de Send the Song.</strong><br></br> Un regalo inolvidable para cumpleaños, aniversarios o cualquier ocasión.",
     "description": "Convierte tus recuerdos en una canción personalizada con sonido de estudio. Crea en minutos un regalo musical único para cumpleaños, bodas, aniversarios y mucho más."
   },
   "Login": {
@@ -70,7 +70,7 @@
       "backToBlogs": "Volver a los artículos", "notFound": "Artículo no encontrado"
     }
   },
-  "About": {"title": "Sobre nosotros", "description": "Conoce One Custom Song"},
+  "About": {"title": "Sobre nosotros", "description": "Conoce Send the Song"},
   "ErrorPage": {
     "403": {"title": "403 - Acceso denegado", "description": "No tienes permiso para acceder a esta página.", "button": {"name": "Volver al inicio", "href": "/"}},
     "RedirectError": {
@@ -113,9 +113,9 @@
     "Copyright": "Copyright © {year} {name}. Todos los derechos reservados.",
     "About": "Sobre nosotros", "PrivacyPolicy": "Política de privacidad (en inglés)", "TermsOfService": "Términos del servicio (en inglés)", "RefundPolicy": "Política de reembolso (en inglés)",
     "Newsletter": {
-      "title": "Recibe nuestras novedades", "description": "Ideas de regalo y novedades de One Custom Song directamente en tu correo.",
+      "title": "Recibe nuestras novedades", "description": "Ideas de regalo y novedades de Send the Song directamente en tu correo.",
       "subscribe": {"invalidEmail": "Introduce un correo válido", "defaultErrorMessage": "No pudimos completar la suscripción. Inténtalo más tarde", "successMessage": "Te has suscrito correctamente", "multipleSubmissions": "Demasiados intentos. Vuelve a probar mañana"},
-      "unsubscribe": {"title": "Cancelar suscripción", "success": "Has cancelado tu suscripción a los correos de One Custom Song.", "emailPrefix": "Correo:", "regretMessage": "Puedes volver a suscribirte cuando quieras.", "errorGeneric": "No pudimos procesar la solicitud", "errorNoToken": "Falta el código de cancelación", "errorMessage": "Comprueba que has usado el enlace correcto. Si el problema continúa, contacta con soporte.", "contactPrefix": "Escríbenos a:", "contactPrefixSuccess": "Si tienes alguna pregunta, escríbenos a:"}
+      "unsubscribe": {"title": "Cancelar suscripción", "success": "Has cancelado tu suscripción a los correos de Send the Song.", "emailPrefix": "Correo:", "regretMessage": "Puedes volver a suscribirte cuando quieras.", "errorGeneric": "No pudimos procesar la solicitud", "errorNoToken": "Falta el código de cancelación", "errorMessage": "Comprueba que has usado el enlace correcto. Si el problema continúa, contacta con soporte.", "contactPrefix": "Escríbenos a:", "contactPrefixSuccess": "Si tienes alguna pregunta, escríbenos a:"}
     },
     "Links": {
       "groups": [

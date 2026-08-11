@@ -44,10 +44,10 @@ export default async function Footer() {
                 <div className="items-center space-x-2 flex">
                   <div className="flex items-center gap-2 text-xl font-medium text-white">
                     <Image
-                      src="/generated-logos/send-the-song-rounder-logo-1.png"
+                      src="/generated-logos/send-the-song-fredoka-logo.webp"
                       alt={t("title")}
-                      width={2017}
-                      height={337}
+                      width={1200}
+                      height={238}
                       className="h-10 w-auto"
                     />
                   </div>
@@ -163,8 +163,8 @@ export default async function Footer() {
                 </div>
                 <div>
                   <a href="https://firstlook.tools" target="_blank"><img src="https://firstlook.tools/badge/badge_dark.svg" alt="Featured on First Look" width="100" height="27" /></a>
-                  <a href="https://fazier.com/launches/onecustomsong.com" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark" width={100} alt="Fazier badge" /></a>
-                  {/* <a href="https://buildvoyage.com/products/onecustomsong?ref=badge">
+                  <a href="https://fazier.com/launches/sendthesong.com" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark" width={100} alt="Fazier badge" /></a>
+                  {/* <a href="https://buildvoyage.com/products/sendthesong?ref=badge">
                     <img src="https://buildvoyage.com/images/featured_badge.png" alt="Featured on BuildVoyage" width="250" />
                   </a> */}
                 </div>

@@ -32,52 +32,52 @@
     "videos": [
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "お母さんが初めて聴いた瞬間"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "うれし涙"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "最高のサプライズ"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "結婚式の思い出をもう一度"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "記念日のサプライズ"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "ふたりの歌"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "驚きが笑顔に変わる瞬間"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "もう一度聴きたい"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "お父さんが初めて聴いた瞬間"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
-        "label": "One Custom Song",
+        "label": "Send the Song",
         "title": "喜びの涙"
       }
     ]
@@ -235,13 +235,13 @@
     ]
   },
   "SongfinchComparison": {
-    "eyebrow": "SongfinchとOne Custom Songの違い",
-    "title": "<us>onecustomsong.com</us> <vs>と</vs> <songfinch>Songfinch</songfinch>",
+    "eyebrow": "SongfinchとSend the Songの違い",
+    "title": "<us>sendthesong.com</us> <vs>と</vs> <songfinch>Songfinch</songfinch>",
     "subtitle": "1曲に<price>$200以上</price>支払う前に、まず無料サンプルを試せます。<strong>スタジオ品質のサウンド</strong>と自由な編集を<underline>より手頃な価格で。</underline>",
     "tableHeaders": {
       "feature": "比較項目",
       "songfinch": "Songfinch",
-      "us": "onecustomsong.com"
+      "us": "sendthesong.com"
     },
     "rows": [
       {
@@ -304,7 +304,7 @@
     "description": "作成前に知っておきたいことをご案内します。",
     "items": [
       {
-        "question": "onecustomsong.comはどのように使いますか？",
+        "question": "sendthesong.comはどのように使いますか？",
         "answer": "思い出を入力し、音楽ジャンルを選ぶと、AIがオリジナルソングを作成します。まず60秒の無料サンプルを試聴し、気に入ったら完成版を購入できます。"
       },
       {

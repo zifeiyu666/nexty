@@ -63,10 +63,10 @@ export function DashboardSidebar() {
             />
           ) : (
             <Image
-              src="/images/brand/one-custom-song-wordmark-header.png"
+              src="/generated-logos/send-the-song-fredoka-logo.webp"
               alt={tHome("title")}
-              width={2024}
-              height={333}
+              width={1200}
+              height={238}
               priority
               className="h-8 w-auto max-w-full object-contain"
             />

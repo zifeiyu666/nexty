@@ -68,10 +68,10 @@ export default function MobileMenu({
           >
             <Image
               alt={t("title")}
-              src="/generated-logos/send-the-song-rounder-logo-1.png"
-              className="h-6 w-auto"
-              width={2017}
-              height={337}
+              src="/generated-logos/send-the-song-fredoka-logo.webp"
+              className="h-7 w-auto"
+              width={1200}
+              height={238}
             />
           </I18nLink>
         </DropdownMenuLabel>

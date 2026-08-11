@@ -5,11 +5,11 @@
       "text": "✨ #1 AI Custom Song Gift Maker",
       "href": ""
     },
-    "title": "Gift A Custom Song They’ll Cherish Forever.",
-    "titleLine": "Gift A Custom Song They’ll",
+    "title": "Send A Custom Song They’ll Cherish Forever",
+    "titleLine": "Send A Custom Song They’ll",
     "titleAccent": "Cherish Forever",
-    "description": "<p class=\"hero-subtitle\">Tell us your story. Our AI turns your memories into a studio-quality <strong>custom song</strong> you can preview, refine, and send as a <strong>personalized music gift</strong>.</p>",
-    "trustBadge": "Custom song gifts · Free preview first",
+    "description": "<p class=\"hero-subtitle\">Share a memory, a milestone, or the words you’ve never quite said. Send the Song turns it into a personal song gift—ready to preview, refine, and send in minutes.</p>",
+    "trustBadge": "Send the Song · Free preview first · Ready in minutes",
     "trustItems": [
       "Free to preview",
       "Ready in minutes",
@@ -25,7 +25,7 @@
   "OccasionShowcase": {
     "eyebrow": "Occasions",
     "title": "For Every Precious Moment, A Personal Melody",
-    "description": "Custom-craft a unique song to honor life's special stories and emotions.",
+    "description": "Send a custom song to honor life's special stories and emotions.",
     "previous": "Previous occasion",
     "next": "Next occasion",
     "carouselLabel": "Occasion carousel"
@@ -35,68 +35,68 @@
       "label": "REACTIONS",
       "text": "😭 Tears of Joy"
     },
-    "title": "Real Personalized Song Reactions",
-    "description": "<p>Grab some tissues before you watch. Hover to preview quietly, then click to hear how a <strong>custom song</strong> creates a lifetime memory.</p>",
+    "title": "See What Happens When You Send The Song",
+    "description": "<p>Grab some tissues before you watch. Hover to preview quietly, then click to hear how sending a song creates an unforgettable moment.</p>",
     "playLabel": "Play {title} with sound",
     "muteLabel": "Mute {title}",
     "trustItems": ["Free to preview", "Ready in minutes", "Just for you"],
     "videos": [
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
-        "label": "One Custom Song",
-        "title": "Mother's first listen"
+        "label": "Send the Song",
+        "title": "Mom's reaction: song sent"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
-        "label": "One Custom Song",
-        "title": "The happy tears"
+        "label": "Send the Song",
+        "title": "Joy from sent song"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
-        "label": "One Custom Song",
-        "title": "Best surprise ever"
+        "label": "Send the Song",
+        "title": "Best sent song surprise"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
-        "label": "One Custom Song",
-        "title": "wedding replay"
+        "label": "Send the Song",
+        "title": "Wedding song sent forever"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
-        "label": "One Custom Song",
-        "title": "Anniversary Surprise"
+        "label": "Send the Song",
+        "title": "Anniversary song sent"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
-        "label": "One Custom Song",
-        "title": "Couple's song"
+        "label": "Send the Song",
+        "title": "Sending her a love song"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
-        "label": "One Custom Song",
-        "title": "From shock to joy"
+        "label": "Send the Song",
+        "title": "Joy from song sent"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
-        "label": "One Custom Song",
-        "title": "One more listen"
+        "label": "Send the Song",
+        "title": "Listening to sent song"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
-        "label": "One Custom Song",
-        "title": "Father's first listen"
+        "label": "Send the Song",
+        "title": "Dad's reaction: song sent"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
-        "label": "One Custom Song",
-        "title": "Cry tears of joy"
+        "label": "Send the Song",
+        "title": "Tears for sent song"
       }
     ]
   },
   "HowItWorks": {
     "eyebrow": "How It Works",
     "title": "From one memory to a tear-worthy song in minutes",
-    "description": "Create a deeply personal <strong>custom song</strong>, preview it for free, then unlock a complete gift bundle with a <strong>music video</strong> and printable <strong>wall art</strong>.",
+    "description": "Create a custom song, preview for free, then unlock the full gift bundle—with a music video and printable lyric art—to send the song in style.",
     "steps": {
       "story": {
         "title": "Tell Us Your Story",
@@ -120,7 +120,7 @@
   "VoicePersonalization": {
     "eyebrow": "Make It Sound Like You",
     "title": "Add the voice only they would recognize",
-    "description": "Bring more of yourself into the first moments of a custom song, then let the music carry the rest of the story.",
+    "description": "Bring more of yourself into the first moments of a custom song, then send a gift that lets music carry the rest of the story.",
     "items": {
       "voiceClone": {
         "title": "Your AI Singing Voice",
@@ -174,7 +174,7 @@
   "OurProducts": {
     "eyebrow": "Our Products",
     "title": "The Complete Personalized Gift",
-    "description": "Turn one personal story into a complete personalized music gift: an AI custom song, a shareable music video gift, and printable digital wall art made for birthdays, weddings, anniversaries, and once-in-a-lifetime moments.",
+    "description": "Turn one personal story into a complete personalized music gift: an AI custom song, a shareable music video, and printable wall art—ready to send for birthdays, weddings, anniversaries, and once-in-a-lifetime moments.",
     "items": {
       "customSong": {
         "label": "Signature",
@@ -249,13 +249,13 @@
     ]
   },
   "SongfinchComparison": {
-    "eyebrow": "Why Users Switch from Songfinch to onecustomsong.com",
-    "title": "<us>onecustomsong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "eyebrow": "Why Users Switch from Songfinch to sendthesong.com",
+    "title": "<us>sendthesong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
     "subtitle": "Don’t pay <price>$200+</price> for a single song. Get <strong>elite studio-quality production</strong> with unlimited freedom <underline>at a fraction of the cost.</underline>",
     "tableHeaders": {
       "feature": "Feature / Benefit",
       "songfinch": "Songfinch",
-      "us": "onecustomsong.com (Us)"
+      "us": "sendthesong.com (Us)"
     },
     "rows": [
       {
@@ -316,15 +316,15 @@
     "badge": {
       "label": "TESTIMONIALS"
     },
-    "title": "What Our Customers Say",
-    "description": "Don't just take our word for it"
+    "title": "What Customers Say About Send the Song",
+    "description": "Real stories from people who turned a memory into a song worth sending."
   },
   "FAQ": {
-    "title": "Common Questions About Our Custom Songs",
-    "description": "Everything you need to know before you create and send a song they’ll cherish forever.",
+    "title": "Common Questions About Send the Song",
+    "description": "Everything you need to know before you create, personalize, and send a song they’ll cherish forever.",
     "items": [
       {
-        "question": "How does onecustomsong.com work?",
+        "question": "How does Send the Song work?",
         "answer": "It’s pure magic. Just tell us your story by answering a few simple questions, choose your favorite music genre, and our AI will craft a custom song instantly. You will get a free 60-second studio-quality preview. If you love it, unlock the full song and get access to our free video and print editors!"
       },
       {
@@ -358,7 +358,7 @@
     ]
   },
   "CTA": {
-    "title": "Gift A Custom Song They’ll Cherish Forever",
+    "title": "Send A Custom Song They’ll Cherish Forever",
     "description": "Tell us your story. Our AI instantly transforms your memories into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.",
     "button": "Create Your Song",
     "trustText": "Made for unforgettable moments",

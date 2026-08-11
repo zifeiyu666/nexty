@@ -42,7 +42,7 @@ describe("UseSend adapter", () => {
 
     const result = await sendUseSendEmail({
       to: "recipient@example.com",
-      from: "One Custom Song <support@mail.onecustomsong.com>",
+      from: "Send the Song <support@mail.onecustomsong.com>",
       replyTo: "support@mail.onecustomsong.com",
       subject: "Your song is ready",
       html: "<p>Hello</p>",
@@ -56,7 +56,7 @@ describe("UseSend adapter", () => {
     assert.equal(request?.headers.get("Idempotency-Key"), "song-ready/song_123");
     assert.deepEqual(await request?.json(), {
       to: "recipient@example.com",
-      from: "One Custom Song <support@mail.onecustomsong.com>",
+      from: "Send the Song <support@mail.onecustomsong.com>",
       replyTo: "support@mail.onecustomsong.com",
       subject: "Your song is ready",
       html: "<p>Hello</p>",
@@ -69,7 +69,7 @@ describe("UseSend adapter", () => {
     await assert.rejects(
       sendUseSendEmail({
         to: "recipient@example.com",
-        from: "One Custom Song <support@mail.onecustomsong.com>",
+        from: "Send the Song <support@mail.onecustomsong.com>",
         replyTo: "support@mail.onecustomsong.com",
         subject: "Missing configuration",
         html: "<p>Hello</p>",
@@ -88,7 +88,7 @@ describe("UseSend adapter", () => {
 
     await sendUseSendEmail({
       to: "recipient@example.com",
-      from: "One Custom Song <support@mail.onecustomsong.com>",
+      from: "Send the Song <support@mail.onecustomsong.com>",
       replyTo: "support@mail.onecustomsong.com",
       subject: "Self-hosted",
       html: "<p>Hello</p>",
@@ -103,7 +103,7 @@ describe("UseSend adapter", () => {
     await assert.rejects(
       sendUseSendEmail({
         to: "recipient@example.com",
-        from: "One Custom Song <support@mail.onecustomsong.com>",
+        from: "Send the Song <support@mail.onecustomsong.com>",
         replyTo: "support@mail.onecustomsong.com",
         subject: "Rejected",
         html: "<p>Hello</p>",
@@ -122,7 +122,7 @@ describe("UseSend adapter", () => {
     await assert.rejects(
       sendUseSendEmail({
         to: "recipient@example.com",
-        from: "One Custom Song <support@mail.onecustomsong.com>",
+        from: "Send the Song <support@mail.onecustomsong.com>",
         replyTo: "support@mail.onecustomsong.com",
         subject: "Rejected",
         html: "<p>Hello</p>",

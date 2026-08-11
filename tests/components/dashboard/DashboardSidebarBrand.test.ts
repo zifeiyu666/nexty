@@ -15,7 +15,7 @@ describe("Dashboard sidebar brand", () => {
 
     assert.match(
       source,
-      /src="\/images\/brand\/one-custom-song-wordmark-header\.png"/,
+      /src="\/generated-logos\/send-the-song-rounder-logo-1\.png"/,
     );
     assert.match(source, /isCollapsed \? \(/);
     assert.doesNotMatch(source, /<h1[^>]*>\{tHome\("title"\)\}<\/h1>/);

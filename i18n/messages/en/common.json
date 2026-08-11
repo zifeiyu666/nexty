@@ -1,7 +1,7 @@
 {
   "Home": {
-    "title": "One Custom Song",
-    "tagLine": "<strong>Personalized AI songs by One Custom Song.</strong><br></br> Gift an unforgettable track for birthdays, anniversaries, or just because.",
+    "title": "Send the Song",
+    "tagLine": "<strong>Personalized AI songs by Send the Song.</strong><br></br> Gift an unforgettable track for birthdays, anniversaries, or just because.",
     "description": "Turn your memories into studio-quality custom songs in minutes. Create a personalized music gift for birthdays, weddings, anniversaries, and more."
   },
   "Login": {
@@ -421,9 +421,9 @@
       },
       "unsubscribe": {
         "title": "Newsletter Unsubscription",
-        "success": "You have successfully unsubscribed from One Custom Song newsletters.",
+        "success": "You have successfully unsubscribed from Send the Song newsletters.",
         "emailPrefix": "Email:",
-        "regretMessage": "You can resubscribe anytime to receive the latest One Custom Song updates and gift ideas.",
+        "regretMessage": "You can resubscribe anytime to receive the latest Send the Song updates and gift ideas.",
         "errorGeneric": "An error occurred while processing your unsubscribe request",
         "errorNoToken": "No unsubscribe token provided",
         "errorMessage": "Please make sure you're using the correct unsubscribe link. If the problem persists, contact our support team for assistance.",

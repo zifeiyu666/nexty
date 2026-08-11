@@ -1,6 +1,6 @@
 # I couldn't find a Valentine's Day gift that felt personal, so I built one
 
-*How a frustrating search for one meaningful gift became One Custom Song*
+*How a frustrating search for one meaningful gift became Send the Song*
 
 Valentine's Day was getting close, and I had reached the familiar stage of gift shopping where every open tab looked like a variation of the one before it.
 
@@ -24,7 +24,7 @@ I was not looking for a cheaper imitation of a commissioned musician. I wanted a
 
 AI made that possible. Yet the AI music products I found were mostly general purpose generators. They were good at turning a prompt into a track. They rarely treated the track as a gift, and they did not help with everything that comes after the audio: the lyrics, the presentation, the moment of giving it to someone.
 
-So I started building [One Custom Song](https://onecustomsong.com).
+So I started building [Send the Song](https://sendthesong.com).
 
 ## Start with the story, not a clever prompt
 
@@ -72,7 +72,7 @@ Once the lyrics felt right, I reached the part I had been waiting for. Details t
 
 There is a strange tension in those first few seconds of playback. You listen for musical quality, of course, but you are also listening for recognition. Does this sound like the person I had in mind? Did the most important line survive? Is the chorus sincere, or did it drift into greeting-card language?
 
-One Custom Song uses current AI music models within a generation workflow tuned for personal music gifts. For this use case, the system has to respect a fixed story, support revised lyrics, and create a song that can hold someone's attention as a gift rather than function as disposable background audio.
+Send the Song uses current AI music models within a generation workflow tuned for personal music gifts. For this use case, the system has to respect a fixed story, support revised lyrics, and create a song that can hold someone's attention as a gift rather than function as disposable background audio.
 
 While the song is generating, you can write a card and create a cover image with AI. You can upload your own image instead, which is often the better choice when a particular photograph already carries the memory.
 
@@ -86,7 +86,7 @@ I care about that model because a personalized product creates a peculiar kind o
 
 After finishing the first version, I ran into a final problem. I had a song I liked, but sending an audio file through a chat app felt oddly unfinished. The song needed a form that made the delivery feel intentional.
 
-One Custom Song can turn the finished lyrics into printable lyric wall art. The export is prepared at 300 PPI, so it can become a framed print at home or a display piece at a wedding. People can choose the size and style that suit the occasion, then download the print-ready file.
+Send the Song can turn the finished lyrics into printable lyric wall art. The export is prepared at 300 PPI, so it can become a framed print at home or a display piece at a wedding. People can choose the size and style that suit the occasion, then download the print-ready file.
 
 The music video editor combines the song with lyrics, cover artwork, and personal photos. We use Remotion to render a high-resolution video that plays cleanly on a phone, tablet, computer, or a larger screen at an event. A couple could send it privately, play it during a proposal, or include it in a wedding reception. People will find their own occasion for it. Our job is to make sure the video is ready when that occasion arrives.
 
@@ -102,4 +102,4 @@ I began this project because I could not find a Valentine's Day gift that carrie
 
 If you are trying to make something for Valentine's Day, an anniversary, a wedding, or an ordinary day that happens to matter, start with one specific memory. Write it down without trying to make it beautiful. You can work on the song after that.
 
-[Create your custom song](https://onecustomsong.com/create-song)
+[Create your custom song](https://sendthesong.com/create-song)
