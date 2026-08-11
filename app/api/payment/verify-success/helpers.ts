@@ -122,6 +122,7 @@ export function buildSubscriptionResponse(subscription: SubscriptionData): NextR
   }
 
   return apiResponse.success({
+    status: 'pending',
     unlockSong,
     message:
       'Subscription found but not active yet. Please allow a few moments and refresh, or contact support if the problem persists.',
@@ -154,6 +155,7 @@ export function buildOrderResponse(order: OrderData): NextResponse {
   }
 
   return apiResponse.success({
+    status: 'pending',
     unlockSong,
     message:
       'Payment recorded but not finalized yet. Please refresh in a moment, or contact support if the problem persists.',

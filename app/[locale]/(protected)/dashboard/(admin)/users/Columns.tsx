@@ -1,6 +1,13 @@
 "use client";
 
-import { banUser, unbanUser, UserWithSource } from "@/actions/users/admin";
+import {
+  AdminCreditLog,
+  banUser,
+  getUserCreditLogs,
+  grantUserCredits,
+  unbanUser,
+  UserWithSource,
+} from "@/actions/users/admin";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
@@ -28,12 +37,78 @@ import {
 } from "@/components/ui/tooltip";
 import { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
-import { MoreHorizontal } from "lucide-react";
+import { History, Loader2, MoreHorizontal, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 type UserType = UserWithSource;
+
+const formatEntitlements = (value: unknown) => {
+  const data = value && typeof value === "object" ? (value as any) : {};
+  const subscription = data.subscription || {};
+  const oneTime = data.oneTime || {};
+  const values = [
+    ["Songs", (subscription.song || 0) + (oneTime.song || 0)],
+    ["Wall art", (subscription.wallArt || 0) + (oneTime.wallArt || 0)],
+    ["Videos", (subscription.mv || 0) + (oneTime.mv || 0)],
+  ] as const;
+
+  return values
+    .filter(([, amount]) => amount !== 0)
+    .map(([label, amount]) => `${label}: ${amount > 0 ? "+" : ""}${amount}`)
+    .join(" · ") || "-";
+};
+
+const GrantCreditsDialog = ({ open, onOpenChange, user }: { open: boolean; onOpenChange: (open: boolean) => void; user: UserType }) => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [song, setSong] = useState("0");
+  const [wallArt, setWallArt] = useState("0");
+  const [mv, setMv] = useState("0");
+  const [notes, setNotes] = useState("");
+  const reset = () => { setSong("0"); setWallArt("0"); setMv("0"); setNotes(""); };
+
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) reset(); onOpenChange(isOpen); }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Grant credits</DialogTitle>
+          <DialogDescription>Grant one-time creation permissions to {user.email || user.id}.</DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-2"><Label htmlFor={`song-${user.id}`}>Songs</Label><Input id={`song-${user.id}`} type="number" min="0" step="1" value={song} onChange={(event) => setSong(event.target.value)} /></div>
+          <div className="space-y-2"><Label htmlFor={`wallart-${user.id}`}>Wall art</Label><Input id={`wallart-${user.id}`} type="number" min="0" step="1" value={wallArt} onChange={(event) => setWallArt(event.target.value)} /></div>
+          <div className="space-y-2"><Label htmlFor={`video-${user.id}`}>Videos</Label><Input id={`video-${user.id}`} type="number" min="0" step="1" value={mv} onChange={(event) => setMv(event.target.value)} /></div>
+        </div>
+        <div className="space-y-2"><Label htmlFor={`grant-notes-${user.id}`}>Note (optional)</Label><Textarea id={`grant-notes-${user.id}`} placeholder="Reason for this grant..." value={notes} onChange={(event) => setNotes(event.target.value)} /></div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>Cancel</Button>
+          <Button disabled={isPending} onClick={() => startTransition(async () => {
+            const result = await grantUserCredits({ userId: user.id, song: Number(song), wallArt: Number(wallArt), mv: Number(mv), notes: notes || undefined });
+            if (result.success) { toast.success("Credits granted"); onOpenChange(false); router.refresh(); }
+            else toast.error("Failed to grant credits", { description: result.error });
+          })}>{isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Grant credits</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const CreditHistoryDialog = ({ open, onOpenChange, user, logs, isLoading }: { open: boolean; onOpenChange: (open: boolean) => void; user: UserType; logs: AdminCreditLog[]; isLoading: boolean }) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="sm:max-w-3xl">
+      <DialogHeader><DialogTitle>Credit history</DialogTitle><DialogDescription>{user.email || user.id}</DialogDescription></DialogHeader>
+      <ScrollArea className="h-[420px] rounded-md border">
+        {isLoading ? <div className="flex h-full items-center justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div> : logs.length === 0 ? <div className="p-6 text-center text-sm text-muted-foreground">No credit history.</div> : (
+          <div className="divide-y">
+            {logs.map((log) => <div key={log.id} className="space-y-1 p-3 text-sm"><div className="flex items-center justify-between gap-4"><span className="font-medium">{log.type === "admin_grant" ? "Admin grant" : log.type}</span><span className="shrink-0 text-muted-foreground">{dayjs(log.createdAt).format("YYYY-MM-DD HH:mm")}</span></div><div>{formatEntitlements(log.entitlementDeltaJsonb)}</div>{log.notes && <p className="text-muted-foreground">{log.notes}</p>}<p className="text-xs text-muted-foreground">Balance after: {formatEntitlements(log.entitlementSnapshotJsonb)}</p></div>)}
+          </div>
+        )}
+      </ScrollArea>
+    </DialogContent>
+  </Dialog>
+);
 
 const BanUserDialog = ({
   open,
@@ -169,6 +244,10 @@ const UnbanUserDialog = ({
 const ActionsCell = ({ user }: { user: UserType }) => {
   const [openBan, setOpenBan] = useState(false);
   const [openUnban, setOpenUnban] = useState(false);
+  const [openGrant, setOpenGrant] = useState(false);
+  const [openHistory, setOpenHistory] = useState(false);
+  const [history, setHistory] = useState<AdminCreditLog[]>([]);
+  const [isHistoryLoading, startHistoryTransition] = useTransition();
 
   return (
     <>
@@ -188,6 +267,19 @@ const ActionsCell = ({ user }: { user: UserType }) => {
             }}
           >
             Copy user ID
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpenGrant(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Grant credits
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => {
+            setOpenHistory(true);
+            startHistoryTransition(async () => {
+              const result = await getUserCreditLogs({ userId: user.id });
+              if (result.success) setHistory(result.data || []);
+              else toast.error("Failed to load credit history", { description: result.error });
+            });
+          }}>
+            <History className="mr-2 h-4 w-4" /> Credit history
           </DropdownMenuItem>
           {user.banned ? (
             <DropdownMenuItem onClick={() => setOpenUnban(true)}>
@@ -215,6 +307,8 @@ const ActionsCell = ({ user }: { user: UserType }) => {
         onOpenChange={setOpenUnban}
         user={user}
       />
+      <GrantCreditsDialog open={openGrant} onOpenChange={setOpenGrant} user={user} />
+      <CreditHistoryDialog open={openHistory} onOpenChange={setOpenHistory} user={user} logs={history} isLoading={isHistoryLoading} />
     </>
   );
 };

@@ -4,6 +4,7 @@ import { Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { isTestimonialsEnabled } from "@/config/features";
 
 export type TestimonialItem = {
   badge: string;
@@ -237,6 +238,8 @@ export default function Testimonials({
   const handleMarqueeMouseLeave = () => {
     isMarqueeHoveredRef.current = false;
   };
+
+  if (!isTestimonialsEnabled) return null;
 
   return (
     <section id="testimonials" className="home-section overflow-hidden">

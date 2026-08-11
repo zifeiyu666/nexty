@@ -45,6 +45,14 @@ export default async function SubscriptionPage() {
         {isMember ? (
           <>
             <CurrentUserBenefitsDisplay />
+            <Button asChild>
+              <I18nLink
+                href={process.env.NEXT_PUBLIC_PRICING_PATH!}
+                title={t("upgradePlan")}
+              >
+                {t("upgradePlan")}
+              </I18nLink>
+            </Button>
             {subscriptionProvider === "stripe" && (
               <>
                 <PortalButton

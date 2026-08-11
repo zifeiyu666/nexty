@@ -73,6 +73,7 @@ export async function verifyPayPalPayment(
 
     if (!subscriptionRecord) {
       return apiResponse.success({
+        status: "pending",
         message:
           "Payment successful! Subscription activation may take a moment. Please refresh shortly.",
       });

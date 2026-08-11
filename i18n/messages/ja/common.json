@@ -257,7 +257,7 @@
           "title": "サービス",
           "links": [
             { "href": "/#features", "name": "ギフト機能" },
-            { "id": "pricing", "href": "/#pricing", "name": "料金" },
+            { "id": "pricing", "href": "/pricing", "name": "料金" },
             { "href": "/songs", "name": "マイソング" },
             { "href": "/voices", "name": "マイボイス" },
             { "href": "/samples", "name": "サンプル" },

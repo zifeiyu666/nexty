@@ -52,6 +52,7 @@ async function handleCreemSubscription(
       `[Verify API] Creem subscription ${subscriptionId} not found in DB for user ${userId}.`
     );
     return apiResponse.success({
+      status: 'pending',
       message:
         'Payment successful! Subscription activation may take a moment. Please refresh shortly.',
     });
@@ -76,6 +77,7 @@ async function handleCreemPayment(
       `[Verify API] Creem order ${orderId} not found via webhook.`
     );
     return apiResponse.success({
+      status: 'pending',
       message:
         'Payment successful! Order confirmation may take a moment. Please refresh shortly, or contact support if the problem persists.',
     });
@@ -103,6 +105,7 @@ async function handleCreemPayment(
   }
 
   return apiResponse.success({
+    status: 'pending',
     message:
       'Payment recorded but not finalized yet. Please refresh in a moment.',
   });

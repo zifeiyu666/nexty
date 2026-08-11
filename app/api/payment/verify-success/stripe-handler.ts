@@ -63,6 +63,7 @@ async function handleStripeSubscription(
       'Status might be pending webhook processing.'
     );
     return apiResponse.success({
+      status: 'pending',
       message:
         'Payment successful! Subscription activation may take a moment. Please refresh shortly.',
     });
@@ -97,6 +98,7 @@ async function handleStripePayment(
       `[Verify API] Stripe order for payment intent ${paymentIntentId} not found via webhook.`
     );
     return apiResponse.success({
+      status: 'pending',
       message:
         'Payment successful! Order confirmation may take a moment. Please refresh shortly.',
     });
@@ -155,4 +157,3 @@ export async function verifyStripePayment(
 
   return apiResponse.badRequest('Unsupported Stripe checkout session mode.');
 }
-

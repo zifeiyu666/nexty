@@ -70,7 +70,7 @@ function SampleCard({
   const [isPending, startTransition] = useTransition();
   const imageUrl = coverImageUrl(sample);
   const isExpired = sample.isExpired;
-  const ctaHref = isExpired ? "/pricing#pricing" : `/samples/${sample.songId}`;
+  const ctaHref = isExpired ? "/pricing" : `/samples/${sample.songId}`;
   const ctaLabel = isExpired ? "Subscribe to unlock" : "View details";
   const CtaIcon = isExpired ? Sparkles : ArrowRight;
 

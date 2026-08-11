@@ -124,7 +124,7 @@
           "title": "Productos",
           "links": [
             {"href": "/#features", "name": "Funciones para regalos"},
-            {"id": "pricing", "href": "/#pricing", "name": "Precios"},
+            {"id": "pricing", "href": "/pricing", "name": "Precios"},
             {"href": "/songs", "name": "Mis canciones"},
             {"href": "/voices", "name": "Mis voces"},
             {"href": "/samples", "name": "Mis muestras"},
