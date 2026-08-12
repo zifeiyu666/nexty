@@ -1,6 +1,6 @@
 import { SiteConfig } from "@/types/siteConfig";
 
-const DEFAULT_SITE_URL = "https://sendthesong.com";
+const DEFAULT_SITE_URL = "https://sendthesong.io";
 
 function resolveBaseUrl() {
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();

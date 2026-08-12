@@ -3,7 +3,7 @@
   "version": "3.4.0",
   "author": {
     "name": "Send the Song",
-    "repository": "https://sendthesong.com"
+    "repository": "https://sendthesong.io"
   },
   "scripts": {
     "dev": "next dev",

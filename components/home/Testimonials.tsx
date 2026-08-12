@@ -145,6 +145,14 @@ type TestimonialsProps = {
 };
 
 export default function Testimonials({
+  ...props
+}: TestimonialsProps) {
+  if (!isTestimonialsEnabled) return null;
+
+  return <TestimonialsContent {...props} />;
+}
+
+function TestimonialsContent({
   title,
   description,
   items,
@@ -238,8 +246,6 @@ export default function Testimonials({
   const handleMarqueeMouseLeave = () => {
     isMarqueeHoveredRef.current = false;
   };
-
-  if (!isTestimonialsEnabled) return null;
 
   return (
     <section id="testimonials" className="home-section overflow-hidden">

@@ -2,15 +2,15 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import {
-  buildRemotionWebhook,
-  getRemotionLambdaConfig,
+    buildRemotionWebhook,
+    getRemotionLambdaConfig,
 } from "@/lib/music-video/remotion-lambda";
 
 describe("remotion lambda config", () => {
   test("builds a signed music video webhook with custom video data", () => {
     const webhook = buildRemotionWebhook({
       env: {
-        WEBHOOK_BASE_URL: "https://sendthesong.com/",
+        WEBHOOK_BASE_URL: "https://sendthesong.io/",
         REMOTION_WEBHOOK_SECRET: "secret-value",
       },
       videoId: "mv-123",
@@ -19,7 +19,7 @@ describe("remotion lambda config", () => {
     assert.deepEqual(webhook, {
       customData: { videoId: "mv-123" },
       secret: "secret-value",
-      url: "https://sendthesong.com/api/webhooks/remotion/music-video",
+      url: "https://sendthesong.io/api/webhooks/remotion/music-video",
     });
   });
 
@@ -28,7 +28,7 @@ describe("remotion lambda config", () => {
       () =>
         getRemotionLambdaConfig({
           env: {
-            WEBHOOK_BASE_URL: "https://sendthesong.com",
+            WEBHOOK_BASE_URL: "https://sendthesong.io",
             REMOTION_AWS_REGION: "us-east-1",
             REMOTION_FUNCTION_NAME: "remotion-render",
             REMOTION_SERVE_URL: "https://bucket.s3.us-east-1.amazonaws.com/index.html",
@@ -151,7 +151,7 @@ describe("remotion lambda config", () => {
       () =>
         buildRemotionWebhook({
           env: {
-            NEXT_PUBLIC_SITE_URL: "https://sendthesong.com",
+            NEXT_PUBLIC_SITE_URL: "https://sendthesong.io",
             REMOTION_WEBHOOK_SECRET: "secret-value",
           },
           videoId: "mv-123",

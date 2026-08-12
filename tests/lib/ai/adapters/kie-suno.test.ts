@@ -2,16 +2,16 @@ import assert from "node:assert/strict";
 import { afterEach, describe, test } from "node:test";
 
 import {
-  buildKieSunoMusicPrompt,
   buildKieSunoCallbackUrl,
+  buildKieSunoMusicPrompt,
   extractLyricsText,
   getMockKieSunoMusicResult,
   getMockKieSunoTaskId,
   normalizeKieLyricsRecord,
   normalizeKieMusicRecord,
   normalizeKieTimestampedLyricsRecord,
-  submitTimestampedLyricsTask,
   submitMusicTask,
+  submitTimestampedLyricsTask,
 } from "../../../../lib/ai/adapters/kie-suno";
 import { persistKieSongVersionMediaToR2 } from "../../../../lib/ai/kie-suno-media";
 
@@ -40,17 +40,17 @@ describe("KIE Suno adapter normalization", () => {
   });
 
   test("builds a KIE Suno callback URL from WEBHOOK_BASE_URL", () => {
-    process.env.WEBHOOK_BASE_URL = "https://sendthesong.com/";
+    process.env.WEBHOOK_BASE_URL = "https://sendthesong.io/";
 
     assert.equal(
       buildKieSunoCallbackUrl(),
-      "https://sendthesong.com/api/webhooks/kie/suno",
+      "https://sendthesong.io/api/webhooks/kie/suno",
     );
   });
 
   test("submits music tasks with callBackUrl required by KIE", async () => {
     process.env.KIE_API_KEY = "test-key";
-    process.env.WEBHOOK_BASE_URL = "https://sendthesong.com";
+    process.env.WEBHOOK_BASE_URL = "https://sendthesong.io";
     process.env.KIE_SUNO_MOCK_TASK_ID = "false";
 
     let payload: any;
@@ -76,7 +76,7 @@ describe("KIE Suno adapter normalization", () => {
     assert.equal(taskId, "kie-music-task");
     assert.equal(
       payload.callBackUrl,
-      "https://sendthesong.com/api/webhooks/kie/suno",
+      "https://sendthesong.io/api/webhooks/kie/suno",
     );
   });
 
@@ -109,7 +109,7 @@ describe("KIE Suno adapter normalization", () => {
 
   test("submits sanitized music prompts to KIE without changing local lyrics", async () => {
     process.env.KIE_API_KEY = "test-key";
-    process.env.WEBHOOK_BASE_URL = "https://sendthesong.com";
+    process.env.WEBHOOK_BASE_URL = "https://sendthesong.io";
     process.env.KIE_SUNO_MOCK_TASK_ID = "false";
 
     let payload: any;

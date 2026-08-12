@@ -4,8 +4,8 @@ Send the Song is an AI-powered music gift platform for turning personal memories
 
 ## Live Demo
 
-- Live Demo: [https://sendthesong.com](https://sendthesong.com)
-- Create a Song: [https://sendthesong.com/create-song](https://sendthesong.com/create-song)
+- Live Demo: [https://sendthesong.io](https://sendthesong.io)
+- Create a Song: [https://sendthesong.io/create-song](https://sendthesong.io/create-song)
 
 ## Overview
 
@@ -144,7 +144,7 @@ pnpm remotion:function:deploy
 
 ## Launch And Assets
 
-- Official website: [https://sendthesong.com](https://sendthesong.com)
+- Official website: [https://sendthesong.io](https://sendthesong.io)
 - Product Hunt launch materials: `product-introduction.md`
 - Site configuration: `config/site.ts`
 - Product images: `public/images/products/`

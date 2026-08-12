@@ -2,6 +2,7 @@
 
 import { DynamicIcon } from "@/components/DynamicIcon";
 import { SidebarUserNav } from "@/components/header/SidebarUserNav";
+import { siteConfig } from "@/config/site";
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link as I18nLink, usePathname } from "@/i18n/routing";
 import { authClient } from "@/lib/auth/auth-client";
+import { Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
@@ -130,6 +132,16 @@ export function DashboardSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Contact support">
+              <a href={`mailto:${siteConfig.socialLinks.email}`}>
+                <Mail className="h-4 w-4" />
+                {!isCollapsed && <span>Contact support</span>}
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <SidebarUserNav user={user} />
       </SidebarFooter>
     </Sidebar>

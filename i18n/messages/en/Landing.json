@@ -341,7 +341,7 @@
       },
       {
         "question": "Are there any hidden fees, and is my payment secure?",
-        "answer": "Zero hidden fees. You only pay when you are completely happy with your preview. All payments are encrypted and securely processed through Stripe (PCI-compliant). We never store your credit card details on our servers."
+        "answer": "Zero hidden fees. You only pay when you are completely happy with your preview. All payments are encrypted and securely processed through Creem (PCI-compliant). We never store your credit card details on our servers."
       },
       {
         "question": "How long are my custom songs stored?",
@@ -353,7 +353,7 @@
       },
       {
         "question": "What if my song generation gets stuck?",
-        "answer": "Our next-gen AI pipeline is incredibly stable, but network glitches can happen. If it gets stuck, simply refresh the page. If the issue persists, our 24/7 support team will manually regenerate and optimize your track right away."
+        "answer": "Our next-gen AI pipeline is designed to be reliable, but network glitches can happen. If it gets stuck, refresh the page. If the issue persists, contact support and we will review the issue within 3 business days."
       }
     ]
   },

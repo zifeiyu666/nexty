@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import {
-  EXTERNAL_MARKDOWN_LINK_CLASS,
-  getMarkdownLinkAttributes,
-  INTERNAL_MARKDOWN_LINK_CLASS,
+    EXTERNAL_MARKDOWN_LINK_CLASS,
+    getMarkdownLinkAttributes,
+    INTERNAL_MARKDOWN_LINK_CLASS,
 } from "../../../lib/cms/link-attributes";
 
 describe("markdown link attributes", () => {
@@ -14,7 +14,7 @@ describe("markdown link attributes", () => {
     });
 
     assert.deepEqual(
-      getMarkdownLinkAttributes("https://sendthesong.com/pricing"),
+      getMarkdownLinkAttributes("https://sendthesong.io/pricing"),
       {
         className: INTERNAL_MARKDOWN_LINK_CLASS,
       },

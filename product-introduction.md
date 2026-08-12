@@ -45,7 +45,7 @@ Product Hunt official launch guide reference: https://www.producthunt.com/launch
 | Field | Ready-to-copy value |
 | --- | --- |
 | Product name | Send the Song |
-| Product URL | https://sendthesong.com |
+| Product URL | https://sendthesong.io |
 | Product Hunt URL | TODO: add after the launch page is created |
 | Maker username | TODO: add Product Hunt maker username |
 | Launch date/time | TODO: add final launch date and time |
@@ -368,7 +368,7 @@ Notes:
 - [ ] Add Product Hunt maker username.
 - [ ] Add launch date and launch time.
 - [ ] Add final Product Hunt URL after the page is created.
-- [ ] Confirm product URL opens correctly: https://sendthesong.com
+- [ ] Confirm product URL opens correctly: https://sendthesong.io
 - [ ] Confirm `/create-song` flow starts without requiring payment.
 - [ ] Confirm unlimited free 60-second preview messaging is accurate.
 - [ ] Confirm login or lazy-registration flow works for new users.

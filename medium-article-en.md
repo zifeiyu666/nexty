@@ -24,7 +24,7 @@ I was not looking for a cheaper imitation of a commissioned musician. I wanted a
 
 AI made that possible. Yet the AI music products I found were mostly general purpose generators. They were good at turning a prompt into a track. They rarely treated the track as a gift, and they did not help with everything that comes after the audio: the lyrics, the presentation, the moment of giving it to someone.
 
-So I started building [Send the Song](https://sendthesong.com).
+So I started building [SendTheSong.io](https://sendthesong.io).
 
 ## Start with the story, not a clever prompt
 
@@ -102,4 +102,4 @@ I began this project because I could not find a Valentine's Day gift that carrie
 
 If you are trying to make something for Valentine's Day, an anniversary, a wedding, or an ordinary day that happens to matter, start with one specific memory. Write it down without trying to make it beautiful. You can work on the song after that.
 
-[Create your custom song](https://sendthesong.com/create-song)
+[Create your custom song](https://sendthesong.io/create-song)
