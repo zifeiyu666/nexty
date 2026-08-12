@@ -9,6 +9,7 @@ import VoicePersonalization from "@/components/home/VoicePersonalization";
 import SongfinchComparison from "@/components/home/SongfinchComparison";
 import ScrollReveal from "@/components/home/ScrollReveal";
 import Testimonials from "@/components/home/Testimonials";
+import { isCustomerReactionsEnabled } from "@/config/features";
 import { BG1 } from "@/components/shared/BGs";
 import { type FinalSongPlayerData } from "@/components/song/FinalSongPlayer";
 import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
@@ -93,7 +94,7 @@ export default async function HomeComponent() {
 
       {/* <DiagonalCounterflowShowcase /> */}
 
-      {messages.Landing.CustomerReactions && (
+      {messages.Landing.CustomerReactions && isCustomerReactionsEnabled && (
         <ScrollReveal>
           {/* <CustomerReactionCollage /> */}
           <CustomerReactions sectionId="customer-reactions-grid" />

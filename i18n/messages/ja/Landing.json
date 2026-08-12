@@ -1,11 +1,11 @@
 {
   "Hero": {
     "badge": { "label": "", "text": "✨ AIで作る世界にひとつの歌", "href": "" },
-    "title": "ずっと心に残る、世界にひとつの歌を贈ろう。",
-    "titleLine": "世界にひとつの歌を",
-    "titleAccent": "大切な人へ",
-    "description": "<p class=\"hero-subtitle\">思い出を聞かせてください。AIが物語を、試聴・編集できるスタジオ品質の<strong>オリジナルソング</strong>に仕上げ、<strong>音楽ギフト</strong>として届けられます。</p>",
-    "trustBadge": "オリジナルソング · まずは無料試聴",
+    "title": "ずっと大切にされる、あの人だけの歌を送ろう",
+    "titleLine": "あの人だけの歌を",
+    "titleAccent": "ずっと大切にされる一曲に",
+    "description": "<p class=\"hero-subtitle\">思い出や節目、まだうまく言葉にできない気持ちを聞かせてください。Send the Songが、試聴・編集して数分で送れる、あなただけの音楽ギフトに仕上げます。</p>",
+    "trustBadge": "Send the Song · まずは無料試聴 · 数分で完成",
     "trustItems": ["無料サンプル", "数分で完成", "カード登録不要"],
     "getStarted": "無料サンプルを作る",
     "getStartedLink": "/create-song",
@@ -17,15 +17,15 @@
   "OccasionShowcase": {
     "eyebrow": "さまざまなシーンに",
     "title": "大切な瞬間に、その人だけのメロディを",
-    "description": "人生の特別な物語や気持ちを、世界にひとつのオリジナルソングに込められます。",
+    "description": "人生の大切な物語や気持ちを、あの人に送る一曲に込められます。",
     "previous": "前のシーン",
     "next": "次のシーン",
     "carouselLabel": "用途別ソングのカルーセル"
   },
   "CustomerReactions": {
     "badge": { "label": "リアクション", "text": "😭 思わずこぼれるうれし涙" },
-    "title": "オリジナルソングを受け取った瞬間",
-    "description": "<p>大切な人が、自分だけの<strong>オリジナルソング</strong>を初めて聴く瞬間をご覧ください。</p>",
+    "title": "歌を送ったときに起こること",
+    "description": "<p>ティッシュをご用意ください。ホバーで音なしプレビューを見て、クリックすると、一曲を送ることが忘れられない瞬間を生む様子を聴けます。</p>",
     "playLabel": "{title}を音声付きで再生",
     "muteLabel": "{title}をミュート",
     "trustItems": ["無料で試せます", "数分で完成", "音楽経験は不要です"],
@@ -33,59 +33,59 @@
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
         "label": "Send the Song",
-        "title": "お母さんが初めて聴いた瞬間"
+        "title": "お母さんの反応：歌を送った日"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
         "label": "Send the Song",
-        "title": "うれし涙"
+        "title": "送られた歌にこぼれる笑顔"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
         "label": "Send the Song",
-        "title": "最高のサプライズ"
+        "title": "送られた歌の最高のサプライズ"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
         "label": "Send the Song",
-        "title": "結婚式の思い出をもう一度"
+        "title": "いつまでも残る、送られた結婚式の歌"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
         "label": "Send the Song",
-        "title": "記念日のサプライズ"
+        "title": "送られた記念日の歌"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
         "label": "Send the Song",
-        "title": "ふたりの歌"
+        "title": "彼女にラブソングを送る"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
         "label": "Send the Song",
-        "title": "驚きが笑顔に変わる瞬間"
+        "title": "送られた歌にこぼれる喜び"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
         "label": "Send the Song",
-        "title": "もう一度聴きたい"
+        "title": "送られた歌を聴く時間"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
         "label": "Send the Song",
-        "title": "お父さんが初めて聴いた瞬間"
+        "title": "お父さんの反応：歌を送った日"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
         "label": "Send the Song",
-        "title": "喜びの涙"
+        "title": "送られた歌に流す涙"
       }
     ]
   },
   "HowItWorks": {
     "eyebrow": "作り方",
     "title": "ひとつの思い出が、数分で心を動かす歌に",
-    "description": "<strong>オリジナルソング</strong>を無料で試聴し、気に入ったら<strong>ミュージックビデオ</strong>や印刷できる<strong>歌詞アート</strong>と一緒に完成版を受け取れます。",
+    "description": "オリジナルソングを無料で試聴し、気に入ったらミュージックビデオと印刷できる歌詞アートを含むギフトセットを完成させて、センスよく歌を送れます。",
     "steps": {
       "story": {
         "title": "思い出を教えてください",
@@ -296,15 +296,15 @@
   },
   "Testimonials": {
     "badge": { "label": "お客様の声" },
-    "title": "お客様の声",
-    "description": "実際にオリジナルソングを贈った方の感想です。"
+    "title": "Send the Songをご利用いただいたお客様の声",
+    "description": "思い出を、送る価値のある一曲に変えた方々のリアルなストーリーです。"
   },
   "FAQ": {
-    "title": "オリジナルソングについてのよくある質問",
-    "description": "作成前に知っておきたいことをご案内します。",
+    "title": "Send the Songについてのよくある質問",
+    "description": "ずっと大切にされる一曲を作り、パーソナライズして送る前に知っておきたいことをご案内します。",
     "items": [
       {
-        "question": "sendthesong.comはどのように使いますか？",
+        "question": "Send the Songはどのように使いますか？",
         "answer": "思い出を入力し、音楽ジャンルを選ぶと、AIがオリジナルソングを作成します。まず60秒の無料サンプルを試聴し、気に入ったら完成版を購入できます。"
       },
       {
@@ -338,7 +338,7 @@
     ]
   },
   "CTA": {
-    "title": "大切な人だけの歌を作ろう",
+    "title": "ずっと大切にされる、あの人だけの歌を送ろう",
     "description": "思い出を、スタジオ品質の<strong>オリジナルソング</strong>に。曲を作って<strong>大切な人へ届ける</strong>、誕生日や結婚式、記念日のための<strong>音楽ギフト</strong>です。",
     "button": "曲を作る",
     "trustText": "忘れられない瞬間のために",

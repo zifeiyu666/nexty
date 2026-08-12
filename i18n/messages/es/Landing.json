@@ -5,11 +5,11 @@
       "text": "✨ Crea una canción personalizada con IA",
       "href": ""
     },
-    "title": "Regala una canción personalizada que nunca olvidarán.",
-    "titleLine": "Regala una canción personalizada",
+    "title": "Envía una canción personalizada que atesorarán para siempre",
+    "titleLine": "Envía una canción personalizada",
     "titleAccent": "que nunca olvidarán",
-    "description": "<p class=\"hero-subtitle\">Cuéntanos vuestra historia. Nuestra IA convierte tus recuerdos en una <strong>canción personalizada</strong> con sonido de estudio que podrás escuchar, ajustar y enviar como un <strong>regalo musical único</strong>.</p>",
-    "trustBadge": "Canción personalizada · Muestra gratuita",
+    "description": "<p class=\"hero-subtitle\">Comparte un recuerdo, un momento importante o esas palabras que nunca has sabido cómo decir. Send the Song lo transforma en un regalo musical personal, listo para escuchar, ajustar y enviar en minutos.</p>",
+    "trustBadge": "Send the Song · Muestra gratuita primero · Lista en minutos",
     "trustItems": ["Muestra gratis", "Lista en minutos", "Sin tarjeta"],
     "getStarted": "Crear una muestra gratis",
     "getStartedLink": "/create-song",
@@ -21,15 +21,15 @@
   "OccasionShowcase": {
     "eyebrow": "Ocasiones",
     "title": "Una melodía personal para cada momento especial",
-    "description": "Crea una canción única para recordar las historias y emociones que de verdad importan.",
+    "description": "Envía una canción personalizada para celebrar las historias y emociones que de verdad importan.",
     "previous": "Ocasión anterior",
     "next": "Ocasión siguiente",
     "carouselLabel": "Carrusel de ocasiones"
   },
   "CustomerReactions": {
     "badge": { "label": "REACCIONES", "text": "😭 Lágrimas de alegría" },
-    "title": "Reacciones reales a canciones personalizadas",
-    "description": "<p>Ten un pañuelo a mano. Pasa el cursor para ver una muestra sin sonido y haz clic para escuchar cómo una <strong>canción personalizada</strong> convierte un recuerdo en algo inolvidable.</p>",
+    "title": "Mira lo que pasa cuando envías la canción",
+    "description": "<p>Ten un pañuelo a mano. Pasa el cursor para ver una muestra sin sonido y haz clic para escuchar cómo enviar una canción crea un momento inolvidable.</p>",
     "playLabel": "Reproducir {title} con sonido",
     "muteLabel": "Silenciar {title}",
     "trustItems": [
@@ -41,59 +41,59 @@
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
         "label": "Send the Song",
-        "title": "La primera vez que mamá la escucha"
+        "title": "Reacción de mamá: canción enviada"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
         "label": "Send the Song",
-        "title": "Lágrimas de felicidad"
+        "title": "Alegría por una canción enviada"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
         "label": "Send the Song",
-        "title": "La mejor sorpresa"
+        "title": "La mejor sorpresa con una canción enviada"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
         "label": "Send the Song",
-        "title": "Volver a vivir la boda"
+        "title": "Una canción de boda enviada para siempre"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
         "label": "Send the Song",
-        "title": "Sorpresa de aniversario"
+        "title": "Canción de aniversario enviada"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
         "label": "Send the Song",
-        "title": "La canción de la pareja"
+        "title": "Enviarle una canción de amor"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
         "label": "Send the Song",
-        "title": "De la sorpresa a la alegría"
+        "title": "Alegría por una canción enviada"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
         "label": "Send the Song",
-        "title": "Escucharla una vez más"
+        "title": "Escuchando una canción enviada"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
         "label": "Send the Song",
-        "title": "La primera escucha de papá"
+        "title": "Reacción de papá: canción enviada"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
         "label": "Send the Song",
-        "title": "Llorar de alegría"
+        "title": "Lágrimas por una canción enviada"
       }
     ]
   },
   "HowItWorks": {
     "eyebrow": "Cómo funciona",
     "title": "De un recuerdo a una canción emocionante en pocos minutos",
-    "description": "Crea una <strong>canción personalizada</strong>, escucha gratis una muestra y desbloquea un regalo completo con <strong>vídeo musical</strong> y una <strong>lámina con la letra</strong> lista para imprimir.",
+    "description": "Crea una canción personalizada, escucha una muestra gratis y desbloquea el regalo completo, con vídeo musical y arte de letras imprimible, para enviar la canción con estilo.",
     "steps": {
       "story": {
         "title": "Cuéntanos vuestra historia",
@@ -311,15 +311,15 @@
   },
   "Testimonials": {
     "badge": { "label": "OPINIONES" },
-    "title": "Lo que cuentan nuestros clientes",
-    "description": "Historias de personas que ya han regalado su canción"
+    "title": "Lo que dicen los clientes sobre Send the Song",
+    "description": "Historias reales de personas que convirtieron un recuerdo en una canción que merecía ser enviada."
   },
   "FAQ": {
-    "title": "Preguntas frecuentes sobre las canciones personalizadas",
-    "description": "Lo esencial antes de crear y enviar tu regalo musical.",
+    "title": "Preguntas frecuentes sobre Send the Song",
+    "description": "Todo lo que necesitas saber antes de crear, personalizar y enviar una canción que atesorarán para siempre.",
     "items": [
       {
-        "question": "¿Cómo funciona sendthesong.com?",
+        "question": "¿Cómo funciona Send the Song?",
         "answer": "Cuéntanos la historia, elige un estilo musical y nuestra IA preparará una canción personalizada. Primero recibirás una muestra gratuita de 60 segundos. Si te gusta, podrás desbloquear la canción completa y usar los editores de vídeo y láminas."
       },
       {
@@ -353,7 +353,7 @@
     ]
   },
   "CTA": {
-    "title": "Crea una canción personalizada que nunca olvidarán",
+    "title": "Envía una canción personalizada que atesorarán para siempre",
     "description": "Cuéntanos vuestra historia y convierte los recuerdos en una <strong>canción personalizada</strong> con sonido de estudio. Crea y <strong>envía una canción</strong> como <strong>regalo musical único</strong> para cumpleaños, bodas o aniversarios.",
     "button": "Crear mi canción",
     "trustText": "Hecha para momentos que importan",

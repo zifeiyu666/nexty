@@ -23,7 +23,7 @@ export default function BrandWordmark({
       aria-label={title}
       className={cn("inline-flex items-center whitespace-nowrap", className)}
     >
-      <span aria-hidden="true">One Custom S</span>
+      <span aria-hidden="true">Send The S</span>
       <Heart
         aria-hidden="true"
         className={cn(
