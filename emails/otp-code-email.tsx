@@ -6,6 +6,8 @@ interface OTPCodeEmailProps {
   type: "sign-in" | "email-verification" | "forget-password";
 }
 
+const BRAND_PRIMARY = "#e04132";
+
 const styles = {
   container: {
     fontFamily:
@@ -25,7 +27,7 @@ const styles = {
   headerTitle: {
     fontSize: "24px",
     fontWeight: "bold",
-    color: "#3b82f6",
+    color: BRAND_PRIMARY,
     margin: "0 0 24px 0",
   },
   contentTitle: {
@@ -115,7 +117,7 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailProps>> = ({
       <h1 style={styles.headerTitle}>
         <a
           href={siteConfig.url}
-          style={{ textDecoration: "none", color: "#3b82f6" }}
+          style={{ textDecoration: "none", color: BRAND_PRIMARY }}
         >
           {siteConfig.name}
         </a>

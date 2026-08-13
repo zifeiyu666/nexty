@@ -5,6 +5,8 @@ interface MagicLinkEmailProps {
   url: string;
 }
 
+const BRAND_PRIMARY = "#e04132";
+
 const styles = {
   container: {
     fontFamily:
@@ -24,7 +26,7 @@ const styles = {
   headerTitle: {
     fontSize: "24px",
     fontWeight: "bold",
-    color: "#3b82f6",
+    color: BRAND_PRIMARY,
     margin: "0 0 24px 0",
   },
   contentTitle: {
@@ -44,7 +46,7 @@ const styles = {
   },
   button: {
     display: "inline-block",
-    backgroundColor: "#3b82f6",
+    backgroundColor: BRAND_PRIMARY,
     color: "#ffffff",
     textDecoration: "none",
     padding: "12px 24px",
@@ -76,15 +78,8 @@ const styles = {
   logo: {
     width: "80px",
     height: "80px",
-    backgroundColor: "#000000",
-    borderRadius: "50%",
     margin: "0 auto 24px",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "36px",
-    fontWeight: "bold",
-    color: "#ffffff",
   },
 };
 
@@ -99,13 +94,14 @@ export const MagicLinkEmail: React.FC<Readonly<MagicLinkEmailProps>> = ({
           alt={siteConfig.name}
           width={80}
           height={80}
+          style={{ display: "block", border: "0", outline: "none" }}
         />
       </div>
 
       <h1 style={styles.headerTitle}>
         <a
           href={siteConfig.url}
-          style={{ textDecoration: "none", color: "#3b82f6" }}
+          style={{ textDecoration: "none", color: BRAND_PRIMARY }}
         >
           {siteConfig.name}
         </a>
