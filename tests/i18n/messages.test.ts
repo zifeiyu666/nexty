@@ -31,7 +31,7 @@ async function collectJsonFiles(directory: string): Promise<string[]> {
 
 describe('English i18n manifest', () => {
   test('merges common messages at the root with every named namespace', () => {
-    assert.equal(englishMessages.Home.title, 'Send the Song');
+    assert.equal(englishMessages.Home.title, 'SendTheSong');
     assert.equal(englishMessages.Landing.Hero.getStarted, 'Start a Free Preview');
     assert.equal(englishMessages.Pricing.title, 'Choose the custom song gift that fits your moment');
     assert.equal(englishMessages.CreditHistory.type_welcome_bonus, 'Welcome Bonus');
@@ -106,7 +106,7 @@ describe('Localized i18n manifests', () => {
   test('loads Japanese with the complete English message shape', async () => {
     assert.equal(LOCALE_TO_HREFLANG.ja, 'ja-JP');
     assert.deepEqual(scalarPaths(japaneseMessages).sort(), scalarPaths(englishMessages).sort());
-    assert.equal((await getMessagesForLocale('ja')).Home.title, 'Send the Song');
+    assert.equal((await getMessagesForLocale('ja')).Home.title, 'SendTheSong');
   });
 
   test('keeps Japanese customer-facing source files complete', () => {
@@ -146,8 +146,8 @@ describe('Localized i18n manifests', () => {
   });
 
   test('loads known locales and falls back to English', async () => {
-    assert.equal((await getMessagesForLocale('es')).Home.title, 'Send the Song');
-    assert.equal((await getMessagesForLocale('en')).Home.title, 'Send the Song');
-    assert.equal((await getMessagesForLocale('invalid')).Home.title, 'Send the Song');
+    assert.equal((await getMessagesForLocale('es')).Home.title, 'SendTheSong');
+    assert.equal((await getMessagesForLocale('en')).Home.title, 'SendTheSong');
+    assert.equal((await getMessagesForLocale('invalid')).Home.title, 'SendTheSong');
   });
 });

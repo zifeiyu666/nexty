@@ -159,7 +159,7 @@ const birthdayTracks: PlaylistTrack[] = [
   },
   {
     title: "Cart and Umbrella",
-    artist: "Send the Song",
+    artist: "SendTheSong",
     reason: "A custom birthday-style song turns shared memories into the centerpiece.",
     mood: "Personal",
     moment: "Gift reveal",
@@ -232,7 +232,7 @@ const anniversaryTracks: PlaylistTrack[] = [
   },
   {
     title: "Ten Years, Ava",
-    artist: "Send the Song",
+    artist: "SendTheSong",
     reason: "A custom anniversary song can name the people, places, and promises.",
     mood: "Personal",
     moment: "Gift reveal",
@@ -291,7 +291,7 @@ const momTracks: PlaylistTrack[] = [
   },
   {
     title: "Linda My Mom",
-    artist: "Send the Song",
+    artist: "SendTheSong",
     reason: "A custom song can include her name, family rituals, and private jokes.",
     mood: "Personal",
     moment: "Gift reveal",
@@ -343,7 +343,7 @@ const dadTracks: PlaylistTrack[] = [
   },
   {
     title: "Seatbelt and Wrenches",
-    artist: "Send the Song",
+    artist: "SendTheSong",
     reason: "A custom dad song can turn his everyday habits into the hook.",
     mood: "Personal",
     moment: "Gift reveal",
@@ -395,7 +395,7 @@ const wifeTracks: PlaylistTrack[] = [
   },
   {
     title: "Final Page Forever",
-    artist: "Send the Song",
+    artist: "SendTheSong",
     reason: "A custom song for your wife can carry vows, names, and real memories.",
     mood: "Personal",
     moment: "Gift reveal",
@@ -440,7 +440,7 @@ const countryTracks: PlaylistTrack[] = [
   },
   {
     title: "Seatbelt and Wrenches",
-    artist: "Send the Song",
+    artist: "SendTheSong",
     reason: "A custom country song can sound personal, grounded, and story-led.",
     mood: "Personal",
     moment: "Gift reveal",
@@ -488,7 +488,7 @@ export const giftPlaylists = [
       {
         question: "Can I create one original song for this playlist?",
         answer:
-          "Yes. Use Send the Song to create a birthday song from names, memories, style, and tone, then place it as the gift reveal track.",
+          "Yes. Use SendTheSong to create a birthday song from names, memories, style, and tone, then place it as the gift reveal track.",
       },
     ],
   },
@@ -566,7 +566,7 @@ export const giftPlaylists = [
       {
         question: "What songs should I put in a playlist for mom?",
         answer:
-          "Blend gratitude songs, memory songs, and gentle classics. Add send the song if you want the playlist to mention her actual story.",
+          "Mix gratitude songs, memory-driven tracks, and gentle classics. Add a custom song if you want the playlist to tell her real story in a more personal way.",
       },
       {
         question: "Is this good for Mother's Day?",
@@ -615,10 +615,10 @@ export const giftPlaylists = [
       {
         question: "How can I make a Father's Day playlist more personal?",
         answer:
-          "Include songs connected to things he taught you, then add send the song that mentions real memories and details.",
+          "Include songs connected to the lessons, rituals, and memories that shaped your relationship, then add a custom song that tells the story in his voice.",
       },
       {
-        question: "Can Send the Song make a song for dad?",
+        question: "Can SendTheSong make a song for dad?",
         answer:
           "Yes. You can create a song from stories, names, favorite memories, and a style such as country, acoustic, or classic rock.",
       },

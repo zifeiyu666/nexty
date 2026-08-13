@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SendTheSong</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div class="eyebrow">SENDTHESONG</div>
+        <h1>Save the story behind their song.</h1>
+        <p>Your notes stay in this browser until you choose to continue.</p>
+      </header>
+
+      <form id="draft-form">
+        <label>
+          Occasion
+          <select id="occasion" name="occasion" required>
+            <option value="birthday">Birthday</option>
+            <option value="anniversary">Anniversary</option>
+            <option value="wedding">Wedding</option>
+            <option value="mothers-day">Mother's Day</option>
+            <option value="fathers-day">Father's Day</option>
+            <option value="valentines-day">Valentine's Day</option>
+            <option value="just-because">Just because</option>
+            <option value="thank-you">Thank you</option>
+          </select>
+        </label>
+        <div class="two-col">
+          <label>
+            Their name
+            <input id="recipientName" name="recipientName" maxlength="80" placeholder="Maya" required />
+          </label>
+          <label>
+            Relationship
+            <select id="relationship" name="relationship">
+              <option value="">Choose one</option>
+              <option>Partner</option>
+              <option>Mom</option>
+              <option>Dad</option>
+              <option>Friend</option>
+              <option>Spouse</option>
+              <option>Family member</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          The memory
+          <textarea id="story" name="story" minlength="10" maxlength="2000" placeholder="What do you want this song to remember?" required></textarea>
+          <span id="story-count" class="hint">0 / 2,000</span>
+        </label>
+        <label>
+          Music style
+          <select id="genre" name="genre" required>
+            <option>Pop</option>
+            <option>R&amp;B</option>
+            <option>Country</option>
+            <option>Rock</option>
+            <option>Folk</option>
+            <option>Jazz</option>
+            <option>You Choose For Me</option>
+          </select>
+        </label>
+        <label class="save-option">
+          <input id="save-local" type="checkbox" checked />
+          Save this unfinished draft in this browser
+        </label>
+        <p id="status" class="status" aria-live="polite"></p>
+        <button id="submit" type="submit">Start creating</button>
+      </form>
+
+      <footer>
+        <a data-site-link href="https://sendthesong.io/samples">Sample songs</a>
+        <a data-site-link href="https://sendthesong.io/pricing">Pricing</a>
+        <a data-site-link href="https://sendthesong.io/privacy-policy">Privacy</a>
+        <a data-site-link href="mailto:support@sendthesong.io">Support</a>
+      </footer>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

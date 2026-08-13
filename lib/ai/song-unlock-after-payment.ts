@@ -6,6 +6,7 @@ import {
 import { eq } from "drizzle-orm";
 import { finalizeSongFromSample } from "./final-song";
 import { songSampleStore, type SongSampleView } from "./song-sample-store";
+import { notifySongUnlockCompleted } from "@/lib/email-notifications";
 
 export type UnlockSongContext = {
   type: "unlock_song";
@@ -488,6 +489,11 @@ export async function finalizeAndRecordOrderUnlockSong({
 }): Promise<UnlockSongResult | null> {
   const result = await finalizeSongUnlockAfterPayment({ userId, context });
   await recordOrderUnlockSongResult(orderId, result);
+  if (result?.status === "completed") {
+    await notifySongUnlockCompleted({ userId, orderId, songId: result.songId, songUrl: result.songUrl }).catch((error) =>
+      console.error("[song-unlock] Failed to send completion notification:", error),
+    );
+  }
   return result;
 }
 
@@ -502,6 +508,11 @@ export async function finalizeAndRecordSubscriptionUnlockSong({
 }): Promise<UnlockSongResult | null> {
   const result = await finalizeSongUnlockAfterPayment({ userId, context });
   await recordSubscriptionUnlockSongResult(subscriptionId, result);
+  if (result?.status === "completed") {
+    await notifySongUnlockCompleted({ userId, orderId: subscriptionId, songId: result.songId, songUrl: result.songUrl }).catch((error) =>
+      console.error("[song-unlock] Failed to send completion notification:", error),
+    );
+  }
   return result;
 }
 

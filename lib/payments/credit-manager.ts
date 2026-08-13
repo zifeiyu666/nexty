@@ -41,6 +41,11 @@ import type {
   Order,
 } from '@/lib/payments/types';
 import { and, eq } from 'drizzle-orm';
+import {
+  formatEntitlements,
+  notifyCreditUpgradeFailure,
+  notifyTransaction,
+} from '@/lib/email-notifications';
 
 // ============================================================================
 // One-Time Credit Operations
@@ -58,32 +63,48 @@ import { and, eq } from 'drizzle-orm';
  * @param orderId - The order's ID
  */
 export async function upgradeOneTimeCredits(userId: string, planId: string, orderId: string) {
-  const planDataResults = await db
-    .select({ benefitsJsonb: pricingPlansSchema.benefitsJsonb })
+  try {
+    const planDataResults = await db
+      .select({ benefitsJsonb: pricingPlansSchema.benefitsJsonb })
     .from(pricingPlansSchema)
     .where(eq(pricingPlansSchema.id, planId))
     .limit(1);
-  const planData = planDataResults[0];
+    const planData = planDataResults[0];
 
-  if (!planData) {
-    throw new Error(`Could not fetch plan benefits for ${planId}`);
+    if (!planData) throw new Error(`Could not fetch plan benefits for ${planId}`);
+
+    const entitlementsToGrant = getPlanEntitlements(planData.benefitsJsonb);
+    if (!hasAnyEntitlements(entitlementsToGrant)) return entitlementsToGrant;
+
+    await applyEntitlementGrant({
+      userId,
+      bucket: 'oneTime',
+      entitlements: entitlementsToGrant,
+      mode: 'add',
+      logType: 'one_time_purchase',
+      notes: 'One-time entitlement purchase',
+      relatedOrderId: orderId,
+    });
+    await notifyTransaction({
+      event: `credit-purchase/${orderId}`,
+      userId,
+      userTitle: 'Your credits have been added',
+      userMessage: 'Your purchase was successful and the purchased credits are now available in your account.',
+      adminTitle: `Credits added for order ${orderId}`,
+      adminMessage: 'A one-time purchase successfully granted entitlements.',
+      details: [{ label: 'Order ID', value: orderId }, { label: 'Credits', value: formatEntitlements(entitlementsToGrant) }],
+      actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sendthesong.io'}/dashboard`,
+      actionLabel: 'View credits',
+    }).catch((notificationError) =>
+      console.error('[Credit Manager] Failed to send credit purchase notification:', notificationError),
+    );
+    return entitlementsToGrant;
+  } catch (error) {
+    await notifyCreditUpgradeFailure({ userId, orderId, planId, error }).catch((notificationError) =>
+      console.error('[Credit Manager] Failed to notify credit upgrade failure:', notificationError),
+    );
+    throw error;
   }
-
-  const entitlementsToGrant = getPlanEntitlements(planData.benefitsJsonb);
-  if (!hasAnyEntitlements(entitlementsToGrant)) {
-    console.log(`No one-time entitlements defined for plan ${planId}. Skipping grant.`);
-    return;
-  }
-
-  await applyEntitlementGrant({
-    userId,
-    bucket: 'oneTime',
-    entitlements: entitlementsToGrant,
-    mode: 'add',
-    logType: 'one_time_purchase',
-    notes: 'One-time entitlement purchase',
-    relatedOrderId: orderId,
-  });
 }
 
 /**
@@ -184,7 +205,7 @@ export async function upgradeSubscriptionCredits(userId: string, planId: string,
     const entitlementsToGrant = getPlanEntitlements(planData.benefitsJsonb);
     if (!hasAnyEntitlements(entitlementsToGrant)) {
       console.log(`No subscription entitlements defined for plan ${planId}. Skipping grant.`);
-      return;
+      return entitlementsToGrant;
     }
 
     await applyEntitlementGrant({
@@ -202,7 +223,21 @@ export async function upgradeSubscriptionCredits(userId: string, planId: string,
         relatedOrderId: orderId,
       },
     });
+    await notifyTransaction({
+      event: `credit-subscription/${orderId}`,
+      userId,
+      userTitle: 'Your subscription credits are ready',
+      userMessage: 'Your subscription payment was successful and your latest credits are now available.',
+      adminTitle: `Subscription credits updated for order ${orderId}`,
+      adminMessage: 'A subscription payment successfully granted or reset entitlements.',
+      details: [{ label: 'Order ID', value: orderId }, { label: 'Credits', value: formatEntitlements(entitlementsToGrant) }],
+      actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sendthesong.io'}/dashboard`,
+      actionLabel: 'View credits',
+    }).catch((notificationError) =>
+      console.error('[Credit Manager] Failed to send subscription credit notification:', notificationError),
+    );
     console.log(`Successfully reset subscription entitlements for user ${userId}.`);
+    return entitlementsToGrant;
   } catch (creditError) {
     console.error(`Error processing credits for user ${userId} (order ${orderId}):`, creditError);
     throw creditError;

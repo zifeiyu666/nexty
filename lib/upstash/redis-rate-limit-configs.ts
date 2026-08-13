@@ -21,4 +21,9 @@ export const REDIS_RATE_LIMIT_CONFIGS = {
     maxRequests: 10,
     window: "1 d",
   },
+  extensionDraft: {
+    prefix: `${LOWER_CASE_SITE_NAME}:rl:extension-draft`,
+    maxRequests: 20,
+    window: "1 h",
+  },
 };

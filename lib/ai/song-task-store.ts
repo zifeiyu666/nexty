@@ -170,4 +170,9 @@ export const songTaskStore = {
 
     return result === "OK";
   },
+
+  async releaseSongSampleReadyEmailClaim(songId: string): Promise<void> {
+    if (!redis) return;
+    await redis.del(keys.sampleReadyEmailSent(songId));
+  },
 };

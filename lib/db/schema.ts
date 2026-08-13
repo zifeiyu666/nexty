@@ -547,6 +547,31 @@ export const userActivityEvents = pgTable(
   }),
 )
 
+export const extensionDrafts = pgTable(
+  'extension_drafts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    token: uuid('token').notNull().unique(),
+    occasion: varchar('occasion', { length: 120 }).notNull(),
+    recipientName: varchar('recipient_name', { length: 80 }).notNull(),
+    relationship: varchar('relationship', { length: 80 }),
+    story: text('story').notNull(),
+    genre: varchar('genre', { length: 120 }).notNull(),
+    language: varchar('language', { length: 8 }).default('en').notNull(),
+    source: varchar('source', { length: 40 }).default('browser-extension').notNull(),
+    campaign: varchar('campaign', { length: 80 }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    consumedAt: timestamp('consumed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    tokenIdx: index('idx_extension_drafts_token').on(table.token),
+    expiresAtIdx: index('idx_extension_drafts_expires_at').on(table.expiresAt),
+  }),
+)
+
 export const postTypeEnum = pgEnum('post_type', [
   'blog',
   'glossary',

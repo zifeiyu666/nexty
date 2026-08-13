@@ -20,11 +20,11 @@ const YOUTUBE_URL = ''
 const INSTAGRAM_URL = ''
 const TIKTOK_URL = ''
 const DISCORD_URL = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL
-const EMAIL_URL = 'support@mail.onecustomsong.com'
+const EMAIL_URL = 'support@sendthesong.io'
 
 export const siteConfig: SiteConfig = {
-  name: "Send The Song",
-  tagLine: "Send The Song - AI Personalized Song Gifts",
+  name: "SendTheSong",
+  tagLine: "SendTheSong - AI Personalized Song Gifts",
   description: "Turn your unique story into a custom, studio-quality song in just 2 minutes. The perfect personalized AI song gift for birthdays, weddings, and anniversaries. Try it free now!",
   url: BASE_URL,
   authors: [

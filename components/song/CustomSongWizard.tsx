@@ -19,6 +19,7 @@ import {
 import { addSpokenIntroToLyrics } from "@/lib/ai/spoken-intro";
 import { normalizeSpokenIntroContentType } from "@/lib/audio/spoken-intro-upload";
 import { authClient } from "@/lib/auth/auth-client";
+import { consumeExtensionDraftRequest } from "@/lib/extension-drafts-client";
 import {
   GenreWarningDialog,
   LyricsVersionComparisonDialog,
@@ -338,6 +339,7 @@ export function CustomSongWizard({
     const stepFromUrl = slugToStep[params.get("step") || ""] || 1;
     const queryLyrics = params.get("lyrics") || "";
     const queryOccasion = params.get("occasion");
+    const draftToken = params.get("draft_token");
 
     try {
       const savedDraft = window.localStorage.getItem(draftStorageKey);
@@ -442,6 +444,42 @@ export function CustomSongWizard({
       setLyricsStage("editor");
       setStep(queryOccasion ? 4 : stepFromUrl);
       setIsHydrated(true);
+      return;
+    }
+
+    if (draftToken) {
+      void consumeExtensionDraftRequest(draftToken)
+        .then((draft) => {
+          if (!draft) {
+            toast.error("Draft expired or unavailable.");
+            return;
+          }
+
+          setOccasion(draft.occasion);
+          if (isCustomOccasion(draft.occasion)) {
+            setCustomOccasionInput(draft.occasion);
+          }
+          setRecipients([
+            {
+              name: draft.recipientName,
+              relationship: draft.relationship,
+            },
+          ]);
+          setStory(draft.story);
+          setGenre(draft.genre);
+          setLanguage(defaultLanguage);
+          setStep(1);
+          toast.success("Your extension draft is ready to personalize.");
+        })
+        .catch(() => {
+          toast.error("Draft expired or unavailable.");
+        })
+        .finally(() => {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("draft_token");
+          window.history.replaceState({}, "", `${url.pathname}?${url.searchParams.toString()}`);
+          setIsHydrated(true);
+        });
       return;
     }
 

@@ -1,7 +1,7 @@
-const SENDER_NAME = "Send the Song";
+const SENDER_NAME = "SendTheSong.io";
 
 export function getTransactionalEmailSender() {
-  const email = "support@mail.onecustomsong.com";
+  const email = "support@sendthesong.io";
 
   return {
     email,

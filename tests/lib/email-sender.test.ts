@@ -11,11 +11,11 @@ afterEach(() => {
 
 describe("transactional email sender", () => {
   test("always uses the verified support address, not ADMIN_EMAIL", () => {
-    process.env.ADMIN_EMAIL = "hello@mail.onecustomsong.com";
+    process.env.ADMIN_EMAIL = "hello@example.com";
 
     assert.deepEqual(getTransactionalEmailSender(), {
-      email: "support@mail.onecustomsong.com",
-      from: "Send the Song <support@mail.onecustomsong.com>",
+      email: "support@sendthesong.io",
+      from: "SendTheSong.io <support@sendthesong.io>",
     });
   });
 });

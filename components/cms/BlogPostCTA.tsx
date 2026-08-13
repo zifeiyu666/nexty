@@ -6,7 +6,7 @@ export function BlogPostCTA() {
   return (
     <section className="mt-14 border-t border-[#e4ded8] pt-10">
       <p className="text-xl font-medium leading-8 text-black sm:text-xl">
-        Ready to create your own with Send the Song?
+        Ready to create your own with SendTheSong?
       </p>
       <MagneticButton
         href="/create-song"
@@ -17,7 +17,7 @@ export function BlogPostCTA() {
         trailingArrow
         className="mt-5 min-w-[180px] border-[#ef5b4e] bg-[#ef5b4e] px-7 text-sm font-bold text-white shadow-[0_14px_32px_rgba(174,67,114,0.24)] hover:border-[#f36a5d] hover:bg-[#bb4b7b] hover:text-white hover:shadow-[0_18px_38px_rgba(174,67,114,0.3)] sm:min-w-[200px]"
       >
-        <span>Create with Send the Song</span>
+        <span>Create with SendTheSong</span>
       </MagneticButton>
     </section>
   );

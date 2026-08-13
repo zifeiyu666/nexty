@@ -51,6 +51,7 @@ export default function PrivacyPolicyPage() {
                 <li><strong>Purchase data:</strong> product, plan, subscription, transaction, refund, billing status, currency, and customer-support information. Payment card details are handled by the payment provider rather than stored by us.</li>
                 <li><strong>Usage and device data:</strong> IP address, browser, operating system, device identifiers, pages viewed, timestamps, approximate location derived from IP, and security logs.</li>
                 <li><strong>Communications:</strong> messages, support requests, newsletter preferences, and correspondence.</li>
+                <li><strong>Browser extension drafts:</strong> when you choose to continue from the SendTheSong browser extension, the recipient, occasion, story, and music preferences you enter are stored as a one-time draft for up to 24 hours. The draft is deleted from the active flow after it is opened and cannot be recovered through the same link.</li>
               </ul>
             </section>
 
@@ -118,6 +119,9 @@ export default function PrivacyPolicyPage() {
                 obligations, and enforce agreements. Retention periods vary by data type and purpose.
                 We use reasonable technical and organizational safeguards, but no online service can
                 guarantee absolute security.
+              </p>
+              <p className="mt-3">
+                Unused browser extension drafts expire automatically after 24 hours. The extension does not collect account passwords, payment details, or browsing history; its optional local draft is stored only in your browser until you submit it, clear it, or uninstall the extension.
               </p>
             </section>
 

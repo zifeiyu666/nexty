@@ -18,7 +18,7 @@ const testimonials: TestimonialItem[] = [
   {
     badge: "💍 5th Anniversary",
     quote:
-      "I was skeptical about AI, but wow! I made my husband's anniversary song with Send the Song, and he loved it. The vocals felt warm, not robotic, and the whole thing sounded studio-quality.",
+      "I was skeptical about AI, but wow! I made my husband's anniversary song with SendTheSong, and he loved it. The vocals felt warm, not robotic, and the whole thing sounded studio-quality.",
     author: "Sarah M. 🇺🇸",
     avatar: "/avatar/avatar1.jpg",
     cardClassName: "bg-white",
@@ -26,7 +26,7 @@ const testimonials: TestimonialItem[] = [
   {
     badge: "🎂 Mom's 50th",
     quote:
-      "So much better than a generic greeting card. Send the Song took less than 2 mins and brought my mom to tears of joy!",
+      "So much better than a generic greeting card. SendTheSong took less than 2 mins and brought my mom to tears of joy!",
     author: "David K. 🇬🇧",
     avatar: "/avatar/avatar2.jpg",
     cardClassName: "bg-white",

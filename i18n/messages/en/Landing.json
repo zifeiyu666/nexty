@@ -8,8 +8,8 @@
     "title": "Send A Custom Song They’ll Cherish Forever",
     "titleLine": "Send A Custom Song They’ll",
     "titleAccent": "Cherish Forever",
-    "description": "<p class=\"hero-subtitle\">Share a memory, a milestone, or the words you’ve never quite said. Send the Song turns it into a personal song gift—ready to preview, refine, and send in minutes.</p>",
-    "trustBadge": "Send the Song · Free preview first · Ready in minutes",
+    "description": "<p class=\"hero-subtitle\">Share a memory, a milestone, or the words you’ve never quite said. SendTheSong turns it into a personal song gift—ready to preview, refine, and send in minutes.</p>",
+    "trustBadge": "SendTheSong · Free preview first · Ready in minutes",
     "trustItems": [
       "Free to preview",
       "Ready in minutes",
@@ -35,7 +35,7 @@
       "label": "REACTIONS",
       "text": "😭 Tears of Joy"
     },
-    "title": "See What Happens When You Send The Song",
+    "title": "See What Happens When You SendTheSong",
     "description": "<p>Grab some tissues before you watch. Hover to preview quietly, then click to hear how sending a song creates an unforgettable moment.</p>",
     "playLabel": "Play {title} with sound",
     "muteLabel": "Mute {title}",
@@ -43,52 +43,52 @@
     "videos": [
       {
         "src": "/cass_demo/optimized/giftsong-slide-2.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Mom's reaction: song sent"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-13.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Joy from sent song"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-14.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Best sent song surprise"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-15.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Wedding song sent forever"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-12.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Anniversary song sent"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-5.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Sending her a love song"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-18.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Joy from song sent"
       },
       {
         "src": "/cass_demo/optimized/giftsong-slide-20.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Listening to sent song"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-17.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Dad's reaction: song sent"
       },
       {
         "src": "/cass_demo/optimized/compressed/giftsong-slide-16.mp4",
-        "label": "Send the Song",
+        "label": "SendTheSong",
         "title": "Tears for sent song"
       }
     ]
@@ -316,15 +316,15 @@
     "badge": {
       "label": "TESTIMONIALS"
     },
-    "title": "What Customers Say About Send the Song",
+    "title": "What Customers Say About SendTheSong",
     "description": "Real stories from people who turned a memory into a song worth sending."
   },
   "FAQ": {
-    "title": "Common Questions About Send the Song",
+    "title": "Common Questions About SendTheSong",
     "description": "Everything you need to know before you create, personalize, and send a song they’ll cherish forever.",
     "items": [
       {
-        "question": "How does Send the Song work?",
+        "question": "How does SendTheSong work?",
         "answer": "It’s pure magic. Just tell us your story by answering a few simple questions, choose your favorite music genre, and our AI will craft a custom song instantly. You will get a free 60-second studio-quality preview. If you love it, unlock the full song and get access to our free video and print editors!"
       },
       {

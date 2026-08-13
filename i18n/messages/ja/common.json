@@ -1,6 +1,6 @@
 {
   "Home": {
-    "title": "Send the Song",
+    "title": "SendTheSong",
     "tagLine": "<strong>パーソナライズド・カスタムソングのギフトジェネレーター。</strong><br></br>思い出や大切な瞬間を、心に残る音楽の贈り物に。",
     "description": "大切な思い出を、スタジオ品質のオリジナルソングに。誕生日、結婚式、記念日に贈れるパーソナルな楽曲を数分で作れます。"
   },
@@ -106,7 +106,7 @@
     }
   },
   "About": {
-    "title": "Send the Songについて",
+    "title": "SendTheSongについて",
     "description": "思い出からオリジナルソングを作るサービスです。"
   },
   "ErrorPage": {

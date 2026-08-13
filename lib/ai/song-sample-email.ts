@@ -42,6 +42,7 @@ export async function sendSongSampleReadyEmail(sample: SongSample): Promise<void
     });
   } catch (error) {
     console.error("[Song Sample Email] Failed to send ready email:", error);
+    throw error;
   }
 }
 

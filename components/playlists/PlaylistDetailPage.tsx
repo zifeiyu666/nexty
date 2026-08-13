@@ -164,7 +164,7 @@ export function PlaylistDetailPage({
           <div className="rounded-lg bg-stone-950 p-5 text-white shadow-[0_18px_54px_rgba(41,37,36,0.2)]">
             <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-amber-200">
               <Gift className="size-4" />
-              Send the Song
+              SendTheSong
             </p>
             <h2 className="mt-3 text-2xl font-black leading-tight">
               Make it personal with one original track.
@@ -190,7 +190,7 @@ export function PlaylistDetailPage({
               Playable custom song demos
             </p>
             <p className="mt-2 text-sm leading-6 text-stone-600">
-              These tracks are Send the Song demos you can play directly.
+              These tracks are SendTheSong demos you can play directly.
             </p>
             <div className="mt-4 space-y-3">
               {playlist.demos.map((demo) => (
@@ -306,7 +306,7 @@ function CustomSongInsert({ playlist }: { playlist: GiftPlaylist }) {
             Make this playlist personal
           </p>
           <h3 className="mt-1 text-xl font-black text-stone-950">
-            Add send the song made from names, memories, and your message.
+            Add a custom song built from names, memories, and your message.
           </h3>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Use the song ideas around it for context, then make one original

@@ -35,6 +35,7 @@ import {
 } from '@/lib/payments/webhook-helpers';
 import { eq, InferInsertModel } from 'drizzle-orm';
 import { getCreemSubscriptionPaymentDetails } from '@/lib/creem/subscription-payment';
+import { notifyTransaction } from '@/lib/email-notifications';
 
 export async function handleCreemPaymentSucceeded(
   payload: CreemCheckoutCompletedEvent
@@ -53,6 +54,27 @@ export async function handleCreemPaymentSucceeded(
       `[Creem webhook] Missing critical metadata on payment.succeeded ${payment.id}`,
       metadata
     );
+    return;
+  }
+
+  if (payment.status !== 'completed' || order.status !== 'completed') {
+    await notifyTransaction({
+      event: `creem-payment-failed/${payment.id}`,
+      userId,
+      userEmail: payment.customer?.email,
+      userTitle: 'Your Creem payment needs attention',
+      userMessage: 'We could not confirm your Creem payment, so no credits were added. Please try again or contact support if you were charged.',
+      adminTitle: `Creem payment failed: ${payment.id}`,
+      adminMessage: 'A Creem checkout did not complete successfully.',
+      details: [
+        { label: 'Payment ID', value: payment.id },
+        { label: 'Status', value: `${payment.status} / ${order.status}` },
+        { label: 'User ID', value: userId },
+        { label: 'Plan ID', value: planId },
+      ],
+      actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sendthesong.io'}/pricing`,
+      actionLabel: 'Try again',
+    }).catch((error) => console.error('[Creem webhook] Failed to send payment failure notification:', error));
     return;
   }
 
@@ -98,6 +120,23 @@ export async function handleCreemPaymentSucceeded(
   if (!insertedOrder) {
     throw new Error('Failed to insert Creem payment order');
   }
+
+  await notifyTransaction({
+    event: `creem-payment-succeeded/${payment.id}`,
+    userId,
+    userEmail: payment.customer?.email,
+    userTitle: 'Your Creem payment was successful',
+    userMessage: 'We received your payment successfully. Your purchase is now being applied to your account.',
+    adminTitle: `Creem payment succeeded: ${payment.id}`,
+    adminMessage: 'A Creem one-time checkout completed successfully.',
+    details: [
+      { label: 'Payment ID', value: payment.id },
+      { label: 'Order ID', value: insertedOrder.id },
+      { label: 'Plan ID', value: planId },
+    ],
+    actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sendthesong.io'}/dashboard`,
+    actionLabel: 'Open dashboard',
+  }).catch((error) => console.error('[Creem webhook] Failed to send payment success notification:', error));
 
   try {
     // --- [custom] Upgrade the user's benefits---
@@ -202,6 +241,23 @@ export async function handleCreemInvoicePaid(
     );
   }
 
+  await notifyTransaction({
+    event: `creem-subscription-paid/${orderId}`,
+    userId,
+    userEmail: subscription.customer?.email,
+    userTitle: 'Your Creem subscription payment was successful',
+    userMessage: 'We received your subscription payment successfully. Your latest benefits are now being applied to your account.',
+    adminTitle: `Creem subscription payment succeeded: ${orderId}`,
+    adminMessage: 'A Creem subscription payment completed successfully.',
+    details: [
+      { label: 'Order ID', value: insertedOrder.id },
+      { label: 'Subscription ID', value: subscriptionId },
+      { label: 'Plan ID', value: planId },
+    ],
+    actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sendthesong.io'}/dashboard`,
+    actionLabel: 'Open dashboard',
+  }).catch((error) => console.error('[Creem webhook] Failed to send subscription payment success notification:', error));
+
 
   try {
     // [custom] Upgrade the user's benefits
@@ -259,6 +315,24 @@ export async function handleCreemSubscriptionUpdated(
   const customerId = subscription?.customer?.id;
 
   try {
+    if (subscription?.status === 'unpaid' || subscription?.status === 'paused') {
+      await notifyTransaction({
+        event: `creem-subscription-payment-failed/${subscriptionId}`,
+        userId: subscription.metadata?.userId,
+        userEmail: subscription.customer?.email,
+        userTitle: 'Your Creem subscription payment needs attention',
+        userMessage: 'Your latest subscription payment could not be confirmed. Please update your payment method or contact support to keep your benefits active.',
+        adminTitle: `Creem subscription payment failed: ${subscriptionId}`,
+        adminMessage: 'A Creem subscription is unpaid or paused and may require payment recovery.',
+        details: [
+          { label: 'Subscription ID', value: subscriptionId },
+          { label: 'Status', value: subscription.status },
+          { label: 'Customer ID', value: customerId ?? 'N/A' },
+        ],
+        actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sendthesong.io'}/dashboard`,
+        actionLabel: 'Review subscription',
+      }).catch((error) => console.error('[Creem webhook] Failed to send subscription payment failure notification:', error));
+    }
     await syncCreemSubscriptionData(subscriptionId, subscription?.metadata);
     if (isDeleted) {
       // --- [custom] Revoke the user's benefits---

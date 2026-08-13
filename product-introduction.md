@@ -1,4 +1,4 @@
-# Send the Song Product Introduction
+# SendTheSong Product Introduction
 
 ## English
 
@@ -8,10 +8,10 @@ Turn any memory, love note, or celebration into a personalized AI song, lyric po
 
 ### Detailed Introduction
 
-Send the Song is an AI-powered music gift platform designed for people who want to celebrate meaningful moments in a more personal way. Users can describe a relationship, memory, occasion, or message, then generate a custom song that captures the emotion and story behind it. They can also use their own voice to create the song, making the gift feel even more intimate and recognizable, and add a personal spoken greeting at the beginning for a heartfelt introduction. The product supports a complete creative workflow, from writing lyrics and generating music to creating personalized lyric posters, shareable music videos, and downloadable keepsakes from a user account dashboard. It is especially suited for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and other moments where a custom music gift can feel more memorable than a standard gift.
+SendTheSong is an AI-powered music gift platform designed for people who want to celebrate meaningful moments in a more personal way. Users can describe a relationship, memory, occasion, or message, then generate a custom song that captures the emotion and story behind it. They can also use their own voice to create the song, making the gift feel even more intimate and recognizable, and add a personal spoken greeting at the beginning for a heartfelt introduction. The product supports a complete creative workflow, from writing lyrics and generating music to creating personalized lyric posters, shareable music videos, and downloadable keepsakes from a user account dashboard. It is especially suited for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, and other moments where a custom music gift can feel more memorable than a standard gift.
 
 ### Why I built it
-The idea came from a simple problem: traditional gifts often say "I remembered the day," but not "I remembered us." I wanted a creative process where a person could stay involved while making something meaningful, change a line, hear a new direction, and keep the result rooted in real memories instead of generic romantic language. Send the Song exists to make personal stories the starting point, to let people experiment with lyrics and music without paying for every attempt, and to turn a song into a gift people can feel confident giving.
+The idea came from a simple problem: traditional gifts often say "I remembered the day," but not "I remembered us." I wanted a creative process where a person could stay involved while making something meaningful, change a line, hear a new direction, and keep the result rooted in real memories instead of generic romantic language. SendTheSong exists to make personal stories the starting point, to let people experiment with lyrics and music without paying for every attempt, and to turn a song into a gift people can feel confident giving.
 
 ### Audience
 
@@ -25,10 +25,10 @@ Gift-givers, couples, families, friends, wedding guests, event organizers, creat
 
 ### 详细介绍
 
-Send the Song 是一个面向个性化音乐礼物场景的 AI 创作平台，帮助用户用更有温度的方式表达情感和纪念重要时刻。用户只需要输入一段关系背景、回忆故事、节日祝福或想传达的信息，就可以生成贴合情绪与主题的定制歌曲；还可以使用自己的声音演唱歌曲，让作品更亲切、更具辨识度，并在歌曲开头加入一段专属口播祝福，为收礼人带来更有仪式感的惊喜。用户还可进一步制作专属歌词海报、可分享的音乐视频和可下载的纪念内容。产品覆盖从歌词创作、音乐生成到视觉内容制作和成品下载管理的完整流程，让这份礼物不仅可以被聆听，也可以被分享、展示和收藏。它特别适合生日、纪念日、婚礼、节日、异地关系、家庭回忆等需要独特表达的场景，让礼物从普通祝福变成一段真正属于收礼人的音乐记忆。
+SendTheSong 是一个面向个性化音乐礼物场景的 AI 创作平台，帮助用户用更有温度的方式表达情感和纪念重要时刻。用户只需要输入一段关系背景、回忆故事、节日祝福或想传达的信息，就可以生成贴合情绪与主题的定制歌曲；还可以使用自己的声音演唱歌曲，让作品更亲切、更具辨识度，并在歌曲开头加入一段专属口播祝福，为收礼人带来更有仪式感的惊喜。用户还可进一步制作专属歌词海报、可分享的音乐视频和可下载的纪念内容。产品覆盖从歌词创作、音乐生成到视觉内容制作和成品下载管理的完整流程，让这份礼物不仅可以被聆听，也可以被分享、展示和收藏。它特别适合生日、纪念日、婚礼、节日、异地关系、家庭回忆等需要独特表达的场景，让礼物从普通祝福变成一段真正属于收礼人的音乐记忆。
 
 ### 创作动机
-这个项目源于一个简单却强烈的感受：很多礼物只能表达“我记得今天”，却无法说“我记得我们”。我希望找到一种创作方式，让送礼的人可以参与其中，随时调整一句歌词、试听新的音乐方向，并且始终让作品扎根于真实的回忆，而不是泛泛的浪漫表述。Send the Song 的目标是让故事成为起点，在不限次数的试听里逐步打磨歌词和音乐，并把歌曲做成一份真正可以放心送出的礼物。
+这个项目源于一个简单却强烈的感受：很多礼物只能表达“我记得今天”，却无法说“我记得我们”。我希望找到一种创作方式，让送礼的人可以参与其中，随时调整一句歌词、试听新的音乐方向，并且始终让作品扎根于真实的回忆，而不是泛泛的浪漫表述。SendTheSong 的目标是让故事成为起点，在不限次数的试听里逐步打磨歌词和音乐，并把歌曲做成一份真正可以放心送出的礼物。
 
 ### 受众
 
@@ -44,13 +44,13 @@ Product Hunt official launch guide reference: https://www.producthunt.com/launch
 
 | Field | Ready-to-copy value |
 | --- | --- |
-| Product name | Send the Song |
+| Product name | SendTheSong |
 | Product URL | https://sendthesong.io |
 | Product Hunt URL | TODO: add after the launch page is created |
 | Maker username | TODO: add Product Hunt maker username |
 | Launch date/time | TODO: add final launch date and time |
 | Tagline | Turn your memories into personalized AI songs |
-| Description | Send the Song helps you turn a memory, love note, or celebration into a personalized AI song in minutes. Create unlimited free 60-second previews, refine the lyrics and style, then unlock the full track with optional music video and printable lyric wall art for birthdays, anniversaries, weddings, holidays, and meaningful everyday moments. |
+| Description | SendTheSong helps you turn a memory, love note, or celebration into a personalized AI song in minutes. Create unlimited free 60-second previews, refine the lyrics and style, then unlock the full track with optional music video and printable lyric wall art for birthdays, anniversaries, weddings, holidays, and meaningful everyday moments. |
 | Tags | Artificial Intelligence, Music, Gifts |
 | Backup tag | Personalization, if Gifts is unavailable |
 | Pricing | Paid with unlimited free previews |
@@ -88,31 +88,31 @@ https://youtu.be/Tl2se8CNf-o
 - Description length: 342 characters, under the 500-character Product Hunt limit.
 - Starting price is based on the lowest active paid plan in the project pricing config.
 - 免费试用说明：用户可以在付费前无限次生成免费的 60 秒歌曲预览，不需要信用卡。每次预览都可以帮助用户确认歌曲方向、歌词感觉、演唱氛围和整体风格，并继续调整故事或音乐提示词。只有当用户满意并决定升级时，才需要解锁完整歌曲、下载文件、音乐视频和歌词海报。
-- 中文说明：Send the Song 可以把回忆、情书或重要时刻快速变成个性化 AI 歌曲。用户可以先无限次免费试听 60 秒预览，继续调整歌词和风格，再解锁完整歌曲，并可制作音乐视频和可打印歌词海报，适合生日、纪念日、婚礼、节日和日常表达心意的场景。
+- 中文说明：SendTheSong 可以把回忆、情书或重要时刻快速变成个性化 AI 歌曲。用户可以先无限次免费试听 60 秒预览，继续调整歌词和风格，再解锁完整歌曲，并可制作音乐视频和可打印歌词海报，适合生日、纪念日、婚礼、节日和日常表达心意的场景。
 
 ## 2. Core Messaging
 
 ### One-Liner
 
-EN: Send the Song turns personal stories into studio-quality AI songs, lyric posters, and shareable music video gifts.
+EN: SendTheSong turns personal stories into studio-quality AI songs, lyric posters, and shareable music video gifts.
 
-ZH: Send the Song 可以把个人故事变成录音室质感的 AI 歌曲、歌词海报和可分享的音乐视频礼物。
+ZH: SendTheSong 可以把个人故事变成录音室质感的 AI 歌曲、歌词海报和可分享的音乐视频礼物。
 
 ### Short Pitch
 
-EN: Send the Song helps anyone turn a personal story into a custom AI song gift in minutes. Start with unlimited free 60-second previews, refine the lyrics and style, then unlock a full song with optional music video and printable lyric wall art.
+EN: SendTheSong helps anyone turn a personal story into a custom AI song gift in minutes. Start with unlimited free 60-second previews, refine the lyrics and style, then unlock a full song with optional music video and printable lyric wall art.
 
-ZH: Send the Song 帮助任何人把一段个人故事快速变成专属 AI 歌曲礼物。用户可以先无限次免费试听 60 秒预览，继续调整歌词和风格，再解锁完整歌曲，并制作音乐视频和可打印歌词海报。
+ZH: SendTheSong 帮助任何人把一段个人故事快速变成专属 AI 歌曲礼物。用户可以先无限次免费试听 60 秒预览，继续调整歌词和风格，再解锁完整歌曲，并制作音乐视频和可打印歌词海报。
 
 ### Long Pitch
 
-EN: Send the Song is built for people who want a gift that feels personal, emotional, and easy to share. Instead of sending another generic card or playlist, users can describe a memory, relationship, occasion, or message, then generate a custom AI song that reflects the story behind it.
+EN: SendTheSong is built for people who want a gift that feels personal, emotional, and easy to share. Instead of sending another generic card or playlist, users can describe a memory, relationship, occasion, or message, then generate a custom AI song that reflects the story behind it.
 
 The workflow starts with unlimited free 60-second previews and does not require a credit card. Users can hear the song direction, lyrics, vocal feel, and overall style before paying. If a preview feels right, they can refine the lyrics, adjust the musical direction, unlock the full track, and turn it into a complete keepsake with shareable music video templates and printable lyric wall art.
 
 It is especially useful for birthdays, anniversaries, weddings, holidays, long-distance relationships, family memories, thank-you gifts, and memorial moments.
 
-ZH: Send the Song 面向那些希望礼物更私人、更有情绪、更容易分享的人。相比普通贺卡、模板祝福或歌单，用户可以输入一段回忆、一段关系背景、一个节日场景或一句想说的话，然后生成一首真正围绕这个故事创作的 AI 定制歌曲。
+ZH: SendTheSong 面向那些希望礼物更私人、更有情绪、更容易分享的人。相比普通贺卡、模板祝福或歌单，用户可以输入一段回忆、一段关系背景、一个节日场景或一句想说的话，然后生成一首真正围绕这个故事创作的 AI 定制歌曲。
 
 整个流程从无限次免费的 60 秒试听预览开始，不需要信用卡。用户可以先确认歌曲方向、歌词感觉、演唱氛围和整体风格，再决定是否付费。如果用户喜欢预览效果，可以继续调整歌词、修改音乐方向、解锁完整歌曲，并把它制作成可分享的音乐视频或可打印的歌词海报，让一份音乐礼物既能被听见，也能被收藏。
 
@@ -124,9 +124,9 @@ ZH: Send the Song 面向那些希望礼物更私人、更有情绪、更容易�
 
 #### English
 
-  Hey Product Hunt! I built Send the Song to help people turn meaningful memories into gifts that feel truly personal.
+  Hey Product Hunt! I built SendTheSong to help people turn meaningful memories into gifts that feel truly personal.
 
-  Describe a relationship, memory, occasion, or message, and Send the Song creates a custom AI song around it. You can refine the lyrics and style, use your own voice for the song, and add a personal spoken greeting at the beginning to make the moment even more special.
+  Describe a relationship, memory, occasion, or message, and SendTheSong creates a custom AI song around it. You can refine the lyrics and style, use your own voice for the song, and add a personal spoken greeting at the beginning to make the moment even more special.
 
   Start with unlimited free 60-second previews—no credit card required. When it feels right, unlock the full song and turn it into a shareable music video or printable lyric wall art.
 
@@ -136,7 +136,7 @@ ZH: Send the Song 面向那些希望礼物更私人、更有情绪、更容易�
 
 #### 中文
 
-大家好，Product Hunt 的朋友们！我做 Send the Song，是希望帮助大家把重要回忆变成真正有个人意义的礼物。
+大家好，Product Hunt 的朋友们！我做 SendTheSong，是希望帮助大家把重要回忆变成真正有个人意义的礼物。
 
 输入一段关系背景、回忆、场景或想说的话，就能生成一首专属 AI 歌曲。你可以调整歌词和风格、使用自己的声音生成歌曲，也可以在开头加入一段专属口播祝福，让礼物更有温度。
 
@@ -150,7 +150,7 @@ ZH: Send the Song 面向那些希望礼物更私人、更有情绪、更容易�
 
 #### English
 
-Hey Product Hunt! I made Send the Song for people who want to give something more personal than a card or a playlist.
+Hey Product Hunt! I made SendTheSong for people who want to give something more personal than a card or a playlist.
 
 I would love your honest feedback: does the idea feel meaningful, and what would make a custom song gift feel truly special to you?
 
@@ -158,7 +158,7 @@ Thanks for checking it out!
 
 #### 中文
 
-大家好，Product Hunt 的朋友们！我做 Send the Song，是希望让大家能送出一份比贺卡或歌单更有个人意义的礼物。
+大家好，Product Hunt 的朋友们！我做 SendTheSong，是希望让大家能送出一份比贺卡或歌单更有个人意义的礼物。
 
 很想听听你的真实反馈：这个想法是否足够打动你？怎样才能让一首定制歌曲更像一份特别的礼物？
 
@@ -168,9 +168,9 @@ Thanks for checking it out!
 
 Hey Product Hunt!
 
-I built Send the Song because many meaningful moments deserve something more personal than a generic message, card, or playlist.
+I built SendTheSong because many meaningful moments deserve something more personal than a generic message, card, or playlist.
 
-Send the Song lets you describe a memory, relationship, occasion, or message, then turns it into a personalized AI song gift. You can start with unlimited free 60-second previews, refine the lyrics and style, and unlock the full track only when it feels right.
+SendTheSong lets you describe a memory, relationship, occasion, or message, then turns it into a personalized AI song gift. You can start with unlimited free 60-second previews, refine the lyrics and style, and unlock the full track only when it feels right.
 
 What makes it more than an audio generator:
 
@@ -192,9 +192,9 @@ Thanks for checking it out. I will be here all day answering questions and takin
 
 大家好，Product Hunt 的朋友们！
 
-我做 Send the Song，是因为很多重要时刻其实值得一份比普通祝福、贺卡或歌单更私人的礼物。
+我做 SendTheSong，是因为很多重要时刻其实值得一份比普通祝福、贺卡或歌单更私人的礼物。
 
-Send the Song 可以让用户输入一段回忆、关系背景、节日场景或想表达的话，然后生成一首个性化 AI 歌曲礼物。用户可以先无限次免费试听 60 秒预览，继续调整歌词和风格，确认喜欢之后再解锁完整歌曲。
+SendTheSong 可以让用户输入一段回忆、关系背景、节日场景或想表达的话，然后生成一首个性化 AI 歌曲礼物。用户可以先无限次免费试听 60 秒预览，继续调整歌词和风格，确认喜欢之后再解锁完整歌曲。
 
 它不只是生成一段音频：
 
@@ -218,7 +218,7 @@ Send the Song 可以让用户输入一段回忆、关系背景、节日场景或
 
 EN:
 
-We just launched Send the Song on Product Hunt.
+We just launched SendTheSong on Product Hunt.
 
 It turns your memories, love notes, and celebrations into personalized AI songs, with unlimited free 60-second previews, lyric editing, music video gifts, and printable lyric wall art.
 
@@ -228,7 +228,7 @@ TODO: add Product Hunt URL
 
 ZH:
 
-Send the Song 今天在 Product Hunt 发布了。
+SendTheSong 今天在 Product Hunt 发布了。
 
 它可以把回忆、情书和重要时刻变成个性化 AI 歌曲，并支持无限次免费 60 秒预览、歌词调整、音乐视频礼物和可打印歌词海报。
 
@@ -240,9 +240,9 @@ TODO: add Product Hunt URL
 
 EN:
 
-Today we are launching Send the Song on Product Hunt.
+Today we are launching SendTheSong on Product Hunt.
 
-Send the Song is an AI music gift platform that turns personal stories into custom songs, lyric posters, and shareable music videos. The goal is simple: make it easier for people to create gifts that feel specific to a relationship, memory, or milestone.
+SendTheSong is an AI music gift platform that turns personal stories into custom songs, lyric posters, and shareable music videos. The goal is simple: make it easier for people to create gifts that feel specific to a relationship, memory, or milestone.
 
 Users can create unlimited free 60-second previews, refine the lyrics and style, then unlock the full track when it feels right.
 
@@ -252,9 +252,9 @@ TODO: add Product Hunt URL
 
 ZH:
 
-今天 Send the Song 在 Product Hunt 发布。
+今天 SendTheSong 在 Product Hunt 发布。
 
-Send the Song 是一个 AI 音乐礼物平台，可以把个人故事变成定制歌曲、歌词海报和可分享的音乐视频。我们的目标很简单：让更多人可以轻松制作一份真正贴合关系、回忆和重要时刻的礼物。
+SendTheSong 是一个 AI 音乐礼物平台，可以把个人故事变成定制歌曲、歌词海报和可分享的音乐视频。我们的目标很简单：让更多人可以轻松制作一份真正贴合关系、回忆和重要时刻的礼物。
 
 用户可以先无限次免费生成 60 秒试听预览，继续调整歌词和风格，满意后再解锁完整歌曲。
 
@@ -266,11 +266,11 @@ TODO: add Product Hunt URL
 
 EN:
 
-Subject: Send the Song is live on Product Hunt
+Subject: SendTheSong is live on Product Hunt
 
 Hi everyone,
 
-Send the Song is live on Product Hunt today.
+SendTheSong is live on Product Hunt today.
 
 It is an AI music gift platform that helps people turn memories, love notes, and meaningful occasions into personalized songs. You can create unlimited free 60-second previews first, refine the lyrics and style, and then unlock the full song with optional music video and printable lyric wall art.
 
@@ -282,11 +282,11 @@ Thank you for taking a look.
 
 ZH:
 
-Subject: Send the Song 今天在 Product Hunt 发布了
+Subject: SendTheSong 今天在 Product Hunt 发布了
 
 大家好，
 
-Send the Song 今天在 Product Hunt 正式发布。
+SendTheSong 今天在 Product Hunt 正式发布。
 
 它是一个 AI 音乐礼物平台，可以帮助用户把回忆、情书和重要时刻变成个性化歌曲。用户可以先无限次免费生成 60 秒试听预览，继续调整歌词和风格，再解锁完整歌曲，并制作音乐视频或可打印歌词海报。
 
@@ -306,9 +306,9 @@ ZH: 谢谢你体验并分享反馈，尤其是关于礼物流程的具体建议�
 
 ### Pricing
 
-EN: Send the Song starts with unlimited free 60-second previews, so users can hear the direction, lyrics, vocal feel, and overall style before paying. The full song and optional gift extras are unlocked only when a preview feels right.
+EN: SendTheSong starts with unlimited free 60-second previews, so users can hear the direction, lyrics, vocal feel, and overall style before paying. The full song and optional gift extras are unlocked only when a preview feels right.
 
-ZH: Send the Song 会先提供无限次免费的 60 秒试听预览，用户可以先确认歌曲方向、歌词感觉、演唱氛围和整体风格，再决定是否付费解锁完整歌曲和额外礼物内容。
+ZH: SendTheSong 会先提供无限次免费的 60 秒试听预览，用户可以先确认歌曲方向、歌词感觉、演唱氛围和整体风格，再决定是否付费解锁完整歌曲和额外礼物内容。
 
 ### Song Quality
 

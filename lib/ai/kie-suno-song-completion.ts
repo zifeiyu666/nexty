@@ -476,11 +476,18 @@ async function finalizeSongTask(
       shouldSendReadyEmail,
     });
     if (shouldSendReadyEmail) {
-      await songSampleEmail.sendSongSampleReadyEmail(sample);
-      console.log("[KIE Suno Completion] Song sample ready email sent", {
-        songId: updated.songId,
-        sampleSongId: sample.songId,
-      });
+      try {
+        await songSampleEmail.sendSongSampleReadyEmail(sample);
+        console.log("[KIE Suno Completion] Song sample ready email sent", {
+          songId: updated.songId,
+          sampleSongId: sample.songId,
+        });
+      } catch (error) {
+        await songTaskStore.releaseSongSampleReadyEmailClaim(updated.songId).catch((releaseError) =>
+          console.error("[KIE Suno Completion] Failed to release email claim", releaseError),
+        );
+        throw error;
+      }
     } else {
       console.log(
         "[KIE Suno Completion] Song sample ready email already sent",

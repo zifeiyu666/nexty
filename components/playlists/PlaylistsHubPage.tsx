@@ -58,7 +58,7 @@ export function PlaylistsHubPage() {
             </p>
             <p className="mt-4 text-sm leading-6 text-stone-300">
               Each guide includes familiar song ideas plus a place for a custom
-              Send the Song track built from names, memories, and the moment
+              SendTheSong track built from names, memories, and the moment
               you want to mark.
             </p>
             <Button asChild className="mt-5 rounded-full bg-white text-stone-950 hover:bg-amber-100">

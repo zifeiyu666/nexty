@@ -14,7 +14,7 @@ export default function BrandWordmark({
 }: BrandWordmarkProps) {
   const normalizedTitle = title.trim().toLowerCase();
 
-  if (normalizedTitle !== "send the song") {
+  if (normalizedTitle.replaceAll(" ", "") !== "sendthesong") {
     return <span className={className}>{title}</span>;
   }
 
@@ -23,7 +23,7 @@ export default function BrandWordmark({
       aria-label={title}
       className={cn("inline-flex items-center whitespace-nowrap", className)}
     >
-      <span aria-hidden="true">Send The S</span>
+      <span aria-hidden="true">SendTheS</span>
       <Heart
         aria-hidden="true"
         className={cn(
