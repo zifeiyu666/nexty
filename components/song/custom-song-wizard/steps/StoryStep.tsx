@@ -12,17 +12,17 @@ import {
   Upload,
   Wand2,
 } from "lucide-react";
-import { useMemo } from "react";
 import type { RefObject } from "react";
+import { useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
-import { LiveRecordingPanel } from "@/components/voice/LiveRecordingPanel";
 import { Textarea } from "@/components/ui/textarea";
+import { LiveRecordingPanel } from "@/components/voice/LiveRecordingPanel";
 import { cn } from "@/lib/utils";
 
 import { storyPlaceholders } from "../constants";
-import type { Occasion, SpokenIntroDraft } from "../types";
 import { useWizardCopy, useWizardLocale } from "../i18n";
+import type { Occasion, SpokenIntroDraft } from "../types";
 
 const detailTemplates = [
   { label: "Nickname", text: "[Nickname: ]" },
@@ -167,11 +167,11 @@ export function StoryStep({
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 px-5 py-4">
           <div>
             <div className="flex items-center gap-2 text-sm font-black text-foreground">
-              <Mic2 className="size-4 text-primary" /> {copy.openingBlessing}
+              <Mic2 className="size-4 text-primary" /> {copy.openingBlessing} ({copy.optional})
             </div>
-            <p className="mt-1 text-sm font-medium text-muted-foreground">
-              {copy.optional}
-            </p>
+            {/* <p className="mt-1 text-sm font-medium text-muted-foreground">
+
+            </p> */}
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               {copy.openingBlessingHelp}
             </p>

@@ -191,11 +191,27 @@ export function StyleStep({
               </button>
             );
           })}
-        </div>
-        <div className="mt-4 rounded-lg border bg-white p-3">
-          <div className="flex items-center justify-between gap-3"><p className="text-sm font-semibold">Use my custom voice</p><a className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline" href="/voices?create=1"><Plus className="size-3.5" /> Add voice</a></div>
-          <div className="mt-3 flex flex-wrap gap-2"><button className={cn("rounded-full border px-3 py-1.5 text-sm", !customVoiceId && "border-primary bg-primary/10 text-primary")} type="button" onClick={() => onCustomVoiceChange(undefined)}>Default voice</button>{customVoices.map((voice) => <button key={voice.id} className={cn("rounded-full border px-3 py-1.5 text-sm", customVoiceId === voice.id && "border-primary bg-primary/10 text-primary")} type="button" onClick={() => onCustomVoiceChange(voice.id)}>{voice.name}</button>)}</div>
-          {!customVoices.length && <p className="mt-2 text-xs text-muted-foreground">Add and verify a voice to use it in this song.</p>}
+          {customVoices.map((voice) => (
+            <button
+              key={voice.id}
+              className={cn(
+                "cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5 hover:shadow-sm",
+                customVoiceId === voice.id
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "bg-card text-foreground",
+              )}
+              type="button"
+              onClick={() => onCustomVoiceChange(voice.id)}
+            >
+              {voice.name}
+            </button>
+          ))}
+          <a
+            className="inline-flex cursor-pointer items-center gap-1 rounded-full border-2 border-dashed border-border px-4 py-2 text-sm font-medium text-foreground transition hover:-translate-y-0.5 hover:bg-card hover:shadow-sm"
+            href="/voices?create=1"
+          >
+            <Plus className="size-3.5" /> Add Custom Voice
+          </a>
         </div>
       </div>
 
