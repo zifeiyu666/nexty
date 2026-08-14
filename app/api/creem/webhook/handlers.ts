@@ -35,6 +35,7 @@ import {
 } from '@/lib/payments/webhook-helpers';
 import { eq, InferInsertModel } from 'drizzle-orm';
 import { getCreemSubscriptionPaymentDetails } from '@/lib/creem/subscription-payment';
+import { isSuccessfulCreemCheckout } from '@/lib/creem/checkout-status';
 import { notifyTransaction } from '@/lib/email-notifications';
 
 export async function handleCreemPaymentSucceeded(
@@ -57,7 +58,7 @@ export async function handleCreemPaymentSucceeded(
     return;
   }
 
-  if (payment.status !== 'completed' || order.status !== 'completed') {
+  if (!isSuccessfulCreemCheckout(payment)) {
     await notifyTransaction({
       event: `creem-payment-failed/${payment.id}`,
       userId,
