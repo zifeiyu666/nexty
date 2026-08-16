@@ -1,4 +1,6 @@
-import { r2PublicUrl } from "@/lib/cloudflare/public-url";
+// Remotion bundles this module with its own Webpack config, which does not
+// resolve the Next.js `@/` alias. Keep this import relative so both builds work.
+import { r2PublicUrl } from "../cloudflare/public-url";
 
 export const DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR = 10;
 export const DEFAULT_MINIMAL_VINYL_BACKGROUND_OVERLAY = {

@@ -166,10 +166,10 @@ function GiftStoryPrompt({
               <p className="font-science-gothic text-xs font-black uppercase tracking-[0.18em] text-[#b25f4d]">
                 Gift note
               </p>
-              <h2 className="mt-3 text-2xl font-black leading-tight text-[#3d2a21]">
+              <h2 className="mt-3 font-['Shadows_Into_Light',cursive] text-4xl leading-[0.9] text-[#3d2a21]">
                 For {recipientLabel}
               </h2>
-              <div className="mt-5 max-h-[42svh] overflow-y-auto pr-2 text-sm font-semibold leading-7 text-[#5b4032] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="mt-5 max-h-[42svh] overflow-y-auto pr-2 font-['Shadows_Into_Light',cursive] text-xl leading-[1.55] text-[#5b4032] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {story ? (
                   story.split(/\r?\n/).map((paragraph, index) => (
                     <p className="mb-4 last:mb-0" key={`${paragraph}-${index}`}>
