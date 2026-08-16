@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  DiscArtworkCropDialog,
   DISC_IMAGE_CROP_PREVIEW_WIDTH,
+  DiscArtworkCropDialog,
   type DiscImageCropDraft,
 } from "@/components/song/DiscArtworkCropDialog";
 import {
@@ -124,9 +124,9 @@ import {
   UploadCloud,
   Video,
   Wand2,
-  XCircle,
   Waves,
   Wind,
+  XCircle,
   ZoomIn,
   type LucideIcon,
 } from "lucide-react";
@@ -139,8 +139,8 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type ChangeEvent,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { useDropzone } from "react-dropzone";
@@ -2438,7 +2438,10 @@ function WaveRadioEditor({
         defaultValue="background"
         className={cn(musicVideoEditorSectionClassName, "min-h-full min-w-0")}
       >
-        <div className="flex items-center justify-center">
+        <div
+          className="sticky top-0 z-20 -mx-2.5 -mt-2.5 flex min-h-[48px] items-center justify-center bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(255,255,255,0.82)_72%,rgba(255,255,255,0)_100%)] px-2.5 pb-1 pt-1.5 backdrop-blur-xl"
+          data-wave-radio-editor-sticky-tabs
+        >
           <TabsList className={musicVideoEditorTabsListClassName}>
             <TabsTrigger
               className={musicVideoEditorTabsTriggerClassName}
@@ -2458,14 +2461,14 @@ function WaveRadioEditor({
         </div>
 
         <TabsContent className="mt-2 space-y-2" value="background">
-          <div className="flex items-center justify-end">
+          {/* <div className="flex items-center justify-end">
             <Badge
               className="shrink-0 rounded-full border-none bg-white/64 px-2 py-0.5 text-[10px] font-black text-[#5b5047]"
               variant="secondary"
             >
               {WAVE_RADIO_BACKGROUND_OPTIONS.length} clips
             </Badge>
-          </div>
+          </div> */}
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {WAVE_RADIO_BACKGROUND_OPTIONS.map(
               (background: WaveRadioBackgroundOption) => {
@@ -2486,7 +2489,6 @@ function WaveRadioEditor({
 
         <TabsContent className="mt-2 space-y-2.5" value="lyrics">
           <LyricsStyleSettings
-            forceCenterPosition
             lyricsStyle={lyricsStyle}
             onChangeLyricsStyle={onChangeLyricsStyle}
           />
@@ -2769,10 +2771,7 @@ export function MusicVideoStudio({
               photos: [],
               songTitle,
               templateId: "wave-radio",
-              lyricsStyle: {
-                ...lyricsStyle,
-                position: "center",
-              },
+              lyricsStyle,
               transitions: [],
               waveRadioBackgroundId,
               width: renderDimensions.width,
@@ -3876,10 +3875,7 @@ export function MusicVideoStudio({
                   <div className="flex min-h-0 flex-1 overflow-hidden pt-1">
                     <WaveRadioEditor
                       backgroundId={waveRadioBackgroundId}
-                      lyricsStyle={{
-                        ...lyricsStyle,
-                        position: "center",
-                      }}
+                      lyricsStyle={lyricsStyle}
                       onChangeLyricsStyle={handleChangeLyricsStyle}
                       onSelectBackground={setWaveRadioBackgroundId}
                     />

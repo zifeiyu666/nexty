@@ -1,6 +1,6 @@
 const DEFAULT_SITE_URL = "https://sendthesong.io";
 
-const OWN_SITE_HOSTS = ["sendthesong.com"];
+const OWN_SITE_HOSTS = ["sendthesong.io"];
 const ABSOLUTE_PROTOCOL_RE = /^[a-z][a-z\d+.-]*:/i;
 
 export const INTERNAL_MARKDOWN_LINK_CLASS =

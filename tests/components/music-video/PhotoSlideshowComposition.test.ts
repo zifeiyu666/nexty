@@ -125,6 +125,13 @@ describe("PhotoSlideshowComposition", () => {
     assert.match(source, /resolveRemotionMediaSrc/);
     assert.match(source, /findActiveCue/);
     assert.match(source, /SingleLineLyric/);
+    assert.match(source, /maxWidth: "86%"/);
+    assert.match(source, /whiteSpace: "pre-wrap"/);
+    assert.match(source, /overflowWrap: "anywhere"/);
+    assert.match(source, /wordBreak: "break-word"/);
+    assert.match(source, /lyricsStyle\.position === "top"/);
+    assert.match(source, /lyricsStyle\.position === "bottom"/);
+    assert.match(source, /justifyContent:/);
     assert.match(source, /interpolate/);
     assert.match(source, /Easing/);
     assert.doesNotMatch(source, /OffthreadVideo/);

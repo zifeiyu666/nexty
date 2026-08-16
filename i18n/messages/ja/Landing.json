@@ -236,12 +236,12 @@
   },
   "SongfinchComparison": {
     "eyebrow": "SongfinchとSendTheSongの違い",
-    "title": "<us>sendthesong.com</us> <vs>と</vs> <songfinch>Songfinch</songfinch>",
+    "title": "<us>sendthesong.io</us> <vs>と</vs> <songfinch>Songfinch</songfinch>",
     "subtitle": "1曲に<price>$200以上</price>支払う前に、まず無料サンプルを試せます。<strong>スタジオ品質のサウンド</strong>と自由な編集を<underline>より手頃な価格で。</underline>",
     "tableHeaders": {
       "feature": "比較項目",
       "songfinch": "Songfinch",
-      "us": "sendthesong.com"
+      "us": "sendthesong.io"
     },
     "rows": [
       {

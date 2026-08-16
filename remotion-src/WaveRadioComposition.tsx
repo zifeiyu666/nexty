@@ -119,19 +119,21 @@ function SingleLineLyric({
         fontSize: `clamp(38px, ${lyricsStyle.fontSize}px, 96px)`,
         fontWeight: 950,
         letterSpacing: 0,
-        lineHeight: 1.05,
+        lineHeight: 1.25,
+        overflowWrap: "anywhere",
         maxWidth: "86%",
         opacity,
         overflow: "visible",
         paintOrder: "stroke fill",
         textAlign: "center",
-        textOverflow: "ellipsis",
         textShadow:
           lyricsStyle.strokeWidth > 0
             ? `0 2px ${lyricsStyle.strokeColor}`
             : "0 8px 32px rgba(0,0,0,.68)",
         transform: `translateY(${y}px) scale(${0.96 + inProgress * 0.04})`,
-        whiteSpace: "nowrap",
+        width: "86%",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
       }}
     >
       {cue?.text ?? songTitle}
@@ -148,10 +150,7 @@ export function WaveRadioComposition({
   const currentTime = frame / fps;
   const activeCue = findActiveCue(timeline.lyrics, currentTime);
   const audioSrc = hasMediaSrc(timeline.audioUrl) ? timeline.audioUrl : "";
-  const lyricsStyle = {
-    ...normalizeLyricsStyleConfig(timeline.lyricsStyle),
-    position: "center" as const,
-  };
+  const lyricsStyle = normalizeLyricsStyleConfig(timeline.lyricsStyle);
   const background = getBackgroundOption(
     timeline.templateId === "wave-radio"
       ? timeline.waveRadioBackgroundId
@@ -188,8 +187,15 @@ export function WaveRadioComposition({
       <AbsoluteFill
         style={{
           alignItems: "center",
+          boxSizing: "border-box",
           display: "flex",
-          justifyContent: "center",
+          justifyContent:
+            lyricsStyle.position === "top"
+              ? "flex-start"
+              : lyricsStyle.position === "bottom"
+                ? "flex-end"
+                : "center",
+          padding: "8% 0",
         }}
       >
         <SingleLineLyric

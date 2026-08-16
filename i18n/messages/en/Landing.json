@@ -249,13 +249,13 @@
     ]
   },
   "SongfinchComparison": {
-    "eyebrow": "Why Users Switch from Songfinch to sendthesong.com",
-    "title": "<us>sendthesong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "eyebrow": "Why Users Switch from Songfinch to sendthesong.io",
+    "title": "<us>sendthesong.io</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
     "subtitle": "Don’t pay <price>$200+</price> for a single song. Get <strong>elite studio-quality production</strong> with unlimited freedom <underline>at a fraction of the cost.</underline>",
     "tableHeaders": {
       "feature": "Feature / Benefit",
       "songfinch": "Songfinch",
-      "us": "sendthesong.com (Us)"
+      "us": "sendthesong.io (Us)"
     },
     "rows": [
       {

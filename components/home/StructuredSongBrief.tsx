@@ -1,14 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   defaultGenre,
   defaultLanguage,
   draftStorageKey,
 } from "@/components/song/custom-song-wizard/constants";
 import type { StoredDraft } from "@/components/song/custom-song-wizard/types";
+import {
+  resolveSongBriefOccasion,
+  songBriefTemplates,
+  type SongBriefTemplate,
+} from "@/components/home/song-brief-templates";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "@/i18n/routing";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Dices, Edit3, Sparkles } from "lucide-react";
 import { useLocale } from "next-intl";
 import {
   useRef,
@@ -56,7 +61,7 @@ function EditableField({
 }: EditableFieldProps) {
   const fieldRef = useRef<HTMLSpanElement>(null);
   const markerClassName =
-    "inline-block min-w-[6rem] cursor-text rounded-[0.42rem] bg-[linear-gradient(177deg,transparent_8%,rgba(255,255,255,0.16)_8%,rgba(255,255,255,0.25)_88%,transparent_88%)] px-2 py-px font-['Bradley_Hand','Comic_Sans_MS',cursive] text-inherit [font-weight:200] leading-inherit text-white/78 outline-none transition-[background-color,box-shadow] empty:before:content-[attr(data-placeholder)] empty:before:text-white/58 hover:bg-white/[0.17] focus:bg-white/[0.25] focus:shadow-[0_0_0_2px_rgba(255,255,255,0.18)]";
+    "inline-block min-w-[6rem] cursor-text rounded-[0.42rem] bg-[linear-gradient(177deg,transparent_8%,rgba(255,255,255,0.16)_8%,rgba(255,255,255,0.25)_88%,transparent_88%)] px-2 py-px text-center font-['Bradley_Hand','Comic_Sans_MS',cursive] text-inherit [font-weight:200] leading-inherit text-white/78 outline-none transition-[background-color,box-shadow] empty:before:content-[attr(data-placeholder)] empty:before:text-white/58 hover:bg-white/[0.17] focus:bg-white/[0.25] focus:shadow-[0_0_0_2px_rgba(255,255,255,0.18)]";
 
   function syncValue() {
     onValueChange(fieldRef.current?.innerText.replace(/\n/g, " ").trim() || "");
@@ -98,19 +103,33 @@ function EditableField({
 export default function StructuredSongBrief() {
   const router = useRouter();
   const locale = useLocale();
-  const [name, setName] = useState("");
-  const [relationship, setRelationship] = useState("");
-  const [occasion, setOccasion] = useState("");
-  const [theme, setTheme] = useState("");
-  const [message, setMessage] = useState("");
-  const [story, setStory] = useState("");
+  const [templateIndex, setTemplateIndex] = useState(0);
+  const [name, setName] = useState(songBriefTemplates[0].name);
+  const [relationship, setRelationship] = useState(
+    songBriefTemplates[0].relationship,
+  );
+  const [occasion, setOccasion] = useState(
+    songBriefTemplates[0].occasion.label,
+  );
+  const [message, setMessage] = useState(songBriefTemplates[0].message);
+  const [story, setStory] = useState(songBriefTemplates[0].story);
 
-  function saveBriefAndStart() {
-    const storyParts = [
-      theme.trim() && `Theme: ${theme.trim()}.`,
-      message.trim() && `Message to include: ${message.trim()}.`,
-      story.trim(),
-    ].filter(Boolean);
+  function applyTemplate(template: SongBriefTemplate, index: number) {
+    setTemplateIndex(index);
+    setName(template.name);
+    setRelationship(template.relationship);
+    setOccasion(template.occasion.label);
+    setMessage(template.message);
+    setStory(template.story);
+  }
+
+  function chooseRandomTemplate() {
+    const offset = 1 + Math.floor(Math.random() * (songBriefTemplates.length - 1));
+    const nextIndex = (templateIndex + offset) % songBriefTemplates.length;
+    applyTemplate(songBriefTemplates[nextIndex], nextIndex);
+  }
+
+  function saveBriefAndStart(mode: "advanced" | "immediate" = "immediate") {
     const previousDraft = window.localStorage.getItem(draftStorageKey);
     let draft: StoredDraft = {};
 
@@ -124,11 +143,14 @@ export default function StructuredSongBrief() {
       ...draft,
       genre: defaultGenre,
       language: languageByLocale[locale] || defaultLanguage,
-      occasion: occasion.trim() || null,
+      occasion: resolveSongBriefOccasion(occasion),
       recipients: [{ name: name.trim(), relationship: relationship.trim() }],
       recipientNames: [name.trim()],
       recipientRelationships: [relationship.trim()],
-      story: storyParts.join("\n\n"),
+      story: story.trim(),
+      spokenBlessing: message.trim(),
+      spokenMode: message.trim() ? "text" : "recording",
+      spokenIntro: undefined,
       generatedLyrics: undefined,
       lyricsGeneratedBy: undefined,
       lyricsInputKey: undefined,
@@ -136,7 +158,7 @@ export default function StructuredSongBrief() {
     };
 
     window.localStorage.setItem(draftStorageKey, JSON.stringify(nextDraft));
-    router.push("/create-song");
+    router.push(mode === "immediate" ? "/create-song?step=lyrics" : "/create-song");
   }
 
   return (
@@ -154,7 +176,7 @@ export default function StructuredSongBrief() {
       </p>
 
       <div
-        className={`flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-[0.8rem] leading-6 sm:text-sm sm:leading-7 ${templateTextClassName}`}
+        className={`flex flex-wrap justify-center items-baseline gap-x-1.5 gap-y-0.5 text-[0.8rem] leading-6 sm:text-sm sm:leading-7 ${templateTextClassName}`}
       >
         <span>I want to send a song to</span>
         <EditableField
@@ -180,14 +202,7 @@ export default function StructuredSongBrief() {
           onValueChange={setOccasion}
           className="min-w-[6rem]"
         />
-        <span>about</span>
-        <EditableField
-          ariaLabel="Song theme"
-          placeholder="[ Theme ]"
-          value={theme}
-          onValueChange={setTheme}
-          className="min-w-[5.25rem]"
-        />
+        <span className="basis-full h-0" aria-hidden="true" />
         <span>. I want to say</span>
         <EditableField
           ariaLabel="Message to include"
@@ -196,6 +211,7 @@ export default function StructuredSongBrief() {
           onValueChange={setMessage}
           className="min-w-[6rem]"
         />
+        <span className="basis-full h-0" aria-hidden="true" />
         <span>. Our story is</span>
         <EditableField
           ariaLabel="Shared story"
@@ -208,15 +224,36 @@ export default function StructuredSongBrief() {
       </div>
 
       <div
-        className={`mt-2 flex justify-end px-1 text-[0.8rem] leading-6 sm:text-sm sm:leading-7 ${templateTextClassName}`}
+        className={`mt-2 flex items-center justify-between gap-3 px-1 text-[0.8rem] leading-6 sm:text-sm sm:leading-7 ${templateTextClassName}`}
       >
         <Button
-          type="submit"
-          className="h-7 shrink-0 rounded-[0.6rem] bg-primary px-3 text-[0.76rem] font-semibold text-white shadow-[0_8px_18px_rgba(224,65,50,0.28)] hover:bg-primary/90 sm:h-8 sm:text-[0.8rem]"
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={chooseRandomTemplate}
+          className="size-7 rounded-full text-white/72 transition-transform hover:rotate-[18deg] hover:bg-white/14 hover:text-white sm:size-8"
+          aria-label="Choose another song template"
+          title="Choose another template"
         >
-          <Sparkles className="size-3.5" /> Create preview{" "}
-          <ArrowRight className="size-3.5" />
+          <Dices className="size-4" />
         </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => saveBriefAndStart("advanced")}
+            className="h-7 shrink-0 rounded-[0.6rem] border-white/20 bg-white/[0.08] px-3 text-[0.72rem] font-semibold text-white/80 shadow-none hover:bg-white/[0.14] hover:text-white sm:h-8 sm:text-[0.76rem]"
+          >
+            <Edit3 className="size-3.5" /> Advanced Editing
+          </Button>
+          <Button
+            type="submit"
+            className="h-7 shrink-0 rounded-[0.6rem] bg-primary px-3 text-[0.76rem] font-semibold text-white shadow-[0_8px_18px_rgba(224,65,50,0.28)] hover:bg-primary/90 sm:h-8 sm:text-[0.8rem]"
+          >
+            <Sparkles className="size-3.5" /> Create immediately{" "}
+            <ArrowRight className="size-3.5" />
+          </Button>
+        </div>
       </div>
     </form>
   );

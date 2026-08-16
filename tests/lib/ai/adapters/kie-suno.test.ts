@@ -2,16 +2,16 @@ import assert from "node:assert/strict";
 import { afterEach, describe, test } from "node:test";
 
 import {
-  buildKieSunoCallbackUrl,
-  buildKieSunoMusicPrompt,
-  extractLyricsText,
-  getMockKieSunoMusicResult,
-  getMockKieSunoTaskId,
-  normalizeKieLyricsRecord,
-  normalizeKieMusicRecord,
-  normalizeKieTimestampedLyricsRecord,
-  submitMusicTask,
-  submitTimestampedLyricsTask,
+    buildKieSunoCallbackUrl,
+    buildKieSunoMusicPrompt,
+    extractLyricsText,
+    getMockKieSunoMusicResult,
+    getMockKieSunoTaskId,
+    normalizeKieLyricsRecord,
+    normalizeKieMusicRecord,
+    normalizeKieTimestampedLyricsRecord,
+    submitMusicTask,
+    submitTimestampedLyricsTask,
 } from "../../../../lib/ai/adapters/kie-suno";
 import { persistKieSongVersionMediaToR2 } from "../../../../lib/ai/kie-suno-media";
 
@@ -252,12 +252,12 @@ describe("KIE Suno adapter normalization", () => {
   { "id":"track-a",
     "title":"May,
     My Sweet Valentine",
-    "audioUrl":"https://cdn.sendthesong.com/a/audio.mp3",
+    "audioUrl":"https://cdn.sendthesong.io/a/audio.mp3",
     "imageUrl":"https://musicfile.kie.ai/cover.jpeg"
   },
   { "id":"track-b",
     "title":"May, My Sweet Valentine",
-    "audioUrl":"https://cdn.sendthesong.com/b/audio.mp3"
+    "audioUrl":"https://cdn.sendthesong.io/b/audio.mp3"
     "imageUrl":"https://musicfile.kie.ai/cover.jpeg"
   }
 ]`;
@@ -276,13 +276,13 @@ describe("KIE Suno adapter normalization", () => {
         {
           id: "track-a",
           title: "May,\n    My Sweet Valentine",
-          audioUrl: "https://cdn.sendthesong.com/a/audio.mp3",
+          audioUrl: "https://cdn.sendthesong.io/a/audio.mp3",
           imageUrl: "https://musicfile.kie.ai/cover.jpeg",
         },
         {
           id: "track-b",
           title: "May, My Sweet Valentine",
-          audioUrl: "https://cdn.sendthesong.com/b/audio.mp3",
+          audioUrl: "https://cdn.sendthesong.io/b/audio.mp3",
           imageUrl: "https://musicfile.kie.ai/cover.jpeg",
         },
       ],

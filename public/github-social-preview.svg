@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#180d14"/>
+      <stop offset="0.55" stop-color="#32131b"/>
+      <stop offset="1" stop-color="#771e24"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.22" r="0.7">
+      <stop offset="0" stop-color="#f5b83d" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#f5b83d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe5a0"/>
+      <stop offset="0.45" stop-color="#f5b83d"/>
+      <stop offset="1" stop-color="#c56d1e"/>
+    </linearGradient>
+    <pattern id="grain" width="90" height="90" patternUnits="userSpaceOnUse">
+      <circle cx="8" cy="18" r="1" fill="#fff" opacity="0.07"/>
+      <circle cx="60" cy="54" r="1" fill="#fff" opacity="0.05"/>
+      <circle cx="36" cy="78" r="1" fill="#fff" opacity="0.04"/>
+    </pattern>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect width="1280" height="640" fill="url(#glow)"/>
+  <rect width="1280" height="640" fill="url(#grain)"/>
+  <path d="M0 520 C180 430 280 570 450 500 S760 400 930 490 S1140 570 1280 470" fill="none" stroke="#f5b83d" stroke-opacity="0.17" stroke-width="2"/>
+  <path d="M0 548 C180 458 280 598 450 528 S760 428 930 518 S1140 598 1280 498" fill="none" stroke="#f5b83d" stroke-opacity="0.08" stroke-width="2"/>
+
+  <g transform="translate(76 72)">
+    <rect x="0" y="0" width="8" height="102" rx="4" fill="url(#gold)"/>
+    <text x="34" y="42" font-family="DejaVu-Sans" font-size="26" font-weight="700" letter-spacing="5" fill="#f5b83d">SENDTHESONG</text>
+    <text x="34" y="84" font-family="DejaVu-Sans" font-size="18" letter-spacing="2" fill="#f7e9d0" opacity="0.8">AI-POWERED PERSONALIZED SONG GIFTS</text>
+  </g>
+
+  <g transform="translate(80 210)">
+    <text x="0" y="0" font-family="DejaVu-Sans" font-size="66" font-weight="800" fill="#fff8ef">Turn your story</text>
+    <text x="0" y="82" font-family="DejaVu-Sans" font-size="66" font-weight="800" fill="url(#gold)">into a song.</text>
+    <text x="4" y="142" font-family="DejaVu-Sans" font-size="24" fill="#f7e9d0" opacity="0.9">A heartfelt gift for birthdays, weddings, anniversaries,</text>
+    <text x="4" y="178" font-family="DejaVu-Sans" font-size="24" fill="#f7e9d0" opacity="0.9">and every moment worth remembering.</text>
+    <g transform="translate(4 228)">
+      <rect width="330" height="52" rx="26" fill="#f5b83d"/>
+      <text x="165" y="34" text-anchor="middle" font-family="DejaVu-Sans" font-size="18" font-weight="700" letter-spacing="1" fill="#281016">CREATE · PREVIEW · SEND</text>
+    </g>
+  </g>
+
+  <g transform="translate(930 122)" filter="url(#shadow)">
+    <circle cx="132" cy="132" r="154" fill="#f5b83d" opacity="0.09"/>
+    <circle cx="132" cy="132" r="126" fill="#180d14" stroke="#f5b83d" stroke-opacity="0.45" stroke-width="2"/>
+    <image href="public/logo.png" x="12" y="12" width="240" height="240" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <text x="1204" y="586" text-anchor="end" font-family="DejaVu-Sans" font-size="18" letter-spacing="2" fill="#f7e9d0" opacity="0.68">SENDTHESONG.IO</text>
+</svg>

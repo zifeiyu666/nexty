@@ -6,7 +6,19 @@ import { CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
-const rotatingOccasions = ["For Love", "For Mom", "For Friends"];
+const rotatingOccasions = [
+  "For Lover",
+  "For Mother",
+  "For Daddy",
+  "For Friends",
+  "For Birthday",
+  "For Wedding",
+  "For My Wife",
+  "For Husband",
+  "Just For Fun",
+  "For My girl",
+  "For Honey",
+];
 
 export default function Hero() {
   const t = useTranslations("Landing.Hero");
@@ -31,7 +43,7 @@ export default function Hero() {
 
       <div className="container mx-auto">
         <div className="flex min-h-[700px] flex-col items-center justify-center gap-3.5 pb-9 pt-[4.5rem] text-center sm:min-h-[650px] sm:gap-4 sm:pb-12 sm:pt-24 lg:gap-5 lg:pb-16 lg:pt-28">
-          <div className="inline-flex max-w-[88vw] items-center gap-1.5 rounded-full border border-white/18 bg-black/28 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-white/84 shadow-[0_10px_28px_rgba(0,0,0,0.24)] backdrop-blur-md sm:px-3.5 sm:text-xs">
+          <div className="inline-flex max-w-[88vw] items-center gap-1.5 rounded-full border border-white/18 bg-black/28 px-3 py-1.5 text-[0.68rem]  uppercase tracking-[0.08em] text-white/84 shadow-[0_10px_28px_rgba(0,0,0,0.24)] backdrop-blur-md sm:px-3.5 sm:text-xs">
             <span className="size-1.5 rounded-full bg-primary shadow-[0_0_14px_rgba(224,65,50,0.78)]" />
             <span className="truncate">{t("trustBadge")}</span>
           </div>
@@ -41,14 +53,15 @@ export default function Hero() {
               aria-label="Personalized Song Gifts for every occasion - SendTheSong AI"
               className="z-10 text-center font-sans text-[1.8rem] font-black leading-[1.1] tracking-normal text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.62)] min-[390px]:text-[2rem] min-[430px]:text-[2.2rem] sm:text-4xl md:text-5xl lg:text-6xl"
             >
-              <span className="hero-title-warm block text-balance 2xl:whitespace-nowrap">
-                Personalized Song Gifts{" "}
-                <span className="inline-flex min-w-[11rem] justify-center sm:min-w-[16rem] lg:min-w-[20rem]">
-                  <WordRotate
-                    words={rotatingOccasions}
-                    className="inline-block text-center"
-                  />
-                </span>{" "}
+              <span className="hero-title-warm block">
+                Personalized Song Gifts
+              </span>
+              <span className="mt-1 flex flex-wrap items-center justify-center gap-x-2 sm:mt-2 sm:gap-x-3">
+                <WordRotate
+                  words={rotatingOccasions}
+                  className="text-center text-white"
+                  containerClassName="min-w-[13rem] min-[390px]:min-w-[15rem] sm:min-w-[19rem] lg:min-w-[23rem]"
+                />
                 <AuroraText
                   className="font-inherit"
                   colors={["#fcb3aa", "#f56d60", "#f4d2a0", "#fcb3aa"]}

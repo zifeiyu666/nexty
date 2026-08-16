@@ -246,13 +246,13 @@
     ]
   },
   "SongfinchComparison": {
-    "eyebrow": "Por qué algunas personas eligen sendthesong.com frente a Songfinch",
-    "title": "<us>sendthesong.com</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
+    "eyebrow": "Por qué algunas personas eligen sendthesong.io frente a Songfinch",
+    "title": "<us>sendthesong.io</us> <vs>vs.</vs> <songfinch>Songfinch</songfinch>",
     "subtitle": "No necesitas pagar <price>más de $200</price> por una sola canción. Consigue una <strong>producción con sonido de estudio</strong>, escucha primero una muestra y conserva el control <underline>por mucho menos.</underline>",
     "tableHeaders": {
       "feature": "Característica",
       "songfinch": "Songfinch",
-      "us": "sendthesong.com"
+      "us": "sendthesong.io"
     },
     "rows": [
       {

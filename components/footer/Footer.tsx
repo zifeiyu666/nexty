@@ -4,8 +4,8 @@ import { TwitterX } from "@/components/social-icons/icons";
 import { siteConfig } from "@/config/site";
 import { Link as I18nLink } from "@/i18n/routing";
 import {
-  getArticleNavigationLinks,
-  withArticleFooterLinks,
+    getArticleNavigationLinks,
+    withArticleFooterLinks,
 } from "@/lib/cms/article-navigation";
 import { cn } from "@/lib/utils";
 import { FooterLink } from "@/types/common";
@@ -163,7 +163,7 @@ export default async function Footer() {
                 </div>
                 <div>
                   <a href="https://firstlook.tools" target="_blank"><img src="https://firstlook.tools/badge/badge_dark.svg" alt="Featured on First Look" width="100" height="27" /></a>
-                  <a href="https://fazier.com/launches/sendthesong.com" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark" width={100} alt="Fazier badge" /></a>
+                  <a href="https://fazier.com/launches/sendthesong.io" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark" width={100} alt="Fazier badge" /></a>
                   {/* <a href="https://buildvoyage.com/products/sendthesong?ref=badge">
                     <img src="https://buildvoyage.com/images/featured_badge.png" alt="Featured on BuildVoyage" width="250" />
                   </a> */}
