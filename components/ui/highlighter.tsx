@@ -102,11 +102,11 @@ function UnderlineStrokes({
           stroke={color}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
+          pathLength={1}
           opacity={iterations > 1 ? 0.55 + 0.45 / iterations : 0.95}
           style={{
             strokeDasharray: 1,
             strokeDashoffset: visible ? 0 : 1,
-            pathLength: 1,
             transition: `stroke-dashoffset ${animationDuration}ms ease-out ${i * 90}ms`,
           }}
         />
@@ -187,7 +187,7 @@ export function Highlighter({
         padding,
         roughness,
         multiline,
-      })
+      } as Parameters<typeof annotate>[1])
       annotation.show()
     }
 
