@@ -6,6 +6,7 @@
     "titleAccent": "ずっと大切にされる一曲に",
     "description": "<p class=\"hero-subtitle\">思い出や節目、まだうまく言葉にできない気持ちを聞かせてください。SendTheSongが、試聴・編集して数分で送れる、あなただけの音楽ギフトに仕上げます。</p>",
     "trustBadge": "SendTheSong · まずは無料試聴 · 数分で完成",
+    "inputLabel": "心からの言葉",
     "trustItems": ["無料サンプル", "数分で完成", "カード登録不要"],
     "getStarted": "無料サンプルを作る",
     "getStartedLink": "/create-song",

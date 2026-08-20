@@ -10,6 +10,7 @@
     "titleAccent": "que nunca olvidarán",
     "description": "<p class=\"hero-subtitle\">Comparte un recuerdo, un momento importante o esas palabras que nunca has sabido cómo decir. SendTheSong lo transforma en un regalo musical personal, listo para escuchar, ajustar y enviar en minutos.</p>",
     "trustBadge": "SendTheSong · Muestra gratuita primero · Lista en minutos",
+    "inputLabel": "escrito desde el corazón",
     "trustItems": ["Muestra gratis", "Lista en minutos", "Sin tarjeta"],
     "getStarted": "Crear una muestra gratis",
     "getStartedLink": "/create-song",

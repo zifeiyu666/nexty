@@ -2,7 +2,7 @@ import HeroDecorations from "@/components/home/HeroDecorations";
 import HeroOccasionMosaic from "@/components/home/HeroOccasionMosaic";
 import StructuredSongBrief from "@/components/home/StructuredSongBrief";
 import { Highlighter } from "@/components/ui/highlighter";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, MessageCircleHeart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
@@ -44,8 +44,8 @@ export default function Hero() {
 
       <div className="container mx-auto">
         <div className="flex min-h-[700px] flex-col items-center justify-center gap-3.5 pb-9 pt-[4.5rem] text-center sm:min-h-[650px] sm:gap-4 sm:pb-12 sm:pt-24 lg:gap-5 lg:pb-16 lg:pt-28">
-          <div className="inline-flex max-w-[88vw] items-center gap-1.5 rounded-full border border-white/18 bg-black/28 px-3 py-1.5 text-[0.68rem]  uppercase tracking-[0.08em] text-white/84 shadow-[0_10px_28px_rgba(0,0,0,0.24)] backdrop-blur-md sm:px-3.5 sm:text-xs">
-            <span className="size-1.5 rounded-full bg-primary shadow-[0_0_14px_rgba(224,65,50,0.78)]" />
+          <div className="inline-flex max-w-[88vw] items-center gap-2 rounded-full border border-white/18 bg-black/28 px-3.5 py-1.5 text-[0.68rem] uppercase tracking-[0.08em] text-white/84 shadow-[0_10px_28px_rgba(0,0,0,0.24)] backdrop-blur-md sm:px-4 sm:text-xs">
+            <MessageCircleHeart className="size-4 shrink-0 text-[#f6b29d]" aria-hidden="true" />
             <span className="truncate">{t("trustBadge")}</span>
           </div>
 
@@ -62,7 +62,7 @@ export default function Hero() {
                   color="#e04132"
                   strokeWidth={5}
                   padding={1}
-                  iterations={2}
+                  iterations={3}
                   roughness={2.5}
                   animationDuration={800}
                 >
@@ -85,7 +85,12 @@ export default function Hero() {
               dangerouslySetInnerHTML={{ __html: descriptionHtml }}
             />
           </div>
-          <StructuredSongBrief />
+          <div className="relative w-full max-w-[58rem] pt-3 sm:pt-4">
+            <div className="song-message-note hero-song-message-note absolute left-3 top-0 z-20 sm:left-9">
+              {t("inputLabel")}
+            </div>
+            <StructuredSongBrief />
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[0.68rem] font-medium text-white/76 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:gap-x-4 sm:text-xs">
             {trustItems.map((item) => (
               <span key={item} className="inline-flex items-center gap-2">
