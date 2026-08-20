@@ -97,6 +97,21 @@ describe("MusicVideoEditorDrawer", () => {
     assert.match(source, /onWheel=\{handleFontListWheel\}/);
   });
 
+  test("offers word-level caption themes only when aligned lyric data is available", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /const captionThemeOptions/);
+    assert.match(source, /Caption theme/);
+    assert.match(source, /Word-level themes require aligned lyrics\./);
+    assert.match(source, /disabled=\{option\.value !== "classic" && !hasCaptionData\}/);
+    assert.match(source, /captionTheme=\{captionTheme\}/);
+    assert.match(source, /captions: captionData/);
+    assert.match(source, /function handleChangeCaptionTheme/);
+  });
+
   test("passes lyric style settings into preview and render timelines", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/MusicVideoEditorDrawer.tsx"),

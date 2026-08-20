@@ -98,7 +98,7 @@ function PublicLyricWallArtPage({ locale }: { locale: string }) {
                 className="object-cover"
                 fill
                 sizes="(min-width: 1024px) 28vw, 90vw"
-                src="/wallart/heart_lyrics.avif"
+                src="/wallart/heart_lyrics.jpg"
               />
             </div>
           </div>

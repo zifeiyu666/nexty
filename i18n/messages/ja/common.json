@@ -1,7 +1,7 @@
 {
   "Home": {
-    "title": "SendTheSong",
-    "tagLine": "<strong>パーソナライズド・カスタムソングのギフトジェネレーター。</strong><br></br>思い出や大切な瞬間を、心に残る音楽の贈り物に。",
+    "title": "数分で贈れるオリジナルソングギフト | SendTheSong.io",
+    "tagLine": "試聴・編集して贈れる、AIパーソナライズドソングギフト。",
     "description": "大切な思い出を、スタジオ品質のオリジナルソングに。誕生日、結婚式、記念日に贈れるパーソナルな楽曲を数分で作れます。"
   },
   "Activity": {
@@ -185,6 +185,11 @@
         "href": "/music/personalized-gift",
         "items": [
           {
+            "name": "メッセージを歌にする",
+            "href": "/gifts/song-message",
+            "description": "メッセージや思い出、ボイスメモの内容から編集できる楽曲サンプルを作成します（英語ページ）。"
+          },
+          {
             "name": "オリジナルソングを作る",
             "href": "/create-song",
             "description": "物語から無料サンプルを作り、完成版を購入する前に試聴できます。"
@@ -272,6 +277,7 @@
           "title": "ギフトアイデア",
           "links": [
             { "name": "AIソング試聴ツール", "href": "/create-song" },
+            { "name": "メッセージを歌にする（英語）", "href": "/gifts/song-message" },
             {
               "name": "誕生日ソング",
               "href": "/occasions/custom-happy-birthday-song"

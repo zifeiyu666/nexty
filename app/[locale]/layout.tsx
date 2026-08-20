@@ -31,12 +31,13 @@ import {
   setRequestLocale,
 } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
-import { Inter as FontSans } from "next/font/google";
+import { Bricolage_Grotesque as FontSans } from "next/font/google";
 import { notFound } from "next/navigation";
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
 });
 
 type MetadataProps = {

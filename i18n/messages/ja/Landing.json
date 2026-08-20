@@ -160,6 +160,15 @@
       }
     }
   },
+  "WallArtGallery": {
+    "eyebrow": "ウォールアート",
+    "title": "あなたの物語を、額装アートに",
+    "description": "実話から生まれた歌詞アートのプレビュー。タップすると大きく表示できます。",
+    "wallArtCta": "オリジナル歌詞アートを見る",
+    "posterCta": "歌詞ポスターメーカーを試す",
+    "imageAlt": "パーソナライズ歌詞アートのプレビュー {index}",
+    "dialogTitle": "ウォールアートのプレビュー"
+  },
   "OurProducts": {
     "eyebrow": "作れるもの",
     "title": "完全なパーソナライズギフト",

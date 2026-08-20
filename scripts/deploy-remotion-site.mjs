@@ -12,6 +12,7 @@ const WATCH_INTERVAL_MS = 4000;
 const TRACKED_PATHS = [
   "remotion-src",
   "lib/music-video",
+  "lib/cloudflare/public-url.ts",
   "lib/wall-art/fonts.ts",
   "public/fonts",
   "package.json",

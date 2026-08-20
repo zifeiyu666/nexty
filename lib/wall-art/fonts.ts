@@ -25,6 +25,13 @@ export const userRequestedWallArtFontLabels = [
   "Playfair Display SC",
   "DM Serif Text",
   "Caveat",
+  "Ceviche One",
+  "Oleo Script",
+  "Fugaz One",
+  "Agbalumo",
+  "Slackey",
+  "Racing Sans One",
+  "Bangers",
 ] as const;
 
 export const wallArtFonts: WallArtFont[] = [
@@ -132,6 +139,29 @@ export const wallArtFonts: WallArtFont[] = [
     previewFamily: "UnifrakturMaguntia",
   },
   {
+    label: "Ceviche One",
+    value: '"Ceviche One", fantasy',
+    previewFamily: "Ceviche One",
+  },
+  {
+    label: "Oleo Script",
+    value: '"Oleo Script", cursive',
+    previewFamily: "Oleo Script",
+  },
+  {
+    label: "Fugaz One",
+    value: '"Fugaz One", fantasy',
+    previewFamily: "Fugaz One",
+  },
+  { label: "Agbalumo", value: "Agbalumo, fantasy", previewFamily: "Agbalumo" },
+  { label: "Slackey", value: "Slackey, fantasy", previewFamily: "Slackey" },
+  {
+    label: "Racing Sans One",
+    value: '"Racing Sans One", fantasy',
+    previewFamily: "Racing Sans One",
+  },
+  { label: "Bangers", value: "Bangers, fantasy", previewFamily: "Bangers" },
+  {
     label: "Montserrat",
     value: "Montserrat, ui-sans-serif, system-ui",
     previewFamily: "Montserrat",
@@ -188,4 +218,11 @@ export const wallArtFontFiles = [
   ["Berkshire Swash", "/fonts/wallart/berkshire-swash-400.ttf", "400"],
   ["Shadows Into Light", "/fonts/wallart/shadows-into-light-400.ttf", "400"],
   ["UnifrakturMaguntia", "/fonts/wallart/unifraktur-maguntia-400.ttf", "400"],
+  ["Ceviche One", "/fonts/wallart/ceviche-one-400.ttf", "400"],
+  ["Oleo Script", "/fonts/wallart/oleo-script-400.ttf", "400"],
+  ["Fugaz One", "/fonts/wallart/fugaz-one-400.ttf", "400"],
+  ["Agbalumo", "/fonts/wallart/agbalumo-400.ttf", "400"],
+  ["Slackey", "/fonts/wallart/slackey-400.ttf", "400"],
+  ["Racing Sans One", "/fonts/wallart/racing-sans-one-400.ttf", "400"],
+  ["Bangers", "/fonts/wallart/bangers-400.ttf", "400"],
 ] as const satisfies readonly WallArtFontFile[];

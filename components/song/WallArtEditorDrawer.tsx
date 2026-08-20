@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  DiscArtworkCropDialog,
   DISC_IMAGE_CROP_PREVIEW_WIDTH,
+  DiscArtworkCropDialog,
 } from "@/components/song/DiscArtworkCropDialog";
 import {
   getStudioTemplateCardClassName,
@@ -28,6 +28,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -36,7 +37,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
@@ -102,6 +102,7 @@ import {
   useState,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
 } from "react";
 import { createPortal } from "react-dom";
 
@@ -115,7 +116,7 @@ type ActiveTarget =
   | "print"
   | "heart";
 type WallArtTemplateKey = "spiral" | "template2" | "heart" | "imageLyrics";
-type PresetPanelKey = "imageLyrics" | "template2" | "spiral";
+type PresetPanelKey = "template2" | "spiral";
 
 type TextStyle = {
   fontFamily: string;
@@ -137,7 +138,6 @@ type CustomTextLayer = {
 type WallArtTemplateSettings = {
   activePresetIndex: number;
   template2PresetIndex: number;
-  imageLyricPresetIndex: number;
   posterBackground: string;
   discColor: string;
   printSizeId: string;
@@ -234,6 +234,8 @@ type CustomTextDragState = {
 
 const POSTER_CENTER = 500;
 const BASE_POSTER_WIDTH = 1000;
+const TEMPLATE2_LYRIC_LETTER_SPACING = 1.6;
+const TEMPLATE2_LYRIC_SIDE_MARGIN = 110;
 const IMAGE_CROP_PREVIEW_WIDTH = 420;
 const IMAGE_CROP_PREVIEW_MAX_HEIGHT = 520;
 const IMAGE_LYRIC_MASK_TOP_PADDING = 0;
@@ -248,12 +250,12 @@ const template2PresetImages = Array.from({ length: 15 }, (_, index) => ({
   name: `Design ${index + 1}`,
   src: `/wallart/color_preset/template2_preset/color_preset${index + 1}.avif`,
 }));
-const lyricPortraitPresetImages = Array.from({ length: 4 }, (_, index) => ({
-  name: `Design ${index + 1}`,
-  src: `/wallart/color_preset/lytric_fill_template/color_preset${index + 1}.avif`,
-  originSrc: `/wallart/color_preset/lytric_fill_template/color_preset_origin${index + 1}.avif`,
-}));
-const heartTemplatePreview = "/wallart/heart_lyrics.avif";
+const lyricPortraitPreset = {
+  name: "Design 1",
+  src: "/wallart/color_preset/lytric_fill_template/color_preset1.avif",
+  originSrc: "/wallart/color_preset/lytric_fill_template/color_preset_origin1.avif",
+};
+const heartTemplatePreview = "/wallart/heart_lyrics.jpg";
 const textTargets: EditableTextKey[] = [
   "lyrics",
   "title",
@@ -282,7 +284,7 @@ const imageLyricEditTargets: Array<[ActiveTarget, string]> = [
   ["title", "Title"],
   ["subtitle", "Subtitle"],
   ["description", "Message"],
-  ["poster", "Poster"],
+  ["poster", "Background"],
   ["print", "Print"],
 ];
 const heartTemplateShape = {
@@ -476,7 +478,6 @@ function createWallArtTemplateSettings(
   return {
     activePresetIndex: 0,
     template2PresetIndex: 0,
-    imageLyricPresetIndex: 0,
     posterBackground: isHeart ? "#ffffff" : preset.posterBackground,
     discColor: preset.discColor,
     printSizeId: "a4",
@@ -503,7 +504,7 @@ function createWallArtTemplateSettings(
     imageLyricInvert: false,
     imageLyricUploadedImage:
       template === "imageLyrics"
-        ? (lyricPortraitPresetImages[0]?.originSrc ?? "")
+        ? lyricPortraitPreset.originSrc
         : "",
     title: songTitle || "Song Name",
     template2TitleLine1: titleLine1,
@@ -514,8 +515,9 @@ function createWallArtTemplateSettings(
     lyricText: cleanWallArtLyrics(lyrics),
     styles: {
       lyrics: {
-        fontFamily: "Georgia, serif",
-        fontSize: isHeart ? 30 : template === "imageLyrics" ? 12 : 18,
+        fontFamily:
+          template === "imageLyrics" ? '"Gravitas One", serif' : "Georgia, serif",
+        fontSize: isHeart ? 30 : template === "imageLyrics" ? 14 : 18,
         fontWeight: isHeart ? "400" : "400",
         color: isHeart ? "#111111" : preset.lyricColor,
         offsetX: 0,
@@ -655,6 +657,19 @@ function FontSelect({
   const selectedFont =
     wallArtFonts.find((font) => font.value === value) ?? wallArtFonts[0];
 
+  function handleFontListWheel(event: ReactWheelEvent<HTMLDivElement>) {
+    const list = event.currentTarget;
+    const isAtTop = list.scrollTop <= 0;
+    const isAtBottom =
+      list.scrollTop + list.clientHeight >= list.scrollHeight - 1;
+    const isTryingToScrollPastBoundary =
+      (event.deltaY < 0 && isAtTop) || (event.deltaY > 0 && isAtBottom);
+
+    if (!isTryingToScrollPastBoundary) {
+      event.stopPropagation();
+    }
+  }
+
   return (
     <div className="space-y-1.5">
       <Label className={wallArtSectionHeadingClassName}>
@@ -689,7 +704,10 @@ function FontSelect({
         >
           <Command className="min-h-0 rounded-[10px] bg-transparent">
             <CommandInput placeholder="Search fonts..." />
-            <CommandList className="min-h-0 flex-1 overscroll-contain">
+            <CommandList
+              className="min-h-0 flex-1 overscroll-contain"
+              onWheel={handleFontListWheel}
+            >
               <CommandEmpty>No font found.</CommandEmpty>
               <CommandGroup>
                 {wallArtFonts.map((font) => (
@@ -828,9 +846,6 @@ export function WallArtStudio({
   );
   const [template2PresetIndex, setTemplate2PresetIndex] = useState(
     initialCurrentSettings.template2PresetIndex,
-  );
-  const [imageLyricPresetIndex, setImageLyricPresetIndex] = useState(
-    initialCurrentSettings.imageLyricPresetIndex,
   );
   const [posterBackground, setPosterBackground] = useState(
     initialCurrentSettings.posterBackground,
@@ -1052,9 +1067,13 @@ export function WallArtStudio({
   const template2LyricsLines = useMemo(
     () =>
       buildTemplate2LyricLines(lyricText, {
-        targetWidth: template2DiscRadius * 1.86,
+        targetWidth: Math.min(
+          template2DiscRadius * 1.86,
+          BASE_POSTER_WIDTH - TEMPLATE2_LYRIC_SIDE_MARGIN * 2,
+        ),
         fontSize: styles.lyrics.fontSize,
         minLines: 15,
+        letterSpacing: TEMPLATE2_LYRIC_LETTER_SPACING,
       }),
     [lyricText, styles.lyrics.fontSize, template2DiscRadius],
   );
@@ -1206,7 +1225,6 @@ export function WallArtStudio({
     return {
       activePresetIndex,
       template2PresetIndex,
-      imageLyricPresetIndex,
       posterBackground,
       discColor,
       printSizeId,
@@ -1247,7 +1265,6 @@ export function WallArtStudio({
   function applyTemplateSettings(settings: WallArtTemplateSettings) {
     setActivePresetIndex(settings.activePresetIndex);
     setTemplate2PresetIndex(settings.template2PresetIndex);
-    setImageLyricPresetIndex(settings.imageLyricPresetIndex);
     setPosterBackground(settings.posterBackground);
     setDiscColor(settings.discColor);
     setPrintSizeId(settings.printSizeId);
@@ -1519,15 +1536,6 @@ export function WallArtStudio({
         style: { ...item.style, color: preset.titleColor },
       })),
     );
-  }
-
-  function applyImageLyricPreset(index: number) {
-    const preset = lyricPortraitPresetImages[index];
-    if (!preset) return;
-
-    setImageLyricPresetIndex(index);
-    setImageLyricUploadedImage(preset.originSrc);
-    setImageCropDraft(null);
   }
 
   function switchTemplate(template: WallArtTemplateKey) {
@@ -2040,30 +2048,6 @@ export function WallArtStudio({
               }}
               onMouseLeave={schedulePresetPanelClose}
             >
-              {openPresetPanel === "imageLyrics" && (
-                <div className="grid grid-cols-2 gap-2">
-                  {lyricPortraitPresetImages.map((preset, index) => (
-                    <button
-                      key={preset.src}
-                      className={getWallArtTemplatePresetCardClassName(
-                        activeTemplate === "imageLyrics" &&
-                          imageLyricPresetIndex === index,
-                      )}
-                      type="button"
-                      onClick={() => {
-                        switchTemplate("imageLyrics");
-                        applyImageLyricPreset(index);
-                      }}
-                    >
-                      <img
-                        alt={preset.name}
-                        className="aspect-[4/5] w-full object-cover"
-                        src={preset.src}
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
               {openPresetPanel === "template2" && (
                 <div className="grid grid-cols-3 gap-2">
                   {template2PresetImages.map((preset, index) => (
@@ -2280,7 +2264,7 @@ export function WallArtStudio({
         />
 
         {hasSongs ? (
-        <div className="relative z-10 grid min-h-0 flex-1 overflow-hidden px-2 pb-2 pt-2 sm:px-2.5 sm:pb-2.5 lg:grid-cols-[148px_minmax(0,1fr)_280px] lg:gap-2.5 lg:px-3 lg:pb-3">
+        <div className="relative z-10 grid min-h-0 flex-1 overflow-hidden px-2 pb-2 pt-2 sm:px-2.5 sm:pb-2.5 lg:grid-cols-[148px_minmax(0,6fr)_minmax(0,4fr)] lg:gap-2.5 lg:px-3 lg:pb-3">
           <aside className={cn(wallArtGlassPanelClassName, "relative z-30 flex min-h-0 flex-col p-1.5")}>
             <div className="flex shrink-0 items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#74685d]">
               <span className="flex size-6 items-center justify-center rounded-full bg-white/72 text-[#b56e4f] shadow-[inset_0_1px_0_rgba(255,255,255,0.76)]">
@@ -2296,13 +2280,7 @@ export function WallArtStudio({
               )}
             >
               <div className="space-y-1.5 pr-2">
-                <div
-                  className="group relative overflow-x-visible"
-                  onMouseEnter={(event) =>
-                    openTemplatePresetPanel("imageLyrics", event)
-                  }
-                  onMouseLeave={schedulePresetPanelClose}
-                >
+                <div className="group relative" onMouseEnter={closePresetPanelImmediately}>
                   <button
                     className={getWallArtTemplateCardClassName(
                       activeTemplate === "imageLyrics",
@@ -2312,15 +2290,9 @@ export function WallArtStudio({
                   >
                     <div className={wallArtTemplateThumbClassName}>
                       <img
-                        alt={
-                          lyricPortraitPresetImages[imageLyricPresetIndex]
-                            ?.name ?? "Image lyric portrait"
-                        }
+                        alt={lyricPortraitPreset.name}
                         className="size-full object-cover"
-                        src={
-                          lyricPortraitPresetImages[imageLyricPresetIndex]?.src ??
-                          lyricPortraitPresetImages[0].src
-                        }
+                        src={lyricPortraitPreset.src}
                       />
                     </div>
                     {activeTemplate === "imageLyrics" ? (
@@ -2652,7 +2624,7 @@ export function WallArtStudio({
                             fontFamily={styles.lyrics.fontFamily}
                             fontSize={styles.lyrics.fontSize}
                             fontWeight={styles.lyrics.fontWeight}
-                            letterSpacing="1.6"
+                            letterSpacing={TEMPLATE2_LYRIC_LETTER_SPACING}
                             textAnchor="middle"
                             onClick={() => setActiveTarget("lyrics")}
                           >
@@ -3872,11 +3844,14 @@ export function WallArtStudio({
                     />
                   </>
                 )}
-                <ColorInput
-                  label="Text color"
-                  value={activeStyle.color}
-                  onChange={(color) => updateStyle(activeTextTarget, { color })}
-                />
+                {!(activeTemplate === "imageLyrics" &&
+                  activeTextTarget === "lyrics") && (
+                  <ColorInput
+                    label="Text color"
+                    value={activeStyle.color}
+                    onChange={(color) => updateStyle(activeTextTarget, { color })}
+                  />
+                )}
               </div>
             )}
 

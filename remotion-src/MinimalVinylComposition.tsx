@@ -1,4 +1,4 @@
-import { useVideoConfig } from "remotion";
+import { AbsoluteFill, useVideoConfig } from "remotion";
 import {
   DEFAULT_MINIMAL_VINYL_BACKGROUND_BLUR,
   normalizeMinimalVinylBackgroundOverlayConfig,
@@ -6,6 +6,7 @@ import {
   type MusicVideoTimeline,
 } from "../lib/music-video/photo-slideshow";
 import { RadialVisualizer } from "./RadialMusicVisualizer";
+import { LyricOverlay } from "./LyricOverlay";
 
 export type MinimalVinylCompositionProps = {
   timeline: MusicVideoTimeline;
@@ -36,7 +37,8 @@ export function MinimalVinylComposition({
       : undefined;
 
   return (
-    <RadialVisualizer
+    <AbsoluteFill>
+      <RadialVisualizer
       audioSrc={audioSrc}
       backgroundBlur={
         timeline.templateId === "minimal-vinyl"
@@ -55,6 +57,16 @@ export function MinimalVinylComposition({
       lyricsStyle={lyricsStyle}
       maxBarHeight={shortSide * 0.16}
       title={timeline.songTitle}
-    />
+        captionTheme={timeline.captionTheme}
+        captions={timeline.captions}
+      />
+      {timeline.captionTheme && timeline.captionTheme !== "classic" && timeline.captions ? (
+        <LyricOverlay
+          captions={timeline.captions}
+          captionTheme={timeline.captionTheme}
+          lyricsStyle={lyricsStyle}
+        />
+      ) : null}
+    </AbsoluteFill>
   );
 }

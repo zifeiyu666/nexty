@@ -1,7 +1,7 @@
 {
   "Home": {
-    "title": "SendTheSong",
-    "tagLine": "<strong>Generador de regalos con canciones personalizadas por IA.</strong><br></br> Crea un recuerdo musical para cumpleaños, aniversarios y cualquier ocasión especial.",
+    "title": "Envía una canción personalizada en minutos | SendTheSong.io",
+    "tagLine": "Regalos musicales personalizados con IA para escuchar, editar y enviar.",
     "description": "Convierte tus recuerdos en una canción personalizada con sonido de estudio. Crea en minutos un regalo musical único para cumpleaños, bodas, aniversarios y mucho más."
   },
   "Login": {
@@ -101,6 +101,7 @@
       {"name": "Mis muestras", "href": "/samples"},
       {"name": "Mis voces", "href": "/voices"},
       {"name": "Ideas de regalo", "href": "/music/personalized-gift", "items": [
+        {"name": "Convertir un mensaje en canción", "href": "/gifts/song-message", "description": "Convierte un mensaje, recuerdo o nota de voz en una muestra de canción editable (página en inglés)."},
         {"name": "Crear una canción", "href": "/create-song", "description": "Convierte una historia en una muestra gratuita antes de desbloquear la canción completa."},
         {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song", "description": "Crea una canción de cumpleaños con nombres, historias y recuerdos."},
         {"name": "Canciones de aniversario", "href": "/occasions/anniversary", "description": "Convierte vuestra historia en una canción de aniversario para escuchar una y otra vez."},
@@ -139,6 +140,7 @@
           "title": "Ideas de regalo",
           "links": [
             {"name": "Herramienta de muestra con IA", "href": "/create-song"},
+            {"name": "Convertir un mensaje en canción (inglés)", "href": "/gifts/song-message"},
             {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song"},
             {"name": "Canciones de aniversario", "href": "/occasions/anniversary"},
             {"name": "Canciones personalizadas para esposa", "href": "/occasions/custom-song-for-wife"},

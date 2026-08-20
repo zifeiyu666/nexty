@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff3df"/><stop offset="1" stop-color="#f5c6b8"/>
+    </linearGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5a85b"/><stop offset="1" stop-color="#d66b3e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="80" fill="url(#bg)"/>
+  <circle cx="512" cy="520" r="330" fill="#fff8ef" opacity=".55"/>
+  <path d="M270 350 L300 150 Q310 110 348 145 L455 245 Q512 225 569 245 L676 145 Q714 110 724 150 L754 350" fill="url(#fur)" stroke="#7e3d2e" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M282 360 Q250 500 292 670 Q340 825 512 846 Q684 825 732 670 Q774 500 742 360 Q690 235 512 235 Q334 235 282 360Z" fill="url(#fur)" stroke="#7e3d2e" stroke-width="18"/>
+  <path d="M315 220 L338 285 L410 270Z" fill="#f7c2a7" opacity=".9"/>
+  <path d="M709 220 L686 285 L614 270Z" fill="#f7c2a7" opacity=".9"/>
+  <ellipse cx="400" cy="485" rx="42" ry="56" fill="#fff8ef"/>
+  <ellipse cx="624" cy="485" rx="42" ry="56" fill="#fff8ef"/>
+  <ellipse cx="405" cy="495" rx="17" ry="28" fill="#3a2524"/>
+  <ellipse cx="619" cy="495" rx="17" ry="28" fill="#3a2524"/>
+  <circle cx="411" cy="484" r="6" fill="white"/><circle cx="625" cy="484" r="6" fill="white"/>
+  <path d="M472 575 Q512 545 552 575 Q546 628 512 640 Q478 628 472 575Z" fill="#7e3d2e"/>
+  <path d="M512 640 Q512 688 464 694 M512 640 Q512 688 560 694" fill="none" stroke="#7e3d2e" stroke-width="15" stroke-linecap="round"/>
+  <path d="M338 585 Q270 570 220 545 M338 620 Q265 625 215 650 M686 585 Q754 570 804 545 M686 620 Q759 625 809 650" fill="none" stroke="#7e3d2e" stroke-width="12" stroke-linecap="round"/>
+  <path d="M420 770 Q512 825 604 770" fill="none" stroke="#a44f36" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="185" cy="200" r="16" fill="#fff" opacity=".7"/><circle cx="835" cy="255" r="10" fill="#fff" opacity=".7"/>
+</svg>

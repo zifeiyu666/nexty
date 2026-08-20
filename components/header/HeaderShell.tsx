@@ -29,10 +29,10 @@ export default function HeaderShell({ children }: HeaderShellProps) {
     <header
       data-scrolled={!isTopLightMode}
       className={cn(
-        "group/header sticky top-0 z-50 py-2 pt-[5px] transition-[background-color,backdrop-filter,color] duration-300",
+        "group/header sticky top-0 z-50 py-2 pt-[8px] transition-[background-color,backdrop-filter,color] duration-300",
         isTopLightMode
           ? " bg-transparent text-[#fdf9f4]"
-          : "bg-white/70 text-[#270a05] backdrop-blur-2xl backdrop-saturate-150"
+          : "bg-white/80 text-[#270a05] backdrop-blur-[5px] backdrop-saturate-150"
       )}
     >
       {children}

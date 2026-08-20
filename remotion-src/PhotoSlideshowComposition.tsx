@@ -27,6 +27,7 @@ import {
 import { wallArtFontFiles } from "../lib/wall-art/fonts";
 import { useMemo, type CSSProperties } from "react";
 import { AtmosphereOverlay } from "./AtmosphereOverlay";
+import { LyricOverlay } from "./LyricOverlay";
 
 export type PhotoSlideshowCompositionProps = {
   mediaQuality?: "preview" | "render";
@@ -543,8 +544,6 @@ export function PhotoSlideshowComposition({
   const activeCueIndex = activeCue
     ? timeline.lyrics.findIndex((cue) => cue.id === activeCue.id)
     : -1;
-  const previousCue =
-    activeCueIndex > 0 ? timeline.lyrics[activeCueIndex - 1] : null;
   const nextCue =
     activeCueIndex >= 0 ? (timeline.lyrics[activeCueIndex + 1] ?? null) : null;
   const resolved = resolveCuePhotos({
@@ -554,13 +553,10 @@ export function PhotoSlideshowComposition({
     photos: timeline.photos,
   });
   const activePhoto = getCuePhoto({ cue: activeCue, resolved });
-  const previousPhoto = getCuePhoto({ cue: previousCue, resolved });
   const nextPhoto = getCuePhoto({ cue: nextCue, resolved });
   const audioUrl = hasMediaSrc(timeline.audioUrl) ? timeline.audioUrl : null;
   const activePhotoUrl = getMediaUrl(activePhoto);
-  const previousPhotoUrl = getMediaUrl(previousPhoto);
   const nextPhotoUrl = getMediaUrl(nextPhoto);
-  const sameAsPreviousPhoto = isSameMedia(previousPhoto, activePhoto);
   const sameAsNextPhoto = isSameMedia(activePhoto, nextPhoto);
   const mediaSegmentStart = getContiguousMediaSegmentStart({
     cues: timeline.lyrics,
@@ -570,89 +566,49 @@ export function PhotoSlideshowComposition({
   const loopProgress = (Math.sin((frame / (fps * 7)) * Math.PI * 2) + 1) / 2;
   const breathingScale = interpolate(loopProgress, [0, 1], [1.03, 1.1]);
   const transitionFrames = Math.max(12, Math.round(fps * 0.55));
-  const incomingProgress =
-    activeCue && previousCue && !sameAsPreviousPhoto
-      ? clamp((frame - activeCue.start * fps) / transitionFrames)
-      : 1;
+  // One transition per cue boundary: it plays during the last
+  // `transitionFrames` of the active cue and completes exactly when the next
+  // cue (and its photo) takes over. A second crossfade after the boundary
+  // would snap the outgoing photo back on screen for a few frames.
   const outgoingProgress =
     activeCue && nextCue && !sameAsNextPhoto
       ? clamp((nextCue.start * fps - frame) / transitionFrames)
       : 1;
-  const isIncomingTransition =
-    Boolean(activeCue && previousCue && !sameAsPreviousPhoto) &&
-    incomingProgress < 1;
   const isOutgoingTransition =
     Boolean(activeCue && nextCue && !sameAsNextPhoto) && outgoingProgress < 1;
-  const incomingTransition = getTransitionForBoundary({
-    fromCue: previousCue,
-    timeline,
-    toCue: activeCue,
-  });
-  const outgoingTransition = getTransitionForBoundary({
+  const boundaryTransition = getTransitionForBoundary({
     fromCue: activeCue,
     timeline,
     toCue: nextCue,
   });
-  const activeBoundaryTransition = isIncomingTransition
-    ? incomingTransition
-    : isOutgoingTransition
-      ? outgoingTransition
-      : null;
-  const fontFaceCss = useMemo(buildFontFaceCss, []);
+  const fontFaceCss = useMemo(() => buildFontFaceCss(), []);
   const lyricsStyle = normalizeLyricsStyle(timeline.lyricsStyle);
   const lyricsOverlayStyle = getLyricsOverlayStyle(lyricsStyle.position);
-  const transitionType = activeBoundaryTransition?.type ?? DEFAULT_TRANSITION_TYPE;
-  const secondaryPhotoUrl = isIncomingTransition
-    ? previousPhotoUrl
-    : isOutgoingTransition
-      ? nextPhotoUrl
-      : null;
-  const activeOpacity = isIncomingTransition
-    ? incomingProgress
-    : isOutgoingTransition
-      ? outgoingProgress
-      : 1;
-  const secondaryOpacity = isIncomingTransition
-    ? 1 - incomingProgress
-    : isOutgoingTransition
-      ? 1 - outgoingProgress
-      : 0;
-  const motionBlur = isIncomingTransition
-    ? (1 - incomingProgress) * 15
-    : isOutgoingTransition
-      ? (1 - outgoingProgress) * 15
-      : 0;
+  const transitionType = boundaryTransition?.type ?? DEFAULT_TRANSITION_TYPE;
+  const transitionProgress = 1 - outgoingProgress;
+  const secondaryPhotoUrl = isOutgoingTransition ? nextPhotoUrl : null;
+  const activeOpacity = isOutgoingTransition ? outgoingProgress : 1;
+  const secondaryOpacity = isOutgoingTransition ? transitionProgress : 0;
+  const motionBlur = isOutgoingTransition
+    ? Math.sin(clamp(transitionProgress) * Math.PI) * 15
+    : 0;
   const activeScale =
-    transitionType === "zoom-push" && isIncomingTransition
-      ? interpolate(incomingProgress, [0, 1], [0.9, 1], {
+    transitionType === "zoom-push" && isOutgoingTransition
+      ? interpolate(outgoingProgress, [0, 1], [1.2, breathingScale], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
         })
-      : transitionType === "zoom-push" && isOutgoingTransition
-        ? interpolate(outgoingProgress, [0, 1], [1.2, 1.05], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          })
-        : breathingScale;
+      : breathingScale;
   const secondaryScale =
-    transitionType === "zoom-push" && isIncomingTransition
-      ? interpolate(incomingProgress, [0, 1], [1.2, 1.05], {
+    transitionType === "zoom-push" && isOutgoingTransition
+      ? interpolate(outgoingProgress, [0, 1], [breathingScale, 0.9], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
         })
-      : transitionType === "zoom-push" && isOutgoingTransition
-        ? interpolate(outgoingProgress, [0, 1], [0.9, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          })
-        : breathingScale;
-  const lightLeakProgress = isIncomingTransition
-    ? incomingProgress
-    : isOutgoingTransition
-      ? 1 - outgoingProgress
-      : 0;
+      : breathingScale;
+  const lightLeakProgress = isOutgoingTransition ? transitionProgress : 0;
   const lightLeakOpacity =
-    transitionType === "light-leak"
+    transitionType === "light-leak" && isOutgoingTransition
       ? Math.sin(clamp(lightLeakProgress) * Math.PI) * 0.82
       : 0;
 
@@ -674,15 +630,11 @@ export function PhotoSlideshowComposition({
           {secondaryPhotoUrl ? (
             <SlideshowMediaLayer
               blur={transitionType === "motion-blur" ? motionBlur : 0}
-              media={isIncomingTransition ? previousPhoto : nextPhoto}
+              media={nextPhoto}
               mediaUrl={secondaryPhotoUrl}
               opacity={secondaryOpacity}
               scale={secondaryScale}
-              startFromFrame={
-                isIncomingTransition
-                  ? Math.max(0, frame - (previousCue?.start ?? 0) * fps)
-                  : Math.max(0, frame - (nextCue?.start ?? 0) * fps)
-              }
+              startFromFrame={Math.max(0, frame - (nextCue?.start ?? 0) * fps)}
             />
           ) : null}
           <SlideshowMediaLayer
@@ -710,7 +662,13 @@ export function PhotoSlideshowComposition({
         />
       ) : null}
 
-      {lyricsStyle.entrance === "rolling-flow" ? (
+      {timeline.captionTheme && timeline.captionTheme !== "classic" && timeline.captions ? (
+        <LyricOverlay
+          captions={timeline.captions}
+          captionTheme={timeline.captionTheme}
+          lyricsStyle={lyricsStyle}
+        />
+      ) : lyricsStyle.entrance === "rolling-flow" ? (
         <RollingLyrics
           activeCueIndex={activeCueIndex}
           currentFrame={frame}

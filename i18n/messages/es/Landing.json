@@ -168,6 +168,15 @@
       }
     }
   },
+  "WallArtGallery": {
+    "eyebrow": "Arte de pared",
+    "title": "Tu historia, bellamente enmarcada",
+    "description": "Un primer vistazo al arte de letras creado a partir de historias reales. Toca cualquier pieza para verla de cerca.",
+    "wallArtCta": "Explorar arte de letras personalizado",
+    "posterCta": "Probar el creador de pósteres",
+    "imageAlt": "Vista previa de arte de letras personalizado {index}",
+    "dialogTitle": "Vista previa del arte de pared"
+  },
   "OurProducts": {
     "eyebrow": "Qué puedes crear",
     "title": "El regalo personalizado completo",

@@ -106,6 +106,46 @@ describe("WallArtEditorDrawer", () => {
     );
   });
 
+  test("hides lyric text color for the image lyric template", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/WallArtEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(
+      source,
+      /!\(activeTemplate === "imageLyrics" &&\s*activeTextTarget === "lyrics"\)/,
+    );
+  });
+
+  test("gives the font list wheel priority while preserving boundary handoff", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/WallArtEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(source, /function handleFontListWheel\(event: ReactWheelEvent<HTMLDivElement>\)/);
+    assert.match(source, /const isAtTop = list\.scrollTop <= 0;/);
+    assert.match(
+      source,
+      /list\.scrollTop \+ list\.clientHeight >= list\.scrollHeight - 1/,
+    );
+    assert.match(source, /event\.stopPropagation\(\);/);
+    assert.match(source, /onWheel=\{handleFontListWheel\}/);
+  });
+
+  test("allocates the preview and editor panels at a six-to-four ratio", () => {
+    const source = readFileSync(
+      join(process.cwd(), "components/song/WallArtEditorDrawer.tsx"),
+      "utf8",
+    );
+
+    assert.match(
+      source,
+      /lg:grid-cols-\[148px_minmax\(0,6fr\)_minmax\(0,4fr\)\]/,
+    );
+  });
+
   test("supports adding draggable custom text layers with rotation controls", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/WallArtEditorDrawer.tsx"),
@@ -166,33 +206,29 @@ describe("WallArtEditorDrawer", () => {
     );
   });
 
-  test("uses lyric portrait hover presets as source image defaults", () => {
+  test("uses a single fixed lyric portrait preset as the image source default", () => {
     const source = readFileSync(
       join(process.cwd(), "components/song/WallArtEditorDrawer.tsx"),
       "utf8",
     );
 
-    assert.match(source, /const lyricPortraitPresetImages = Array\.from\(\{ length: 4 \}/);
+    assert.match(source, /const lyricPortraitPreset = \{/);
     assert.match(
       source,
-      /src: `\/wallart\/color_preset\/lytric_fill_template\/color_preset\$\{index \+ 1\}\.avif`/,
+      /src: "\/wallart\/color_preset\/lytric_fill_template\/color_preset1\.avif"/,
     );
     assert.match(
       source,
-      /originSrc: `\/wallart\/color_preset\/lytric_fill_template\/color_preset_origin\$\{index \+ 1\}\.avif`/,
+      /originSrc: "\/wallart\/color_preset\/lytric_fill_template\/color_preset_origin1\.avif"/,
     );
-    assert.match(source, /imageLyricPresetIndex: number;/);
     assert.match(
       source,
-      /imageLyricUploadedImage:\s*template === "imageLyrics"\s*\?\s*\(lyricPortraitPresetImages\[0\]\?\.originSrc \?\? ""\)\s*:\s*""/,
+      /imageLyricUploadedImage:\s*template === "imageLyrics"\s*\? lyricPortraitPreset\.originSrc\s*:\s*""/,
     );
-    assert.match(source, /function applyImageLyricPreset\(index: number\)/);
-    assert.match(source, /setImageLyricUploadedImage\(preset\.originSrc\)/);
-    assert.match(source, /lyricPortraitPresetImages\.map\(\(preset, index\) =>/);
-    assert.match(
-      source,
-      /switchTemplate\("imageLyrics"\);[\s\S]*applyImageLyricPreset\(index\);/,
-    );
+    assert.match(source, /\? '\"Gravitas One\", serif' : "Georgia, serif"/);
+    assert.match(source, /fontSize: isHeart \? 30 : template === "imageLyrics" \? 14 : 18,/);
+    assert.doesNotMatch(source, /applyImageLyricPreset/);
+    assert.doesNotMatch(source, /lyricPortraitPresetImages/);
   });
 
   test("keeps template preset panels open while moving from template to panel", () => {
@@ -207,7 +243,7 @@ describe("WallArtEditorDrawer", () => {
 
     assert.match(
       source,
-      /type PresetPanelKey = "imageLyrics" \| "template2" \| "spiral";/,
+      /type PresetPanelKey = "template2" \| "spiral";/,
     );
     assert.match(
       source,
@@ -256,7 +292,7 @@ describe("WallArtEditorDrawer", () => {
     assert.match(source, /"pointer-events-none"/);
     assert.match(source, /"pointer-events-auto block opacity-100"/);
     assert.match(source, /"pointer-events-none opacity-0"/);
-    assert.match(source, /openTemplatePresetPanel\("imageLyrics", event\)/);
+    assert.doesNotMatch(source, /openTemplatePresetPanel\("imageLyrics", event\)/);
     assert.match(source, /openTemplatePresetPanel\("template2", event\)/);
     assert.match(source, /openTemplatePresetPanel\("spiral", event\)/);
     const heartLyricIndex = source.indexOf('alt="Heart lyric"');
@@ -298,9 +334,9 @@ describe("WallArtEditorDrawer", () => {
     assert.doesNotMatch(source, /Hover to switch color presets\./);
     assert.doesNotMatch(source, /Heart-shaped lyric template\./);
     assert.doesNotMatch(source, /wallArtTemplateActiveBadgeClassName/);
-    assert.match(source, /lg:grid-cols-\[148px_minmax\(0,1fr\)_280px\]/);
+    assert.match(source, /lg:grid-cols-\[148px_minmax\(0,6fr\)_minmax\(0,4fr\)\]/);
     assert.match(source, /wallArtTemplateThumbClassName = studioGlassStyles\.templateThumb/);
-    assert.match(primitiveSource, /"aspect-\[3\/4\] max-h-\[8\.5rem\] w-full overflow-hidden/);
+    assert.match(primitiveSource, /"aspect-\[3\/6\] max-h-\[10\.5rem\] w-full overflow-hidden/);
     assert.match(
       source,
       /"relative z-30 flex min-h-0 flex-col p-1\.5"/,
@@ -312,7 +348,7 @@ describe("WallArtEditorDrawer", () => {
       "Preview section should not cover the preset panel.",
     );
     assert.match(source, /onMouseLeave=\{schedulePresetPanelClose\}/);
-    assert.match(source, /openPresetPanel === "imageLyrics"/);
+    assert.doesNotMatch(source, /openPresetPanel === "imageLyrics"/);
     assert.match(source, /openPresetPanel === "template2"/);
     assert.match(source, /openPresetPanel === "spiral"/);
     assert.doesNotMatch(

@@ -508,6 +508,7 @@ export type Template2LyricLinesInput = {
   targetWidth?: number;
   fontSize?: number;
   minLines?: number;
+  letterSpacing?: number;
 };
 
 export type ShapeInterval = {
@@ -573,7 +574,12 @@ export function splitTemplate2TitleLines(title: string): [string, string] {
 
 export function buildTemplate2LyricLines(
   lyrics: string,
-  { targetWidth = 360, fontSize = 16, minLines = 15 }: Template2LyricLinesInput,
+  {
+    targetWidth = 360,
+    fontSize = 16,
+    minLines = 15,
+    letterSpacing = 0,
+  }: Template2LyricLinesInput,
 ): string[] {
   const cleaned = cleanWallArtLyrics(lyrics)
     .split(/\r?\n/)
@@ -587,15 +593,16 @@ export function buildTemplate2LyricLines(
   let cursor = 0;
 
   function measure(text: string): number {
-    return Array.from(text).reduce((width, char) => {
+    const chars = Array.from(text.toUpperCase());
+    const width = chars.reduce((width, char) => {
       if (/\s/.test(char)) return width + fontSize * 0.34;
       if (/[\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]/.test(char)) {
         return width + fontSize;
       }
       if (/[A-Z0-9]/.test(char)) return width + fontSize * 0.66;
-      if (/[a-z]/.test(char)) return width + fontSize * 0.56;
       return width + fontSize * 0.62;
     }, 0);
+    return width + chars.length * letterSpacing;
   }
 
   while (lines.length < minLines) {

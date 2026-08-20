@@ -1,7 +1,7 @@
+import HeroDecorations from "@/components/home/HeroDecorations";
 import HeroOccasionMosaic from "@/components/home/HeroOccasionMosaic";
 import StructuredSongBrief from "@/components/home/StructuredSongBrief";
-import { AuroraText } from "@/components/ui/aurora-text";
-import { WordRotate } from "@/components/ui/word-rotate";
+import { Highlighter } from "@/components/ui/highlighter";
 import { CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -37,9 +37,10 @@ export default function Hero() {
         className="-z-30 object-cover object-center sm:hidden"
       />
       <HeroOccasionMosaic />
-      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.74)_0%,rgba(0,0,0,0.58)_34%,rgba(0,0,0,0.34)_68%,rgba(0,0,0,0.2)_100%)]" />
-      <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,rgba(8,6,5,0.58)_0%,rgba(8,6,5,0.14)_32%,rgba(8,6,5,0.22)_66%,rgba(8,6,5,0.78)_100%)]" />
+      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.68)_34%,rgba(0,0,0,0.44)_68%,rgba(0,0,0,0.3)_100%)]" />
+      <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,rgba(8,6,5,0.66)_0%,rgba(8,6,5,0.24)_32%,rgba(8,6,5,0.32)_66%,rgba(8,6,5,0.84)_100%)]" />
       <div className="absolute inset-x-0 top-0 -z-20 h-32 bg-gradient-to-b from-black/46 to-transparent" />
+      <HeroDecorations />
 
       <div className="container mx-auto">
         <div className="flex min-h-[700px] flex-col items-center justify-center gap-3.5 pb-9 pt-[4.5rem] text-center sm:min-h-[650px] sm:gap-4 sm:pb-12 sm:pt-24 lg:gap-5 lg:pb-16 lg:pt-28">
@@ -50,29 +51,37 @@ export default function Hero() {
 
           <div className="flex max-w-6xl flex-col items-center gap-2 sm:gap-2.5">
             <h1
-              aria-label="Personalized Song Gifts for every occasion - SendTheSong AI"
-              className="z-10 text-center font-sans text-[1.8rem] font-black leading-[1.1] tracking-normal text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.62)] min-[390px]:text-[2rem] min-[430px]:text-[2.2rem] sm:text-4xl md:text-5xl lg:text-6xl"
+              aria-label={t("title")}
+              className="z-10 text-center font-sans text-[clamp(2rem,5.6vw,4.25rem)] font-black leading-[1.1] tracking-normal text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.62)]"
             >
-              <span className="hero-title-warm block">
-                Personalized Song Gifts
-              </span>
-              <span className="mt-1 flex flex-wrap items-center justify-center gap-x-2 sm:mt-2 sm:gap-x-3">
-                <WordRotate
-                  words={rotatingOccasions}
-                  className="text-center text-white"
-                  containerClassName="min-w-[13rem] min-[390px]:min-w-[15rem] sm:min-w-[19rem] lg:min-w-[23rem]"
-                />
-                <AuroraText
-                  className="font-inherit"
-                  colors={["#fcb3aa", "#f56d60", "#f4d2a0", "#fcb3aa"]}
+              <span className="block">{t("titleLine")}</span>
+              <span className="block whitespace-nowrap pb-2 sm:pb-2.5">
+                {/* "highlight" | "circle" | "box" | "bracket" | "crossed-off" | "strike-through" | "underline" */}
+                <Highlighter
+                  action="underline"
+                  color="#e04132"
+                  strokeWidth={5}
+                  padding={1}
+                  iterations={2}
+                  roughness={2.5}
+                  animationDuration={800}
                 >
-                  - SendTheSong AI
-                </AuroraText>
+                  {t("titleAccent")}
+                </Highlighter>
               </span>
             </h1>
 
+            {/* <p className="text-sm font-semibold text-white/85 sm:text-base">
+              <WordRotate
+                words={rotatingOccasions}
+                className="text-center text-white"
+                containerClassName="inline-block min-w-[13rem] min-[390px]:min-w-[15rem] sm:min-w-[19rem] lg:min-w-[23rem]"
+              />
+              <span className="ml-2 text-white/75">· SendTheSong.io</span>
+            </p> */}
+
             <div
-              className="w-full max-w-[38rem] text-center text-[0.8rem] font-normal leading-relaxed tracking-tight text-white/80 drop-shadow-[0_3px_12px_rgba(0,0,0,0.62)] sm:max-w-3xl sm:text-base md:text-lg [&_p]:m-0 [&_strong]:font-normal"
+              className="w-full max-w-[38rem] text-center text-[0.7rem] font-normal leading-relaxed tracking-tight text-white/80 drop-shadow-[0_3px_12px_rgba(0,0,0,0.62)] sm:max-w-3xl sm:text-base md:text-lg [&_p]:m-0 [&_strong]:font-normal"
               dangerouslySetInnerHTML={{ __html: descriptionHtml }}
             />
           </div>

@@ -1,11 +1,12 @@
+import { carterOne } from "@/app/fonts";
 import { Newsletter } from "@/components/footer/Newsletter";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { TwitterX } from "@/components/social-icons/icons";
 import { siteConfig } from "@/config/site";
 import { Link as I18nLink } from "@/i18n/routing";
 import {
-    getArticleNavigationLinks,
-    withArticleFooterLinks,
+  getArticleNavigationLinks,
+  withArticleFooterLinks,
 } from "@/lib/cms/article-navigation";
 import { cn } from "@/lib/utils";
 import { FooterLink } from "@/types/common";
@@ -41,16 +42,29 @@ export default async function Footer() {
           <div className="grid grid-cols-1 gap-8 py-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12">
             <div className="col-span-full flex w-full flex-col gap-4 sm:flex-row md:col-span-2 lg:col-span-1 lg:max-w-xs lg:flex-col xl:col-span-3">
               <div className="space-y-4 flex-1">
-                <div className="items-center space-x-2 flex">
-                  <div className="flex items-center gap-2 text-xl font-medium text-white">
+                <div className="flex items-center">
+                  <I18nLink
+                    href="/"
+                    title={t("title")}
+                    prefetch={true}
+                    className="flex items-center space-x-1 text-white"
+                  >
                     <Image
-                      src="/generated-logos/send-the-song-fredoka-logo.webp"
-                      alt={t("title")}
-                      width={1200}
-                      height={238}
-                      className="h-10 w-auto"
+                      src="/logo.png"
+                      alt=""
+                      width={512}
+                      height={512}
+                      className="-mt-1.5 h-10 w-10"
                     />
-                  </div>
+                    <span
+                      className={cn(
+                        carterOne.className,
+                        "text-[20px] leading-none tracking-wide"
+                      )}
+                    >
+                      SendTheSong.io
+                    </span>
+                  </I18nLink>
                 </div>
 
                 <p className="text-sm p4-4 md:pr-12">
@@ -162,7 +176,7 @@ export default async function Footer() {
                   <LocaleSwitcher variant="footer" />
                 </div>
                 <div>
-                  <a href="https://firstlook.tools" target="_blank"><img src="https://firstlook.tools/badge/badge_dark.svg" alt="Featured on First Look" width="100" height="27" /></a>
+                  {/* <a href="https://firstlook.tools" target="_blank"><img src="https://firstlook.tools/badge/badge_dark.svg" alt="Featured on First Look" width="100" height="27" /></a> */}
                   <a href="https://fazier.com/launches/sendthesong.io" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark" width={100} alt="Fazier badge" /></a>
                   {/* <a href="https://buildvoyage.com/products/sendthesong?ref=badge">
                     <img src="https://buildvoyage.com/images/featured_badge.png" alt="Featured on BuildVoyage" width="250" />

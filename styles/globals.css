@@ -3,6 +3,30 @@
 
 @import "tailwindcss";
 
+@keyframes hero-particle-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.75); filter: blur(0.2px); }
+  50% { transform: translate3d(10px, -18px, 0) scale(1.25); filter: blur(0.8px); }
+}
+
+.hero-particle {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  background: #f4d2a0;
+  box-shadow: 0 0 10px 2px rgba(244, 210, 160, 0.34);
+  animation: hero-particle-drift ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+.hero-particle-coral {
+  background: #e85b4c;
+  box-shadow: 0 0 12px 2px rgba(224, 65, 50, 0.38);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-particle { animation: none; }
+}
+
 @plugin 'tailwindcss-animate';
 @plugin '@tailwindcss/typography';
 
@@ -649,7 +673,7 @@
   --sidebar-border: rgb(240, 228, 222);
   --sidebar-ring: rgb(255, 126, 165);
   /* --font-sans: Alegreya Sans SC, ui-sans-serif, sans-serif, system-ui; */
-  --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Bricolage Grotesque, ui-sans-serif, sans-serif, system-ui;
   /* --font-sans: Arial, ui-sans-serif, sans-serif, system-ui; */
   --font-serif: Playfair Display, ui-serif, serif;
   --font-mono: JetBrains Mono, ui-monospace, monospace;
@@ -710,7 +734,7 @@
   --sidebar-accent-foreground: rgb(255, 179, 198);
   --sidebar-border: rgb(45, 36, 33);
   --sidebar-ring: rgb(255, 126, 165);
-  --font-sans: Alegreya Sans SC, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Bricolage Grotesque, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Playfair Display, ui-serif, serif;
   --font-mono: JetBrains Mono, ui-monospace, monospace;
   --radius: 0.5rem;
@@ -944,4 +968,115 @@
   .song-cover-visualizer.is-playing .song-cover-visualizer-line {
     animation: none;
   }
+}
+/*
+  Hand-drawn marker highlight for the editable song brief fields.
+  Geometry migrated from the rough-notation "highlight" style used by the
+  Highlighter component: one thick bowed stroke, so the top/bottom edges are
+  smooth parallel arcs (no per-edge jitter) and only the left/right caps carry
+  a little jaggedness.
+  The shape is an alpha mask; the color comes from --marker-tint so it can be
+  tweaked in one place (defaults derive from the theme primary).
+*/
+.marker-stroke {
+  --marker-tint: color-mix(in srgb, var(--primary) 12%, white 8%);
+  position: relative;
+  background-color: var(--marker-tint);
+  -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
+  mask-repeat: no-repeat, no-repeat, no-repeat;
+  -webkit-mask-size: 12px 100%, 12px 100%, calc(100% - 16px) 100%;
+  mask-size: 12px 100%, 12px 100%, calc(100% - 16px) 100%;
+  -webkit-mask-position: left top, right top, 8px top;
+  mask-position: left top, right top, 8px top;
+  caret-color: rgba(255, 255, 255, 0.92);
+  transition:
+    filter 0.15s ease,
+    top 0.15s ease,
+    font-size 0.15s ease;
+}
+
+/* Hover affordance: the handwritten text lifts and grows a touch so users
+   can tell the field is editable. top/position works on inline elements too
+   (transform does not). */
+.marker-stroke:hover {
+  top: -1px;
+  font-size: 1.05em;
+  filter: brightness(1.25);
+}
+
+.marker-stroke:focus {
+  filter: brightness(1.4);
+}
+
+/* The letter-style brief needs a softer, readable wash on cream paper. */
+.marker-stroke-letter {
+  --marker-tint: color-mix(in srgb, var(--primary) 7%, white 5%);
+  caret-color: #a84534;
+  text-shadow: 0 1px 0 rgba(255, 250, 244, 0.35);
+}
+
+.marker-stroke-letter:hover,
+.marker-stroke-letter:focus {
+  filter: saturate(1.25) brightness(1.08);
+}
+
+.song-message-note {
+  position: relative;
+  display: inline-block;
+  padding: 0.7rem 1.35rem 0.8rem;
+  color: #fffaf4;
+  font-family: "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transform: rotate(-4deg);
+  filter: drop-shadow(0 0.45rem 0.35rem rgba(111, 48, 31, 0.16));
+}
+
+.song-message-note::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: #cf513d;
+  clip-path: polygon(2% 12%, 97% 0, 100% 83%, 5% 100%, 0 68%);
+}
+
+.song-message-note::after {
+  position: absolute;
+  top: -0.45rem;
+  left: 50%;
+  width: 4.8rem;
+  height: 1rem;
+  content: "";
+  background: rgba(246, 207, 157, 0.78);
+  clip-path: polygon(4% 12%, 100% 0, 95% 88%, 0 100%);
+  transform: translateX(-50%) rotate(3deg);
+}
+
+@media (max-width: 639px) {
+  .song-message-note {
+    left: 50%;
+    padding: 0.62rem 1rem 0.7rem;
+    font-size: 0.9rem;
+    transform: translateX(-50%) rotate(-3deg);
+  }
+}
+
+.marker-stroke-a {
+  -webkit-mask-image: url(/images/marker/cap-left.svg), url(/images/marker/cap-right.svg), url(/images/marker/mid-a.svg);
+  mask-image: url(/images/marker/cap-left.svg), url(/images/marker/cap-right.svg), url(/images/marker/mid-a.svg);
+}
+
+.marker-stroke-b {
+  -webkit-mask-image: url(/images/marker/cap-left.svg), url(/images/marker/cap-right.svg), url(/images/marker/mid-b.svg);
+  mask-image: url(/images/marker/cap-left.svg), url(/images/marker/cap-right.svg), url(/images/marker/mid-b.svg);
+}
+
+.marker-stroke-c {
+  -webkit-mask-image: url(/images/marker/cap-left.svg), url(/images/marker/cap-right.svg), url(/images/marker/mid-c.svg);
+  mask-image: url(/images/marker/cap-left.svg), url(/images/marker/cap-right.svg), url(/images/marker/mid-c.svg);
 }

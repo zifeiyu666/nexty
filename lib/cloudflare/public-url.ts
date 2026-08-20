@@ -1,5 +1,13 @@
+// The Remotion Lambda bundle evaluates this module in an environment without the
+// app's env vars. Without a fallback, r2PublicUrl() would return relative paths
+// that Remotion resolves against the Lambda site bucket (staticFile), breaking
+// renders. Mirror the DEFAULT_SITE_URL pattern from config/site.ts.
+const DEFAULT_PUBLIC_URL = "https://cdn.sendthesong.io";
+
 const configuredPublicUrl =
-  process.env.NEXT_PUBLIC_R2_PUBLIC_URL || process.env.R2_PUBLIC_URL || "";
+  process.env.NEXT_PUBLIC_R2_PUBLIC_URL ||
+  process.env.R2_PUBLIC_URL ||
+  DEFAULT_PUBLIC_URL;
 
 export const R2_PUBLIC_URL = configuredPublicUrl.replace(/\/+$/, "");
 

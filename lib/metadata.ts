@@ -48,7 +48,7 @@ export async function constructMetadata({
 
   const finalTitle =
     path === "/"
-      ? `${pageTitle} - ${pageTagLine}`
+      ? pageTitle
       : `${pageTitle} | ${siteConfig.name}`;
 
   canonicalUrl = canonicalUrl || path;

@@ -1,8 +1,8 @@
 {
   "Home": {
-    "title": "SendTheSong",
-    "tagLine": "Personalized Custom Song Gifts.",
-    "description": "Turn your memories into studio-quality custom songs in minutes. Create a personalized music gift for birthdays, weddings, anniversaries, and more."
+    "title": "Send a Custom Song Gift in Minutes | SendTheSong.io",
+    "tagLine": "AI custom song gifts you can preview, refine, and send.",
+    "description": "Create a personalized, studio-quality custom song from your story. Preview it free, edit the lyrics, and send a meaningful song gift in minutes."
   },
   "Login": {
     "title": "Welcome back",
@@ -367,9 +367,30 @@
         "href": "/voices"
       },
       {
+        "name": "Lyric Art",
+        "href": "/custom-song-lyrics-wall-art",
+        "items": [
+          {
+            "name": "Custom Lyrics Wall Art",
+            "href": "/custom-song-lyrics-wall-art",
+            "description": "Turn a meaningful song into personalized, printable lyric wall decor."
+          },
+          {
+            "name": "Lyric Poster Maker",
+            "href": "/lyric-poster-maker",
+            "description": "Design an aesthetic song lyrics poster with editable layouts and typography."
+          }
+        ]
+      },
+      {
         "name": "Gift Ideas",
         "href": "/music/personalized-gift",
         "items": [
+          {
+            "name": "Turn a Message Into a Song",
+            "href": "/gifts/song-message",
+            "description": "Shape a personal message, memory, or voice-note idea into an editable song preview."
+          },
           {
             "name": "AI Voice Cloning",
             "href": "/voice-clone",
@@ -473,6 +494,14 @@
               "name": "My Samples"
             },
             {
+              "href": "/custom-song-lyrics-wall-art",
+              "name": "Custom Lyrics Wall Art"
+            },
+            {
+              "href": "/lyric-poster-maker",
+              "name": "Lyric Poster Maker"
+            },
+            {
               "isSubTitle": true,
               "name": "Resources"
             },
@@ -499,6 +528,10 @@
             {
               "name": "AI Song Preview Tool",
               "href": "/create-song"
+            },
+            {
+              "name": "Turn a Message Into a Song",
+              "href": "/gifts/song-message"
             },
             {
               "name": "Birthday song gifts",
@@ -572,8 +605,8 @@
     }
   },
   "CreateSong": {
-    "title": "Free AI Song Generator | Preview Your Song",
-    "description": "Turn your story into a quick song preview, refine the lyrics and style, then unlock the final MP3 when it feels right.",
+    "title": "AI Song Maker: Make a Custom Song from Your Story",
+    "description": "Make a personalized song from your story, preview it free, refine the lyrics and style, then unlock and send the finished song.",
     "srTitle": "Free AI Song Generator",
     "srDescription": "Start from a personal story, preview a generated song, then refine the lyrics, style, and delivery before unlocking the full MP3."
   },

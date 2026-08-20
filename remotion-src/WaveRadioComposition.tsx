@@ -18,6 +18,7 @@ import {
   type MusicVideoTimeline,
 } from "../lib/music-video/photo-slideshow";
 import { resolveRemotionMediaSrc } from "./media-src";
+import { LyricOverlay } from "./LyricOverlay";
 
 export type WaveRadioCompositionProps = {
   mediaQuality?: "preview" | "render";
@@ -198,13 +199,21 @@ export function WaveRadioComposition({
           padding: "8% 0",
         }}
       >
-        <SingleLineLyric
-          cue={activeCue}
-          frame={frame}
-          fps={fps}
-          lyricsStyle={lyricsStyle}
-          songTitle={timeline.songTitle}
-        />
+        {timeline.captionTheme && timeline.captionTheme !== "classic" && timeline.captions ? (
+          <LyricOverlay
+            captions={timeline.captions}
+            captionTheme={timeline.captionTheme}
+            lyricsStyle={lyricsStyle}
+          />
+        ) : (
+          <SingleLineLyric
+            cue={activeCue}
+            frame={frame}
+            fps={fps}
+            lyricsStyle={lyricsStyle}
+            songTitle={timeline.songTitle}
+          />
+        )}
       </AbsoluteFill>
     </AbsoluteFill>
   );

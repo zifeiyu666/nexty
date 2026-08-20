@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    background: #080605;
+    color: rgba(255,255,255,0.78);
+    font: 14px/28px 'Bradley Hand', 'Comic Sans MS', cursive;
+    max-width: 460px;
+    margin: 40px auto;
+    padding: 0 16px;
+  }
+  h2 { color: #fff; font: 12px/1.4 sans-serif; margin: 24px 0 8px; }
+  /* mask approach: shape as alpha mask, color from CSS var */
+  .m {
+    --marker-tint: rgb(224 65 50 / 0.3);
+    background-color: var(--marker-tint);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    padding: 0 8px;
+  }
+  .m.short { display: inline-block; min-width: 6rem; text-align: center; padding: 0 8px; }
+  .m.multi {
+    display: inline;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    padding: 6px 8px;
+  }
+  .m-a {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 48' preserveAspectRatio='none'%3E%3Cpath d='M6 10 Q120 4.5 234 9 L236 15 L233.5 23 L236 31 L234 41 Q120 36.5 6 42 L4 35 L6.5 26 L4 17 Z' fill='black'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 48' preserveAspectRatio='none'%3E%3Cpath d='M6 10 Q120 4.5 234 9 L236 15 L233.5 23 L236 31 L234 41 Q120 36.5 6 42 L4 35 L6.5 26 L4 17 Z' fill='black'/%3E%3C/svg%3E");
+  }
+  /* old background approach for comparison */
+  .b {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: 0 8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 48' preserveAspectRatio='none'%3E%3Cpath d='M6 10 Q120 4.5 234 9 L236 15 L233.5 23 L236 31 L234 41 Q120 36.5 6 42 L4 35 L6.5 26 L4 17 Z' fill='%23e04132' fill-opacity='0.3'/%3E%3C/svg%3E");
+  }
+  .b.short { display: inline-block; min-width: 6rem; text-align: center; }
+  .b.multi {
+    display: inline;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    padding: 6px 8px;
+  }
+</style>
+</head>
+<body>
+  <h2>MASK approach (short / inline-block)</h2>
+  <p>I want to send a song to <span class="m m-a short">Maya</span> my <span class="m m-a short">best friend</span> for <span class="m m-a short">Birthday</span></p>
+
+  <h2>MASK approach (multiline / inline + clone)</h2>
+  <p>Our story <span class="m m-a multi">Late-night talks, inside jokes, and the way you always cheer me on make every year brighter.</span></p>
+
+  <h2>BACKGROUND approach (short)</h2>
+  <p>I want to send a song to <span class="b short">Maya</span> my <span class="b short">best friend</span> for <span class="b short">Birthday</span></p>
+
+  <h2>BACKGROUND approach (multiline)</h2>
+  <p>Our story <span class="b multi">Late-night talks, inside jokes, and the way you always cheer me on make every year brighter.</span></p>
+</body>
+</html>

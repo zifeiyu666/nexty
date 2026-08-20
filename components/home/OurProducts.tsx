@@ -11,7 +11,7 @@ import { type WallArtSongOption } from "@/components/song/WallArtEditorDrawer";
 import { WallArtStudioCta } from "@/components/song/WallArtStudioCta";
 import { Link } from "@/i18n/routing";
 import { ArrowRight } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { type MouseEvent } from "react";
 
@@ -77,6 +77,7 @@ export default function OurProducts({
   wallArtSongOptions,
 }: OurProductsProps) {
   const t = useTranslations("Landing.OurProducts");
+  const locale = useLocale();
   const ctaClassName =
     "mt-7 inline-flex items-center gap-2 text-base font-bold text-primary transition hover:text-primary/80";
 
@@ -118,7 +119,11 @@ export default function OurProducts({
           {productKey === "wallArt" ? (
             <div className="mt-6 flex flex-col items-center gap-3 md:mt-7">
               <Link
-                href={productHrefs[productKey]}
+                href={
+                  locale === "en"
+                    ? "/custom-song-lyrics-wall-art"
+                    : productHrefs[productKey]
+                }
                 className={ctaClassName.replace("mt-7 ", "")}
               >
                 Turn lyrics into printable wall art

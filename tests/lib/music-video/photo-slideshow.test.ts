@@ -8,10 +8,12 @@ import {
   buildPhotoSlideshowTimeline,
   buildWaveRadioTimeline,
   buildRandomTransitionAssignments,
+  buildLyricsCaptionData,
   buildLyricCuesFromAlignedWords,
   DEFAULT_TRANSITION_TYPE,
   DEFAULT_LYRICS_STYLE,
   DEFAULT_WAVE_RADIO_BACKGROUND,
+  normalizeCaptionThemeId,
   normalizeLyricsStyleConfig,
   normalizeRenderDimensions,
   normalizeWaveRadioBackgroundId,
@@ -30,6 +32,107 @@ const photos = [
 ];
 
 describe("photo slideshow music video helpers", () => {
+  test("builds word-level caption data only when every lyric line aligns", () => {
+    const captions = buildLyricsCaptionData({
+      lyrics: "We found the light\nIn every moment",
+      alignedWords: [
+        { word: "We", startS: 0, endS: 0.2 },
+        { word: "found", startS: 0.2, endS: 0.5 },
+        { word: "the", startS: 0.5, endS: 0.65 },
+        { word: "light", startS: 0.65, endS: 1 },
+        { word: "In", startS: 1.2, endS: 1.4 },
+        { word: "every", startS: 1.4, endS: 1.8 },
+        { word: "moment", startS: 1.8, endS: 2.3 },
+      ],
+    });
+
+    assert.deepEqual(captions, {
+      lines: [
+        { words: [
+          { text: "We", start: 0, end: 0.2 },
+          { text: "found", start: 0.2, end: 0.5 },
+          { text: "the", start: 0.5, end: 0.65 },
+          { text: "light", start: 0.65, end: 1 },
+        ] },
+        { words: [
+          { text: "In", start: 1.2, end: 1.4 },
+          { text: "every", start: 1.4, end: 1.8 },
+          { text: "moment", start: 1.8, end: 2.3 },
+        ] },
+      ],
+    });
+  });
+
+  test("accepts an aligned word prefixed with an upstream section label", () => {
+    const captions = buildLyricsCaptionData({
+      lyrics: "Hey May, happy Valentine's Day.",
+      alignedWords: [
+        {
+          word: "[Spoken Intro / Narration]\nHey",
+          startS: 1.995,
+          endS: 2.234,
+        },
+        { word: "May,", startS: 2.274, endS: 3.643 },
+        { word: "happy", startS: 3.697, endS: 3.91 },
+        { word: "Valentine's", startS: 3.963, endS: 4.548 },
+        { word: "Day.", startS: 4.654, endS: 6.902 },
+      ],
+    });
+
+    assert.deepEqual(captions, {
+      lines: [
+        {
+          words: [
+            { text: "Hey", start: 1.995, end: 2.234 },
+            { text: "May,", start: 2.274, end: 3.643 },
+            { text: "happy", start: 3.697, end: 3.91 },
+            { text: "Valentine's", start: 3.963, end: 4.548 },
+            { text: "Day.", start: 4.654, end: 6.902 },
+          ],
+        },
+      ],
+    });
+  });
+
+  test("repairs an upstream zero-length word without crossing the next word", () => {
+    const captions = buildLyricsCaptionData({
+      lyrics: "You are a brighter light",
+      alignedWords: [
+        { word: "You", startS: 0, endS: 0.2 },
+        { word: "are", startS: 0.2, endS: 0.4 },
+        { word: "a", startS: 0.4, endS: 0.4 },
+        { word: "brighter", startS: 0.46, endS: 0.7 },
+        { word: "light", startS: 0.7, endS: 0.9 },
+      ],
+    });
+
+    assert.equal(captions?.lines[0]?.words[2]?.text, "a");
+    assert.equal(captions?.lines[0]?.words[2]?.start, 0.4);
+    assert.equal(captions?.lines[0]?.words[2]?.end, 0.46);
+  });
+
+  test("rejects invalid or incomplete word alignment and normalizes caption themes", () => {
+    assert.equal(
+      buildLyricsCaptionData({
+        lyrics: "Only two words",
+        alignedWords: [{ word: "Only", startS: 0, endS: 0.3 }],
+      }),
+      undefined,
+    );
+    assert.equal(
+      buildLyricsCaptionData({
+        lyrics: "Broken timing",
+        alignedWords: [
+          { word: "Broken", startS: 1, endS: 0.2 },
+          { word: "timing", startS: 0.2, endS: 0.5 },
+        ],
+      }),
+      undefined,
+    );
+    assert.equal(normalizeCaptionThemeId("karaoke"), "karaoke");
+    assert.equal(normalizeCaptionThemeId("unknown"), "classic");
+  });
+
   test("parses bracketed timestamp lyrics into cue start and end ranges", () => {
     const cues = parseTimestampedLyrics(
       "[00:00] Romantic prelude\n[00:06] The first time I met you\n[00:12] Sunlight in your eyes",
@@ -538,6 +641,50 @@ describe("photo slideshow music video helpers", () => {
     );
   });
 
+  test("persists a selected word-level caption theme in every video timeline", () => {
+    const timestampedLyrics = {
+      alignedWords: [
+        { word: "Hold", startS: 0, endS: 0.3 },
+        { word: "on", startS: 0.3, endS: 0.55 },
+        { word: "close", startS: 0.55, endS: 1 },
+      ],
+    };
+    const base = {
+      songTitle: "Our Song",
+      audioUrl: "https://cdn.example.com/song.mp3",
+      duration: 4,
+      lyrics: "Hold on close",
+      timestampedLyrics,
+      captionTheme: "karaoke",
+    } as const;
+    const timelines = [
+      buildPhotoSlideshowTimeline({ ...base, photos: [], assignments: [] }),
+      buildMinimalVinylTimeline(base),
+      buildWaveRadioTimeline(base),
+    ];
+
+    for (const timeline of timelines) {
+      assert.equal(timeline.captionTheme, "karaoke");
+      assert.equal(timeline.captions?.lines[0]?.words[1]?.text, "on");
+    }
+  });
+
+  test("forces classic mode when the requested theme has no valid caption data", () => {
+    const timeline = buildWaveRadioTimeline({
+      songTitle: "Our Song",
+      audioUrl: "https://cdn.example.com/song.mp3",
+      duration: 4,
+      lyrics: "Hold on close",
+      timestampedLyrics: {
+        alignedWords: [{ word: "Hold", startS: 0, endS: 0.3 }],
+      },
+      captionTheme: "karaoke",
+    });
+
+    assert.equal(timeline.captionTheme, "classic");
+    assert.equal(timeline.captions, undefined);
+  });
+
   test("normalizes wave radio background choices to a CDN video", () => {
     assert.equal(
       normalizeWaveRadioBackgroundId(WAVE_RADIO_BACKGROUND_OPTIONS[1].id),
@@ -558,7 +705,7 @@ describe("photo slideshow music video helpers", () => {
     assert.equal(overlayOptions.length > 0, true);
 
     for (const option of overlayOptions) {
-      assert.match(option.src, /^https:\/\/cdn\.sendthesong\.com\/overlay\//);
+      assert.match(option.src, /^https:\/\/cdn\.sendthesong\.io\/overlay\//);
       assert.doesNotMatch(option.src, /^\/overlay\//);
     }
 

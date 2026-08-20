@@ -1,3 +1,4 @@
+import { bricolageGrotesque } from "@/app/fonts";
 import {
   HeaderActionText,
   headerActionButtonClassName,
@@ -11,6 +12,7 @@ import { Link as I18nLink } from "@/i18n/routing";
 import { getSession } from "@/lib/auth/server";
 import { getHeaderNavigationLinks } from "@/lib/cms/article-navigation";
 import { user as userSchema } from "@/lib/db/schema";
+import { cn } from "@/lib/utils";
 import { Music2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
@@ -29,23 +31,31 @@ const Header = async () => {
   return (
     <HeaderShell>
       <nav className="relative flex items-center justify-between container max-w-8xl mx-auto">
-        <div className="flex items-center space-x-6 md:space-x-12">
-          <I18nLink
-            href="/"
-            title={t("title")}
-            prefetch={true}
-            className="absolute left-1/2 flex -translate-x-1/2 items-center space-x-1 lg:static lg:translate-x-0"
+        <I18nLink
+          href="/"
+          title={t("title")}
+          prefetch={true}
+          className="absolute left-1/2 flex -translate-x-1/2 items-center space-x-1 lg:static lg:translate-x-0"
+        >
+          <Image
+            src="/logo.png"
+            alt=""
+            width={512}
+            height={512}
+            priority
+            className="h-10 w-10 mt-[-6px] drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-[filter] duration-300 group-data-[scrolled=true]/header:drop-shadow-none"
+          />
+          <span
+            className={cn(
+              bricolageGrotesque.className,
+              "text-[20px] font-extrabold leading-none tracking-wide drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-[filter] duration-300 group-data-[scrolled=true]/header:drop-shadow-none"
+            )}
           >
-            <Image
-              src="/generated-logos/send-the-song-fredoka-logo.webp"
-              alt={t("title")}
-              width={1200}
-              height={238}
-              priority
-              className="h-9 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] transition-opacity duration-300 group-data-[scrolled=true]/header:drop-shadow-none sm:h-10"
-            />
-          </I18nLink>
+            SendTheSong.io
+          </span>
+        </I18nLink>
 
+        <div className="absolute left-1/2 hidden -translate-x-1/2 lg:block">
           <HeaderLinks links={headerLinks} variant="adaptive" />
         </div>
 

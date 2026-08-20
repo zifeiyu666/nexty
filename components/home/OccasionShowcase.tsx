@@ -20,8 +20,6 @@ import {
 import { Link } from "@/i18n/routing";
 import { useGlobalMusicPlayer } from "@/lib/music-player/global-player-store";
 import { cn } from "@/lib/utils";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowLeft, ArrowRight, MoveRight, Pause, Play } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
@@ -33,8 +31,6 @@ import {
   type CSSProperties,
   type PointerEvent,
 } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 type DragState = {
   pointerId: number;
@@ -49,6 +45,15 @@ const clamp = (value: number, min: number, max: number) => {
 
 const isMobileCarouselLayout = () => {
   return window.matchMedia("(max-width: 639px)").matches;
+};
+
+const applyTrackTranslate = (
+  track: HTMLElement,
+  x: number,
+  animate: boolean,
+) => {
+  track.style.transition = animate ? "" : "none";
+  track.style.transform = `translate3d(${x}px, 0, 0)`;
 };
 
 export default function OccasionShowcase() {
@@ -73,7 +78,6 @@ export default function OccasionShowcase() {
   const cardOffsetsRef = useRef<number[]>([]);
   const translateRef = useRef(0);
   const activeIndexRef = useRef(0);
-  const reducedMotionRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [mobileApi, setMobileApi] = useState<CarouselApi>();
   const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
@@ -121,27 +125,10 @@ export default function OccasionShowcase() {
     const nextIndex = clamp(index, 0, localizedCards.length - 1);
     const targetTranslate = getTargetTranslate(nextIndex);
 
-    gsap.killTweensOf(track);
     activeIndexRef.current = nextIndex;
     setActiveIndex(nextIndex);
-
-    if (!animate || reducedMotionRef.current) {
-      translateRef.current = targetTranslate;
-      gsap.set(track, { x: targetTranslate });
-      return;
-    }
-
-    gsap.to(track, {
-      x: targetTranslate,
-      duration: 0.72,
-      ease: "power3.out",
-      onUpdate: () => {
-        translateRef.current = Number(gsap.getProperty(track, "x"));
-      },
-      onComplete: () => {
-        translateRef.current = targetTranslate;
-      },
-    });
+    translateRef.current = targetTranslate;
+    applyTrackTranslate(track, targetTranslate, animate);
   };
 
   const getClosestIndexForTranslate = (translate: number) => {
@@ -176,48 +163,6 @@ export default function OccasionShowcase() {
   };
 
   useEffect(() => {
-    reducedMotionRef.current = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    const section = sectionRef.current;
-
-    if (!section || reducedMotionRef.current || isMobileCarouselLayout()) {
-      return;
-    }
-
-    const context = gsap.context(() => {
-      const cards = gsap.utils.toArray<HTMLElement>("[data-occasion-card]");
-
-      gsap.set(cards, {
-        opacity: 0,
-        rotate: 0,
-        scale: 0.96,
-        y: (index, target) =>
-          Number((target as HTMLElement).dataset.y ?? 0) + 96,
-      });
-
-      gsap.to(cards, {
-        opacity: 1,
-        rotate: (index, target) =>
-          Number((target as HTMLElement).dataset.rotate ?? 0),
-        scale: 1,
-        y: (index, target) => Number((target as HTMLElement).dataset.y ?? 0),
-        duration: 1.25,
-        ease: "power3.out",
-        stagger: 0.075,
-        scrollTrigger: {
-          trigger: section,
-          start: "top 72%",
-          once: true,
-        },
-      });
-    }, section);
-
-    return () => context.revert();
-  }, []);
-
-  useEffect(() => {
     if (isMobileCarouselLayout()) return;
 
     moveToIndex(activeIndexRef.current, false);
@@ -227,51 +172,7 @@ export default function OccasionShowcase() {
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-    // The carousel is driven by refs and GSAP listeners; resize should bind once.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
-
-    if (!section || !track || isMobileCarouselLayout()) return;
-
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (reducedMotion) return;
-
-    updateTrackMetrics();
-
-    const setX = gsap.quickSetter(track, "x", "px");
-    const scrollTrigger = ScrollTrigger.create({
-      trigger: section,
-      start: "top 72%",
-      end: "bottom 20%",
-      invalidateOnRefresh: true,
-      onRefresh: (self) => {
-        const maxScroll = updateTrackMetrics();
-        const nextTranslate = -maxScroll * self.progress;
-
-        translateRef.current = nextTranslate;
-        setX(nextTranslate);
-        updateActiveIndexForTranslate(nextTranslate);
-      },
-      onUpdate: (self) => {
-        if (dragStateRef.current) return;
-
-        const nextTranslate = -maxScrollRef.current * self.progress;
-
-        translateRef.current = nextTranslate;
-        setX(nextTranslate);
-        updateActiveIndexForTranslate(nextTranslate);
-      },
-    });
-
-    return () => scrollTrigger.kill();
-    // ScrollTrigger owns the card-track transform; the heading remains outside it.
+    // The carousel is driven by refs and CSS transitions; resize should bind once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -296,15 +197,15 @@ export default function OccasionShowcase() {
     if (event.pointerType === "mouse" && event.button !== 0) return;
 
     const track = trackRef.current;
-
-    if (track) {
-      gsap.killTweensOf(track);
-    }
+    // Read the live transform so grabbing mid-transition doesn't jump.
+    const startTranslate = track
+      ? new DOMMatrixReadOnly(getComputedStyle(track).transform).m41
+      : translateRef.current;
 
     dragStateRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
-      startTranslate: translateRef.current,
+      startTranslate,
       moved: false,
     };
 
@@ -331,8 +232,7 @@ export default function OccasionShowcase() {
     );
 
     translateRef.current = nextTranslate;
-    gsap.killTweensOf(track);
-    gsap.set(track, { x: nextTranslate });
+    applyTrackTranslate(track, nextTranslate, false);
     updateActiveIndexForTranslate(nextTranslate);
   };
 
@@ -347,67 +247,6 @@ export default function OccasionShowcase() {
     if (dragState.moved) {
       settleNearestCard();
     }
-  };
-
-  const handleCardPointerEnter = (event: PointerEvent<HTMLElement>) => {
-    if (reducedMotionRef.current) return;
-
-    const card = event.currentTarget;
-
-    gsap.to(card, {
-      transformPerspective: 900,
-      x: 0,
-      rotate: 0,
-      rotationX: 0,
-      rotationY: 0,
-      y: Number(card.dataset.y ?? 0) - 18,
-      scale: 1.035,
-      boxShadow:
-        "0 30px 70px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 126, 165, 0.18)",
-      duration: 0.42,
-      ease: "power3.out",
-      overwrite: "auto",
-    });
-  };
-
-  const handleCardPointerMove = (event: PointerEvent<HTMLElement>) => {
-    if (reducedMotionRef.current || dragStateRef.current) return;
-
-    const card = event.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    const baseY = Number(card.dataset.y ?? 0) - 18;
-
-    gsap.to(card, {
-      transformPerspective: 900,
-      x: x * 18,
-      y: baseY + y * 14,
-      rotationX: y * -6,
-      rotationY: x * 7,
-      duration: 0.28,
-      ease: "power3.out",
-      overwrite: "auto",
-    });
-  };
-
-  const handleCardPointerLeave = (event: PointerEvent<HTMLElement>) => {
-    if (reducedMotionRef.current) return;
-
-    const card = event.currentTarget;
-
-    gsap.to(card, {
-      x: 0,
-      rotate: Number(card.dataset.rotate ?? 0),
-      rotationX: 0,
-      rotationY: 0,
-      y: Number(card.dataset.y ?? 0),
-      scale: 1,
-      boxShadow: "0 18px 45px rgba(0, 0, 0, 0.32)",
-      duration: 0.5,
-      ease: "power3.out",
-      overwrite: "auto",
-    });
   };
 
   return (
@@ -493,7 +332,7 @@ export default function OccasionShowcase() {
       >
         <div
           ref={trackRef}
-          className="flex cursor-grab gap-4 pb-8 pl-8 pt-3 will-change-transform active:cursor-grabbing sm:gap-5 sm:pl-10 lg:gap-5"
+          className="flex cursor-grab gap-4 pb-8 pl-8 pt-3 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.33,1,0.68,1)] motion-reduce:transition-none active:cursor-grabbing sm:gap-5 sm:pl-10 lg:gap-5"
         >
           {localizedCards.map((occasion, index) => (
             <OccasionPhotoCard
@@ -501,9 +340,6 @@ export default function OccasionShowcase() {
               refCallback={setCardRef(index)}
               occasion={occasion}
               isActive={activeIndex === index}
-              onPointerEnter={handleCardPointerEnter}
-              onPointerMove={handleCardPointerMove}
-              onPointerLeave={handleCardPointerLeave}
             />
           ))}
         </div>
@@ -544,30 +380,18 @@ function OccasionPhotoCard({
   occasion,
   isActive,
   refCallback,
-  onPointerEnter,
-  onPointerMove,
-  onPointerLeave,
   mobile = false,
 }: {
   occasion: OccasionCard;
   isActive: boolean;
   refCallback?: (node: HTMLElement | null) => void;
-  onPointerEnter?: (event: PointerEvent<HTMLElement>) => void;
-  onPointerMove?: (event: PointerEvent<HTMLElement>) => void;
-  onPointerLeave?: (event: PointerEvent<HTMLElement>) => void;
   mobile?: boolean;
 }) {
   return (
     <article
       ref={refCallback}
-      data-occasion-card={mobile ? undefined : true}
-      data-rotate={mobile ? undefined : occasion.rotate}
-      data-y={mobile ? undefined : occasion.y}
-      onPointerEnter={onPointerEnter}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
       className={cn(
-        "group relative flex shrink-0 select-none flex-col rounded-2xl border border-[#efe3d3] bg-white p-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)] will-change-transform",
+        "group relative flex shrink-0 select-none flex-col rounded-2xl border border-[#efe3d3] bg-white p-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)]",
         mobile
           ? "h-[21.5rem] w-full"
           : "h-[22rem] w-[min(68vw,16rem)] sm:h-[22.75rem] sm:w-[16.75rem] lg:w-[17.25rem]",

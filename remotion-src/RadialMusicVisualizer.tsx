@@ -34,6 +34,8 @@ export type RadialVisualizerProps = {
     start: number;
     text: string;
   }>;
+  captionTheme?: string;
+  captions?: import("../lib/music-video/photo-slideshow").LyricsCaptionData;
   lyricsStyle?: LyricsStyleConfig;
   maxBarHeight?: number;
   title?: string;
@@ -692,9 +694,11 @@ export function RadialVisualizer({
   density = DEFAULT_DENSITY,
   glowColor = DEFAULT_GLOW_COLOR,
   lyricCues = [],
+  captionTheme = "classic",
   lyricsStyle = DEFAULT_LYRICS_STYLE,
   maxBarHeight = DEFAULT_MAX_BAR_HEIGHT,
   title,
+  captions,
 }: RadialVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundImageRef = useRef<HTMLImageElement>(null);
@@ -744,7 +748,7 @@ export function RadialVisualizer({
         title,
         width,
       });
-      drawLyricsPanel({
+      if (!captions || captionTheme === "classic") drawLyricsPanel({
         activeCue,
         activeIndex: visibleLyrics.activeIndex,
         context,
@@ -802,7 +806,7 @@ export function RadialVisualizer({
       radius: pulseRadius,
       title,
     });
-    drawLyricsPanel({
+    if (!captions || captionTheme === "classic") drawLyricsPanel({
       activeCue,
       activeIndex: visibleLyrics.activeIndex,
       context,
@@ -824,6 +828,8 @@ export function RadialVisualizer({
     glowColor,
     height,
     lyricCues,
+    captions,
+    captionTheme,
     normalizedLyricsStyle,
     safeDensity,
     title,

@@ -54,6 +54,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ATMOSPHERE_OVERLAY_OPTIONS,
   buildEvenPhotoAssignments,
+  buildLyricsCaptionData,
   buildLyricCuesFromAlignedWords,
   buildMinimalVinylTimeline,
   buildPhotoSlideshowTimeline,
@@ -73,6 +74,7 @@ import {
   shouldShowPhotoTransition,
   WAVE_RADIO_BACKGROUND_OPTIONS,
   type AlignedLyricWord,
+  type CaptionThemeId,
   type AtmosphereOverlayConfig,
   type LyricsEntranceMode,
   type LyricsPosition,
@@ -382,6 +384,16 @@ const lyricsEntranceOptions: Array<{
   { label: "Motion Blur Slip", value: "motion-blur-slip" },
   { label: "Staggered Glow Reveal", value: "staggered-glow-reveal" },
   { label: "Rolling Flow", value: "rolling-flow" },
+];
+
+const captionThemeOptions: Array<{ label: string; value: CaptionThemeId }> = [
+  { label: "Classic", value: "classic" },
+  { label: "Pop", value: "pop" },
+  { label: "Karaoke", value: "karaoke" },
+  { label: "Hustle", value: "hustle" },
+  { label: "Beast", value: "beast" },
+  { label: "Soft AI", value: "soft-ai" },
+  { label: "Podcast", value: "podcast" },
 ];
 
 function formatTime(seconds: number) {
@@ -1468,23 +1480,42 @@ function LyricsColorField({
 }
 
 function LyricsStyleSettings({
+  captionTheme,
   forceCenterPosition = false,
+  hasCaptionData,
   lyricsStyle,
+  onChangeCaptionTheme,
   onChangeLyricsStyle,
 }: {
+  captionTheme: CaptionThemeId;
   forceCenterPosition?: boolean;
+  hasCaptionData: boolean;
   lyricsStyle: LyricsStyleConfig;
+  onChangeCaptionTheme: (theme: CaptionThemeId) => void;
   onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
 }) {
+  const usesTheme = captionTheme !== "classic";
   const isRollingFlow = lyricsStyle.entrance === "rolling-flow";
   const lockCenterPosition = forceCenterPosition || isRollingFlow;
 
   return (
     <div className="space-y-2.5">
-      <LyricsFontPicker
+      <div className="space-y-1.5">
+        <Label className={musicVideoSectionHeadingClassName}>Caption theme</Label>
+        <Select value={captionTheme} onValueChange={(theme) => onChangeCaptionTheme(theme as CaptionThemeId)}>
+          <SelectTrigger className={cn(musicVideoFieldClassName, "w-full")}><SelectValue /></SelectTrigger>
+          <SelectContent className={cn(musicVideoPopoverClassName, studioGlassStyles.selectContentItems)}>
+            {captionThemeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value} disabled={option.value !== "classic" && !hasCaptionData}>{option.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {!hasCaptionData ? <p className="text-[10px] text-[#817468]">Word-level themes require aligned lyrics.</p> : null}
+      </div>
+      {!usesTheme ? <LyricsFontPicker
         value={lyricsStyle.fontFamily}
         onChange={(fontFamily) => onChangeLyricsStyle({ fontFamily })}
-      />
+      /> : null}
       <LyricsSliderField
         label="Size"
         max={120}
@@ -1495,24 +1526,24 @@ function LyricsStyleSettings({
       />
       <div className="grid min-w-0 gap-2 sm:grid-cols-2">
         <LyricsColorField
-          label="Text color"
+          label={usesTheme ? "Primary color" : "Text color"}
           value={lyricsStyle.color}
           onChange={(color) => onChangeLyricsStyle({ color })}
         />
         <LyricsColorField
-          label="Border color"
+          label={usesTheme ? "Accent color" : "Border color"}
           value={lyricsStyle.strokeColor}
           onChange={(strokeColor) => onChangeLyricsStyle({ strokeColor })}
         />
       </div>
-      <LyricsSliderField
+      {!usesTheme ? <LyricsSliderField
         label="Border"
         max={15}
         min={0}
         step={1}
         value={lyricsStyle.strokeWidth}
         onChange={(strokeWidth) => onChangeLyricsStyle({ strokeWidth })}
-      />
+      /> : null}
       <div className="grid min-w-0 gap-2 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label className={musicVideoSectionHeadingClassName}>Position</Label>
@@ -1544,7 +1575,7 @@ function LyricsStyleSettings({
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1.5">
+        {!usesTheme ? <div className="space-y-1.5">
           <Label className={musicVideoSectionHeadingClassName}>Entrance</Label>
           <Select
             value={lyricsStyle.entrance}
@@ -1570,7 +1601,7 @@ function LyricsStyleSettings({
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </div> : null}
       </div>
     </div>
   );
@@ -1578,18 +1609,24 @@ function LyricsStyleSettings({
 
 function PhotoUploadLyricsTabs({
   atmosphereOverlay,
+  captionTheme,
+  hasCaptionData,
   lyricsStyle,
   photos,
   selectedUploadedPhoto,
   onChangeAtmosphereOverlay,
+  onChangeCaptionTheme,
   onChangeLyricsStyle,
   onDropPhotos,
 }: {
   atmosphereOverlay: AtmosphereOverlayConfig;
+  captionTheme: CaptionThemeId;
+  hasCaptionData: boolean;
   lyricsStyle: LyricsStyleConfig;
   photos: UploadedPhoto[];
   selectedUploadedPhoto: UploadedPhoto | null;
   onChangeAtmosphereOverlay: (patch: Partial<AtmosphereOverlayConfig>) => void;
+  onChangeCaptionTheme: (theme: CaptionThemeId) => void;
   onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
   onDropPhotos: (files: File[]) => void;
 }) {
@@ -1648,7 +1685,10 @@ function PhotoUploadLyricsTabs({
 
       <TabsContent className="mt-2 space-y-2.5" value="lyrics">
         <LyricsStyleSettings
+          captionTheme={captionTheme}
+          hasCaptionData={hasCaptionData}
           lyricsStyle={lyricsStyle}
+          onChangeCaptionTheme={onChangeCaptionTheme}
           onChangeLyricsStyle={onChangeLyricsStyle}
         />
       </TabsContent>
@@ -2127,9 +2167,12 @@ function MinimalVinylEditor({
   backgroundImageInputId,
   discArtwork,
   discArtworkInputId,
+  captionTheme,
+  hasCaptionData,
   lyricsStyle,
   onChangeBackgroundBlur,
   onChangeBackgroundOverlay,
+  onChangeCaptionTheme,
   onChangeLyricsStyle,
   onUploadBackgroundImage,
   onUploadDiscArtwork,
@@ -2140,11 +2183,14 @@ function MinimalVinylEditor({
   backgroundImageInputId: string;
   discArtwork: UploadedPhoto | null;
   discArtworkInputId: string;
+  captionTheme: CaptionThemeId;
+  hasCaptionData: boolean;
   lyricsStyle: LyricsStyleConfig;
   onChangeBackgroundBlur: (value: number) => void;
   onChangeBackgroundOverlay: (
     patch: Partial<MinimalVinylBackgroundOverlayConfig>,
   ) => void;
+  onChangeCaptionTheme: (theme: CaptionThemeId) => void;
   onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
   onUploadBackgroundImage: (event: ChangeEvent<HTMLInputElement>) => void;
   onUploadDiscArtwork: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -2402,7 +2448,10 @@ function MinimalVinylEditor({
 
         <TabsContent className="mt-2 space-y-2.5" value="lyrics">
           <LyricsStyleSettings
+            captionTheme={captionTheme}
+            hasCaptionData={hasCaptionData}
             lyricsStyle={lyricsStyle}
+            onChangeCaptionTheme={onChangeCaptionTheme}
             onChangeLyricsStyle={onChangeLyricsStyle}
           />
         </TabsContent>
@@ -2413,12 +2462,18 @@ function MinimalVinylEditor({
 
 function WaveRadioEditor({
   backgroundId,
+  captionTheme,
+  hasCaptionData,
   lyricsStyle,
+  onChangeCaptionTheme,
   onChangeLyricsStyle,
   onSelectBackground,
 }: {
   backgroundId: string;
+  captionTheme: CaptionThemeId;
+  hasCaptionData: boolean;
   lyricsStyle: LyricsStyleConfig;
+  onChangeCaptionTheme: (theme: CaptionThemeId) => void;
   onChangeLyricsStyle: (patch: Partial<LyricsStyleConfig>) => void;
   onSelectBackground: (backgroundId: string) => void;
 }) {
@@ -2489,7 +2544,11 @@ function WaveRadioEditor({
 
         <TabsContent className="mt-2 space-y-2.5" value="lyrics">
           <LyricsStyleSettings
+            captionTheme={captionTheme}
+            forceCenterPosition
+            hasCaptionData={hasCaptionData}
             lyricsStyle={lyricsStyle}
+            onChangeCaptionTheme={onChangeCaptionTheme}
             onChangeLyricsStyle={onChangeLyricsStyle}
           />
         </TabsContent>
@@ -2620,6 +2679,7 @@ export function MusicVideoStudio({
     useState<PreviewAspectRatio>("landscape");
   const [lyricsStyle, setLyricsStyle] =
     useState<LyricsStyleConfig>(DEFAULT_LYRICS_STYLE);
+  const [captionTheme, setCaptionTheme] = useState<CaptionThemeId>("classic");
   const [waveRadioBackgroundId, setWaveRadioBackgroundId] = useState(
     DEFAULT_WAVE_RADIO_BACKGROUND.id,
   );
@@ -2676,6 +2736,15 @@ export function MusicVideoStudio({
         : parseTimestampedLyrics(lyrics, playerDuration),
     [lyrics, playerDuration, timestampedLyrics],
   );
+  const captionData = useMemo(
+    () =>
+      buildLyricsCaptionData({
+        lyrics,
+        alignedWords: timestampedLyrics?.alignedWords,
+      }),
+    [lyrics, timestampedLyrics],
+  );
+  const hasCaptionData = Boolean(captionData);
   const coverPhoto = useMemo(() => createCoverPhoto(imageUrl), [imageUrl]);
   const minimalVinylCoverPhoto = minimalVinylDiscArtwork ?? coverPhoto;
   const minimalVinylPreviewBackgroundPhoto =
@@ -2757,6 +2826,8 @@ export function MusicVideoStudio({
             songTitle,
             templateId: "minimal-vinyl",
             lyricsStyle,
+            captionTheme,
+            captions: captionData,
             transitions: [],
             width: renderDimensions.width,
           }
@@ -2772,6 +2843,8 @@ export function MusicVideoStudio({
               songTitle,
               templateId: "wave-radio",
               lyricsStyle,
+              captionTheme,
+              captions: captionData,
               transitions: [],
               waveRadioBackgroundId,
               width: renderDimensions.width,
@@ -2788,6 +2861,8 @@ export function MusicVideoStudio({
               songTitle,
               templateId: "photo-slideshow",
               lyricsStyle,
+              captionTheme,
+              captions: captionData,
               transitions: timelineTransitions,
               width: renderDimensions.width,
             },
@@ -2799,6 +2874,8 @@ export function MusicVideoStudio({
       coverPhoto,
       cues,
       lyricsStyle,
+      captionTheme,
+      captionData,
       minimalVinylBackgroundBlur,
       minimalVinylBackgroundOverlay,
       minimalVinylPreviewBackgroundPhoto,
@@ -2916,6 +2993,7 @@ export function MusicVideoStudio({
       setActiveTemplate("photo-slideshow");
       setPreviewAspectRatio("landscape");
       setLyricsStyle(DEFAULT_LYRICS_STYLE);
+      setCaptionTheme("classic");
       setWaveRadioBackgroundId(DEFAULT_WAVE_RADIO_BACKGROUND.id);
       setAtmosphereOverlay(DEFAULT_ATMOSPHERE_OVERLAY);
       setEditorWidth(clampEditorWidth(DEFAULT_EDITOR_WIDTH));
@@ -3419,6 +3497,10 @@ export function MusicVideoStudio({
     setLyricsStyle((currentStyle) => ({ ...currentStyle, ...patch }));
   }
 
+  function handleChangeCaptionTheme(theme: CaptionThemeId) {
+    setCaptionTheme(hasCaptionData ? theme : "classic");
+  }
+
   function handleChangeAtmosphereOverlay(
     patch: Partial<AtmosphereOverlayConfig>,
   ) {
@@ -3601,6 +3683,7 @@ export function MusicVideoStudio({
             fallbackImageUrl: imageUrl,
             timestampedLyrics,
             lyricsStyle,
+            captionTheme,
           })
         : activeTemplate === "wave-radio"
           ? buildWaveRadioTimeline({
@@ -3611,6 +3694,7 @@ export function MusicVideoStudio({
               lyrics,
               timestampedLyrics,
               lyricsStyle,
+              captionTheme,
               waveRadioBackgroundId,
             })
           : buildPhotoSlideshowTimeline({
@@ -3625,6 +3709,7 @@ export function MusicVideoStudio({
               timestampedLyrics,
               transitions: timelineTransitions,
               lyricsStyle,
+              captionTheme,
               atmosphereOverlay,
             });
 
@@ -3815,22 +3900,30 @@ export function MusicVideoStudio({
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent
-                        className={musicVideoPopoverClassName}
+                        className={musicVideoCloseConfirmDialogClassName}
                       >
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Auto Movie</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Uploaded media assets will be distributed across the
-                            song at lyric change points, and transition
-                            animations will be chosen at random. Current manual
-                            media bindings and transition settings will be
-                            replaced.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <div className="px-5 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
+                          <AlertDialogHeader className="gap-2 text-left">
+                            <AlertDialogTitle className="text-[22px] font-black leading-[1.08] tracking-normal text-[#211813]">
+                              Auto Movie
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="text-[13.5px] leading-6 text-[#7a6d62]">
+                              Uploaded media assets will be distributed across the
+                              song at lyric change points, and transition
+                              animations will be chosen at random. Current manual
+                              media bindings and transition settings will be
+                              replaced.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                        </div>
+                        <AlertDialogFooter className="flex-col gap-2.5 border-t border-[#eadfd3]/75 bg-white/42 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+                          <AlertDialogCancel
+                            className={musicVideoCloseConfirmCancelClassName}
+                          >
+                            Cancel
+                          </AlertDialogCancel>
                           <AlertDialogAction
-                            className={musicVideoPrimaryButtonClassName}
+                            className={musicVideoCloseConfirmActionClassName}
                             onClick={handleOneClickMovie}
                           >
                             Apply
@@ -3859,11 +3952,14 @@ export function MusicVideoStudio({
                       }
                       discArtwork={minimalVinylDiscArtwork}
                       discArtworkInputId={minimalVinylDiscArtworkInputId}
+                      captionTheme={captionTheme}
+                      hasCaptionData={hasCaptionData}
                       lyricsStyle={lyricsStyle}
                       onChangeBackgroundBlur={setMinimalVinylBackgroundBlur}
                       onChangeBackgroundOverlay={
                         handleChangeMinimalVinylBackgroundOverlay
                       }
+                      onChangeCaptionTheme={handleChangeCaptionTheme}
                       onChangeLyricsStyle={handleChangeLyricsStyle}
                       onUploadBackgroundImage={
                         handleMinimalVinylBackgroundArtworkUpload
@@ -3875,7 +3971,10 @@ export function MusicVideoStudio({
                   <div className="flex min-h-0 flex-1 overflow-hidden pt-1">
                     <WaveRadioEditor
                       backgroundId={waveRadioBackgroundId}
+                      captionTheme={captionTheme}
+                      hasCaptionData={hasCaptionData}
                       lyricsStyle={lyricsStyle}
+                      onChangeCaptionTheme={handleChangeCaptionTheme}
                       onChangeLyricsStyle={handleChangeLyricsStyle}
                       onSelectBackground={setWaveRadioBackgroundId}
                     />
@@ -3902,12 +4001,15 @@ export function MusicVideoStudio({
                       <div className="min-h-full min-w-0 space-y-2">
                         <PhotoUploadLyricsTabs
                           atmosphereOverlay={atmosphereOverlay}
+                          captionTheme={captionTheme}
+                          hasCaptionData={hasCaptionData}
                           lyricsStyle={lyricsStyle}
                           photos={photos}
                           selectedUploadedPhoto={selectedUploadedPhoto}
                           onChangeAtmosphereOverlay={
                             handleChangeAtmosphereOverlay
                           }
+                          onChangeCaptionTheme={handleChangeCaptionTheme}
                           onChangeLyricsStyle={handleChangeLyricsStyle}
                           onDropPhotos={handleDropPhotos}
                         />

@@ -59,6 +59,28 @@ export type LyricsStyleConfig = {
   strokeWidth: number;
 };
 
+export const CAPTION_THEME_IDS = [
+  "classic",
+  "pop",
+  "karaoke",
+  "hustle",
+  "beast",
+  "soft-ai",
+  "podcast",
+] as const;
+
+export type CaptionThemeId = (typeof CAPTION_THEME_IDS)[number];
+
+export type CaptionWord = {
+  text: string;
+  start: number;
+  end: number;
+};
+
+export type CaptionLine = { words: CaptionWord[] };
+
+export type LyricsCaptionData = { lines: CaptionLine[] };
+
 export type AtmosphereOverlayOption = {
   durationInFrames: number;
   id: string;
@@ -144,6 +166,8 @@ type BaseMusicVideoTimeline = {
   coverPhoto?: UploadedPhoto;
   transitions: TransitionAssignment[];
   lyricsStyle?: LyricsStyleConfig;
+  captionTheme?: CaptionThemeId;
+  captions?: LyricsCaptionData;
 };
 
 export type PhotoSlideshowTimeline = BaseMusicVideoTimeline & {
@@ -412,6 +436,272 @@ export const WAVE_RADIO_BACKGROUND_OPTIONS: WaveRadioBackgroundOption[] = [
     posterSrc: overlayCdnSrc("bg-video-poster/84916-587646675.jpg"),
     src: overlayCdnSrc("bg-video/84916-587646675.mp4"),
   },
+  {
+    durationInFrames: 301,
+    id: "131999-751915336",
+    label: "Background 131999-751915336",
+    posterSrc: overlayCdnSrc("bg-video-poster/131999-751915336.jpg"),
+    src: overlayCdnSrc("bg-video/131999-751915336.mp4"),
+  },
+  {
+    durationInFrames: 600,
+    id: "13306-246909929",
+    label: "Background 13306-246909929",
+    posterSrc: overlayCdnSrc("bg-video-poster/13306-246909929.jpg"),
+    src: overlayCdnSrc("bg-video/13306-246909929.mp4"),
+  },
+  {
+    durationInFrames: 264,
+    id: "137614-767056227",
+    label: "Background 137614-767056227",
+    posterSrc: overlayCdnSrc("bg-video-poster/137614-767056227.jpg"),
+    src: overlayCdnSrc("bg-video/137614-767056227.mp4"),
+  },
+  {
+    durationInFrames: 313,
+    id: "140151-865442951",
+    label: "Background 140151-865442951",
+    posterSrc: overlayCdnSrc("bg-video-poster/140151-865442951.jpg"),
+    src: overlayCdnSrc("bg-video/140151-865442951.mp4"),
+  },
+  {
+    durationInFrames: 300,
+    id: "14572459",
+    label: "Background 14572459",
+    posterSrc: overlayCdnSrc("bg-video-poster/14572459.jpg"),
+    src: overlayCdnSrc("bg-video/14572459.mp4"),
+  },
+  {
+    durationInFrames: 601,
+    id: "15283166",
+    label: "Background 15283166",
+    posterSrc: overlayCdnSrc("bg-video-poster/15283166.jpg"),
+    src: overlayCdnSrc("bg-video/15283166.mp4"),
+  },
+  {
+    durationInFrames: 300,
+    id: "16945380",
+    label: "Background 16945380",
+    posterSrc: overlayCdnSrc("bg-video-poster/16945380.jpg"),
+    src: overlayCdnSrc("bg-video/16945380.mp4"),
+  },
+  {
+    durationInFrames: 450,
+    id: "171422-845465103",
+    label: "Background 171422-845465103",
+    posterSrc: overlayCdnSrc("bg-video-poster/171422-845465103.jpg"),
+    src: overlayCdnSrc("bg-video/171422-845465103.mp4"),
+  },
+  {
+    durationInFrames: 302,
+    id: "183279-870457579",
+    label: "Background 183279-870457579",
+    posterSrc: overlayCdnSrc("bg-video-poster/183279-870457579.jpg"),
+    src: overlayCdnSrc("bg-video/183279-870457579.mp4"),
+  },
+  {
+    durationInFrames: 452,
+    id: "203336-920723750",
+    label: "Background 203336-920723750",
+    posterSrc: overlayCdnSrc("bg-video-poster/203336-920723750.jpg"),
+    src: overlayCdnSrc("bg-video/203336-920723750.mp4"),
+  },
+  {
+    durationInFrames: 1801,
+    id: "2114-154902076",
+    label: "Background 2114-154902076",
+    posterSrc: overlayCdnSrc("bg-video-poster/2114-154902076.jpg"),
+    src: overlayCdnSrc("bg-video/2114-154902076.mp4"),
+  },
+  {
+    durationInFrames: 901,
+    id: "214405",
+    label: "Background 214405",
+    posterSrc: overlayCdnSrc("bg-video-poster/214405.jpg"),
+    src: overlayCdnSrc("bg-video/214405.mp4"),
+  },
+  {
+    durationInFrames: 1795,
+    id: "218714",
+    label: "Background 218714",
+    posterSrc: overlayCdnSrc("bg-video-poster/218714.jpg"),
+    src: overlayCdnSrc("bg-video/218714.mp4"),
+  },
+  {
+    durationInFrames: 344,
+    id: "22908-331768732",
+    label: "Background 22908-331768732",
+    posterSrc: overlayCdnSrc("bg-video-poster/22908-331768732.jpg"),
+    src: overlayCdnSrc("bg-video/22908-331768732.mp4"),
+  },
+  {
+    durationInFrames: 447,
+    id: "2527977",
+    label: "Background 2527977",
+    posterSrc: overlayCdnSrc("bg-video-poster/2527977.jpg"),
+    src: overlayCdnSrc("bg-video/2527977.mp4"),
+  },
+  {
+    durationInFrames: 361,
+    id: "26007-353916139",
+    label: "Background 26007-353916139",
+    posterSrc: overlayCdnSrc("bg-video-poster/26007-353916139.jpg"),
+    src: overlayCdnSrc("bg-video/26007-353916139.mp4"),
+  },
+  {
+    durationInFrames: 756,
+    id: "268528",
+    label: "Background 268528",
+    posterSrc: overlayCdnSrc("bg-video-poster/268528.jpg"),
+    src: overlayCdnSrc("bg-video/268528.mp4"),
+  },
+  {
+    durationInFrames: 301,
+    id: "27669-365224683",
+    label: "Background 27669-365224683",
+    posterSrc: overlayCdnSrc("bg-video-poster/27669-365224683.jpg"),
+    src: overlayCdnSrc("bg-video/27669-365224683.mp4"),
+  },
+  {
+    durationInFrames: 3340,
+    id: "4194964",
+    label: "Background 4194964",
+    posterSrc: overlayCdnSrc("bg-video-poster/4194964.jpg"),
+    src: overlayCdnSrc("bg-video/4194964.mp4"),
+  },
+  {
+    durationInFrames: 301,
+    id: "48569-454825064",
+    label: "Background 48569-454825064",
+    posterSrc: overlayCdnSrc("bg-video-poster/48569-454825064.jpg"),
+    src: overlayCdnSrc("bg-video/48569-454825064.mp4"),
+  },
+  {
+    durationInFrames: 871,
+    id: "5192-183786490",
+    label: "Background 5192-183786490",
+    posterSrc: overlayCdnSrc("bg-video-poster/5192-183786490.jpg"),
+    src: overlayCdnSrc("bg-video/5192-183786490.mp4"),
+  },
+  {
+    durationInFrames: 1783,
+    id: "67358-521707474",
+    label: "Background 67358-521707474",
+    posterSrc: overlayCdnSrc("bg-video-poster/67358-521707474.jpg"),
+    src: overlayCdnSrc("bg-video/67358-521707474.mp4"),
+  },
+  {
+    durationInFrames: 1649,
+    id: "7077358",
+    label: "Background 7077358",
+    posterSrc: overlayCdnSrc("bg-video-poster/7077358.jpg"),
+    src: overlayCdnSrc("bg-video/7077358.mp4"),
+  },
+  {
+    durationInFrames: 563,
+    id: "71122-537102350",
+    label: "Background 71122-537102350",
+    posterSrc: overlayCdnSrc("bg-video-poster/71122-537102350.jpg"),
+    src: overlayCdnSrc("bg-video/71122-537102350.mp4"),
+  },
+  {
+    durationInFrames: 299,
+    id: "7230819",
+    label: "Background 7230819",
+    posterSrc: overlayCdnSrc("bg-video-poster/7230819.jpg"),
+    src: overlayCdnSrc("bg-video/7230819.mp4"),
+  },
+  {
+    durationInFrames: 901,
+    id: "7606423",
+    label: "Background 7606423",
+    posterSrc: overlayCdnSrc("bg-video-poster/7606423.jpg"),
+    src: overlayCdnSrc("bg-video/7606423.mp4"),
+  },
+  {
+    durationInFrames: 1136,
+    id: "8462519",
+    label: "Background 8462519",
+    posterSrc: overlayCdnSrc("bg-video-poster/8462519.jpg"),
+    src: overlayCdnSrc("bg-video/8462519.mp4"),
+  },
+  {
+    durationInFrames: 1774,
+    id: "106383-673007978",
+    label: "Background 106383-673007978",
+    posterSrc: overlayCdnSrc("bg-video-poster/106383-673007978.jpg"),
+    src: overlayCdnSrc("bg-video/106383-673007978.mp4"),
+  },
+  {
+    durationInFrames: 752,
+    id: "111643-691223143",
+    label: "Background 111643-691223143",
+    posterSrc: overlayCdnSrc("bg-video-poster/111643-691223143.jpg"),
+    src: overlayCdnSrc("bg-video/111643-691223143.mp4"),
+  },
+  {
+    durationInFrames: 958,
+    id: "153908-806526834",
+    label: "Background 153908-806526834",
+    posterSrc: overlayCdnSrc("bg-video-poster/153908-806526834.jpg"),
+    src: overlayCdnSrc("bg-video/153908-806526834.mp4"),
+  },
+  {
+    durationInFrames: 1776,
+    id: "156117-811878070",
+    label: "Background 156117-811878070",
+    posterSrc: overlayCdnSrc("bg-video-poster/156117-811878070.jpg"),
+    src: overlayCdnSrc("bg-video/156117-811878070.mp4"),
+  },
+  {
+    durationInFrames: 903,
+    id: "16453-272487468",
+    label: "Background 16453-272487468",
+    posterSrc: overlayCdnSrc("bg-video-poster/16453-272487468.jpg"),
+    src: overlayCdnSrc("bg-video/16453-272487468.mp4"),
+  },
+  {
+    durationInFrames: 213,
+    id: "173531-849610811",
+    label: "Background 173531-849610811",
+    posterSrc: overlayCdnSrc("bg-video-poster/173531-849610811.jpg"),
+    src: overlayCdnSrc("bg-video/173531-849610811.mp4"),
+  },
+  {
+    durationInFrames: 473,
+    id: "208813",
+    label: "Background 208813",
+    posterSrc: overlayCdnSrc("bg-video-poster/208813.jpg"),
+    src: overlayCdnSrc("bg-video/208813.mp4"),
+  },
+  {
+    durationInFrames: 198,
+    id: "258220",
+    label: "Background 258220",
+    posterSrc: overlayCdnSrc("bg-video-poster/258220.jpg"),
+    src: overlayCdnSrc("bg-video/258220.mp4"),
+  },
+  {
+    durationInFrames: 256,
+    id: "preview-1",
+    label: "Background preview-1",
+    posterSrc: overlayCdnSrc("bg-video-poster/preview-1.jpg"),
+    src: overlayCdnSrc("bg-video/preview-1.mp4"),
+  },
+  {
+    durationInFrames: 1646,
+    id: "preview",
+    label: "Background preview",
+    posterSrc: overlayCdnSrc("bg-video-poster/preview.jpg"),
+    src: overlayCdnSrc("bg-video/preview.mp4"),
+  },
+  {
+    durationInFrames: 7533,
+    id: "steady-light-mv",
+    label: "Background steady-light-mv",
+    posterSrc: overlayCdnSrc("bg-video-poster/steady-light-mv.jpg"),
+    src: overlayCdnSrc("bg-video/steady-light-mv.mp4"),
+  },
 ];
 export const DEFAULT_WAVE_RADIO_BACKGROUND = WAVE_RADIO_BACKGROUND_OPTIONS[0];
 export const DEFAULT_ATMOSPHERE_OVERLAY: AtmosphereOverlayConfig = {
@@ -499,6 +789,14 @@ export function normalizeLyricsStyleConfig(
     fontSize,
     strokeWidth,
   };
+}
+
+export function normalizeCaptionThemeId(
+  theme?: string | null,
+): CaptionThemeId {
+  return CAPTION_THEME_IDS.includes(theme as CaptionThemeId)
+    ? (theme as CaptionThemeId)
+    : "classic";
 }
 
 function normalizeOverlayOpacity(opacity?: number | null) {
@@ -598,6 +896,52 @@ function normalizeLyricWords(text: string) {
     .replace(/[^\p{L}\p{N}\s]+/gu, " ")
     .split(/\s+/)
     .filter(Boolean);
+}
+
+// KIE occasionally combines a section marker with the first spoken word in a
+// single alignment item: "[Spoken Intro / Narration]\\nHey". The marker is not
+// lyric content, but the word after it still has a valid timestamp.
+function stripAlignedWordSectionPrefix(text: string) {
+  return text
+    .replace(/^\s*\[[^\]\r\n]+\]\s*(?:\r?\n)+/, "")
+    .trim();
+}
+
+const ZERO_LENGTH_ALIGNMENT_MAX_DURATION_SECONDS = 0.12;
+
+function normalizeAlignedCaptionWords(
+  alignedWords: AlignedLyricWord[],
+): AlignedLyricWord[] | undefined {
+  const words: AlignedLyricWord[] = [];
+
+  for (const [index, alignedWord] of alignedWords.entries()) {
+    const word = stripAlignedWordSectionPrefix(alignedWord.word);
+    const startS = Number(alignedWord.startS);
+    let endS = Number(alignedWord.endS);
+
+    if (!word || !Number.isFinite(startS) || !Number.isFinite(endS) || startS < 0) {
+      return undefined;
+    }
+
+    // KIE occasionally emits zero-length timings for short tokens such as
+    // "a", "I", and "'s". Use only the immediate next word boundary, so the
+    // repaired interval stays in order and never overlaps the following word.
+    if (endS === startS) {
+      const nextStartS = Number(alignedWords[index + 1]?.startS);
+      if (!Number.isFinite(nextStartS) || nextStartS <= startS) {
+        return undefined;
+      }
+      endS = Math.min(
+        nextStartS,
+        startS + ZERO_LENGTH_ALIGNMENT_MAX_DURATION_SECONDS,
+      );
+    }
+
+    if (endS <= startS) return undefined;
+    words.push({ word, startS, endS });
+  }
+
+  return words;
 }
 
 function normalizeCueEnd(
@@ -705,6 +1049,58 @@ export function buildLyricCuesFromAlignedWords({
   }
 
   return cues.length ? cues : parseTimestampedLyrics(lyrics, duration);
+}
+
+export function buildLyricsCaptionData({
+  lyrics,
+  alignedWords,
+}: {
+  lyrics: string;
+  alignedWords?: AlignedLyricWord[] | null;
+}): LyricsCaptionData | undefined {
+  const lyricLines = cleanUntimedLines(lyrics);
+  if (!lyricLines.length || !alignedWords?.length) return undefined;
+
+  const words = normalizeAlignedCaptionWords(alignedWords);
+  if (!words) return undefined;
+
+  let cursor = 0;
+  const lines: CaptionLine[] = [];
+  for (const line of lyricLines) {
+    const expectedWords = normalizeLyricWords(line);
+    if (!expectedWords.length) continue;
+
+    const lineWords: typeof words = [];
+    let expectedCursor = 0;
+    while (expectedCursor < expectedWords.length) {
+      const word = words[cursor];
+      const normalizedWord = word ? normalizeLyricWords(word.word) : [];
+      if (
+        !word ||
+        !normalizedWord.length ||
+        normalizedWord.length > expectedWords.length - expectedCursor ||
+        normalizedWord.some(
+          (token, index) => token !== expectedWords[expectedCursor + index],
+        )
+      ) {
+        return undefined;
+      }
+
+      lineWords.push(word);
+      cursor += 1;
+      expectedCursor += normalizedWord.length;
+    }
+
+    lines.push({
+      words: lineWords.map((word) => ({
+        text: word.word,
+        start: word.startS,
+        end: word.endS,
+      })),
+    });
+  }
+
+  return cursor === words.length && lines.length ? { lines } : undefined;
 }
 
 export function resolveCuePhotos({
@@ -857,6 +1253,7 @@ export function buildPhotoSlideshowTimeline({
   transitions,
   lyricsStyle,
   atmosphereOverlay,
+  captionTheme,
 }: {
   songTitle: string;
   audioUrl: string;
@@ -870,6 +1267,7 @@ export function buildPhotoSlideshowTimeline({
   transitions?: TransitionAssignment[];
   lyricsStyle?: LyricsStyleConfig;
   atmosphereOverlay?: AtmosphereOverlayInput;
+  captionTheme?: string | null;
 }): MusicVideoTimeline {
   const effectiveDuration = normalizeDuration(duration);
   const renderDimensions = normalizeRenderDimensions(dimensions);
@@ -880,6 +1278,13 @@ export function buildPhotoSlideshowTimeline({
         duration: effectiveDuration,
       })
     : parseTimestampedLyrics(lyrics, effectiveDuration);
+  const captions = buildLyricsCaptionData({
+    lyrics,
+    alignedWords: timestampedLyrics?.alignedWords,
+  });
+  const normalizedCaptionTheme = captions
+    ? normalizeCaptionThemeId(captionTheme)
+    : "classic";
 
   return {
     templateId: "photo-slideshow",
@@ -897,6 +1302,8 @@ export function buildPhotoSlideshowTimeline({
         ? (createCoverPhoto(fallbackImageUrl) ?? undefined)
         : undefined,
     lyricsStyle: normalizeLyricsStyleConfig(lyricsStyle),
+    captionTheme: normalizedCaptionTheme,
+    captions,
     transitions: normalizeTransitions({ cues: lyricCues, transitions }),
   };
 }
@@ -914,6 +1321,7 @@ export function buildMinimalVinylTimeline({
   coverPhoto,
   timestampedLyrics,
   lyricsStyle,
+  captionTheme,
 }: {
   songTitle: string;
   audioUrl: string;
@@ -927,6 +1335,7 @@ export function buildMinimalVinylTimeline({
   coverPhoto?: UploadedPhoto | null;
   timestampedLyrics?: { alignedWords: AlignedLyricWord[] } | null;
   lyricsStyle?: LyricsStyleConfig;
+  captionTheme?: string | null;
 }): MusicVideoTimeline {
   const effectiveDuration = normalizeDuration(duration);
   const renderDimensions = normalizeRenderDimensions(dimensions);
@@ -937,6 +1346,10 @@ export function buildMinimalVinylTimeline({
         duration: effectiveDuration,
       })
     : parseTimestampedLyrics(lyrics, effectiveDuration);
+  const captions = buildLyricsCaptionData({
+    lyrics,
+    alignedWords: timestampedLyrics?.alignedWords,
+  });
 
   return {
     templateId: "minimal-vinyl",
@@ -957,6 +1370,8 @@ export function buildMinimalVinylTimeline({
     backgroundPhoto: backgroundPhoto ?? undefined,
     coverPhoto: coverPhoto ?? createCoverPhoto(fallbackImageUrl) ?? undefined,
     lyricsStyle: normalizeLyricsStyleConfig(lyricsStyle),
+    captionTheme: captions ? normalizeCaptionThemeId(captionTheme) : "classic",
+    captions,
     transitions: [],
   };
 }
@@ -970,6 +1385,7 @@ export function buildWaveRadioTimeline({
   timestampedLyrics,
   lyricsStyle,
   waveRadioBackgroundId,
+  captionTheme,
 }: {
   songTitle: string;
   audioUrl: string;
@@ -979,6 +1395,7 @@ export function buildWaveRadioTimeline({
   timestampedLyrics?: { alignedWords: AlignedLyricWord[] } | null;
   lyricsStyle?: LyricsStyleConfig;
   waveRadioBackgroundId?: string | null;
+  captionTheme?: string | null;
 }): MusicVideoTimeline {
   const effectiveDuration = normalizeDuration(duration);
   const renderDimensions = normalizeRenderDimensions(dimensions);
@@ -990,6 +1407,10 @@ export function buildWaveRadioTimeline({
       })
     : parseTimestampedLyrics(lyrics, effectiveDuration);
   const normalizedLyricsStyle = normalizeLyricsStyleConfig(lyricsStyle);
+  const captions = buildLyricsCaptionData({
+    lyrics,
+    alignedWords: timestampedLyrics?.alignedWords,
+  });
 
   return {
     templateId: "wave-radio",
@@ -1005,6 +1426,8 @@ export function buildWaveRadioTimeline({
       ...normalizedLyricsStyle,
       position: "center",
     },
+    captionTheme: captions ? normalizeCaptionThemeId(captionTheme) : "classic",
+    captions,
     transitions: [],
     waveRadioBackgroundId: normalizeWaveRadioBackgroundId(
       waveRadioBackgroundId,

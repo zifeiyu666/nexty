@@ -2,13 +2,13 @@
   "Hero": {
     "badge": {
       "label": "",
-      "text": "✨ #1 AI Custom Song Gift Maker",
+      "text": "✨ AI custom song gift maker",
       "href": ""
     },
     "title": "Send A Custom Song They’ll Cherish Forever",
     "titleLine": "Send A Custom Song They’ll",
     "titleAccent": "Cherish Forever",
-    "description": "<p class=\"hero-subtitle\">Share a memory, a milestone, or the words you’ve never quite said. SendTheSong turns it into a personal song gift—ready to preview, refine, and send in minutes.</p>",
+    "description": "<p class=\"hero-subtitle\">Turn your story into a personalized song gift. Preview it free, refine the lyrics, and send a meaningful custom song in minutes.</p>",
     "trustBadge": "SendTheSong · Free preview first · Ready in minutes",
     "trustItems": [
       "Free to preview",
@@ -170,6 +170,15 @@
         "imageAlt": "Voice message being recorded before a personalized song begins"
       }
     }
+  },
+  "WallArtGallery": {
+    "eyebrow": "Wall Art",
+    "title": "Your Story, Beautifully Framed",
+    "description": "A first look at lyric wall art made from real stories. Tap any piece to see it up close.",
+    "wallArtCta": "Explore custom lyrics wall art",
+    "posterCta": "Try the lyric poster maker",
+    "imageAlt": "Personalized lyric wall art preview {index}",
+    "dialogTitle": "Wall art preview"
   },
   "OurProducts": {
     "eyebrow": "Our Products",
