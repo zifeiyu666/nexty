@@ -2,7 +2,7 @@
   "Hero": {
     "badge": {
       "label": "",
-      "text": "✨ Crea una canción personalizada con IA",
+      "text": "✨ Crea una canción personalizada única",
       "href": ""
     },
     "title": "Envía una canción personalizada que atesorarán para siempre",
@@ -98,7 +98,7 @@
     "steps": {
       "story": {
         "title": "Cuéntanos vuestra historia",
-        "description": "Elige la ocasión y el estilo musical, y comparte algunos recuerdos. La IA los transforma en una letra personal y natural.",
+        "description": "Elige la ocasión y el estilo musical, y comparte algunos recuerdos. Los transformamos en una letra personal y natural.",
         "cta": "Crear mi canción"
       },
       "preview": {
@@ -121,7 +121,7 @@
     "description": "Lleva más de ti a los primeros segundos de una canción personalizada y deja que la música cuente el resto de la historia.",
     "items": {
       "voiceClone": {
-        "title": "Tu voz de canto con IA",
+        "title": "Tu propia voz de canto",
         "description": "Crea un perfil de voz verificado y usa un carácter vocal familiar en las canciones que hagas.",
         "highlights": [
           "Crea una voz de canto personal para tus próximas canciones",
@@ -137,7 +137,7 @@
           },
           "song": {
             "title": "Canción creada con esa voz",
-            "subtitle": "La voz de canto generada dentro de una canción terminada",
+            "subtitle": "Tu voz de canto dentro de una canción terminada",
             "startsAt": "La vista previa empieza en 0:04"
           },
           "play": "Reproducir {title}",
@@ -145,14 +145,14 @@
         },
         "consent": "Solo puedes clonar una voz que tengas autorización para usar. Es necesario completar una verificación antes de utilizarla.",
         "cta": "Crear mi voz",
-        "imageAlt": "Persona grabando una muestra de voz para una voz de canto personalizada con IA"
+        "imageAlt": "Persona grabando una muestra de voz para una voz de canto personalizada"
       },
       "spokenIntro": {
         "title": "Una apertura con tus propias palabras",
         "description": "Empieza la canción con un saludo breve para que la sorpresa se sienta personal desde el primer segundo.",
         "highlights": [
           "Graba tu propio mensaje de voz al inicio de la canción",
-          "O escribe una dedicatoria para que la diga la voz de IA",
+          "O escribe una dedicatoria para que la diga la voz de la canción",
           "Deja que el momento hablado fluya de forma natural hacia la música"
         ],
         "demo": {
@@ -181,7 +181,7 @@
   "OurProducts": {
     "eyebrow": "Qué puedes crear",
     "title": "El regalo personalizado completo",
-    "description": "Convierte una historia en un regalo musical completo: una canción personalizada con IA, un vídeo para compartir y una lámina digital lista para imprimir.",
+    "description": "Convierte una historia en un regalo musical completo: una canción personalizada, un vídeo para compartir y una lámina digital lista para imprimir.",
     "items": {
       "customSong": {
         "label": "Principal",
@@ -330,7 +330,7 @@
     "items": [
       {
         "question": "¿Cómo funciona SendTheSong?",
-        "answer": "Cuéntanos la historia, elige un estilo musical y nuestra IA preparará una canción personalizada. Primero recibirás una muestra gratuita de 60 segundos. Si te gusta, podrás desbloquear la canción completa y usar los editores de vídeo y láminas."
+        "answer": "Cuéntanos la historia, elige un estilo musical y prepararemos una canción personalizada al instante. Primero recibirás una muestra gratuita de 60 segundos. Si te gusta, podrás desbloquear la canción completa y usar los editores de vídeo y láminas."
       },
       {
         "question": "¿Qué diferencia a SendTheSong de otras plataformas?",

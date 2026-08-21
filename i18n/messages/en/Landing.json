@@ -2,7 +2,7 @@
   "Hero": {
     "badge": {
       "label": "",
-      "text": "✨ AI custom song gift maker",
+      "text": "✨ Custom song gift maker",
       "href": ""
     },
     "title": "Send A Custom Song They’ll Cherish Forever",
@@ -101,7 +101,7 @@
     "steps": {
       "story": {
         "title": "Tell Us Your Story",
-        "description": "Pick an occasion, select a genre, and drop a few favorite memories. Our AI transforms your raw text into beautifully poetic lyrics.",
+        "description": "Pick an occasion, select a genre, and drop a few favorite memories. Your words are transformed into beautifully poetic lyrics.",
         "cta": "Craft My Song"
       },
       "preview": {
@@ -124,7 +124,7 @@
     "description": "Bring more of yourself into the first moments of a custom song, then send a gift that lets music carry the rest of the story.",
     "items": {
       "voiceClone": {
-        "title": "Your AI Singing Voice",
+        "title": "Your Own Singing Voice",
         "description": "Create a verified voice profile and use your own familiar vocal character in the songs you make.",
         "highlights": [
           "Create a personal singing voice for future songs",
@@ -140,7 +140,7 @@
           },
           "song": {
             "title": "Song created with that voice",
-            "subtitle": "The generated singing voice in a finished song",
+            "subtitle": "Your singing voice in a finished song",
             "startsAt": "Song preview starts at 0:04"
           },
           "play": "Play {title}",
@@ -148,14 +148,14 @@
         },
         "consent": "Only clone a voice you are authorized to use. A verification step is required before it can be used.",
         "cta": "Create my voice",
-        "imageAlt": "Person recording a voice sample for a custom AI singing voice"
+        "imageAlt": "Person recording a voice sample for a custom singing voice"
       },
       "spokenIntro": {
         "title": "An Opening in Your Own Words & Voice",
         "description": "Start the song with a short greeting that makes the surprise feel personal from the very first second.",
         "highlights": [
           "Record your own voice message to open the song",
-          "Or write a blessing for the AI singer to deliver",
+          "Or write a blessing for the singer to deliver",
           "Let the spoken moment flow naturally into the music"
         ],
         "demo": {
@@ -184,7 +184,7 @@
   "OurProducts": {
     "eyebrow": "Our Products",
     "title": "The Complete Personalized Gift",
-    "description": "Turn one personal story into a complete personalized music gift: an AI custom song, a shareable lyric video, and printable wall art—ready to send for birthdays, weddings, anniversaries, and once-in-a-lifetime moments.",
+    "description": "Turn one personal story into a complete personalized music gift: a custom song, a shareable lyric video, and printable wall art—ready to send for birthdays, weddings, anniversaries, and once-in-a-lifetime moments.",
     "items": {
       "customSong": {
         "label": "Signature",
@@ -222,7 +222,7 @@
     "cases": [
       {
         "title": "Ready in 2 Minutes",
-        "description": "Answer a few simple questions and watch our AI instantly transform your memories into a custom song sample in just 2 minutes. No musical skills required.",
+        "description": "Answer a few simple questions and watch your memories transform into a custom song sample in just 2 minutes. No musical skills required.",
         "image": "/placeholder.webp",
         "icon": "Zap"
       },
@@ -234,7 +234,7 @@
       },
       {
         "title": "Premium Quality, Better Price",
-        "description": "Why pay more for the same magic? We offer top-tier AI songwriting and studio-quality generation at the most competitive price on the market, giving you premium value for less.",
+        "description": "Why pay more for the same magic? We offer top-tier songwriting and studio-quality production at the most competitive price on the market, giving you premium value for less.",
         "image": "/placeholder.webp",
         "icon": "CircleDollarSign"
       },
@@ -308,7 +308,7 @@
       {
         "icon": "speed",
         "title": "From Memories to Music in 2 Minutes",
-        "description": "Why wait a whole week for your anniversary or birthday gift? Our next-gen AI pipeline allows you to create a custom song sample in just 2 minutes. Perfect for last-minute lifesavers and instant emotional impacts."
+        "description": "Why wait a whole week for your anniversary or birthday gift? Our instant creation process lets you create a custom song sample in just 2 minutes. Perfect for last-minute lifesavers and instant emotional impacts."
       },
       {
         "icon": "edits",
@@ -335,7 +335,7 @@
     "items": [
       {
         "question": "How does SendTheSong work?",
-        "answer": "It’s pure magic. Just tell us your story by answering a few simple questions, choose your favorite music genre, and our AI will craft a custom song instantly. You will get a free 60-second studio-quality preview. If you love it, unlock the full song and get access to our free video and print editors!"
+        "answer": "It’s pure magic. Just tell us your story by answering a few simple questions, choose your favorite music genre, and we will craft a custom song instantly. You will get a free 60-second studio-quality preview. If you love it, unlock the full song and get access to our free video and print editors!"
       },
       {
         "question": "What makes you different from other custom song platforms?",
@@ -362,18 +362,18 @@
         "answer": "We keep it completely frictionless. You don't even need to register to start crafting your preview! We use a \"lazy registration\" system - simply enter your email to listen to your preview, and a guest account is silently created for you. You can sign in via Google or Email later anytime."
       },
       {
-        "question": "What if my song generation gets stuck?",
-        "answer": "Our next-gen AI pipeline is designed to be reliable, but network glitches can happen. If it gets stuck, refresh the page. If the issue persists, contact support and we will review the issue within 3 business days."
+        "question": "What if my song creation gets stuck?",
+        "answer": "Our creation process is designed to be reliable, but network glitches can happen. If it gets stuck, refresh the page. If the issue persists, contact support and we will review the issue within 3 business days."
       }
     ]
   },
   "CTA": {
     "title": "Send A Custom Song They’ll Cherish Forever",
-    "description": "Tell us your story. Our AI instantly transforms your memories into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.",
+    "description": "Tell us your story. Your memories are instantly transformed into a studio-quality <strong>custom song</strong>. Create and <strong>send a song</strong> that makes the perfect <strong>personalized music gift</strong> for birthdays, weddings, or anniversaries.",
     "button": "Create Your Song",
     "trustText": "Made for unforgettable moments",
     "features": {
-      "deploy": "🎵 Studio-Quality AI Song",
+      "deploy": "🎵 Studio-Quality Custom Song",
       "production": "🎁 Personalized Gift Ready",
       "updates": "⚡ Instant Free Preview",
       "i18n": "💌 Easy to Send & Share"
