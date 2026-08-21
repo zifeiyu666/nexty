@@ -23,7 +23,7 @@
     "freeNow": "Free Now", "from": "From", "interactiveHint": "Hover to preview and open the studio", "automaticHint": "Add automatically with eligible checkout"
   },
   "addOns": {
-    "video": {"title":"Cinematic Music Video","description":"Transform your custom song into a visual story with your own memories.","cta":"Open video studio","suffix":"per video","promo":"FREE ADD-ON"},
+    "video": {"title":"Cinematic Lyric Video","description":"Transform your custom song into a visual story with your own memories.","cta":"Open video studio","suffix":"per video","promo":"FREE ADD-ON"},
     "wallArt": {"title":"Digital Lyrics Wall Art","description":"A high-resolution design of your custom song lyrics, ready to download, print, and frame.","cta":"Open wall art studio","suffix":"per print","promo":"FREE ADD-ON"},
     "mp3": {"title":"Studio-Quality MP3","description":"Download your custom song in high quality, keep it offline, and play it on any device.","suffix":"per song","promo":"FREE ADD-ON"}
   },

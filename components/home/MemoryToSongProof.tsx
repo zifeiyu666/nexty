@@ -330,10 +330,10 @@ const giftOutputs = [
     alt: "Private custom song sharing page",
   },
   {
-    label: "Music video",
+    label: "Lyric video",
     icon: Video,
     image: "/steps/music-video.webp",
-    alt: "Custom song music video editor",
+    alt: "Custom song lyric video editor",
   },
   {
     label: "Printable lyric art",

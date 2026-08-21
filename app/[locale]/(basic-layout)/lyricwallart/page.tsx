@@ -26,6 +26,7 @@ export async function generateMetadata({
     images: ["/images/blog/custom-song-lyric-gifts/custom-song-lyric-gifts-cover.webp"],
     locale: locale as Locale,
     path: "/lyricwallart",
+    noIndex: true,
   });
 }
 

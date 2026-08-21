@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 const verificationRetryDelays = [0, 1000, 2000, 4000, 6000];
 
@@ -268,6 +268,21 @@ function SuccessContent() {
     searchParams,
     retryNonce,
   ]);
+
+  // Google tag (gtag.js) event: fire the Google Ads purchase conversion
+  // exactly once, after the payment has been confirmed as successful.
+  const conversionTracked = useRef(false);
+  useEffect(() => {
+    if (status !== "success" || conversionTracked.current) return;
+    const w = window as Window & {
+      gtag?: (...args: unknown[]) => void;
+    };
+    if (typeof w.gtag !== "function") return;
+    conversionTracked.current = true;
+    w.gtag("event", "ads_conversion_PURCHASE_1", {
+      // <event_parameters>
+    });
+  }, [status]);
 
   const fadeIn: Variants = {
     hidden: { opacity: 0, y: 10 },

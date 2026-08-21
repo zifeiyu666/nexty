@@ -106,7 +106,7 @@
         {"name": "Canciones de cumpleaños", "href": "/occasions/custom-happy-birthday-song", "description": "Crea una canción de cumpleaños con nombres, historias y recuerdos."},
         {"name": "Canciones de aniversario", "href": "/occasions/anniversary", "description": "Convierte vuestra historia en una canción de aniversario para escuchar una y otra vez."},
         {"name": "Regalos musicales personalizados", "href": "/music/personalized-gift", "description": "Descubre canciones, vídeos y recuerdos personalizados para amantes de la música."},
-        {"name": "Regalos con letras personalizadas", "href": "/free-custom-song-lyric-gifts", "description": "Convierte letras personalizadas en láminas imprimibles y recuerdos únicos."}
+        {"name": "Regalos con letras personalizadas", "href": "/custom-song-lyrics-wall-art", "description": "Convierte letras personalizadas en láminas imprimibles y recuerdos únicos."}
       ]}
     ]
   },
@@ -154,7 +154,7 @@
             {"name": "Canciones para desear una pronta recuperación", "href": "/occasions/get-well-soon"},
             {"name": "Regalos musicales personalizados", "href": "/music/personalized-gift"},
             {"name": "Listas de reproducción para regalar", "href": "/playlists"},
-            {"name": "Regalos con letras personalizadas", "href": "/free-custom-song-lyric-gifts"}
+            {"name": "Regalos con letras personalizadas", "href": "/custom-song-lyrics-wall-art"}
           ]
         },
         {

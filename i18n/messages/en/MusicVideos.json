@@ -1,12 +1,12 @@
 {
   "meta": {
-    "title": "Music Videos",
-    "description": "Browse every generated music video version for your songs."
+    "title": "Lyric Videos",
+    "description": "Browse every generated lyric video version for your songs."
   },
   "hero": {
-    "badge": "Music Videos",
+    "badge": "Lyric Videos",
     "title": "Generated MV Versions",
-    "description": "Browse every rendered music video, preview completed exports, and jump back to the source song when you want to create another version."
+    "description": "Browse every rendered lyric video, preview completed exports, and jump back to the source song when you want to create another version."
   },
   "stats": {
     "totalVideos": "Total videos",
@@ -26,7 +26,7 @@
   },
   "empty": {
     "noVideos": {
-      "title": "No music videos yet",
+      "title": "No lyric videos yet",
       "description": "Open a finalized song, bind photos to the lyrics, and generate a vertical MV. Every render will appear here as its own version."
     },
     "noMatches": {

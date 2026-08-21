@@ -97,7 +97,7 @@
   "HowItWorks": {
     "eyebrow": "How It Works",
     "title": "From one memory to a tear-worthy song in minutes",
-    "description": "Create a custom song, preview for free, then unlock the full gift bundle—with a music video and printable lyric art—to send the song in style.",
+    "description": "Create a custom song, preview for free, then unlock the full gift bundle—with a lyric video and printable lyric art—to send the song in style.",
     "steps": {
       "story": {
         "title": "Tell Us Your Story",
@@ -110,11 +110,11 @@
       },
       "gift": {
         "title": "Unleash the Ultimate Gift",
-        "description": "Unlock the full <strong>custom song</strong> and get a free custom <strong>music video</strong> plus customizable <strong>wall art</strong> poster combo. Send it privately or post on socials to watch them cry tears of joy."
+        "description": "Unlock the full <strong>custom song</strong> and get a free custom <strong>lyric video</strong> plus customizable <strong>wall art</strong> poster combo. Send it privately or post on socials to watch them cry tears of joy."
       },
       "deliver": {
         "title": "Share the Surprise Anywhere",
-        "description": "Send the finished song privately, pair it with a <strong>music video</strong>, or print <strong>wall art</strong> lyrics to turn one memory into a gift they can replay and keep."
+        "description": "Send the finished song privately, pair it with a <strong>lyric video</strong>, or print <strong>wall art</strong> lyrics to turn one memory into a gift they can replay and keep."
       }
     }
   },
@@ -173,9 +173,9 @@
     }
   },
   "WallArtGallery": {
-    "eyebrow": "Wall Art",
-    "title": "Your Story, Beautifully Framed",
-    "description": "A first look at lyric wall art made from real stories. Tap any piece to see it up close.",
+    "eyebrow": "More Than a Song",
+    "title": "One Story. A Gift in Every Form.",
+    "description": "Turn one personal story into a song they can hear, a lyric video they can share, and lyric art they can keep. Tap any piece to see it up close.",
     "wallArtCta": "Explore custom lyrics wall art",
     "posterCta": "Try the lyric poster maker",
     "imageAlt": "Personalized lyric wall art preview {index}",
@@ -184,7 +184,7 @@
   "OurProducts": {
     "eyebrow": "Our Products",
     "title": "The Complete Personalized Gift",
-    "description": "Turn one personal story into a complete personalized music gift: an AI custom song, a shareable music video, and printable wall art—ready to send for birthdays, weddings, anniversaries, and once-in-a-lifetime moments.",
+    "description": "Turn one personal story into a complete personalized music gift: an AI custom song, a shareable lyric video, and printable wall art—ready to send for birthdays, weddings, anniversaries, and once-in-a-lifetime moments.",
     "items": {
       "customSong": {
         "label": "Signature",
@@ -196,11 +196,11 @@
       },
       "videoGift": {
         "label": "Add-on",
-        "title": "Music Video Gift",
+        "title": "Lyric Video Gift",
         "price": "From $23.99",
-        "description": "Pair your custom song with photos, lyric scenes, and emotional video templates. A music video gift is easy to share by text, email, or social media.",
+        "description": "Pair your custom song with photos, synced lyric scenes, and emotional video templates. A lyric video gift is easy to share by text, email, or social media.",
         "cta": "Create video styles",
-        "imageAlt": "Personalized music video gift with family photo and custom song lyrics"
+        "imageAlt": "Personalized lyric video gift with family photo and custom song lyrics"
       },
       "wallArt": {
         "label": "Add-on",
@@ -246,13 +246,13 @@
       },
       {
         "title": "Free Custom Wall Art & Video Templates",
-        "description": "Get way more than just audio. Every song comes packed with a massive library of free music video and printable wall art templates to create the ultimate personalized music gift combo.",
+        "description": "Get way more than just audio. Every song comes packed with a massive library of free lyric video and printable wall art templates to create the ultimate personalized music gift combo.",
         "image": "/placeholder.webp",
         "icon": "Palette"
       },
       {
         "title": "Built-in Personalization Editors",
-        "description": "Take complete control. Use our intuitive interactive editors to fully customize your music video or layout your wall art lyrics. Add your personal photos, dates, and love notes effortlessly.",
+        "description": "Take complete control. Use our intuitive interactive editors to fully customize your lyric video or layout your wall art lyrics. Add your personal photos, dates, and love notes effortlessly.",
         "image": "/placeholder.webp",
         "icon": "SlidersHorizontal"
       }
@@ -289,7 +289,7 @@
         "us": "Unlimited edits with complete control"
       },
       {
-        "feature": "Free Music Video",
+        "feature": "Free Lyric Video",
         "songfinch": "Not included",
         "us": "Included free with customizable templates"
       },
@@ -318,7 +318,7 @@
       {
         "icon": "bundle",
         "title": "A Complete Personalized Music Gift Bundle",
-        "description": "A song is great, but a multimedia memory is legendary. Every unlocked track comes with free customizable music video creators and printable wall art templates. It's a complete personalized music gift ecosystem that Songfinch simply doesn't offer."
+        "description": "A song is great, but a multimedia memory is legendary. Every unlocked track comes with free customizable lyric video templates and printable wall art templates. It's a complete personalized music gift ecosystem that Songfinch simply doesn't offer."
       }
     ]
   },
@@ -339,7 +339,7 @@
       },
       {
         "question": "What makes you different from other custom song platforms?",
-        "answer": "We don't just give you an audio file. We offer the most competitive pricing on the market, plus every song unlocks an unlimited library of free, customizable music video and printable wall art templates. You can use our built-in interactive editors to personalize them with your own photos and love notes."
+        "answer": "We don't just give you an audio file. We offer the most competitive pricing on the market, plus every song unlocks an unlimited library of free, customizable lyric video and printable wall art templates. You can use our built-in interactive editors to personalize them with your own photos and love notes."
       },
       {
         "question": "Can I edit the lyrics or change the music genre?",
@@ -355,7 +355,7 @@
       },
       {
         "question": "How long are my custom songs stored?",
-        "answer": "Your purchased tracks, custom music videos, and wall art layouts are stored on your account securely and indefinitely. You can log in to stream, replay, or re-download them in high-quality MP3 format at any time."
+        "answer": "Your purchased tracks, custom lyric videos, and wall art layouts are stored on your account securely and indefinitely. You can log in to stream, replay, or re-download them in high-quality MP3 format at any time."
       },
       {
         "question": "What are the login requirements?",

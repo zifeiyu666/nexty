@@ -41,7 +41,7 @@ const productImages: Record<
 const productHrefs: Record<(typeof productKeys)[number], string> = {
   customSong: "/create-song",
   videoGift: "/music/personalized-gift",
-  wallArt: "/free-custom-song-lyric-gifts",
+  wallArt: "/custom-song-lyrics-wall-art",
 };
 
 const resetProductMagnet = (card: HTMLElement) => {

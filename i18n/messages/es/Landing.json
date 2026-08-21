@@ -94,7 +94,7 @@
   "HowItWorks": {
     "eyebrow": "Cómo funciona",
     "title": "De un recuerdo a una canción emocionante en pocos minutos",
-    "description": "Crea una canción personalizada, escucha una muestra gratis y desbloquea el regalo completo, con vídeo musical y arte de letras imprimible, para enviar la canción con estilo.",
+    "description": "Crea una canción personalizada, escucha una muestra gratis y desbloquea el regalo completo, con un vídeo con letras y arte de letras imprimible, para enviar la canción con estilo.",
     "steps": {
       "story": {
         "title": "Cuéntanos vuestra historia",
@@ -107,11 +107,11 @@
       },
       "gift": {
         "title": "Desbloquea el regalo completo",
-        "description": "Obtén la <strong>canción personalizada</strong> completa y crea un <strong>vídeo musical</strong> o una <strong>lámina con la letra</strong> usando nuestras plantillas."
+        "description": "Obtén la <strong>canción personalizada</strong> completa y crea un <strong>vídeo con letras</strong> o una <strong>lámina con la letra</strong> usando nuestras plantillas."
       },
       "deliver": {
         "title": "Compártela como prefieras",
-        "description": "Envía la canción en privado, acompáñala con un <strong>vídeo musical</strong> o imprime una <strong>lámina con la letra</strong> para convertir un recuerdo en un regalo que podrán conservar."
+        "description": "Envía la canción en privado, acompáñala con un <strong>vídeo con letras</strong> o imprime una <strong>lámina con la letra</strong> para convertir un recuerdo en un regalo que podrán conservar."
       }
     }
   },
@@ -170,9 +170,9 @@
     }
   },
   "WallArtGallery": {
-    "eyebrow": "Arte de pared",
-    "title": "Tu historia, bellamente enmarcada",
-    "description": "Un primer vistazo al arte de letras creado a partir de historias reales. Toca cualquier pieza para verla de cerca.",
+    "eyebrow": "Más que una canción",
+    "title": "Una historia. Un regalo en cada formato.",
+    "description": "Convierte una historia personal en una canción para escuchar, un vídeo con letras para compartir y un arte con letras para conservar. Toca cualquier pieza para verla de cerca.",
     "wallArtCta": "Explorar arte de letras personalizado",
     "posterCta": "Probar el creador de pósteres",
     "imageAlt": "Vista previa de arte de letras personalizado {index}",
@@ -193,11 +193,11 @@
       },
       "videoGift": {
         "label": "Complemento",
-        "title": "Vídeo musical personalizado",
+        "title": "Vídeo con letras personalizado",
         "price": "Desde $23.99",
         "description": "Combina la canción con fotos, letras sincronizadas y plantillas emotivas. Compártelo por mensaje, correo o redes sociales.",
         "cta": "Crear un vídeo",
-        "imageAlt": "Vídeo musical personalizado con una foto familiar y la letra de una canción"
+        "imageAlt": "Vídeo con letras personalizado con una foto familiar y la letra de una canción"
       },
       "wallArt": {
         "label": "Complemento",
@@ -286,7 +286,7 @@
         "us": "Ediciones incluidas"
       },
       {
-        "feature": "Vídeo musical",
+        "feature": "Vídeo con letras",
         "songfinch": "No incluido",
         "us": "Plantillas personalizables disponibles"
       },

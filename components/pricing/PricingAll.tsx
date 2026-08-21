@@ -151,7 +151,7 @@ const addOns: Array<InteractiveAddOn | StaticAddOn> = [
     originalPrice: "$23.99",
     promoLabel: "FREE ADD-ON",
     suffix: "per video",
-    title: "Cinematic Music Video",
+    title: "Cinematic Lyric Video",
     trigger: "music-video",
   },
   {
