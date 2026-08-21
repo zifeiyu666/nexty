@@ -326,10 +326,10 @@ export default function StructuredSongBrief({
         event.preventDefault();
         saveBriefAndStart();
       }}
-      className={`w-full max-w-[58rem] rounded-[1rem] p-3 text-left backdrop-blur-[5px] sm:p-3.5 ${
+      className={`w-full max-w-[58rem] rounded-[1rem] p-3 text-left backdrop-blur-[10px] sm:p-3.5 ${
         isLetter
           ? "border border-[#d9bfb2] bg-[#fffaf2]/94 shadow-[0_28px_80px_rgba(75,43,31,0.18)]"
-          : "bg-white/[0.14]"
+          : "bg-black/[0.14]"
       }`}
     >
       <p

@@ -12,19 +12,59 @@
   position: absolute;
   display: block;
   border-radius: 999px;
+  min-width: 3px;
+  min-height: 3px;
   background: #f4d2a0;
-  box-shadow: 0 0 10px 2px rgba(244, 210, 160, 0.34);
+  box-shadow: 0 0 13px 3px rgba(244, 210, 160, 0.52);
   animation: hero-particle-drift ease-in-out infinite;
   will-change: transform, filter;
 }
 
 .hero-particle-coral {
   background: #e85b4c;
-  box-shadow: 0 0 12px 2px rgba(224, 65, 50, 0.38);
+  box-shadow: 0 0 15px 3px rgba(224, 65, 50, 0.58);
 }
 
+.hero-particle-field::before,
+.hero-particle-field::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(26px);
+  animation: hero-particle-glow 6s ease-in-out infinite;
+}
+
+.hero-particle-field::before {
+  left: 8%;
+  top: 18%;
+  width: 12rem;
+  height: 12rem;
+  background: radial-gradient(circle, rgba(244, 210, 160, 0.22), transparent 68%);
+}
+
+.hero-particle-field::after {
+  right: 10%;
+  bottom: 16%;
+  width: 16rem;
+  height: 16rem;
+  background: radial-gradient(circle, rgba(224, 65, 50, 0.18), transparent 70%);
+  animation-delay: -2.8s;
+}
+
+@keyframes hero-particle-glow {
+  0%, 100% { opacity: 0.45; transform: scale(0.86); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+
+
+
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-particle { animation: none; }
+  .hero-particle,
+  .hero-particle-field::before,
+  .hero-particle-field::after { animation: none; }
 }
 
 @plugin 'tailwindcss-animate';
@@ -1021,7 +1061,7 @@
 }
 
 .song-message-note {
-  position: relative;
+  position: absolute;
   display: inline-block;
   padding: 0.7rem 1.35rem 0.8rem;
   color: #fffaf4;
@@ -1067,11 +1107,6 @@
     padding: 0.62rem 1rem 0.7rem;
     font-size: 0.9rem;
     transform: translateX(-50%) rotate(-3deg);
-  }
-
-  .hero-song-message-note {
-    left: 0.75rem;
-    transform: rotate(-8deg);
   }
 }
 

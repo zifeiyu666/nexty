@@ -20,7 +20,7 @@ import {
 import { Link } from "@/i18n/routing";
 import { useGlobalMusicPlayer } from "@/lib/music-player/global-player-store";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight, MoveRight, Pause, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -253,7 +253,7 @@ export default function OccasionShowcase() {
     <section
       ref={sectionRef}
       id="occasions"
-      className="home-section-deep home-warm-ambient relative isolate overflow-hidden py-16 md:py-20"
+      className="home-section-deep home-warm-ambient-original relative isolate overflow-hidden py-16 md:py-20"
       aria-labelledby="occasion-showcase-heading"
     >
       <div
@@ -261,15 +261,27 @@ export default function OccasionShowcase() {
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(18,11,9,0.42)_72%,rgba(18,11,9,0.72)_100%)]"
       />
       <div className="home-container relative">
-        <div className="home-section-header">
-          <p className="home-eyebrow">{t("eyebrow")}</p>
-          <h2
-            id="occasion-showcase-heading"
-            className="home-title hero-title-warm"
+        <div className="mb-9 flex items-end justify-between gap-6 text-left md:mb-11">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+              {t("eyebrow")}
+            </p>
+            <h2
+              id="occasion-showcase-heading"
+              className="mt-3 text-balance font-sans text-3xl font-black leading-[1.05] tracking-tight text-white sm:text-4xl md:text-5xl"
+            >
+              {t("title")}
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/65 md:text-lg">
+              {t("description")}
+            </p>
+          </div>
+          <Link
+            href="/music/personalized-gift"
+            className="hidden shrink-0 items-center gap-2 pb-1 text-sm font-semibold text-white/80 transition hover:text-white md:inline-flex"
           >
-            {t("title")}
-          </h2>
-          <p className="home-description text-white/70">{t("description")}</p>
+            See all occasions <ArrowRight className="size-4" />
+          </Link>
         </div>
       </div>
 
@@ -332,7 +344,7 @@ export default function OccasionShowcase() {
       >
         <div
           ref={trackRef}
-          className="flex cursor-grab gap-4 pb-8 pl-8 pt-3 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.33,1,0.68,1)] motion-reduce:transition-none active:cursor-grabbing sm:gap-5 sm:pl-10 lg:gap-5"
+          className="flex cursor-grab gap-4 pb-8 pl-0 pt-3 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.33,1,0.68,1)] motion-reduce:transition-none active:cursor-grabbing sm:gap-5 sm:pl-0 lg:gap-6"
         >
           {localizedCards.map((occasion, index) => (
             <OccasionPhotoCard
@@ -391,10 +403,10 @@ function OccasionPhotoCard({
     <article
       ref={refCallback}
       className={cn(
-        "group relative flex shrink-0 select-none flex-col rounded-2xl border border-[#efe3d3] bg-white p-3 text-left shadow-[0_18px_45px_rgba(0,0,0,0.32)]",
+        "group relative flex shrink-0 select-none flex-col overflow-hidden rounded-[1.35rem] border border-white/[0.06] bg-[#1c1c1b] text-left shadow-[0_18px_45px_rgba(0,0,0,0.34)]",
         mobile
-          ? "h-[21.5rem] w-full"
-          : "h-[22rem] w-[min(68vw,16rem)] sm:h-[22.75rem] sm:w-[16.75rem] lg:w-[17.25rem]",
+          ? "h-[20rem] w-full"
+          : "h-[20rem] w-[min(62vw,14.5rem)] sm:h-[21rem] sm:w-[15rem] lg:h-[22rem] lg:w-[15.75rem]",
         isActive && "z-10",
       )}
       style={
@@ -406,39 +418,32 @@ function OccasionPhotoCard({
             } as CSSProperties)
       }
     >
-      <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[linear-gradient(115deg,rgba(255,255,255,0.55),transparent_36%,rgba(92,55,27,0.06))]" />
-      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#e6d2bd]">
+      <div className="absolute inset-0 bg-[#e6d2bd]">
         <Image
           src={occasion.image}
           alt={`${occasion.title} custom song occasion`}
           fill
           sizes="(min-width: 1024px) 18rem, (min-width: 640px) 18rem, 88vw"
-          className="object-cover saturate-[0.96] transition-transform duration-700 ease-out group-hover:scale-[1.07] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="object-cover saturate-[0.92] transition-transform duration-700 ease-out group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/46 to-transparent" />
-        {/* <span className="absolute left-3 top-3 rounded-full bg-[#232321]/82 px-3 py-1 text-xs font-bold text-[#ffd8e4] shadow-sm backdrop-blur">
-          {occasion.index}
-        </span> */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,8,0.1)_0%,transparent_38%,rgba(8,8,8,0.82)_100%)]" />
       </div>
 
-      <div className="relative flex flex-1 flex-col px-1 pb-1 pt-4">
-        <p className="text-xs font-bold uppercase text-primary">
-          {occasion.title}
-        </p>
-        <h3 className="mt-2 text-[1.22rem] font-semibold leading-[1.05] text-[#251913]">
-          {occasion.tagline}
-        </h3>
-        <p className="mt-3 min-h-12 text-[12px] leading-5 text-[#655245]">
-          {occasion.description}
-        </p>
-        <Link
-          href={occasion.href}
-          className="mt-auto inline-flex items-center gap-1.5 pr-12 pt-4 text-[12px] font-bold text-primary transition hover:text-primary/80"
-          onClick={(event) => event.stopPropagation()}
-        >
-          {occasion.cta}
-          <MoveRight className="size-3.5" aria-hidden="true" />
-        </Link>
+      <div className="relative z-10 flex h-full flex-col justify-between p-4 sm:p-5">
+        {occasion.index <= "04" && (
+          <span className="w-fit rounded-md bg-white px-2.5 py-1 text-[0.68rem] font-black uppercase tracking-[0.08em] text-[#171716] shadow-sm">
+            Most popular
+          </span>
+        )}
+        <div className="mt-auto">
+          <Link
+            href={occasion.href}
+            className="block max-w-[88%] pr-3 text-lg font-black uppercase leading-[1.02] tracking-tight text-white transition hover:text-white/80 sm:text-xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {occasion.title}
+          </Link>
+        </div>
       </div>
 
       <OccasionCardPlaybackButton occasion={occasion} />
@@ -464,7 +469,7 @@ function OccasionCardPlaybackButton({ occasion }: { occasion: OccasionCard }) {
           type="button"
           aria-label={`${actionLabel}: ${sampleTrack.title}`}
           className={cn(
-            "absolute bottom-3 right-3 z-20 flex size-11 items-center justify-center rounded-full border border-[#2b2019]/10 bg-[#251913] text-white shadow-[0_14px_28px_rgba(37,25,19,0.24)] transition hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+            "absolute bottom-20 left-4 z-20 flex size-10 items-center justify-center rounded-full border border-white/15 bg-white text-[#111] shadow-[0_12px_24px_rgba(0,0,0,0.24)] transition hover:scale-105 hover:bg-primary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#231713]",
             isCurrentTrackPlaying &&
               "bg-primary shadow-[0_14px_30px_rgba(239,68,68,0.3)]",
           )}

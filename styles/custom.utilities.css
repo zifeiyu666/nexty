@@ -128,22 +128,22 @@
 }
 
 @utility home-section {
-  @apply bg-[#fffaf6] py-20 text-[#2b1710] md:py-24;
+  @apply bg-[#fffdf9] py-20 text-[#351d17] md:py-24;
 }
 
 @utility home-section-muted {
-  @apply bg-[#f7efea] py-20 text-[#2b1710] md:py-24;
+  @apply bg-[#f4e5dc] py-20 text-[#351d17] md:py-24;
 }
 
 @utility home-section-soft {
   background:
-    radial-gradient(circle at 12% 6%, rgba(255, 221, 214, 0.42), transparent 27rem),
-    linear-gradient(180deg, #fffaf6 0%, #fcf3ee 100%);
-  @apply py-20 text-[#2b1710] md:py-24;
+    radial-gradient(circle at 12% 6%, rgba(238, 187, 166, 0.2), transparent 27rem),
+    linear-gradient(180deg, #fffdf9 0%, #fffaf4 100%);
+  @apply py-20 text-[#351d17] md:py-24;
 }
 
 @utility home-section-deep {
-  @apply bg-[#231713] py-20 text-white md:py-24;
+  @apply bg-[#351d17] py-20 text-white md:py-24;
 }
 
 @utility home-warm-ambient {
@@ -163,7 +163,7 @@
       rgba(255, 205, 112, 0.12),
       transparent 26rem
     ),
-    linear-gradient(135deg, #2a1710 0%, #231713 45%, #120b09 100%);
+    linear-gradient(135deg, #43231b 0%, #351d17 45%, #24110d 100%);
 }
 
 @utility home-warm-ambient-soft {
@@ -178,11 +178,31 @@
       rgba(224, 65, 50, 0.16),
       transparent 22rem
     ),
-    linear-gradient(145deg, #2a1710 0%, #231713 50%, #120b09 100%);
+    linear-gradient(145deg, #43231b 0%, #351d17 50%, #24110d 100%);
+}
+
+@utility home-warm-ambient-original {
+  background:
+    radial-gradient(
+      circle at 16% 10%,
+      rgba(255, 167, 64, 0.24),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 82% 18%,
+      rgba(224, 65, 50, 0.2),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 54% 84%,
+      rgba(255, 205, 112, 0.12),
+      transparent 26rem
+    ),
+    linear-gradient(135deg, #2a1710 0%, #231713 45%, #120b09 100%);
 }
 
 @utility home-cta-animated-gradient {
-  background-color: #231713;
+  background-color: #351d17;
   background-image:
     radial-gradient(
       circle at var(--c5-x1) var(--c5-y1),
@@ -209,7 +229,7 @@
       rgba(35, 23, 19, 0.94) 0px,
       transparent var(--c5-s5)
     ),
-    linear-gradient(135deg, #32160f 0%, #231713 48%, #120b09 100%);
+    linear-gradient(135deg, #4a241a 0%, #351d17 48%, #24110d 100%);
   animation:
     c5-blob1 8s ease-in-out infinite,
     c5-blob2 9s ease-in-out infinite,
@@ -256,7 +276,7 @@
 }
 
 @utility home-card {
-  @apply rounded-2xl border border-[#eadbd3] bg-[#fffdfa] shadow-[0_18px_52px_rgba(74,45,32,0.08)];
+  @apply rounded-2xl border border-[#ead7cd] bg-[#fffaf4] shadow-[0_18px_52px_rgba(80,48,36,0.08)];
 }
 
 @utility home-card-hover {

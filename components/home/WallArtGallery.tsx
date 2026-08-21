@@ -129,7 +129,7 @@ export default function WallArtGallery({ images }: { images: WallArtImage[] }) {
     <section
       ref={sectionRef}
       id="wall-art-gallery"
-      className="home-section-deep overflow-hidden"
+      className="home-section-deep !bg-[#231713] overflow-hidden"
     >
       <div className="home-container">
         <div className="home-section-header">

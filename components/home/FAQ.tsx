@@ -42,7 +42,7 @@ export default function FAQ({
 
   return (
     <section
-      className="home-section-muted text-[#2b1710]"
+      className="home-section-muted !bg-[#f5eee7] text-[#2b1710]"
     >
       <div
         className="home-section-header home-container"

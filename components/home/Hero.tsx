@@ -37,13 +37,13 @@ export default function Hero() {
         className="-z-30 object-cover object-center sm:hidden"
       />
       <HeroOccasionMosaic />
-      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.82)_0%,rgba(0,0,0,0.68)_34%,rgba(0,0,0,0.44)_68%,rgba(0,0,0,0.3)_100%)]" />
+      {/* <div className="absolute inset-0 -z-20 bg-[radial-gradient(ellipse_60%_80%_at_center,rgba(0,0,0,0.8)_0%,rgba(0,0,0,0.5)_50%,rgba(0,0,0,0)_100%)]" /> */}
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,rgba(8,6,5,0.66)_0%,rgba(8,6,5,0.24)_32%,rgba(8,6,5,0.32)_66%,rgba(8,6,5,0.84)_100%)]" />
-      <div className="absolute inset-x-0 top-0 -z-20 h-32 bg-gradient-to-b from-black/46 to-transparent" />
+      {/* <div className="absolute inset-x-0 top-0 -z-20 h-32 bg-gradient-to-b from-black/46 to-transparent" /> */}
       <HeroDecorations />
 
       <div className="container mx-auto">
-        <div className="flex min-h-[700px] flex-col items-center justify-center gap-3.5 pb-9 pt-[4.5rem] text-center sm:min-h-[650px] sm:gap-4 sm:pb-12 sm:pt-24 lg:gap-5 lg:pb-16 lg:pt-28">
+        <div className="relative z-10 flex min-h-[700px] flex-col items-center justify-center gap-3.5 pb-9 pt-[4.5rem] text-center sm:min-h-[650px] sm:gap-4 sm:pb-12 sm:pt-24 lg:gap-5 lg:pb-16 lg:pt-28">
           <div className="inline-flex max-w-[88vw] items-center gap-2 rounded-full border border-white/18 bg-black/28 px-3.5 py-1.5 text-[0.68rem] uppercase tracking-[0.08em] text-white/84 shadow-[0_10px_28px_rgba(0,0,0,0.24)] backdrop-blur-md sm:px-4 sm:text-xs">
             <MessageCircleHeart className="size-4 shrink-0 text-[#f6b29d]" aria-hidden="true" />
             <span className="truncate">{t("trustBadge")}</span>
@@ -52,7 +52,7 @@ export default function Hero() {
           <div className="flex max-w-6xl flex-col items-center gap-2 sm:gap-2.5">
             <h1
               aria-label={t("title")}
-              className="z-10 text-center font-sans text-[clamp(2rem,5.6vw,4.25rem)] font-black leading-[1.1] tracking-normal text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.62)]"
+              className="z-10 text-center font-sans text-[clamp(2rem,5.6vw,4.25rem)] font-black leading-[1.1] tracking-normal text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.62)] [text-shadow:0_1px_2px_rgba(0,0,0,0.8),0_4px_12px_rgba(0,0,0,0.5)]"
             >
               <span className="block">{t("titleLine")}</span>
               <span className="block whitespace-nowrap pb-2 sm:pb-2.5">
@@ -85,8 +85,8 @@ export default function Hero() {
               dangerouslySetInnerHTML={{ __html: descriptionHtml }}
             />
           </div>
-          <div className="relative w-full max-w-[58rem] pt-3 sm:pt-4">
-            <div className="song-message-note hero-song-message-note absolute left-3 top-0 z-20 sm:left-9">
+          <div className="relative isolate w-full max-w-[58rem] pt-4 sm:pt-5">
+            <div className="song-message-note hero-song-message-note absolute top-1 -left-2 z-20 sm:-left-8">
               {t("inputLabel")}
             </div>
             <StructuredSongBrief />

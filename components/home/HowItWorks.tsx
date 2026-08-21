@@ -18,7 +18,7 @@ export default function HowItWorks() {
 
   return (
     <HowItWorksSection
-      sectionClassName="home-section-muted isolate"
+      sectionClassName="home-section-muted !bg-white isolate"
       containerClassName="max-w-7xl px-4 sm:px-6 lg:px-8"
       eyebrowClassName="home-eyebrow"
       titleClassName="home-title"

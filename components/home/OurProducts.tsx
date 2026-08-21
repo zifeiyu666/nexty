@@ -164,7 +164,7 @@ export default function OurProducts({
   };
 
   return (
-    <section id="our-products" className="home-section-muted">
+    <section id="our-products" className="home-section-muted !bg-[#f5eee7]">
       <div className="home-container">
         <div className="home-section-header">
           <p className="home-eyebrow">{t("eyebrow")}</p>
